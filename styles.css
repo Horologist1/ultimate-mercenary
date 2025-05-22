@@ -1,0 +1,793 @@
+:root {
+    --primary-color: #00f2ff;
+    --secondary-color: #ff00aa;
+    --dark-bg: #0a0a12;
+    --darker-bg: #050508;
+    --medium-bg: #121224;
+    --light-text: #e0e0ff;
+    --header-font: 'Orbitron', sans-serif;
+    --body-font: 'Roboto', sans-serif;
+    --glow-effect: 0 0 10px var(--primary-color), 0 0 20px rgba(0, 242, 255, 0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--dark-bg);
+    background-image: 
+        linear-gradient(0deg, rgba(10, 10, 18, 0.9), rgba(10, 10, 18, 0.95)),
+        url('images/cyberpunk_bg.png');
+    background-attachment: fixed;
+    background-size: cover;
+    color: var(--light-text);
+    font-family: var(--body-font);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header Styles */
+header {
+    background-color: var(--darker-bg);
+    border-bottom: 2px solid var(--primary-color);
+    padding: 20px 0;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+    margin-right: 20px;
+    filter: drop-shadow(0 0 5px var(--primary-color));
+}
+
+.title-container {
+    flex-grow: 1;
+}
+
+h1, h2 {
+    font-family: var(--header-font);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+    margin: 0;
+}
+
+header h2 {
+    font-size: 1.3rem;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+nav {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: visible; /* Cambiado de overflow-x: auto para evitar scroll */
+    padding: 5px 0; /* Añadir padding para evitar que los botones toquen los bordes */
+}
+
+nav ul {
+    display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan si no caben */
+    list-style: none;
+    padding: 10px 0; /* Aumentar el padding vertical para dar más espacio */
+    justify-content: center; /* Centrar los elementos */
+}
+
+nav ul li {
+    padding: 5px;
+    margin: 2px;
+}
+
+nav ul li a {
+    display: block;
+    padding: 5px 15px;
+    color: var(--light-text);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+}
+
+nav ul li a:hover {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    text-shadow: var(--glow-effect);
+}
+
+nav ul li a i {
+    margin-right: 5px;
+}
+
+/* Section Styles */
+.section {
+    margin-bottom: 40px;
+    background-color: var(--medium-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.section-header {
+    background-color: var(--darker-bg);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.section-header h2 {
+    font-size: 1.6rem;
+    margin: 0;
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px rgba(255, 0, 170, 0.5);
+}
+
+.section-header h2 i {
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.section-content {
+    padding: 20px;
+}
+
+/* Content formatting */
+h3 {
+    font-family: var(--header-font);
+    color: var(--primary-color);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+}
+
+.character-card {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.character-image {
+    width: 200px;
+    height: 250px;
+    object-fit: cover;
+    object-position: center top;
+    border-right: 1px solid rgba(0, 242, 255, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.character-image:hover {
+    transform: scale(1.02);
+}
+
+/* Ajuste específico para la doctora Naomi */
+.doctora-image {
+    object-position: 35% 0;
+    object-fit: cover;
+    width: 200px;
+    height: 250px;
+}
+
+.character-info {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.character-name {
+    color: var(--secondary-color);
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.character-role {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.character-description {
+    font-size: 0.9rem;
+}
+
+.dialogue {
+    font-style: italic;
+    margin: 10px 0;
+    padding: 10px 15px;
+    border-left: 2px solid var(--primary-color);
+    background-color: rgba(0, 242, 255, 0.1);
+}
+
+.test-card {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 30px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.test-title {
+    font-family: var(--header-font);
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 0, 170, 0.3);
+    padding-bottom: 5px;
+}
+
+.test-image {
+    width: 100%;
+    border-radius: 5px;
+    margin: 10px 0 20px 0;
+    height: 400px; /* Altura fija para todas las imágenes */
+    object-fit: cover; /* Llenar el contenedor manteniendo proporciones */
+    object-position: center; /* Centrar la imagen */
+}
+
+.test-section {
+    margin-bottom: 15px;
+}
+
+.test-section-title {
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Shop tables */
+.shop-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.shop-table th {
+    background-color: rgba(0, 242, 255, 0.2);
+    color: var(--light-text);
+    text-align: left;
+    padding: 10px;
+    font-family: var(--header-font);
+    font-size: 0.9rem;
+}
+
+.shop-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(224, 224, 255, 0.1);
+}
+
+.shop-table tr:hover {
+    background-color: rgba(0, 242, 255, 0.1);
+}
+
+.price {
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+/* Character sheet */
+.character-sheet {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+}
+
+.sheet-header {
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.stat-name {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+    border-top: 1px solid rgba(0, 242, 255, 0.3);
+    font-size: 0.8rem;
+    color: rgba(224, 224, 255, 0.7);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .logo {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .character-card {
+        flex-direction: column;
+    }
+    
+    .character-image {
+        width: 100%;
+        height: 300px;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+    }
+}
+
+/* Animations */
+@keyframes glow {
+    0% { text-shadow: 0 0 5px var(--primary-color); }
+    50% { text-shadow: 0 0 15px var(--primary-color), 0 0 30px rgba(0, 242, 255, 0.5); }
+    100% { text-shadow: 0 0 5px var(--primary-color); }
+}
+
+header h1 {
+    animation: glow 2s infinite;
+}
+
+/* Interactive elements */
+.interactive-element {
+    background-color: rgba(255, 0, 170, 0.1);
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.interactive-element h3 {
+    color: var(--secondary-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.button {
+    display: inline-block;
+    background-color: var(--darker-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--header-font);
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.button:hover {
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* Tabs for character sheet */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted var(--primary-color);
+    cursor: help;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--darker-bg);
+    color: var(--light-text);
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.9rem;
+    border: 1px solid var(--primary-color);
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Gallery view */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.gallery-item {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 200px; /* Altura consistente */
+    object-fit: cover; /* Llenar el contenedor manteniendo proporciones */
+    object-position: center; /* Centrar la imagen */
+    background-color: rgba(0, 0, 0, 0.2); /* Fondo sutil para imágenes transparentes */
+}
+
+.gallery-caption {
+    padding: 10px;
+    background-color: var(--darker-bg);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Special elements */
+.highlight-box {
+    background-color: rgba(255, 0, 170, 0.1);
+    border-left: 3px solid var(--secondary-color);
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.data-terminal {
+    font-family: monospace;
+    background-color: #000;
+    color: var(--primary-color);
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    box-shadow: inset 0 0 10px var(--primary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.data-terminal::before {
+    content: "OCE TERMINAL ACCESS";
+    display: block;
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.glitch-text {
+    position: relative;
+    color: var(--secondary-color);
+    text-shadow: 0 0 5px var(--secondary-color);
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+}
+
+.glitch-text::before {
+    color: var(--primary-color);
+    animation: glitch-anim-1 0.4s infinite;
+}
+
+.glitch-text::after {
+    color: var(--secondary-color);
+    animation: glitch-anim-2 0.3s infinite;
+}
+
+@keyframes glitch-anim-1 {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(1px, -1px); }
+}
+
+@keyframes glitch-anim-2 {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(-1px, 1px); }
+}
+
+/* Estilos para el modal de imagen */
+.image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-modal.active {
+    display: flex;
+}
+
+.modal-content {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 20px var(--primary-color);
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--primary-color);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+/* Botón de volver arriba */
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 99;
+}
+
+.back-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4);
+}
+
+/* Estilos para el editor de la tienda */
+.add-item-button {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    margin: 20px auto;
+}
+
+.add-item-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(255, 0, 170, 0.4);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: rgba(40, 40, 40, 0.95);
+    margin: 10% auto;
+    padding: 25px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 0 30px rgba(255, 0, 170, 0.3);
+    color: var(--light-text);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: var(--secondary-color);
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--light-text);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 10px;
+    background-color: rgba(30, 30, 30, 0.8);
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    font-family: var(--body-font);
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn {
+    background-color: #333;
+    color: var(--light-text);
+}
+
+.cancel-btn:hover {
+    background-color: #555;
+}
+
+.save-btn {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #ff1a8c;
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 20px;
+    border-left: 4px solid var(--secondary-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}

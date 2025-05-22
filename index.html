@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mercenary: La Forja del Acero Callejero</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="styles_links.css">
+    <link rel="stylesheet" href="styles_test_summary.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chat-publico.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>La Forja del Acero Callejero</h2>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="#facciones"><i class="fas fa-users"></i> Facciones</a></li>
+                    <li><a href="#programa"><i class="fas fa-tv"></i> El Programa</a></li>
+                    <li><a href="concursantes_numerados.html"><i class="fas fa-user-secret"></i> Concursantes</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle"><i class="fas fa-gamepad"></i> Pruebas <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="prueba0.html"><i class="fas fa-arrow-right"></i> Prueba 0: La Caída</a></li>
+                            <li><a href="prueba1.html"><i class="fas fa-arrow-right"></i> Prueba 1: Obstáculos</a></li>
+                            <li><a href="prueba2.html"><i class="fas fa-arrow-right"></i> Prueba 2: Cosecha</a></li>
+                            <li><a href="prueba3.html"><i class="fas fa-arrow-right"></i> Prueba 3: Entrega</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#tienda"><i class="fas fa-store"></i> Tienda de Méritos</a></li>
+                    <li><a href="character-sheet.html"><i class="fas fa-id-card"></i> Fichas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="introduccion" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-info-circle"></i> Introducción y Ambientación</h2>
+                </div>
+                <div class="section-content">
+                    <h3>Ambientación</h3>
+                    <p>Neo-Kyoto, 2127 DA. Un mundo que ha sobrevivido a los eventos de Edgerunners y que ahora se desliza lentamente hacia el transhumanismo oscuro que caracteriza a Eclipse Phase. En esta época, la tecnología de transferencia de conciencia o "resleeving" existe, pero es extremadamente rara y costosa, disponible solo para los ultra-ricos o como herramienta experimental militar.</p>
+                    
+                    <h3>Premisa</h3>
+                    <p>100 individuos desesperados, endeudados o criminales, son "reclutados" (a menudo contra su voluntad) para participar en un reality show de combate mortal organizado por OmniCorp Entertainment. El objetivo oficial: forjar al "Samurái Callejero Definitivo", un mercenario perfecto para las guerras corporativas clandestinas.</p>
+                    
+                    <p>Los concursantes ganan Puntos de Mérito (PM) completando pruebas, que pueden canjear por equipo, implantes, e incluso por la remota posibilidad de comenzar una nueva vida. La mayoría serán eliminados—permanentemente.</p>
+                    
+                    <div class="data-terminal">
+BIENVENIDOS A ULTIMATE MERCENARY
+TRANSMISIÓN EN DIRECTO: 2.5 BILLONES DE ESPECTADORES
+RATING ACTUAL: 9.7/10
+APUESTAS ACTIVAS: 16.3 MILLONES DE CRÉDITOS
+CONCURSANTES RESTANTES: 100/100
+</div>
+
+                    <img src="images/welcome_hall.png" alt="Hangar de bienvenida" class="full-width-image">
+                </div>
+            </section>
+
+            <!-- Chat público colocado entre Introducción y Facciones -->
+            <div class="chat-section">
+                <div class="live-chat-container-outer">
+                    <div class="live-chat-wrapper">
+                        <div class="live-chat-header">
+                            <h3>Canal de Audiencia En Vivo</h3>
+                            <div class="live-indicator">
+                                <div class="live-dot"></div>
+                                <span>EN DIRECTO</span>
+                            </div>
+                        </div>
+                        <div id="live-chat-container" class="live-chat-container">
+                            <!-- Los mensajes se insertarán aquí dinámicamente -->
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" placeholder="Envía un mensaje a los concursantes..." disabled>
+                            <button class="send-button" disabled>Enviar</button>
+                        </div>
+                    </div>
+                    <div class="live-chat-sponsor">
+                        <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="chat-sponsor-logo">
+                        <div class="sponsor-text">
+                            <p>PATROCINADO POR</p>
+                            <h3>OMNICORP ENTERTAINMENT</h3>
+                        </div>
+                        <div class="rating-box">
+                            <p>RATING ACTUAL</p>
+                            <div class="rating-value">9.7</div>
+                            <p class="spectators">2.5 BILLONES DE ESPECTADORES</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="facciones" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Facciones y Personajes Clave</h2>
+                </div>
+                <div class="section-content">
+                    <h3>OmniCorp Entertainment (OCE)</h3>
+                    <div class="faction-card">
+                        <img src="images/oce_logo.png" alt="Logo de OmniCorp Entertainment" class="faction-logo">
+                        <div class="faction-info">
+                            <p>Conglomerado mediático global con una división especializada en "entretenimiento extremo". Rumores dicen que también es una tapadera para operaciones negras y desarrollo de tecnología militar. OCE no sólo busca entretener, sino obtener datos biomecánicos y psicológicos de combate bajo estrés extremo.</p>
+                            <p>Dentro de su estructura se ocultan múltiples sub-divisiones dedicadas a investigación prohibida, desde modificaciones genéticas hasta tecnología de transferencia mental.</p>
+                        </div>
+                    </div>
+
+                    <h3>Personajes Clave</h3>
+                    
+                    <div class="character-card">
+                        <img src="images/kaiser_new.png" alt="Kaiser Von Stroheim" class="character-image">
+                        <div class="character-info">
+                            <h4 class="character-name">Kaiser "El Emperador" Von Stroheim</h4>
+                            <div class="character-role">Anfitrión y Productor Ejecutivo</div>
+                            <p class="character-description">Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta.</p>
+                            <p class="character-description">Motivación: Ratings, poder, sadismo, y lo que él denomina "crear al guerrero definitivo".</p>
+                            <div class="dialogue">
+                                <p>"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="character-card">
+                        <img src="images/guard_ocemk2.png" alt="Mr. Kenji Tanaka" class="character-image">
+                        <div class="character-info">
+                            <h4 class="character-name">Mr. Kenji Tanaka</h4>
+                            <div class="character-role">Jefe de Adquisiciones de Talento, OCE</div>
+                            <p class="character-description">Trajeado impecablemente, Mr. Tanaka es la cara "amable" de OCE. Con una sonrisa falsa pero convincente y mirada fríamente calculadora, es él quien cierra los tratos sucios que llevan a los concursantes hasta el programa.</p>
+                            <p class="character-description">Función: Maneja la "contratación" de concursantes y otros activos de OCE, asegurándose de que todo tenga el aspecto de legalidad necesario para la transmisión pública.</p>
+                            <div class="dialogue">
+                                <p>"Le aseguro que todas nuestras operaciones son... completamente legales. ¿Los participantes? Todos son voluntarios, por supuesto. Han firmado contratos extensivos. El que algunos lo hicieran con una pistola figurativa en la cabeza es, como comprenderá, irrelevante para nuestros abogados."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="character-card">
+                        <img src="images/goliath.png" alt="Tetsuo Ox Hamada" class="character-image">
+                        <div class="character-info">
+                            <h4 class="character-name">"Ox" (Tetsuo "Ox" Hamada)</h4>
+                            <div class="character-role">Yakuza de los Dragones de Jade</div>
+                            <p class="character-description">Corpulento, con un brazo cibernético oxidado pero funcional y una mirada que destila brutalidad sin filtros. Ox representa a una de las muchas organizaciones criminales a las que los concursantes deben dinero o favores.</p>
+                            <p class="character-description">Función: Representante externo que asegura la "colaboración" de los concursantes que provienen del mundo criminal. También sirve como recordatorio de lo que espera fuera a quienes consideren abandonar.</p>
+                            <div class="dialogue">
+                                <p>"Los Dragones invertimos mucho en ti. Si mueres aquí, es negocio. Si ganas, es mejor negocio. Si intentas escapar... bueno, hay cosas peores que morir en cámara, ¿sabes?"</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-card">
+                        <img src="images/doctora_nano_thumb.png" alt="Dra. Naomi Nano McClaray" class="character-image doctora-image" data-full-image="images/doctora_nano.png">
+                        <div class="character-info">
+                            <h4 class="character-name">Dra. Naomi "Nano" McClaray</h4>
+                            <div class="character-role">Médica Jefe de OCE</div>
+                            <p class="character-description">Ex-investigadora principal en BioTech Corp, especializad en nanomedicina avanzada. Ahora supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.</p>
+                            <p class="character-description">Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes.</p>
+                            <div class="dialogue">
+                                <p>"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-card">
+                        <img src="images/director_ikari.png" alt="Director Ikari" class="character-image">
+                        <div class="character-info">
+                            <h4 class="character-name">Director Ikari</h4>
+                            <div class="character-role">Agente del Gobierno Sombra</div>
+                            <p class="character-description">Oficial de alto rango en el Ministerio de Seguridad Interna de Neo-Kyoto. Su presencia en las gradas VIP de Ultimate Mercenary es discreta pero constante.</p>
+                            <p class="character-description">El gobierno oficialmente condena el show mientras secretamente lo utiliza para probar implantes experimentales y reclutar especialistas en combate.</p>
+                            <div class="dialogue">
+                                <p>"Puedo hacer que tu historial criminal desaparezca... o que tú desaparezcas. Ambas opciones son igualmente sencillas para mí. La diferencia está en lo útil que me resultes."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="programa" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tv"></i> El Programa: Ultimate Mercenary</h2>
+                </div>
+                <div class="section-content">
+                    <h3>Funcionamiento Básico</h3>
+                    <p>Ultimate Mercenary es un programa de combate y supervivencia extrema que se desarrolla a lo largo de varias semanas. Al inicio, 100 concursantes son arrojados a una serie de pruebas diseñadas para eliminar a los más débiles rápidamente. Los supervivientes obtienen acceso a mejores recursos y enfrentan desafíos cada vez más exigentes.</p>
+
+                    <div class="two-column">
+                        <div>
+                            <h4>Puntos de Mérito (PM)</h4>
+                            <p>Los PM son la moneda del programa. Se ganan completando objetivos en las pruebas, eliminando a otros concursantes (en pruebas que lo permitan), y generando entretenimiento para la audiencia. Kaiser puede otorgar PM extra por acciones particularmente audaces o espectaculares.</p>
+                            
+                            <p>Los PM se pueden gastar en la Tienda de Méritos para adquirir equipo, información, o pequeños privilegios que mejoren las probabilidades de supervivencia.</p>
+                        </div>
+                        <div>
+                            <img src="images/terminal_tienda.png" alt="Terminal de la Tienda de Méritos" class="contained-image">
+                        </div>
+                    </div>
+
+                    <h3>Reglas de Supervivencia</h3>
+                    <div class="rules-box">
+                        <ol>
+                            <li><strong>No hay reglas fijas</strong> — Kaiser puede cambiarlas en cualquier momento para aumentar el drama.</li>
+                            <li><strong>La eliminación es permanente</strong> — Fallar una prueba, ser asesinado por otros concursantes (en pruebas PvP), o tener "baja audiencia" (Kaiser puede decidir eliminar a alguien aburrido).</li>
+                            <li><strong>Las pilas corticales son propiedad de OCE</strong> — Al morir, toda tecnología implantada pertenece a la corporación.</li>
+                            <li><strong>No hay salida</strong> — Intentar escapar se considera una violación del contrato y conlleva "consecuencias extremas".</li>
+                            <li><strong>El entretenimiento es prioritario</strong> — Un concursante que genere suficiente interés podría recibir "privilegios especiales".</li>
+                        </ol>
+                    </div>
+
+                    <h3>Sobre las "Segundas Oportunidades"</h3>
+                    <p>El gran premio final es el "resleeving": la posibilidad de transferir la conciencia a un nuevo cuerpo si el original es destruido. Excepcionalmente, un concursante eliminado pero muy entretenido podría ser resleeveado en una funda sintética barata con una deuda de PM masiva (una "segunda oportunidad" que es más bien una condena a servidumbre).</p>
+
+                    <div class="data-terminal">
+AVISO INTERNO OCE - CONFIDENCIAL
+LAS "SEGUNDAS OPORTUNIDADES" SON FUNDAMENTALMENTE UN EXPERIMENTO
+ÉXITO DE TRANSFERENCIA: 74%
+ESTABILIDAD PSICOLÓGICA POST-TRANSFERENCIA: 31%
+RENTABILIDAD ESTIMADA: ALTA
+</div>
+
+                    <div class="interactive-element">
+                        <h3>Calculadora de Puntos de Mérito</h3>
+                        <form id="merit-calculator">
+                            <div class="form-group">
+                                <label for="base-points">Puntos Base:</label>
+                                <input type="number" id="base-points" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="tasks-completed">Objetivos completados:</label>
+                                <input type="number" id="tasks-completed" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="bonus-points">Puntos por espectáculo:</label>
+                                <input type="number" id="bonus-points" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="penalties">Penalizaciones:</label>
+                                <input type="number" id="penalties" min="0" value="0">
+                            </div>
+                            <button type="submit" class="button">Calcular</button>
+                        </form>
+                        <div id="result-container" style="display: none;">
+                            <h4>Total de Puntos de Mérito: <span id="total-points">0</span> PM</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tienda" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-store"></i> Tienda de Méritos OCE</h2>
+                </div>
+                <div class="section-content">
+                    <p>La Tienda de Méritos OCE es el único lugar donde los concursantes pueden adquirir equipo, mejoras e información a cambio de sus duramente ganados Puntos de Mérito (PM). La disponibilidad de ciertos artículos está condicionada al nivel de "acceso" del concursante, que aumenta conforme avanza en las pruebas.</p>
+
+                    <img src="images/merit_shop.png" alt="Terminal de la Tienda de Méritos" class="full-width-image">
+
+                    <div class="tabs">
+                        <div class="tab active" data-tab="weapons">Armas</div>
+                        <div class="tab" data-tab="armor">Armaduras</div>
+                        <div class="tab" data-tab="equipment">Equipamiento</div>
+                        <div class="tab" data-tab="implants">Implantes</div>
+                        <div class="tab" data-tab="services">Servicios</div>
+                    </div>
+
+                    <div id="weapons" class="tab-content active">
+                        <h3>Armas de Combate Cuerpo a Cuerpo</h3>
+                        <table class="shop-table">
+                            <thead>
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Descripción</th>
+                                    <th>Daño</th>
+                                    <th>Notas</th>
+                                    <th>Coste</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Cuchillo de Combate</td>
+                                    <td>K-BAR 2100 Neo-Ceramic</td>
+                                    <td>1d10+2</td>
+                                    <td>Básico pero fiable</td>
+                                    <td class="price">20 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Porra Retráctil</td>
+                                    <td>Titanio, extensible</td>
+                                    <td>1d10+1</td>
+                                    <td>Aturdimiento</td>
+                                    <td class="price">40 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Katana Monomolecular</td>
+                                    <td>"Filo Espectral"</td>
+                                    <td>2d10+2</td>
+                                    <td>AP -2, Exclusivo</td>
+                                    <td class="price">350 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Nudillos Cibernéticos</td>
+                                    <td>"Machacador" (Implante)</td>
+                                    <td>1d10+3</td>
+                                    <td>+10 a golpes</td>
+                                    <td class="price">150 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Armas de Proyectil (Pistolas)</h3>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Daño</th>
+                                <th>Notas</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Pistola de Autodefensa</td>
+                                <td>Pocket Pal Mk.II, .22</td>
+                                <td>1d10</td>
+                                <td>Equipamiento inicial</td>
+                                <td class="price">Inicial</td>
+                            </tr>
+                            <tr>
+                                <td>Pistola Ligera Estándar</td>
+                                <td>Ronin Arms Type-12, 9mm</td>
+                                <td>2d10</td>
+                                <td>Fiable, común</td>
+                                <td class="price">75 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Pistola Pesada</td>
+                                <td>Ares "Predator V", .45</td>
+                                <td>2d10+2</td>
+                                <td>AP -1</td>
+                                <td class="price">150 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Pistola de Dardos</td>
+                                <td>Tranquilizantes (3 dardos)</td>
+                                <td>Especial</td>
+                                <td>Aturdimiento/Veneno</td>
+                                <td class="price">120 PM</td>
+                            </tr>
+                        </table>
+
+                        <h3>Armas de Proyectil (Subfusiles/Escopetas)</h3>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Daño</th>
+                                <th>Notas</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Subfusil Ligero</td>
+                                <td>Federated Arms Striker, 9mm</td>
+                                <td>2d10</td>
+                                <td>Ráfaga</td>
+                                <td class="price">350 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Escopeta de Combate</td>
+                                <td>Ronin "Street Sweeper", Cal. 12</td>
+                                <td>3d10</td>
+                                <td>Dispersión</td>
+                                <td class="price">400 PM</td>
+                            </tr>
+                        </table>
+
+                        <h3>Armas de Proyectil (Rifles)</h3>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Daño</th>
+                                <th>Notas</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Rifle de Asalto</td>
+                                <td>Militech "Ronin" M-77</td>
+                                <td>2d10+4</td>
+                                <td>AP -2, Acceso Mayor</td>
+                                <td class="price">600 PM</td>
+                            </tr>
+                        </table>
+
+                        <h3>Munición</h3>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Compatible con</th>
+                                <th>Cantidad</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Cargador Pistola Ligera</td>
+                                <td>Pistolas 9mm</td>
+                                <td>12 balas</td>
+                                <td class="price">25 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Cargador Pistola Pesada</td>
+                                <td>Pistolas .45</td>
+                                <td>10 balas</td>
+                                <td class="price">35 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Cargador Subfusil</td>
+                                <td>Subfusiles 9mm</td>
+                                <td>30 balas</td>
+                                <td class="price">50 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Cartuchos Escopeta</td>
+                                <td>Escopetas Cal. 12</td>
+                                <td>8 cartuchos</td>
+                                <td class="price">40 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Cargador Rifle</td>
+                                <td>Rifles de asalto</td>
+                                <td>20 balas</td>
+                                <td class="price">70 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Munición Especial</td>
+                                <td>Cualquier arma</td>
+                                <td>AP, Expansiva, EMP</td>
+                                <td class="price">+50%</td>
+                            </tr>
+                        </table>
+
+                        <div class="gallery">
+                            <div class="gallery-item">
+                                <img src="images/predator_pistol.png" alt="Ares Predator V" class="gallery-image">
+                                <div class="gallery-caption">Ares "Predator V", .45</div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="images/katana.png" alt="Katana Monomolecular" class="gallery-image">
+                                <div class="gallery-caption">Katana "Filo Espectral"</div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="images/street_sweeper.png" alt="Street Sweeper" class="gallery-image">
+                                <div class="gallery-caption">Ronin "Street Sweeper"</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="armor" class="tab-content">
+                        <h3>Armaduras</h3>
+                        <table class="shop-table">
+                            <thead>
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Armadura (K/E)</th>
+                                    <th>Descripción</th>
+                                    <th>Cobertura</th>
+                                    <th>Coste</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ropa Reforzada</td>
+                                    <td>2/2</td>
+                                    <td>Aspecto de ropa normal pero con protección</td>
+                                    <td>Cuerpo</td>
+                                    <td class="price">50 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Chaleco Antibalas Ligero</td>
+                                    <td>4/6</td>
+                                    <td>Aegis-Lite, discreto pero efectivo</td>
+                                    <td>Torso</td>
+                                    <td class="price">120 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Chaleco Antibalas Medio</td>
+                                    <td>6/8</td>
+                                    <td>Aegis Standard, protección notable</td>
+                                    <td>Torso</td>
+                                    <td class="price">250 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Traje de Combate Ligero</td>
+                                    <td>5/7</td>
+                                    <td>Armadura integral con casco</td>
+                                    <td>Cuerpo completo</td>
+                                    <td class="price">450 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Escudo Balístico Ligero</td>
+                                    <td>8/10</td>
+                                    <td>Protección móvil</td>
+                                    <td>Parcial (defensa)</td>
+                                    <td class="price">100 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="equipment" class="tab-content">
+                        <h3>Equipamiento General</h3>
+                        <table class="shop-table">
+                            <thead>
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th>Descripción</th>
+                                    <th>Efectos</th>
+                                    <th>Coste</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Kit Médico Básico</td>
+                                    <td>1x Trauma-Patch Plus</td>
+                                    <td>Cura 1d10 PV</td>
+                                    <td class="price">60 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Kit Médico Avanzado</td>
+                                    <td>Spray Medigel, Estimulantes, Analgésicos</td>
+                                    <td>Cura 2d10 PV, reduce penalizadores</td>
+                                    <td class="price">150 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Multiherramienta</td>
+                                    <td>Herramienta multifunción compacta</td>
+                                    <td>+10 a reparaciones básicas</td>
+                                    <td class="price">30 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Cuerda (20m) con Gancho</td>
+                                    <td>Fibra sintética ultraresistente</td>
+                                    <td>Facilita escaladas, soporta hasta 400kg</td>
+                                    <td class="price">40 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Gafas de Visión Nocturna/Térmica</td>
+                                    <td>No requiere implante</td>
+                                    <td>Visión en oscuridad/calor</td>
+                                    <td class="price">100 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Respirador</td>
+                                    <td>Protección gases básicos</td>
+                                    <td>+10 vs. toxinas inhaladas</td>
+                                    <td class="price">70 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Equipamiento Tecnológico</h3>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Efectos</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Datapad Básico</td>
+                                <td>Ordenador portátil simple</td>
+                                <td>Funciones básicas de información</td>
+                                <td class="price">50 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Datapad Encriptado</td>
+                                <td>Con software de hacking básico</td>
+                                <td>+10 a intentos de hackeo</td>
+                                <td class="price">200 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Cyberdeck "Shinigami Micro"</td>
+                                <td>Herramienta de hacking dedicada</td>
+                                <td>+20 a intentos de hackeo, funciones avanzadas</td>
+                                <td class="price">300 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Inhibidor de Señal</td>
+                                <td>Corto alcance, un solo uso</td>
+                                <td>Bloquea comunicaciones en 10m por 2 minutos</td>
+                                <td class="price">120 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Micro-Dron de Reconocimiento</td>
+                                <td>Básico, tamaño de un insecto</td>
+                                <td>Exploración remota, transmisión de vídeo</td>
+                                <td class="price">250 PM</td>
+                            </tr>
+                        </table>
+
+                        <div class="gallery">
+                            <div class="gallery-item">
+                                <img src="images/cyberdeck.png" alt="Cyberdeck Shinigami" class="gallery-image">
+                                <div class="gallery-caption">Cyberdeck "Shinigami Micro"</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="implants" class="tab-content">
+                        <h3>Implantes Cibernéticos (Nivel Básico)</h3>
+                        <p>Disponibles tras Prueba 1</p>
+                        <table class="shop-table">
+                            <thead>
+                                <tr>
+                                    <th>Implante</th>
+                                    <th>Descripción</th>
+                                    <th>Efectos</th>
+                                    <th>Coste</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ojo Cibernético</td>
+                                    <td>HawkEye-1</td>
+                                    <td>+10 Percepción Visual, Visión Nocturna, Zoom x2</td>
+                                    <td class="price">250 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Interfaz Neuronal Básica</td>
+                                    <td>Conexión DNI para control de dispositivos</td>
+                                    <td>Control directo de electrónica compatible</td>
+                                    <td class="price">200 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Chip de Memoria Ampliada</td>
+                                    <td>Almacenamiento de datos extra</td>
+                                    <td>+5 a Conocimiento, almacenamiento de información</td>
+                                    <td class="price">180 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Piernas Cibernéticas</td>
+                                    <td>Modelo "Runner" Básico</td>
+                                    <td>+1 MOV, +5 Atletismo Saltar/Correr</td>
+                                    <td class="price">350 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Brazo Cibernético</td>
+                                    <td>Modelo "Laborer" Básico</td>
+                                    <td>+1 SOM para ese brazo, compartimento oculto</td>
+                                    <td class="price">300 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Implantes Cibernéticos (Nivel Medio)</h3>
+                        <p>Disponibles tras Prueba 2 o 3, requieren más PM</p>
+                        <table class="shop-table">
+                            <tr>
+                                <th>Implante</th>
+                                <th>Descripción</th>
+                                <th>Efectos</th>
+                                <th>Coste</th>
+                            </tr>
+                            <tr>
+                                <td>Ojo Cibernético Avanzado</td>
+                                <td>HawkEye-3</td>
+                                <td>+15 Percepción Visual, Térmica, EMF, Smartlink</td>
+                                <td class="price">500 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Reflejos Cableados</td>
+                                <td>Lynx V.1</td>
+                                <td>+5 Iniciativa, +10 Atletismo y Esquiva</td>
+                                <td class="price">450 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Piel Subdérmica Blindada</td>
+                                <td>Armadura integrada</td>
+                                <td>Armadura +2/+2 natural</td>
+                                <td class="price">600 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Procesador de Combate Táctico</td>
+                                <td>Ayuda en Puntería/Esquiva</td>
+                                <td>+5 a una habilidad de combate</td>
+                                <td class="price">550 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Pulmones Filtradores Mejorados</td>
+                                <td>Sistema respiratorio avanzado</td>
+                                <td>Resistencia a toxinas, respirar bajo agua poco tiempo</td>
+                                <td class="price">400 PM</td>
+                            </tr>
+                            <tr>
+                                <td>Implante de Camuflaje Óptico</td>
+                                <td>Básico, corta duración</td>
+                                <td>Invisibilidad parcial (1 minuto), recarga lenta</td>
+                                <td class="price">700 PM</td>
+                            </tr>
+                        </table>
+
+                        <div class="gallery">
+                            <div class="gallery-item">
+                                <img src="images/cyber_eye.png" alt="Ojo Cibernético" class="gallery-image">
+                                <div class="gallery-caption">HawkEye-3</div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="images/cyber_arm.png" alt="Brazo Cibernético" class="gallery-image">
+                                <div class="gallery-caption">Brazo Cibernético</div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="images/cyber_legs.png" alt="Piernas Cibernéticas" class="gallery-image">
+                                <div class="gallery-caption">Piernas "Runner"</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="services" class="tab-content">
+                        <h3>Servicios / Información</h3>
+                        <table class="shop-table">
+                            <thead>
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Descripción</th>
+                                    <th>Coste</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Información Vaga sobre la Próxima Prueba</td>
+                                    <td>Detalles generales, sin especificaciones</td>
+                                    <td class="price">150 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Información Detallada</td>
+                                    <td>Sobre un aspecto específico de la próxima prueba</td>
+                                    <td class="price">300 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Mapa Parcial</td>
+                                    <td>Del área de la próxima prueba</td>
+                                    <td class="price">250 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>"Soborno" a un Guardia</td>
+                                    <td>Para un pequeño favor (arriesgado)</td>
+                                    <td class="price">100-500 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Reserva de Funda Sintética Básica</td>
+                                    <td>En caso de muerte y si Kaiser lo aprueba</td>
+                                    <td class="price">1000 PM + Deuda</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="data-terminal">
+AVISO OCE - PROGRAMA DE SEGUNDA OPORTUNIDAD
+EL SOLICITANTE DEBE:
+- TENER SUFICIENTES PM
+- HABER GENERADO ALTO RATING
+- ACEPTAR DEUDA PERPETUA
+
+TASA DE ÉXITO DE RESLEEVE: CLASIFICADO
+NOTA INTERNA: IMPLANTACIÓN DE KILLSWITCH OBLIGATORIA
+</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+
+    <!-- Modal para imágenes -->
+    <div id="imageModal" class="image-modal">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Botón flotante para volver arriba -->
+    <div id="back-to-top" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <script src="script.js"></script>
+    <script src="mensajes-publico.js"></script>
+    <script src="js/shop_editor.js"></script>
+    <script>
+        // Funcionalidad del modal de imágenes
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = document.getElementsByClassName('modal-close')[0];
+
+        // Añadir evento click a todas las imágenes de personajes
+        document.querySelectorAll('.character-image').forEach(img => {
+            img.addEventListener('click', function() {
+                modal.classList.add('active');
+                // Usar la imagen original si está disponible, sino usar la miniatura
+                modalImg.src = this.dataset.fullImage || this.src;
+            });
+        });
+
+        // Cerrar modal al hacer click en el botón de cerrar
+        closeBtn.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
+
+        // Cerrar modal al hacer click fuera de la imagen
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Cerrar modal con la tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification"></div>
+</body>
+</html>

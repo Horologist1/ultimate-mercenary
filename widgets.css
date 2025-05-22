@@ -1,0 +1,1027 @@
+/**
+ * Estilos para los widgets de Ultimate Mercenary
+ */
+
+/* Estilos comunes para todos los widgets */
+[data-widget] {
+    margin-bottom: 20px;
+    background-color: var(--medium-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+[data-widget]:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Estilos específicos para el Widget de Dados */
+.dice-widget {
+    width: 100%;
+    border: 1px solid var(--primary-color);
+}
+
+.dice-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.dice-widget-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.dice-widget-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.dice-result {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice-result .success {
+    color: #4caf50;
+}
+
+.dice-result .failure {
+    color: #f44336;
+}
+
+.dice-result .critical-success {
+    color: #4caf50;
+    font-size: 0.9rem;
+}
+
+.dice-result .critical-failure {
+    color: #f44336;
+    font-size: 0.9rem;
+}
+
+.dice-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.difficulty-container {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.difficulty-input {
+    width: 60px;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary-color);
+    color: var(--light-text);
+    border-radius: 4px;
+}
+
+.dice-select {
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary-color);
+    color: var(--light-text);
+    border-radius: 4px;
+}
+
+.roll-button {
+    background-color: var(--darker-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--header-font);
+    transition: all 0.3s ease;
+}
+
+.roll-button:hover {
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* Estilos para la animación de resultado */
+.success-bg {
+    animation: pulse-success 1s;
+}
+
+.failure-bg {
+    animation: pulse-failure 1s;
+}
+
+@keyframes pulse-success {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(76, 175, 80, 0.3); }
+}
+
+@keyframes pulse-failure {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(244, 67, 54, 0.3); }
+}
+
+/* Estilos para Widget de Contador de PM */
+.merit-widget {
+    width: 100%;
+    border: 1px solid var(--secondary-color);
+}
+
+.merit-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.merit-widget-header h4 {
+    margin: 0;
+    color: var(--secondary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.merit-widget-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.merit-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: var(--secondary-color);
+    text-shadow: 0 0 5px rgba(255, 0, 170, 0.5);
+}
+
+.merit-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.merit-input {
+    width: 80px;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--secondary-color);
+    color: var(--light-text);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.merit-btn {
+    background-color: var(--darker-bg);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.merit-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--secondary-color);
+}
+
+.merit-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.history-button {
+    background-color: var(--darker-bg);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.history-button:hover {
+    background-color: var(--secondary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--secondary-color);
+}
+
+.history-log {
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.history-log h5 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.history-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.history-list li {
+    padding: 3px 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(224, 224, 255, 0.1);
+}
+
+.history-list li.gain {
+    color: #4caf50;
+}
+
+.history-list li.loss {
+    color: #f44336;
+}
+
+/* Estilos para Widget de Temporizador */
+.timer-widget {
+    width: 100%;
+    border: 1px solid var(--primary-color);
+}
+
+.timer-widget.warning .timer-display {
+    color: #ff9800;
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+}
+
+.timer-widget.completed .timer-display {
+    color: #f44336;
+    text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+}
+
+.timer-widget.blink {
+    animation: blink-animation 0.5s 6 alternate;
+}
+
+@keyframes blink-animation {
+    0% { border-color: var(--primary-color); }
+    100% { border-color: #f44336; }
+}
+
+.timer-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.timer-widget-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.timer-widget-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-family: monospace;
+}
+
+.timer-progress {
+    height: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 100%;
+    transition: width 1s linear;
+}
+
+.timer-widget.warning .progress-bar {
+    background-color: #ff9800;
+}
+
+.timer-widget.completed .progress-bar {
+    background-color: #f44336;
+}
+
+.timer-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+}
+
+.timer-btn {
+    background-color: var(--darker-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.timer-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.timer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para Widget de Notas */
+.notes-widget {
+    width: 100%;
+    border: 1px solid var(--secondary-color);
+}
+
+.notes-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.notes-widget-header h4 {
+    margin: 0;
+    color: var(--secondary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.notes-widget-body {
+    padding: 15px;
+}
+
+.notes-textarea {
+    width: 100%;
+    min-height: 150px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--secondary-color);
+    color: var(--light-text);
+    padding: 10px;
+    border-radius: 5px;
+    resize: vertical;
+}
+
+.notes-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.notes-btn {
+    background-color: var(--darker-bg);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.notes-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--secondary-color);
+}
+
+.notes-btn.save.saved {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.notes-btn.clear {
+    background-color: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+    color: #f44336;
+}
+
+.notes-btn.clear:hover {
+    background-color: #f44336;
+    color: white;
+    box-shadow: 0 0 10px #f44336;
+}
+
+/* Temas para widgets */
+/* Por defecto: azul/rosa */
+
+/* Tema Rojo */
+[data-widget].theme-red {
+    --widget-primary: #ff5252;
+    --widget-secondary: #ff867f;
+}
+
+[data-widget].theme-red .dice-widget-header h4,
+[data-widget].theme-red .timer-widget-header h4 {
+    color: var(--widget-primary);
+}
+
+[data-widget].theme-red .merit-widget-header h4,
+[data-widget].theme-red .notes-widget-header h4 {
+    color: var(--widget-secondary);
+}
+
+/* Tema Verde */
+[data-widget].theme-green {
+    --widget-primary: #4caf50;
+    --widget-secondary: #80e27e;
+}
+
+[data-widget].theme-green .dice-widget-header h4,
+[data-widget].theme-green .timer-widget-header h4 {
+    color: var(--widget-primary);
+}
+
+[data-widget].theme-green .merit-widget-header h4,
+[data-widget].theme-green .notes-widget-header h4 {
+    color: var(--widget-secondary);
+}
+
+/* Tema Oscuro */
+[data-widget].theme-dark {
+    --widget-primary: #bbbbbb;
+    --widget-secondary: #888888;
+    background-color: #121212;
+}
+
+[data-widget].theme-dark .dice-widget-header,
+[data-widget].theme-dark .merit-widget-header,
+[data-widget].theme-dark .timer-widget-header,
+[data-widget].theme-dark .notes-widget-header {
+    background-color: #000000;
+}
+
+[data-widget].theme-dark .dice-widget-footer,
+[data-widget].theme-dark .merit-widget-footer,
+[data-widget].theme-dark .timer-widget-footer,
+[data-widget].theme-dark .notes-widget-footer {
+    background-color: #0a0a0a;
+}
+
+/* Estilos para Widget de Encuesta/Votación */
+.poll-widget {
+    width: 100%;
+    border: 1px solid var(--primary-color);
+}
+
+.poll-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.poll-widget-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.poll-widget-body {
+    padding: 15px;
+}
+
+.poll-question {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: var(--light-text);
+}
+
+.poll-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.poll-option {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.poll-option input {
+    margin: 0;
+}
+
+.poll-option label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.poll-bar {
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    flex: 1;
+    min-width: 100px;
+    display: none;
+}
+
+.poll-progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.poll-percentage {
+    min-width: 40px;
+    text-align: right;
+    font-size: 0.8rem;
+    display: none;
+}
+
+.poll-widget.show-results .poll-bar,
+.poll-widget.show-results .poll-percentage {
+    display: block;
+}
+
+.poll-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.poll-btn {
+    background-color: var(--darker-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.poll-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.poll-btn.vote.voted {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.poll-btn.reset {
+    background-color: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+    color: #f44336;
+}
+
+.poll-btn.reset:hover {
+    background-color: #f44336;
+    color: white;
+    box-shadow: 0 0 10px #f44336;
+}
+
+/* Estilos para Widget de Generador de Eventos Aleatorios */
+.event-widget {
+    width: 100%;
+    border: 1px solid var(--secondary-color);
+    transition: all 0.3s ease;
+}
+
+.event-widget.event-generated {
+    box-shadow: 0 0 15px var(--secondary-color);
+}
+
+.event-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.event-widget-header h4 {
+    margin: 0;
+    color: var(--secondary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.event-widget-body {
+    padding: 15px;
+}
+
+.event-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.event-category {
+    flex: 1;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--secondary-color);
+    color: var(--light-text);
+    border-radius: 4px;
+}
+
+.event-btn {
+    background-color: var(--darker-bg);
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.event-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--secondary-color);
+}
+
+.event-display {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.event-category-display {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #ff9800;
+}
+
+.event-category-display.category-combate {
+    color: #f44336;
+}
+
+.event-category-display.category-social {
+    color: #2196f3;
+}
+
+.event-category-display.category-ambiental {
+    color: #4caf50;
+}
+
+.event-text {
+    font-size: 1.2rem;
+    color: var(--light-text);
+    line-height: 1.4;
+}
+
+.event-history {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.event-history h5 {
+    margin: 0 0 10px 0;
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+
+.event-history .history-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.event-history .history-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-history .history-list .event-cat {
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.event-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Estilos para Widget de Seguimiento de Concursantes */
+.tracker-widget {
+    width: 100%;
+    border: 1px solid var(--primary-color);
+}
+
+.tracker-widget-header {
+    background-color: var(--darker-bg);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.tracker-widget-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-family: var(--header-font);
+    font-size: 1rem;
+}
+
+.tracker-widget-body {
+    padding: 15px;
+}
+
+.tracker-summary {
+    margin-bottom: 20px;
+}
+
+.tracker-counts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tracker-count {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.tracker-count .count-label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    color: var(--light-text);
+}
+
+.tracker-count .count-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.tracker-count.total .count-value {
+    color: var(--light-text);
+}
+
+.tracker-count.alive .count-value {
+    color: #4caf50;
+}
+
+.tracker-count.eliminated .count-value {
+    color: #f44336;
+}
+
+.tracker-progress {
+    height: 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.tracker-progress .progress-bar {
+    height: 100%;
+    background-color: #f44336;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.tracker-progress .progress-bar.warning {
+    background-color: #ff9800;
+}
+
+.tracker-progress .progress-bar.critical {
+    background-color: #f44336;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.tracker-details {
+    margin-top: 20px;
+}
+
+.tracker-details h5 {
+    margin: 0 0 10px 0;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.contestant-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.contestant-item {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.contestant-item:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.contestant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.contestant-name {
+    font-weight: 700;
+    color: var(--light-text);
+}
+
+.contestant-status {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.contestant-status.vivo {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+}
+
+.contestant-status.eliminado {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.contestant-info {
+    font-size: 0.9rem;
+    color: var(--light-text);
+}
+
+.contestant-info div {
+    margin-bottom: 3px;
+}
+
+.threat {
+    font-weight: 700;
+}
+
+.threat-alta {
+    color: #f44336;
+}
+
+.threat-media {
+    color: #ff9800;
+}
+
+.threat-baja {
+    color: #4caf50;
+}
+
+.threat-desconocida {
+    color: #2196f3;
+}
+
+.tracker-widget-footer {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.tracker-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.tracker-btn {
+    background-color: var(--darker-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.tracker-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--darker-bg);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.tracker-btn.eliminate {
+    border-color: #f44336;
+    color: #f44336;
+}
+
+.tracker-btn.eliminate:hover, .tracker-btn.eliminate.active {
+    background-color: #f44336;
+    color: white;
+    box-shadow: 0 0 10px #f44336;
+}
+
+.tracker-btn.resurrect {
+    border-color: #4caf50;
+    color: #4caf50;
+}
+
+.tracker-btn.resurrect:hover, .tracker-btn.resurrect.active {
+    background-color: #4caf50;
+    color: white;
+    box-shadow: 0 0 10px #4caf50;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+    .timer-widget-footer,
+    .event-widget-footer,
+    .poll-widget-footer,
+    .tracker-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .timer-btn,
+    .event-btn,
+    .poll-btn,
+    .tracker-btn {
+        width: 100%;
+    }
+    
+    .merit-display {
+        font-size: 2rem;
+    }
+    
+    .dice-result {
+        font-size: 1.5rem;
+    }
+    
+    .tracker-counts {
+        grid-template-columns: 1fr;
+    }
+    
+    .contestant-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .event-controls {
+        flex-direction: column;
+    }
+}

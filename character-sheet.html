@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Personaje - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="character-sheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>Hoja de Personaje Digital</h2>
+                </div>
+            </div>
+            <div class="return-button-container">
+                <a href="index.html" class="return-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="digital-sheet">
+                <div class="tabs">
+                    <div class="tab active" data-tab="basics">Básicos</div>
+                    <div class="tab" data-tab="skills">Habilidades</div>
+                    <div class="tab" data-tab="gear">Equipo</div>
+                    <div class="tab" data-tab="cyber">Implantes</div>
+                    <div class="tab" data-tab="notes">Notas</div>
+                </div>
+
+                <div id="basics" class="tab-content active">
+                    <div class="sheet-section">
+                        <h3>Datos Personales</h3>
+                        <div class="character-profile">
+                            <div class="character-avatar">
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <button class="button" id="randomize-avatar">Aleatorio</button>
+                            </div>
+                            <div class="character-details">
+                                <div class="form-group">
+                                    <label for="character-name">Nombre:</label>
+                                    <input type="text" id="character-name" placeholder="Nombre del Personaje">
+                                </div>
+                                <div class="form-group">
+                                    <label for="character-concept">Concepto:</label>
+                                    <input type="text" id="character-concept" placeholder="Concepto/Arquetipo">
+                                </div>
+                                <div class="form-group">
+                                    <label for="character-background">Trasfondo:</label>
+                                    <select id="character-background">
+                                        <option value="">Seleccionar Trasfondo</option>
+                                        <option value="criminal">Criminal de los Barrios Bajos</option>
+                                        <option value="corpo">Ex-Corporativo Caído</option>
+                                        <option value="military">Ex-Militar</option>
+                                        <option value="tech">Técnico Callejero</option>
+                                        <option value="nomad">Nómada</option>
+                                        <option value="media">Periodista/Media</option>
+                                        <option value="yakuza">Yakuza/Mafioso</option>
+                                        <option value="custom">Personalizado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="character-debt">Deuda/Razón:</label>
+                                    <textarea id="character-debt" placeholder="¿Por qué estás en Ultimate Mercenary?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sheet-section">
+                        <h3>Aptitudes</h3>
+                        <div class="aptitudes-grid">
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">VIG <span class="aptitude-desc">(Vigor)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="vig">-</button>
+                                    <input type="number" class="aptitude-value" id="vig" value="10" min="5" max="20" data-aptitude="vig">
+                                    <button class="aptitude-btn plus" data-aptitude="vig">+</button>
+                                </div>
+                                <div class="aptitude-desc">Fuerza física, resistencia, salud</div>
+                            </div>
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">COO <span class="aptitude-desc">(Coordinación)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="coo">-</button>
+                                    <input type="number" class="aptitude-value" id="coo" value="10" min="5" max="20" data-aptitude="coo">
+                                    <button class="aptitude-btn plus" data-aptitude="coo">+</button>
+                                </div>
+                                <div class="aptitude-desc">Destreza, agilidad manual, precisión</div>
+                            </div>
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">INT <span class="aptitude-desc">(Intelecto)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="int">-</button>
+                                    <input type="number" class="aptitude-value" id="int" value="10" min="5" max="20" data-aptitude="int">
+                                    <button class="aptitude-btn plus" data-aptitude="int">+</button>
+                                </div>
+                                <div class="aptitude-desc">Cognición, razonamiento, memoria</div>
+                            </div>
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">REF <span class="aptitude-desc">(Reflejos)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="ref">-</button>
+                                    <input type="number" class="aptitude-value" id="ref" value="10" min="5" max="20" data-aptitude="ref">
+                                    <button class="aptitude-btn plus" data-aptitude="ref">+</button>
+                                </div>
+                                <div class="aptitude-desc">Tiempo de reacción, coordinación</div>
+                            </div>
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">WIL <span class="aptitude-desc">(Voluntad)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="wil">-</button>
+                                    <input type="number" class="aptitude-value" id="wil" value="10" min="5" max="20" data-aptitude="wil">
+                                    <button class="aptitude-btn plus" data-aptitude="wil">+</button>
+                                </div>
+                                <div class="aptitude-desc">Determinación, autocontrol</div>
+                            </div>
+                            <div class="aptitude-block">
+                                <div class="aptitude-name">SAV <span class="aptitude-desc">(Desenvoltura)</span></div>
+                                <div class="aptitude-controls">
+                                    <button class="aptitude-btn minus" data-aptitude="sav">-</button>
+                                    <input type="number" class="aptitude-value" id="sav" value="10" min="5" max="20" data-aptitude="sav">
+                                    <button class="aptitude-btn plus" data-aptitude="sav">+</button>
+                                </div>
+                                <div class="aptitude-desc">Carisma, empatía, intuición social</div>
+                            </div>
+                        </div>
+
+                        <div class="points-remaining">
+                            <div class="points-label">Puntos Disponibles:</div>
+                            <div class="points-value" id="attribute-points">20</div>
+                        </div>
+                    </div>
+
+                    <div class="sheet-section">
+                        <h3>Estadísticas Derivadas</h3>
+                        <div class="derived-stats">
+                            <div class="stat-block">
+                                <div class="stat-name">Puntos de Vida</div>
+                                <div class="stat-value" id="health-points">20</div>
+                                <div class="stat-desc">VIG × 2</div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-name">Iniciativa</div>
+                                <div class="stat-value" id="initiative">7</div>
+                                <div class="stat-desc">(REF + INT) ÷ 3</div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-name">Umbral de Heridas</div>
+                                <div class="stat-value" id="wound-threshold">4</div>
+                                <div class="stat-desc">(VIG + WIL) ÷ 5</div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-name">MOV</div>
+                                <div class="stat-value" id="movement">4</div>
+                                <div class="stat-desc">Base 4 (humano)</div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-name">Traumas</div>
+                                <div class="stat-value" id="traumas">0/5</div>
+                                <div class="stat-desc">Max: WIL ÷ 2</div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-name">Armadura</div>
+                                <div class="stat-value" id="armor">0/0</div>
+                                <div class="stat-desc">KIN/ENE</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sheet-section">
+                        <h3>Estado Actual</h3>
+                        <div class="current-status">
+                            <div class="status-row">
+                                <div class="status-label">Puntos de Mérito (PM):</div>
+                                <input type="number" id="merit-points" value="0" min="0">
+                            </div>
+                            <div class="status-row">
+                                <div class="status-label">PV Actuales:</div>
+                                <div class="health-tracker">
+                                    <input type="number" id="current-health" value="20" min="0">
+                                    <div class="health-bar">
+                                        <div class="health-bar-fill" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="status-row wounds">
+                                <div class="status-label">Heridas:</div>
+                                <div class="wounds-tracker">
+                                    <div class="wound-checkbox" data-wound="1">
+                                        <input type="checkbox" id="wound-1">
+                                        <label for="wound-1">Herida 1</label>
+                                    </div>
+                                    <div class="wound-checkbox" data-wound="2">
+                                        <input type="checkbox" id="wound-2">
+                                        <label for="wound-2">Herida 2</label>
+                                    </div>
+                                    <div class="wound-checkbox" data-wound="3">
+                                        <input type="checkbox" id="wound-3">
+                                        <label for="wound-3">Herida 3</label>
+                                    </div>
+                                    <div class="wound-checkbox" data-wound="4">
+                                        <input type="checkbox" id="wound-4">
+                                        <label for="wound-4">Herida 4</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="skills" class="tab-content">
+                    <div class="sheet-section">
+                        <h3>Habilidades</h3>
+                        <div class="skill-points">
+                            <div class="points-label">Puntos de Habilidad:</div>
+                            <div class="points-value" id="skill-points">400</div>
+                        </div>
+                        
+                        <div class="skills-container">
+                            <div class="skills-column">
+                                <h4>Combate</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Armas de Fuego</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="firearms">
+                                            <option value="pistols">Pistolas</option>
+                                            <option value="rifles">Rifles</option>
+                                            <option value="smg">Subfusiles</option>
+                                            <option value="shotguns">Escopetas</option>
+                                            <option value="heavy">Armas Pesadas</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="firearms">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Combate Cuerpo a Cuerpo</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="melee">
+                                            <option value="blades">Filos</option>
+                                            <option value="blunt">Contundentes</option>
+                                            <option value="unarmed">Desarmado</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="melee">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Explosivos</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="explosives">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Combate Táctico</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="tactics">
+                                    </div>
+                                </div>
+
+                                <h4>Físicas</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Atletismo</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="athletics">
+                                            <option value="climb">Trepar</option>
+                                            <option value="run">Correr</option>
+                                            <option value="jump">Saltar</option>
+                                            <option value="swim">Nadar</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="athletics">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Fuerza Bruta</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="brawn">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Sigilo</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="stealth">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Supervivencia</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="survival">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="skills-column">
+                                <h4>Técnicas</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Hardware</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="hardware">
+                                            <option value="electronics">Electrónica</option>
+                                            <option value="industrial">Industrial</option>
+                                            <option value="weapons">Armería</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="hardware">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Medicina</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="medicine">
+                                            <option value="firstaid">Primeros Auxilios</option>
+                                            <option value="trauma">Trauma</option>
+                                            <option value="pharmtech">Farmacología</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="medicine">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Programación</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="programming">
+                                            <option value="hacking">Hacking</option>
+                                            <option value="security">Seguridad</option>
+                                            <option value="data">Minería de Datos</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="programming">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Interfaz</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="interface">
+                                    </div>
+                                </div>
+
+                                <h4>Conocimiento</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Investigación</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="research">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Percepción</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="perception">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Conocimiento (Especificar)</div>
+                                    <div class="skill-controls">
+                                        <input type="text" class="skill-custom-name" placeholder="Tipo...">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="knowledge">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="skills-column">
+                                <h4>Sociales</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Engaño</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="deception">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Intimidación</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="intimidation">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Persuasión</div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="persuasion">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Contactos</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="contacts">
+                                            <option value="criminal">Criminales</option>
+                                            <option value="corporate">Corporativos</option>
+                                            <option value="street">Callejeros</option>
+                                            <option value="media">Media</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="contacts">
+                                    </div>
+                                </div>
+
+                                <h4>Vehículos</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">Pilotaje</div>
+                                    <div class="skill-controls">
+                                        <select class="skill-specialization" data-skill="pilot">
+                                            <option value="ground">Terrestre</option>
+                                            <option value="air">Aéreo</option>
+                                            <option value="sea">Marítimo</option>
+                                        </select>
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="pilot">
+                                    </div>
+                                </div>
+                                
+                                <h4>Habilidades Personalizadas</h4>
+                                <div class="skill-entry">
+                                    <div class="skill-name">
+                                        <input type="text" class="skill-custom-full" placeholder="Nombre de habilidad...">
+                                    </div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="custom1">
+                                    </div>
+                                </div>
+                                <div class="skill-entry">
+                                    <div class="skill-name">
+                                        <input type="text" class="skill-custom-full" placeholder="Nombre de habilidad...">
+                                    </div>
+                                    <div class="skill-controls">
+                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="custom2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gear" class="tab-content">
+                    <div class="sheet-section">
+                        <h3>Equipo y Armamento</h3>
+                        
+                        <div class="gear-section">
+                            <h4>Armas</h4>
+                            <table class="gear-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Daño</th>
+                                        <th>Alcance</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="weapons-list">
+                                    <tr class="empty-row">
+                                        <td colspan="5"><em>Sin armas equipadas</em></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="button add-item" data-type="weapon">+ Añadir Arma</button>
+                        </div>
+                        
+                        <div class="gear-section">
+                            <h4>Armadura</h4>
+                            <table class="gear-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Localización</th>
+                                        <th>Armadura K/E</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="armor-list">
+                                    <tr class="empty-row">
+                                        <td colspan="4"><em>Sin armadura equipada</em></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="button add-item" data-type="armor">+ Añadir Armadura</button>
+                        </div>
+                        
+                        <div class="gear-section">
+                            <h4>Equipo Misceláneo</h4>
+                            <table class="gear-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="misc-list">
+                                    <tr class="empty-row">
+                                        <td colspan="3"><em>Sin equipo adicional</em></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="button add-item" data-type="misc">+ Añadir Equipo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cyber" class="tab-content">
+                    <div class="sheet-section">
+                        <h3>Implantes Cibernéticos</h3>
+                        
+                        <div class="cyber-diagram">
+                            <div class="cyber-body">
+                                <img src="images/cyber_diagram.png" alt="Diagrama Corporal" class="body-image">
+                                <div class="cyber-markers">
+                                    <!-- Los marcadores serán agregados dinámicamente por el JS -->
+                                </div>
+                            </div>
+                            <div class="cyber-stats">
+                                <div class="cyber-stat">
+                                    <div class="stat-name">Nivel Infección</div>
+                                    <div class="stat-value" id="cyber-level">0%</div>
+                                </div>
+                                <div class="cyber-stat">
+                                    <div class="stat-name">Implantes</div>
+                                    <div class="stat-value" id="cyber-count">0/10</div>
+                                </div>
+                                <div class="cyber-stat">
+                                    <div class="stat-name">Vulnerabilidad</div>
+                                    <div class="stat-value" id="cyber-vuln">Baja</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="cyber-section">
+                            <h4>Implantes Activos</h4>
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Localización</th>
+                                        <th>Nivel</th>
+                                        <th>Efectos</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="implants-list">
+                                    <tr class="empty-row">
+                                        <td colspan="5"><em>Sin implantes cibernéticos</em></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="button add-item" data-type="cyber">+ Añadir Implante</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="notes" class="tab-content">
+                    <div class="sheet-section">
+                        <h3>Notas Personales</h3>
+                        <textarea id="character-notes" placeholder="Anota aquí información adicional sobre tu personaje, detalles de su historia, contactos, objetivos, etc."></textarea>
+                    </div>
+                    
+                    <div class="sheet-section">
+                        <h3>Aliados y Enemigos</h3>
+                        <div class="contacts-grid">
+                            <div class="contact-column">
+                                <h4>Aliados</h4>
+                                <div id="allies-list">
+                                    <div class="empty-contacts">Sin aliados registrados</div>
+                                </div>
+                                <button class="button add-contact" data-type="ally">+ Añadir Aliado</button>
+                            </div>
+                            <div class="contact-column">
+                                <h4>Enemigos</h4>
+                                <div id="enemies-list">
+                                    <div class="empty-contacts">Sin enemigos registrados</div>
+                                </div>
+                                <button class="button add-contact" data-type="enemy">+ Añadir Enemigo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sheet-actions">
+                <button class="button action-button" id="save-sheet">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="button action-button" id="load-sheet">
+                    <i class="fas fa-folder-open"></i> Cargar
+                </button>
+                <button class="button action-button" id="print-sheet">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+                <button class="button action-button" id="export-sheet">
+                    <i class="fas fa-file-export"></i> Exportar
+                </button>
+                <button class="button action-button" id="new-sheet">
+                    <i class="fas fa-file"></i> Nuevo
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+
+    <!-- Templates for dialogs -->
+    <div id="templates" style="display: none;">
+        <!-- Weapon Dialog Template -->
+        <div id="weapon-dialog-template">
+            <div class="dialog-header">
+                <h4>Añadir Arma</h4>
+            </div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <label for="weapon-name">Nombre:</label>
+                    <input type="text" id="weapon-name" placeholder="Nombre del arma">
+                </div>
+                <div class="form-group">
+                    <label for="weapon-type">Tipo:</label>
+                    <select id="weapon-type">
+                        <option value="melee">Cuerpo a Cuerpo</option>
+                        <option value="pistol">Pistola</option>
+                        <option value="smg">Subfusil</option>
+                        <option value="shotgun">Escopeta</option>
+                        <option value="rifle">Rifle</option>
+                        <option value="heavy">Arma Pesada</option>
+                        <option value="exotic">Exótica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="weapon-damage">Daño:</label>
+                    <input type="text" id="weapon-damage" placeholder="ej: 2d10+2">
+                </div>
+                <div class="form-group">
+                    <label for="weapon-range">Alcance:</label>
+                    <input type="text" id="weapon-range" placeholder="ej: Corto">
+                </div>
+                <div class="form-group">
+                    <label for="weapon-notes">Notas:</label>
+                    <input type="text" id="weapon-notes" placeholder="ej: AP -2, Ráfaga">
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="button cancel-button">Cancelar</button>
+                <button class="button confirm-button">Añadir</button>
+            </div>
+        </div>
+
+        <!-- Armor Dialog Template -->
+        <div id="armor-dialog-template">
+            <div class="dialog-header">
+                <h4>Añadir Armadura</h4>
+            </div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <label for="armor-name">Nombre:</label>
+                    <input type="text" id="armor-name" placeholder="Nombre de la armadura">
+                </div>
+                <div class="form-group">
+                    <label for="armor-location">Localización:</label>
+                    <select id="armor-location">
+                        <option value="full">Cuerpo Completo</option>
+                        <option value="torso">Torso</option>
+                        <option value="head">Cabeza</option>
+                        <option value="arms">Brazos</option>
+                        <option value="legs">Piernas</option>
+                    </select>
+                </div>
+                <div class="form-group double-input">
+                    <label>Armadura (K/E):</label>
+                    <div class="input-group">
+                        <input type="number" id="armor-kinetic" placeholder="Kinética" min="0">
+                        <span>/</span>
+                        <input type="number" id="armor-energy" placeholder="Energética" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="armor-notes">Notas:</label>
+                    <input type="text" id="armor-notes" placeholder="ej: Camuflaje, Reforzada">
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="button cancel-button">Cancelar</button>
+                <button class="button confirm-button">Añadir</button>
+            </div>
+        </div>
+
+        <!-- Equipment Dialog Template -->
+        <div id="gear-dialog-template">
+            <div class="dialog-header">
+                <h4>Añadir Equipo</h4>
+            </div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <label for="gear-name">Nombre:</label>
+                    <input type="text" id="gear-name" placeholder="Nombre del equipo">
+                </div>
+                <div class="form-group">
+                    <label for="gear-type">Tipo:</label>
+                    <select id="gear-type">
+                        <option value="medical">Médico</option>
+                        <option value="tech">Tecnología</option>
+                        <option value="survival">Supervivencia</option>
+                        <option value="tools">Herramientas</option>
+                        <option value="comms">Comunicaciones</option>
+                        <option value="misc">Misceláneo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gear-desc">Descripción:</label>
+                    <textarea id="gear-desc" placeholder="Descripción y efectos"></textarea>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="button cancel-button">Cancelar</button>
+                <button class="button confirm-button">Añadir</button>
+            </div>
+        </div>
+
+        <!-- Implant Dialog Template -->
+        <div id="implant-dialog-template">
+            <div class="dialog-header">
+                <h4>Añadir Implante</h4>
+            </div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <label for="implant-name">Nombre:</label>
+                    <input type="text" id="implant-name" placeholder="Nombre del implante">
+                </div>
+                <div class="form-group">
+                    <label for="implant-location">Localización:</label>
+                    <select id="implant-location">
+                        <option value="head">Cabeza/Cerebro</option>
+                        <option value="eyes">Ojos</option>
+                        <option value="ears">Oídos</option>
+                        <option value="arm-r">Brazo Derecho</option>
+                        <option value="arm-l">Brazo Izquierdo</option>
+                        <option value="torso">Torso</option>
+                        <option value="leg-r">Pierna Derecha</option>
+                        <option value="leg-l">Pierna Izquierda</option>
+                        <option value="skin">Piel/Sistema</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="implant-level">Nivel:</label>
+                    <select id="implant-level">
+                        <option value="basic">Básico</option>
+                        <option value="standard">Estándar</option>
+                        <option value="advanced">Avanzado</option>
+                        <option value="bleeding">Bleeding Edge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="implant-effects">Efectos:</label>
+                    <textarea id="implant-effects" placeholder="Bonificaciones y efectos"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="implant-status">Estado:</label>
+                    <select id="implant-status">
+                        <option value="active">Activo</option>
+                        <option value="damaged">Dañado</option>
+                        <option value="disabled">Desactivado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="button cancel-button">Cancelar</button>
+                <button class="button confirm-button">Añadir</button>
+            </div>
+        </div>
+
+        <!-- Contact Dialog Template -->
+        <div id="contact-dialog-template">
+            <div class="dialog-header">
+                <h4>Añadir Contacto</h4>
+            </div>
+            <div class="dialog-body">
+                <div class="form-group">
+                    <label for="contact-name">Nombre:</label>
+                    <input type="text" id="contact-name" placeholder="Nombre del contacto">
+                </div>
+                <div class="form-group">
+                    <label for="contact-relation">Relación:</label>
+                    <input type="text" id="contact-relation" placeholder="ej: Compañero, Rival">
+                </div>
+                <div class="form-group">
+                    <label for="contact-desc">Descripción:</label>
+                    <textarea id="contact-desc" placeholder="Información sobre el contacto"></textarea>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="button cancel-button">Cancelar</button>
+                <button class="button confirm-button">Añadir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="character-sheet.js"></script>
+</body>
+</html>

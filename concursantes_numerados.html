@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concursantes - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .personajes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            align-items: stretch;
+        }
+        
+        .back-button {
+            display: inline-block;
+            background-color: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #ff6b81;
+        }
+        
+        .character-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            height: auto;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+            border-color: #ff4757;
+        }
+        
+        .character-image {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            object-position: top;
+            border-bottom: 1px solid #444;
+            cursor: pointer;
+        }
+        
+        .character-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .character-name {
+            color: #ff4757;
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .character-number {
+            display: inline-block;
+            background-color: #ff4757;
+            color: #fff;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            vertical-align: middle;
+        }
+
+        .character-real-name {
+            font-size: 0.8rem;
+            color: #888;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-style: italic;
+        }
+
+        .character-name:hover .character-real-name {
+            opacity: 1;
+        }
+        
+        .character-role {
+            color: #00ccff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .character-description {
+            color: #ccc;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            max-height: none;
+            overflow: visible;
+        }
+        
+        .dialogue {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid #ff4757;
+            padding: 10px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #ddd;
+            max-height: none;
+            overflow: visible;
+            margin-top: auto;
+        }
+        
+        .stats-summary {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-name {
+            font-size: 0.8rem;
+            color: #00ccff;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .section-header {
+            color: #ff4757;
+            border-bottom: 1px solid #ff4757;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .featured-character {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid #ff4757;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .featured-character:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+        }
+        
+        .featured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            max-height: 400px;
+            cursor: default;
+        }
+        
+        .featured-info {
+            padding: 25px;
+        }
+        
+        .featured-name {
+            color: #ff4757;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .featured-role {
+            color: #00ccff;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .category-tabs {
+            display: none;
+        }
+        
+        .category-tab {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #ccc;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .category-tab:hover, .category-tab.active {
+            background-color: #ff4757;
+            color: white;
+        }
+        
+        .category-section {
+            display: none;
+        }
+        
+        .category-section.active {
+            display: block;
+        }
+        
+        .fullscreen-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        
+        .fullscreen-image img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        @media (max-width: 768px) {
+            .featured-character {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-image {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>La Forja del Acero Callejero</h2>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="index.html#facciones"><i class="fas fa-users"></i> Facciones</a></li>
+                    <li><a href="index.html#programa"><i class="fas fa-tv"></i> El Programa</a></li>
+                    <li><a href="concursantes_numerados.html"><i class="fas fa-user-secret"></i> Concursantes</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle"><i class="fas fa-gamepad"></i> Pruebas <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="prueba0.html"><i class="fas fa-arrow-right"></i> Prueba 0: La Caída</a></li>
+                            <li><a href="prueba1.html"><i class="fas fa-arrow-right"></i> Prueba 1: Obstáculos</a></li>
+                            <li><a href="prueba2.html"><i class="fas fa-arrow-right"></i> Prueba 2: Cosecha</a></li>
+                            <li><a href="prueba3.html"><i class="fas fa-arrow-right"></i> Prueba 3: Entrega</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="index.html#tienda"><i class="fas fa-store"></i> Tienda de Méritos</a></li>
+                    <li><a href="character-sheet.html"><i class="fas fa-id-card"></i> Fichas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h2 class="section-header"><i class="fas fa-user-secret"></i> Concursantes Destacados</h2>
+            
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+            
+            <p>Con 100 concursantes compitiendo en Ultimate Mercenary, estos son los más destacados que la audiencia sigue de cerca. Cada uno tiene su propia historia y motivación para participar en este letal reality show.</p>
+            
+            <!-- Auri - Protagonista Principal (Personalizable) -->
+            <div class="featured-character">
+                <div class="featured-image-container">
+                    <img src="images/kira_initial.png" alt="Auri" class="featured-image" id="protagonist-image">
+                </div>
+                <div class="featured-info">
+                    <div class="protagonist-header">
+                        <div>
+                            <h3 class="featured-name" id="protagonist-name">Auri <span class="character-number">#13</span></h3>
+                            <div class="featured-role">Protagonista Principal (Personalizable)</div>
+                        </div>
+                        <a href="character-customizer.html" class="customize-button" id="customize-protagonist"><i class="fas fa-edit"></i> Personalizar</a>
+                    </div>
+                    <p class="character-description" id="protagonist-description">Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.</p>
+                </div>
+            </div>
+            
+            <div class="personajes-container">
+                <!-- Boris "Goliath" Volkov -->
+                <div class="character-card">
+                    <img src="images/goliath.png" alt="Boris Goliath Volkov" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#42</span>
+                            <span class="character-real-name">Boris "Goliath" Volkov</span>
+                        </h3>
+                        <div class="character-role">El Tanque Ruso</div>
+                        <p class="character-description">Ex-Spetsnaz, enorme (SOM 14), implantes de fuerza de primera gen, cicatrices. Directo, brutal, desprecia la debilidad. Entró en el programa tras desertar y ser perseguido por su antiguo comando.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">VIG</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Combate</div>
+                                <div class="stat-value">65</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">30</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"¿Tú? ¿Competir? ¡Ja! Durarás menos que un helado en el infierno." (Si muestras habilidad) "Quizás no seas tan inútil, malenkaya. Pero no te confundas, esto es mi victoria."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Silas "Glitch" Vance -->
+                <div class="character-card">
+                    <img src="images/silas_glitch.png" alt="Silas Glitch Vance" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#17</span>
+                            <span class="character-real-name">Silas "Glitch" Vance</span>
+                        </h3>
+                        <div class="character-role">El Netrunner Nervioso</div>
+                        <p class="character-description">Delgado, gafas de datos, siempre murmurando sobre sistemas y exploits. Evita el conflicto directo, prefiere la astucia. Ex-ingeniero de seguridad corporativa que vendió secretos y fue descubierto.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">INT</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Interfaz</div>
+                                <div class="stat-value">65</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Los protocolos de seguridad de esta prueba son... anticuados. Si me cubres, podría darte una 'ventaja'. Por un porcentaje de tus PM, claro. Y esto... nunca ocurrió."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Raven" (Mizuki Tanaka) -->
+                <div class="character-card">
+                    <img src="images/raven.png" alt="Raven (Mizuki Tanaka)" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#89</span>
+                            <span class="character-real-name">"Raven" (Mizuki Tanaka)</span>
+                        </h3>
+                        <div class="character-role">La Asesina Silenciosa</div>
+                        <p class="character-description">Ágil, tatuajes de cuervo, mirada intensa. Maestra del sigilo y el combate cuerpo a cuerpo. Habla poco, observa mucho. Posible conexión con asesinos profesionales o agencias de inteligencia.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">COO</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Sigilo</div>
+                                <div class="stat-value">75</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">20</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p class="subtle-dialogue">(Si la impresionas o ayudas) Un asentimiento casi imperceptible. (Si la obstaculizas) Una mirada fría que promete problemas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Chispa" (Anya Sharma) -->
+                <div class="character-card">
+                    <img src="images/chispa_new.png" alt="Chispa (Anya Sharma)" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#31</span>
+                            <span class="character-real-name">"Chispa" (Anya Sharma)</span>
+                        </h3>
+                        <div class="character-role">La Mecánica Optimista</div>
+                        <p class="character-description">Pelo azul eléctrico, dedos protésicos con herramientas. Sorprendentemente optimista, siempre trasteando. Busca mejorar su cromo. Ex-ingeniera de mantenimiento en los astilleros orbitales.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">COO</div>
+                                <div class="stat-value">14</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Hardware</div>
+                                <div class="stat-value">70</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">18</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"¡Ey! ¿Nueva? Soy Chispa. No te dejes comer por los tiburones. A veces, un destornillador bien colocado vale más que una bala. ¿Necesitas algo arreglado? Podría echarle un vistazo... si compartimos recursos, claro."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marcus "Old Man" Thorne -->
+                <div class="character-card">
+                    <img src="images/old_man.png" alt="Marcus Old Man Thorne" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#76</span>
+                            <span class="character-real-name">Marcus "Old Man" Thorne</span>
+                        </h3>
+                        <div class="character-role">El Veterano Cínico</div>
+                        <p class="character-description">Hombre mayor (50s aparentes), cuerpo desgastado pero con ojos que han visto demasiado. Ex-corporativo de seguridad, lo perdió todo. Pragmático y calculador.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">WIL</div>
+                                <div class="stat-value">14</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Intuición</div>
+                                <div class="stat-value">65</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">20</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"He visto programas como este ir y venir. Todos terminan igual: con sangre en el suelo y los bolsillos de los de arriba llenos. No te hagas ilusiones, chico/a. Solo sobrevive al siguiente día. Y si tienes que apuñalar a alguien por la espalda... asegúrate de que nadie te vea hacerlo."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Jinx" (Nombre real desconocido) -->
+                <div class="character-card">
+                    <img src="images/jinx_alt.png" alt="Jinx" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#23</span>
+                            <span class="character-real-name">"Jinx" (Nombre real desconocido)</span>
+                        </h3>
+                        <div class="character-role">La Psicópata Impredecible</div>
+                        <p class="character-description">Ropa colorida y desgarrada, maquillaje corrido, una sonrisa demasiado amplia. Totalmente impredecible, disfruta del caos. Implantes de combate llamativos pero quizás no de la mejor calidad.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">REF</div>
+                                <div class="stat-value">13</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Caos</div>
+                                <div class="stat-value">80</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">18</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"¡Esto es más divertido que quemar un puesto de ramen! ¿Quieres jugar? Tengo este cuchillito que dice que quiere ser tu amigo. ¡O tal vez tu enemigo! ¡Depende de cómo me mires mañana! ¡HAHAHA!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lin Mayfair -->
+                <div class="character-card">
+                    <img src="images/lin_mayfair_new.png" alt="Lin Mayfair" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#58</span>
+                            <span class="character-real-name">Lin Mayfair</span>
+                        </h3>
+                        <div class="character-role">La "Inocente" Endeudada</div>
+                        <p class="character-description">Joven, aspecto asustado, claramente no es una luchadora. Su familia fue amenazada para obligarla a entrar. O al menos esa es su historia...</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">SAV</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Engaño</div>
+                                <div class="stat-value">70</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"No debería estar aquí... Solo quiero volver a casa... Por favor, ¿alguien puede ayudarme? Mi familia... ellos ni siquiera saben dónde estoy..."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Omega -->
+                <div class="character-card">
+                    <img src="images/subject_omega.png" alt="Subject Omega" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#91</span>
+                            <span class="character-real-name">Subject Omega</span>
+                        </h3>
+                        <div class="character-role">El Misterioso</div>
+                        <p class="character-description">Andrógino, con implantes sutiles pero de alta tecnología apenas visibles. Movimientos precisos, casi inhumanos. No interactúa a menos que sea necesario. Podría ser un agente encubierto de otra facción, o un experimento de OCE.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">???</div>
+                                <div class="stat-value">??</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">???</div>
+                                <div class="stat-value">??</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">??</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Mi propósito aquí es irrelevante para ti. Concéntrate en tu propia supervivencia. La interferencia... no es aconsejable."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ekaterina "Echo" Petrov -->
+                <div class="character-card">
+                    <img src="images/cyber_sniper.png" alt="Ekaterina Echo Petrov" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#37</span>
+                            <span class="character-real-name">Ekaterina "Echo" Petrov</span>
+                        </h3>
+                        <div class="character-role">La Francotiradora Fantasma</div>
+                        <p class="character-description">Ex-militar de élite de las Fuerzas Especiales del Este, la precisión sobrehumana de Echo la convirtió en leyenda. Sus ojos cibernéticos HawkEye-X de grado militar pueden rastrear objetivos a más de 2 km y están conectados a un sistema de predicción balística implantado en su corteza visual.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">COO</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Armas Dist.</div>
+                                <div class="stat-value">90</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">19</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Un disparo, una baja. No es solo mi lema, es mi religión. He apretado el gatillo más veces de las que tú has respirado conscientemente. La diferencia entre tú y yo? Cuando yo apunto a algo, deja de existir, y nunca, jamás, fallo."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dr. Felix "Compound" Reyes -->
+                <div class="character-card">
+                    <img src="images/cyber_chemist.png" alt="Dr. Felix Compound Reyes" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#64</span>
+                            <span class="character-real-name">Dr. Felix "Compound" Reyes</span>
+                        </h3>
+                        <div class="character-role">El Químico Clandestino</div>
+                        <p class="character-description">Genio científico que trabajaba para Pharmaceutech desarrollando drogas de combate para soldados corporativos. Sus ojos brillantes son resultado de sus propios experimentos con neurorreguladores que amplificaron su capacidad intelectual pero desestabilizaron su psique.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">INT</div>
+                                <div class="stat-value">18</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Bioquímica</div>
+                                <div class="stat-value">85</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"¿Ves estas manos? Pueden crear sustancias que harían que tus pesadillas parezcan cuentos infantiles. Una gota, y tu cerebro se derretiría dentro de tu cráneo. Una gota diferente, y pelearías como un dios. Así que... ¿quieres ser mi amigo o mi experimento?"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- "The Twins" (Jin & Jun) -->
+                <div class="character-card">
+                    <img src="images/cyber_twins.png" alt="The Twins - Jin and Jun" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#82</span>
+                            <span class="character-real-name">"Los Gemelos" (Jin & Jun)</span>
+                        </h3>
+                        <div class="character-role">Los Sincronizados</div>
+                        <p class="character-description">Gemelos idénticos que cuentan como un solo concursante gracias a una regla especial de Kaiser. Sus mentes están enlazadas por implantes neurales experimentales que les permiten compartir percepciones sensoriales y actuar con una coordinación perfecta.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">REF</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Coordinación</div>
+                                <div class="stat-value">80</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">20x2</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Nunca estamos solos." (Jin) "Nunca luchamos solos." (Jun) "Siempre somos dos." (Jin) "Y eso nos hace invencibles." (Jun) "Cuando nos enfrentas..." (Jin) "...enfrentas a dos enemigos que actúan como uno." (Ambos al unísono)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sofía "Viper" Nakamura -->
+                <div class="character-card">
+                    <img src="images/viper_blade.png" alt="Sofía Viper Nakamura" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#45</span>
+                            <span class="character-real-name">Sofía "Viper" Nakamura</span>
+                        </h3>
+                        <div class="character-role">La Samurái Callejera</div>
+                        <p class="character-description">Ex-guardaespaldas de la élite corporativa, fue traicionada y dejada por muerta tras un golpe a la familia que protegía. Su mandíbula metálica y el brazo biónico son recuerdos de aquel día. Ahora lucha en Ultimate Mercenary buscando visibilidad y una oportunidad de venganza.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">REF</div>
+                                <div class="stat-value">17</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Armas CaC</div>
+                                <div class="stat-value">80</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">22</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"¿Ves esta hoja? Ha terminado con más vidas de las que puedo recordar. No busco amigos aquí, busco salir viva y con suficiente exposición mediática para que ciertas personas sepan que sigo viva. Y cuando me vean en la pantalla, sabrán que voy por ellos."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alex "Phantom" Mercer -->
+                <div class="character-card">
+                    <img src="images/hacker_phantom.png" alt="Alex Phantom Mercer" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#29</span>
+                            <span class="character-real-name">Alex "Phantom" Mercer</span>
+                        </h3>
+                        <div class="character-role">El Fantasma de la Red</div>
+                        <p class="character-description">Considerado uno de los mejores hackers de Neo-Kyoto, fue capturado tras infiltrarse en los sistemas corporativos de OmniCorp. En lugar de ejecutarlo, decidieron ofrecerle un lugar en el programa, principalmente por su habilidad para el espectáculo.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">INT</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Hack</div>
+                                <div class="stat-value">85</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Las cámaras, los drones, incluso los implantes de seguridad de OCE... Todo sistema tiene una vulnerabilidad. Solo hay que saber dónde mirar. Y yo... bueno, siempre estoy mirando. ¿Alianza? Tal vez. Pero te advierto: no me gustan las personas predecibles."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Marcus "Titan" Graves -->
+                <div class="character-card">
+                    <img src="images/titan_warrior.png" alt="Marcus Titan Graves" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#71</span>
+                            <span class="character-real-name">Marcus "Titan" Graves</span>
+                        </h3>
+                        <div class="character-role">El Soldado Aumentado</div>
+                        <p class="character-description">Veterano de las Guerras Corporativas, Graves participó en el programa experimental de super-soldados del ejército. Su cuerpo está reforzado con un exoesqueleto militar integrado y sistemas de armas. Tras ser dado por "obsoleto" y programado para desmantelamiento, escapó.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">VIG</div>
+                                <div class="stat-value">18</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Armas Pes.</div>
+                                <div class="stat-value">75</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">35</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"Me construyeron para la guerra. Me entrenaron para la victoria. ¿Y cuando terminó todo? Me tiraron como chatarra. Pero lo que no entienden es que me hicieron demasiado bien. No soy una herramienta que se pueda desechar. Soy un arma que ahora apunta hacia ellos."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Faith "Oracle" Lee -->
+                <div class="character-card">
+                    <img src="images/faith_oracle.png" alt="Faith Oracle Lee" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#53</span>
+                            <span class="character-real-name">Faith "Oracle" Lee</span>
+                        </h3>
+                        <div class="character-role">La Tecno-Sacerdotisa</div>
+                        <p class="character-description">Ex-profeta de la Iglesia de la Singularidad Divina, una religión que venera la fusión de humanidad y tecnología. Tiene implantes neurales que le permiten procesar información a velocidades sobrehumanas y conectarse directamente con sistemas informáticos.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">INT</div>
+                                <div class="stat-value">17</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Intuición</div>
+                                <div class="stat-value">75</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"La carne es solo el vehículo temporal de la conciencia. En la confluencia de sangre y silicio hallaremos la trascendencia. Tus temores, tus dudas... He visto cómo terminan. Te guiaré si estás dispuesto a escuchar."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Darius "Thunder Fist" Jackson -->
+                <div class="character-card">
+                    <img src="images/thunder_fist.png" alt="Darius Thunder Fist Jackson" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#68</span>
+                            <span class="character-real-name">Darius "Thunder Fist" Jackson</span>
+                        </h3>
+                        <div class="character-role">El Campeón de las Peleas Clandestinas</div>
+                        <p class="character-description">Ex-campeón del circuito de luchas ilegales de Neo-Kyoto, Darius fue modificado ilegalmente con brazos cibernéticos de combate que contienen capacitores de impacto. Fue arrestado tras matar accidentalmente a un oponente y ahora busca en Ultimate Mercenary una vía para recuperar su libertad.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">VIG</div>
+                                <div class="stat-value">16</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Combate CaC</div>
+                                <div class="stat-value">80</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">30</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"No busco fama, no busco gloria. Tengo tres hijos esperándome en casa. Haré lo que sea necesario para volver con ellos, y si eso significa destrozar algunos cráneos en el proceso, que así sea. No tengo nada personal contra ti, pero no te metas en mi camino."</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aria "Maven" Chen -->
+                <div class="character-card">
+                    <img src="images/maven_corporate.png" alt="Aria Maven Chen" class="character-image">
+                    <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#19</span>
+                            <span class="character-real-name">Aria "Maven" Chen</span>
+                        </h3>
+                        <div class="character-role">La Ejecutiva Despiadada</div>
+                        <p class="character-description">Ex-vicepresidenta de operaciones en Nakamura-Daichi Corp, una rival de OCE. Fue culpada por el fracaso de un proyecto de billones y ahora debe "rehabilitarse" en Ultimate Mercenary para recuperar su posición. Sus implantes de negocios incluyen analizadores de microexpresiones y potenciadores cognitivos para estrategia.</p>
+                        <div class="stats-summary">
+                            <div class="stat-item">
+                                <div class="stat-name">INT</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">Manipulación</div>
+                                <div class="stat-value">70</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-name">PV</div>
+                                <div class="stat-value">18</div>
+                            </div>
+                        </div>
+                        <div class="dialogue">
+                            <p>"En las corporaciones o en este juego, las reglas son las mismas: planifica a largo plazo, identifica activos valiosos, elimina obstáculos con precisión, y nunca muestres tus verdaderas intenciones. La diferencia es que aquí puedo ensuciarme las manos personalmente."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+        </main>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Función para mostrar imágenes en pantalla completa al hacer clic
+        document.addEventListener('DOMContentLoaded', function() {
+            // Habilitar las imágenes ampliadas al hacer clic
+            document.querySelectorAll('.character-image, .featured-image').forEach(img => {
+                img.addEventListener('click', function() {
+                    const fullscreen = document.createElement('div');
+                    fullscreen.className = 'fullscreen-image';
+                    
+                    const fullImg = document.createElement('img');
+                    fullImg.src = this.src;
+                    
+                    fullscreen.appendChild(fullImg);
+                    document.body.appendChild(fullscreen);
+                    
+                    fullscreen.addEventListener('click', function() {
+                        this.remove();
+                    });
+                });
+            });
+
+            // Cargar datos de protagonista guardados si existen
+            if (localStorage.getItem('character-name')) {
+                document.getElementById('protagonist-name').textContent = localStorage.getItem('character-name') + ' <span class="character-number">#13</span>';
+                document.getElementById('protagonist-description').textContent = localStorage.getItem('character-bio');
+                
+                if (localStorage.getItem('character-image')) {
+                    document.getElementById('protagonist-image').src = localStorage.getItem('character-image');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

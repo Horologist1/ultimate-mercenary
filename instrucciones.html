@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .instructions-container {
+            background-color: var(--medium-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .instructions-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .instructions-header h2 {
+            font-family: var(--header-font);
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .instructions-section {
+            margin-bottom: 30px;
+        }
+
+        .instructions-section h3 {
+            font-family: var(--header-font);
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 0, 170, 0.3);
+        }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .instruction-card {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .instruction-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .instruction-card h4 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .instruction-card h4 i {
+            margin-right: 10px;
+        }
+
+        .instruction-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .code-block {
+            background-color: var(--darker-bg);
+            border-radius: 5px;
+            padding: 15px;
+            font-family: monospace;
+            overflow-x: auto;
+            border-left: 3px solid var(--primary-color);
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+
+        .toc {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            border-bottom: none;
+        }
+
+        .toc ul {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--primary-color);
+        }
+
+        .note-box {
+            background-color: rgba(0, 242, 255, 0.1);
+            border-left: 3px solid var(--primary-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .warning-box {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 3px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(224, 224, 255, 0.2);
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .instructions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Widget examples*/
+        .widget-example {
+            margin: 20px 0;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .widget-example-header {
+            background-color: var(--darker-bg);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--primary-color);
+        }
+        
+        .widget-example-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .widget-example-body {
+            padding: 15px;
+        }
+        
+        .widget-example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>Manual de Usuario</h2>
+                </div>
+            </div>
+            <div class="return-button-container">
+                <a href="index.html" class="return-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="instructions-container">
+                <div class="instructions-header">
+                    <img src="images/oce_logo.png" alt="OCE Logo" style="width: 120px; height: auto; margin-bottom: 20px;">
+                    <h2>Ultimate Mercenary: La Forja del Acero Callejero</h2>
+                    <p>Manual de Usuario Completo</p>
+                </div>
+
+                <div class="toc">
+                    <h3><i class="fas fa-list"></i> Contenido</h3>
+                    <ul>
+                        <li><a href="#introduccion">Introducción</a></li>
+                        <li><a href="#estructura">Estructura del Proyecto</a></li>
+                        <li><a href="#inicio-rapido">Guía de Inicio Rápido</a></li>
+                        <li><a href="#componentes">Componentes Principales</a></li>
+                        <li><a href="#consejos">Consejos para Directores de Juego</a></li>
+                        <li><a href="#expansion">Ideas para Expansión</a></li>
+                        <li><a href="#widgets">Sistema de Widgets</a></li>
+                        <li><a href="#problemas">Solución de Problemas</a></li>
+                    </ul>
+                </div>
+
+                <hr>
+
+                <div id="introduccion" class="instructions-section">
+                    <h3><i class="fas fa-info-circle"></i> Introducción</h3>
+                    <p>Bienvenido a <strong>Ultimate Mercenary: La Forja del Acero Callejero</strong>, un juego de rol cyberpunk donde 100 concursantes desesperados compiten por su supervivencia en un brutal reality show. Este paquete contiene todos los recursos necesarios para dirigir una campaña completa en este oscuro futuro.</p>
+                    <p>El juego está basado en el sistema <strong>Eclipse Phase Segunda Edición</strong> con adaptaciones para facilitar su uso. Todos los recursos se presentan como un sitio web interactivo que incluye la ambientación, personajes, reglas y herramientas digitales.</p>
+                </div>
+
+                <hr>
+
+                <div id="estructura" class="instructions-section">
+                    <h3><i class="fas fa-folder-open"></i> Estructura del Proyecto</h3>
+                    <p>El proyecto está organizado de la siguiente manera:</p>
+                    <ul>
+                        <li><code>index.html</code>: Página principal con toda la información del juego</li>
+                        <li><code>character-sheet.html</code>: Hoja de personaje digital interactiva</li>
+                        <li><code>dice-roller.html</code>: Herramienta para tiradas de dados</li>
+                        <li><code>encounter-generator.html</code>: Generador de encuentros aleatorios</li>
+                        <li><code>instrucciones.html</code>: Versión web de este manual de usuario</li>
+                        <li><code>widgets-demo.html</code>: Demostración de los widgets interactivos básicos</li>
+                        <li><code>widgets-nuevos.html</code>: Demostración de los widgets interactivos avanzados</li>
+                        <li><code>images/</code>: Carpeta con todas las imágenes del juego</li>
+                        <li><code>styles.css</code>, <code>styles_additional.css</code>, etc.: Archivos de estilos visuales</li>
+                        <li><code>script.js</code>, <code>character-sheet.js</code>, <code>widgets.js</code>: Scripts para funcionalidades interactivas</li>
+                    </ul>
+                </div>
+
+                <hr>
+
+                <div id="inicio-rapido" class="instructions-section">
+                    <h3><i class="fas fa-bolt"></i> Guía de Inicio Rápido</h3>
+                    <ol>
+                        <li>Abre el archivo <code>index.html</code> en cualquier navegador web moderno.</li>
+                        <li>Explora las diferentes secciones desde el menú de navegación superior.</li>
+                        <li>Familiarízate con la ambientación, personajes y reglas.</li>
+                        <li>Utiliza las herramientas adicionales para preparar tu sesión de juego.</li>
+                    </ol>
+                    <div class="note-box">
+                        <strong>Nota:</strong> Todos los archivos deben mantenerse en su estructura original para que funcionen correctamente.
+                    </div>
+                </div>
+
+                <hr>
+
+                <div id="componentes" class="instructions-section">
+                    <h3><i class="fas fa-cubes"></i> Componentes Principales</h3>
+                    
+                    <h4>Página Principal</h4>
+                    <p>La página principal (<code>index.html</code>) contiene toda la información necesaria para dirigir el juego, organizada en secciones:</p>
+                    <ul>
+                        <li><strong>Introducción y Ambientación</strong>: Contexto y trasfondo del mundo.</li>
+                        <li><strong>Facciones y Personajes Clave</strong>: OmniCorp Entertainment y PNJs importantes.</li>
+                        <li><strong>El Programa Ultimate Mercenary</strong>: Reglas y mecánicas.</li>
+                        <li><strong>Concursantes Destacados</strong>: PNJs para interacción con los jugadores.</li>
+                        <li><strong>Las Pruebas</strong>: Escenarios de juego detallados.</li>
+                        <li><strong>Tienda de Méritos OCE</strong>: Equipamiento y mejoras disponibles.</li>
+                        <li><strong>Fichas de Personajes</strong>: Arquetipos y estadísticas.</li>
+                        <li><strong>Recursos Adicionales</strong>: Herramientas interactivas.</li>
+                    </ul>
+
+                    <h4>Hoja de Personaje</h4>
+                    <p>La hoja de personaje digital (<code>character-sheet.html</code>) permite gestionar todos los aspectos de tu personaje:</p>
+                    <ol>
+                        <li><strong>Datos Básicos</strong>: Nombre, concepto, trasfondo y razón para estar en el programa.</li>
+                        <li><strong>Aptitudes</strong>: Valores de VIG, COO, INT, REF, WIL y SAV que determinan las capacidades base.</li>
+                        <li><strong>Habilidades</strong>: Lista de competencias con sus especializaciones.</li>
+                        <li><strong>Equipo</strong>: Gestión de armas, armadura y equipo misceláneo.</li>
+                        <li><strong>Implantes</strong>: Control de mejoras cibernéticas y sus efectos.</li>
+                        <li><strong>Notas</strong>: Espacio para información adicional y contactos.</li>
+                    </ol>
+                    <p><strong>Funcionalidades:</strong></p>
+                    <ul>
+                        <li>Cálculo automático de estadísticas derivadas</li>
+                        <li>Sistema para guardar y cargar personajes</li>
+                        <li>Exportación a formato JSON</li>
+                    </ul>
+
+                    <h4>Lanzador de Dados</h4>
+                    <p>La herramienta de dados (<code>dice-roller.html</code>) facilita todas las tiradas necesarias durante el juego:</p>
+                    <ol>
+                        <li><strong>Tiradas de Habilidad</strong>: Sistema d100 donde debes obtener un resultado menor o igual que tu valor de habilidad.</li>
+                        <li><strong>Tiradas de Daño</strong>: Cálculo automático del daño basado en diferentes armas.</li>
+                        <li><strong>Enfrentamientos</strong>: Resolución de conflictos entre PJs y PNJs.</li>
+                        <li><strong>Generador de Encuentros Rápidos</strong>: Creación de situaciones aleatorias.</li>
+                    </ol>
+                    <p><strong>Características:</strong></p>
+                    <ul>
+                        <li>Historial de tiradas con resultados detallados</li>
+                        <li>Cálculo automático de éxitos/fallos críticos</li>
+                        <li>Modificadores y condiciones especiales</li>
+                    </ul>
+
+                    <h4>Generador de Encuentros</h4>
+                    <p>El generador de encuentros (<code>encounter-generator.html</code>) te permite crear situaciones de juego completas:</p>
+                    <ol>
+                        <li><strong>Configuración</strong>: Selección de escenario, tipo, dificultad y elementos especiales.</li>
+                        <li><strong>Generación</strong>: Creación automática de participantes, desafíos y recompensas.</li>
+                        <li><strong>Estadísticas</strong>: Valores recomendados para cada encuentro.</li>
+                        <li><strong>Guardado</strong>: Exportación de encuentros individuales o en conjunto.</li>
+                    </ol>
+                    <p><strong>Opciones de personalización:</strong></p>
+                    <ul>
+                        <li>5 tipos de escenarios (Carrera de Obstáculos, Invernaderos, etc.)</li>
+                        <li>5 tipos de encuentros (Combate, Exploración, Social, etc.)</li>
+                        <li>4 niveles de dificultad</li>
+                        <li>Elementos especiales (trampas, recompensas, etc.)</li>
+                    </ul>
+                </div>
+
+                <hr>
+
+                <div id="consejos" class="instructions-section">
+                    <h3><i class="fas fa-lightbulb"></i> Consejos para Directores de Juego</h3>
+                    
+                    <div class="instructions-grid">
+                        <div class="instruction-card">
+                            <h4><i class="fas fa-users"></i> Gestión de 100 Concursantes</h4>
+                            <p>No es necesario rastrear a todos los concursantes individualmente:</p>
+                            <ul>
+                                <li>Enfócate en los 8-10 PNJs destacados con perfiles detallados.</li>
+                                <li>Usa concursantes genéricos como "carne de cañón" para aumentar la tensión.</li>
+                                <li>Reduce el número de participantes a medida que avanza la historia.</li>
+                                <li>El generador de PNJs aleatorios puede crear nuevos personajes rápidamente.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="instruction-card">
+                            <h4><i class="fas fa-calendar-alt"></i> Estructura de Sesiones</h4>
+                            <p>Organiza tus sesiones siguiendo la estructura de pruebas:</p>
+                            <ul>
+                                <li><strong>Sesión 1</strong>: Introducción y Prueba 1 (eliminación de ~50 concursantes)</li>
+                                <li><strong>Sesión 2</strong>: Interacción social en dormitorios y Prueba 2</li>
+                                <li><strong>Sesión 3</strong>: Prueba 3 y más interacción con supervivientes</li>
+                                <li><strong>Sesiones posteriores</strong>: Pruebas personalizadas con menos concursantes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="instruction-card">
+                            <h4><i class="fas fa-crown"></i> El Factor Kaiser</h4>
+                            <p>Kaiser (el anfitrión) es tu herramienta para ajustar la dificultad sobre la marcha:</p>
+                            <ul>
+                                <li>Úsalo para cambiar reglas si los jugadores tienen demasiada ventaja.</li>
+                                <li>Introduce elementos imprevistos para mantener la tensión.</li>
+                                <li>Otorga ventajas inesperadas a personajes "entretenidos".</li>
+                                <li>Sirve como Deus Ex Machina si los jugadores están completamente atascados.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="instruction-card">
+                            <h4><i class="fas fa-balance-scale"></i> Equilibrio de Juego</h4>
+                            <p>Mantén el equilibrio entre supervivencia y progresión:</p>
+                            <ul>
+                                <li>Ajusta los PM ganados según el rendimiento del grupo.</li>
+                                <li>Personaliza las pruebas para destacar las fortalezas de los PJs.</li>
+                                <li>Utiliza la Tienda de Méritos para controlar la progresión.</li>
+                                <li>Balancea los encuentros con el generador basándote en el equipo actual.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div id="expansion" class="instructions-section">
+                    <h3><i class="fas fa-expand-alt"></i> Ideas para Expansión</h3>
+                    <p>Si deseas expandir o personalizar "Ultimate Mercenary", aquí tienes algunas ideas:</p>
+                    <ol>
+                        <li><strong>Pruebas Adicionales</strong>: Crea nuevas pruebas usando el mismo formato que las existentes.</li>
+                        <li><strong>Facciones Ocultas</strong>: Introduce grupos secretos dentro de OCE u otras corporaciones.</li>
+                        <li><strong>Modo Rebelde</strong>: Desarrolla una subtrama donde los jugadores intentan sabotear el programa.</li>
+                        <li><strong>Evento Catástrofe</strong>: Un desastre o ataque interrumpe el programa, cambiando las dinámicas.</li>
+                        <li><strong>Flashbacks</strong>: Explora el pasado de los personajes y cómo llegaron al programa.</li>
+                        <li><strong>Audiencia Interactiva</strong>: La audiencia puede votar o influir en las pruebas.</li>
+                        <li><strong>Segunda Temporada</strong>: Los supervivientes podrían convertirse en "mentores" o "cazadores".</li>
+                    </ol>
+                </div>
+
+                <hr>
+
+                <div id="widgets" class="instructions-section">
+                    <h3><i class="fas fa-puzzle-piece"></i> Sistema de Widgets</h3>
+                    <p>"Ultimate Mercenary" incluye un potente sistema de widgets interactivos para mejorar la experiencia de juego. Estos componentes pueden integrarse fácilmente en cualquier página web y proporcionan diversas herramientas útiles para jugadores y Directores de Juego.</p>
+                    
+                    <h4>Uso Básico de Widgets</h4>
+                    <p>Para utilizar un widget, simplemente añade un elemento HTML con el atributo <code>data-widget</code> establecido al nombre del widget que deseas usar:</p>
+                    
+                    <div class="code-block">
+&lt;div data-widget="dice-roller-mini"&gt;&lt;/div&gt;</div>
+                    
+                    <p>Cada widget acepta parámetros adicionales mediante atributos <code>data-option-*</code>:</p>
+                    
+                    <div class="code-block">
+&lt;div data-widget="dice-roller-mini" 
+     data-option-diceType="d100" 
+     data-option-showDifficulty="true"&gt;&lt;/div&gt;</div>
+                    
+                    <h4>Widgets Principales</h4>
+                    <ol>
+                        <li><strong>Lanzador de Dados Rápido</strong> (<code>dice-roller-mini</code>): Realiza tiradas rápidas de dados con diferentes opciones.</li>
+                        <li><strong>Contador de Puntos de Mérito</strong> (<code>merit-counter</code>): Contador interactivo para gestionar puntos de mérito con historial.</li>
+                        <li><strong>Temporizador</strong> (<code>time-tracker</code>): Cronómetro o cuenta atrás configurable para gestionar el tiempo en las pruebas.</li>
+                        <li><strong>Notas Rápidas</strong> (<code>quick-notes</code>): Bloc de notas con autoguardado para apuntes.</li>
+                        <li><strong>Encuestas/Votaciones</strong> (<code>poll-widget</code>): Sistema de votación interactivo para tomar decisiones grupales.</li>
+                        <li><strong>Generador de Eventos Aleatorios</strong> (<code>random-event</code>): Generador dinámico de eventos aleatorios para añadir sorpresas.</li>
+                        <li><strong>Seguimiento de Concursantes</strong> (<code>contestant-tracker</code>): Sistema para realizar seguimiento del progreso de concursantes.</li>
+                    </ol>
+                    
+                    <p>Para una documentación completa, consulta los archivos:</p>
+                    <ul>
+                        <li><code>widgets-demo.html</code>: Documentación y ejemplos de los widgets básicos</li>
+                        <li><code>widgets-nuevos.html</code>: Documentación y ejemplos de los widgets avanzados</li>
+                        <li><code>widgets-README.md</code>: Documentación técnica del sistema</li>
+                    </ul>
+                    
+                    <div class="widget-example">
+                        <div class="widget-example-header">
+                            <h4>Ejemplos de Widgets</h4>
+                        </div>
+                        <div class="widget-example-body">
+                            <div class="widget-example-grid">
+                                <div data-widget="dice-roller-mini" data-option-diceType="d100" data-option-showDifficulty="true"></div>
+                                <div data-widget="merit-counter" data-option-initialValue="50"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4>Personalización y Extensión</h4>
+                    <p>El sistema es completamente extensible. Los desarrolladores pueden crear nuevos widgets registrándolos en el objeto <code>UltimateWidgets</code>:</p>
+                    
+                    <div class="code-block">
+UltimateWidgets.register('mi-widget', {
+    init: function(element, options) {
+        // Código de inicialización
+        return {
+            // API expuesta
+        };
+    }
+});</div>
+                    
+                    <p>Todos los widgets pueden personalizarse visualmente mediante temas y CSS personalizado.</p>
+                    
+                    <h4>Integración en tu Campaña</h4>
+                    <p>Experimenta con diferentes combinaciones de widgets según las necesidades de tu mesa:</p>
+                    <ul>
+                        <li>Añade un temporizador y contador de PM durante una prueba</li>
+                        <li>Usa el lanzador de dados rápido para resolver conflictos menores</li>
+                        <li>Integra notas rápidas para registrar eventos importantes</li>
+                        <li>Crea un panel de control para el Director de Juego con múltiples widgets</li>
+                        <li>Utiliza las encuestas para que los jugadores voten en decisiones importantes</li>
+                        <li>Genera eventos aleatorios para mantener las partidas dinámicas</li>
+                        <li>Realiza seguimiento visual de los concursantes eliminados</li>
+                    </ul>
+                    
+                    <p>Para ver ejemplos prácticos y el código necesario, consulta las páginas de demostración:</p>
+                    <ul>
+                        <li><a href="widgets-demo.html"><code>widgets-demo.html</code></a> para widgets básicos</li>
+                        <li><a href="widgets-nuevos.html"><code>widgets-nuevos.html</code></a> para widgets avanzados</li>
+                    </ul>
+                </div>
+
+                <hr>
+
+                <div id="problemas" class="instructions-section">
+                    <h3><i class="fas fa-wrench"></i> Solución de Problemas</h3>
+                    
+                    <h4>Problemas Comunes</h4>
+                    <ol>
+                        <li>
+                            <strong>Las imágenes no se muestran</strong>
+                            <ul>
+                                <li>Verifica que la carpeta <code>images/</code> esté en el mismo directorio que los archivos HTML.</li>
+                                <li>Comprueba que los nombres de archivo coincidan con las referencias en el código.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Las herramientas interactivas no funcionan</strong>
+                            <ul>
+                                <li>Asegúrate de que JavaScript esté habilitado en tu navegador.</li>
+                                <li>Verifica que todos los archivos JS estén en la ubicación correcta.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Errores al guardar personajes</strong>
+                            <ul>
+                                <li>La función de guardado utiliza localStorage, que debe estar habilitado en tu navegador.</li>
+                                <li>Algunos navegadores en modo incógnito pueden bloquear esta función.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Problemas de visualización</strong>
+                            <ul>
+                                <li>Utiliza un navegador actualizado (Chrome, Firefox, Edge, Safari).</li>
+                                <li>Si hay problemas con los estilos, verifica que todos los archivos CSS estén presentes.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Widgets no funcionan correctamente</strong>
+                            <ul>
+                                <li>Asegúrate de que <code>widgets.js</code> y <code>widgets.css</code> estén incluidos en tu HTML.</li>
+                                <li>Verifica la sintaxis de los atributos <code>data-widget</code> y <code>data-option-*</code>.</li>
+                                <li>Comprueba la consola del navegador (F12) para posibles errores.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <h4>Contacto y Soporte</h4>
+                    <p>Si encuentras problemas adicionales o necesitas asistencia, puedes contactar al equipo de desarrollo.</p>
+                </div>
+
+                <hr>
+
+                <div class="instructions-section" style="text-align: center;">
+                    <p><em>Ultimate Mercenary: La Forja del Acero Callejero © 2025</em></p>
+                    <p><em>Basado en Eclipse Phase Segunda Edición</em></p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Volver arriba" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+    <script src="widgets.js"></script>
+    <script>
+        // Botón para volver arriba
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
