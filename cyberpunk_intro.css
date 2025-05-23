@@ -1,0 +1,57 @@
+/* Estilos adicionales para la nueva introducción cyberpunk */
+
+.intro-terminal {
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    animation: terminal-glow 2s infinite alternate;
+}
+
+@keyframes terminal-glow {
+    from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+    to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.3); }
+}
+
+.cyberpunk-list {
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 15px 0;
+}
+
+.cyberpunk-list li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    color: #00ffff;
+}
+
+.cyberpunk-list li:before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: #ff00ff;
+    font-weight: bold;
+}
+
+.warning-box {
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+    margin: 25px 0;
+    overflow: hidden;
+}
+
+.warning-header {
+    background-color: rgba(255, 0, 0, 0.3);
+    color: #ffffff;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.warning-content {
+    padding: 15px;
+    color: #ff6b6b;
+}

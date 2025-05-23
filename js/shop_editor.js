@@ -1,188 +1,3 @@
-// Elementos del DOM
-const addItemButton = document.querySelector('.add-item-button');
-const modal = document.getElementById('addItemModal');
-const closeButton = document.querySelector('.close');
-const cancelButton = document.querySelector('.cancel-btn');
-const addItemForm = document.getElementById('addItemForm');
-const notification = document.getElementById('notification');
-
-// Función para mostrar el modal
-function showModal() {
-    if (!modal) {
-        console.error('Modal no encontrado');
-        return;
-    }
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Previene el scroll
-}
-
-// Función para ocultar el modal
-function hideModal() {
-    if (!modal) {
-        console.error('Modal no encontrado');
-        return;
-    }
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Restaura el scroll
-    if (addItemForm) {
-        addItemForm.reset(); // Limpia el formulario
-    }
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'success') {
-    if (!notification) {
-        console.error('Elemento de notificación no encontrado');
-        return;
-    }
-    notification.textContent = message;
-    notification.style.borderLeftColor = type === 'success' ? 'var(--secondary-color)' : '#ff4444';
-    notification.classList.add('show');
-
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
-
-// Función para guardar items en localStorage
-function saveItem(item) {
-    const items = JSON.parse(localStorage.getItem('shopItems') || '[]');
-    items.push({
-        ...item,
-        id: Date.now(), // Identificador único
-        dateAdded: new Date().toISOString()
-    });
-    localStorage.setItem('shopItems', JSON.stringify(items));
-}
-
-// Función para cargar items desde localStorage
-function loadItems() {
-    return JSON.parse(localStorage.getItem('shopItems') || '[]');
-}
-
-// Función para añadir un item a la tabla correspondiente
-function addItemToTable(item) {
-    const table = document.querySelector(`#${item.category} table.shop-table`);
-    if (!table) {
-        console.error(`Tabla para categoría ${item.category} no encontrada`);
-        return;
-    }
-
-    const tbody = table.querySelector('tbody');
-    if (!tbody) {
-        console.error('Tbody no encontrado en la tabla');
-        return;
-    }
-
-    const row = document.createElement('tr');
-    
-    // Crear las celdas según la categoría
-    switch(item.category) {
-        case 'armas':
-            row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.description}</td>
-                <td>-</td>
-                <td>-</td>
-                <td class="price">${item.price} PM</td>
-            `;
-            break;
-        case 'armaduras':
-            row.innerHTML = `
-                <td>${item.name}</td>
-                <td>-</td>
-                <td>${item.description}</td>
-                <td>-</td>
-                <td class="price">${item.price} PM</td>
-            `;
-            break;
-        case 'equipment':
-        case 'implants':
-            row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.description}</td>
-                <td>-</td>
-                <td class="price">${item.price} PM</td>
-            `;
-            break;
-        case 'services':
-            row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.description}</td>
-                <td class="price">${item.price} PM</td>
-            `;
-            break;
-        default:
-            console.error(`Categoría desconocida: ${item.category}`);
-            return;
-    }
-
-    tbody.appendChild(row);
-}
-
-// Función para cargar todos los items guardados
-function loadAllItems() {
-    const items = loadItems();
-    items.forEach(item => addItemToTable(item));
-}
-
-// Inicialización de event listeners
-function initializeEventListeners() {
-    if (addItemButton) {
-        addItemButton.addEventListener('click', showModal);
-    } else {
-        console.error('Botón de añadir item no encontrado');
-    }
-
-    if (closeButton) {
-        closeButton.addEventListener('click', hideModal);
-    }
-
-    if (cancelButton) {
-        cancelButton.addEventListener('click', hideModal);
-    }
-
-    // Cerrar modal al hacer clic fuera
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            hideModal();
-        }
-    });
-
-    if (addItemForm) {
-        addItemForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = {
-                name: document.getElementById('itemName').value,
-                category: document.getElementById('itemCategory').value,
-                price: document.getElementById('itemPrice').value,
-                description: document.getElementById('itemDescription').value
-            };
-
-            try {
-                // Guardar el item
-                saveItem(formData);
-                
-                // Añadir el item a la tabla correspondiente
-                addItemToTable(formData);
-                
-                showNotification('Item añadido exitosamente');
-                hideModal();
-            } catch (error) {
-                console.error('Error al añadir item:', error);
-                showNotification('Error al añadir el item', 'error');
-            }
-        });
-    }
-}
-
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEventListeners();
-    loadAllItems();
-});
-
 // Funcionalidades para el editor de la tienda y la visualización de imágenes
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -202,8 +17,14 @@ document.addEventListener('DOMContentLoaded', function() {
             showAddItemForm(tabId);
         });
         
-        // Añadir el botón a la sección
-        tab.appendChild(addButton);
+        // Añadir el botón después del primer h3 de la sección
+        const firstH3 = tab.querySelector('h3');
+        if (firstH3) {
+            firstH3.parentNode.insertBefore(addButton, firstH3.nextSibling);
+        } else {
+            // Si no hay h3, añadir al principio de la sección
+            tab.insertBefore(addButton, tab.firstChild);
+        }
     });
 
     // Cargar items guardados al iniciar
@@ -216,327 +37,198 @@ function showAddItemForm(tabId) {
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'block';
-    
-    let formTitle = '';
-    let formFields = '';
-    
-    // Ajustar los campos según la categoría
-    switch(tabId) {
-        case 'weapons':
-            formTitle = 'Añadir Nueva Arma';
-            formFields = `
-                <div class="form-group">
-                    <label for="item-name">Nombre del Arma:</label>
-                    <input type="text" id="item-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-description">Descripción:</label>
-                    <input type="text" id="item-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-damage">Daño:</label>
-                    <input type="text" id="item-damage" placeholder="Ej: 2d10+2">
-                </div>
-                <div class="form-group">
-                    <label for="item-notes">Notas:</label>
-                    <input type="text" id="item-notes">
-                </div>
-                <div class="form-group">
-                    <label for="item-cost">Coste (PM):</label>
-                    <input type="number" id="item-cost" min="1" required>
-                </div>
-            `;
-            break;
-        case 'armor':
-            formTitle = 'Añadir Nueva Armadura';
-            formFields = `
-                <div class="form-group">
-                    <label for="item-name">Nombre de la Armadura:</label>
-                    <input type="text" id="item-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-armor">Armadura (K/E):</label>
-                    <input type="text" id="item-armor" placeholder="Ej: 4/6">
-                </div>
-                <div class="form-group">
-                    <label for="item-description">Descripción:</label>
-                    <input type="text" id="item-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-coverage">Cobertura:</label>
-                    <input type="text" id="item-coverage" placeholder="Ej: Torso, Cuerpo completo">
-                </div>
-                <div class="form-group">
-                    <label for="item-cost">Coste (PM):</label>
-                    <input type="number" id="item-cost" min="1" required>
-                </div>
-            `;
-            break;
-        case 'equipment':
-            formTitle = 'Añadir Nuevo Equipamiento';
-            formFields = `
-                <div class="form-group">
-                    <label for="item-name">Nombre del Equipamiento:</label>
-                    <input type="text" id="item-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-description">Descripción:</label>
-                    <input type="text" id="item-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-effects">Efectos:</label>
-                    <input type="text" id="item-effects">
-                </div>
-                <div class="form-group">
-                    <label for="item-cost">Coste (PM):</label>
-                    <input type="number" id="item-cost" min="1" required>
-                </div>
-            `;
-            break;
-        case 'implants':
-            formTitle = 'Añadir Nuevo Implante';
-            formFields = `
-                <div class="form-group">
-                    <label for="item-name">Nombre del Implante:</label>
-                    <input type="text" id="item-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-description">Descripción:</label>
-                    <input type="text" id="item-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-effects">Efectos:</label>
-                    <input type="text" id="item-effects" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-level">Nivel:</label>
-                    <select id="item-level">
-                        <option value="básico">Básico</option>
-                        <option value="medio">Medio</option>
-                        <option value="avanzado">Avanzado</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="item-cost">Coste (PM):</label>
-                    <input type="number" id="item-cost" min="1" required>
-                </div>
-            `;
-            break;
-        case 'services':
-            formTitle = 'Añadir Nuevo Servicio';
-            formFields = `
-                <div class="form-group">
-                    <label for="item-name">Nombre del Servicio:</label>
-                    <input type="text" id="item-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-description">Descripción:</label>
-                    <input type="text" id="item-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-cost">Coste (PM):</label>
-                    <input type="text" id="item-cost" required>
-                </div>
-            `;
-            break;
-    }
-    
-    // Crear contenido del modal
+
+    // Obtener la estructura de columnas según la sección
+    const columns = getColumnsForSection(tabId);
+
+    // Crear el contenido del modal
     modal.innerHTML = `
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>${formTitle}</h2>
-            <form id="add-item-form">
-                ${formFields}
+            <h2>Añadir nuevo item</h2>
+            <form id="addItemForm">
+                ${columns.map(col => `
+                    <div class="form-group">
+                        <label for="${col.toLowerCase()}">${col}</label>
+                        <input type="text" id="${col.toLowerCase()}" name="${col.toLowerCase()}" required>
+                    </div>
+                `).join('')}
                 <div class="button-group">
-                    <button type="button" class="cancel-btn">Cancelar</button>
-                    <button type="submit" class="save-btn">Guardar</button>
+                    <button type="button" class="cancel-button">Cancelar</button>
+                    <button type="submit" class="confirm-button">Añadir</button>
                 </div>
             </form>
         </div>
     `;
-    
-    // Añadir el modal al documento
+
+    // Añadir el modal al body
     document.body.appendChild(modal);
-    
-    // Configurar eventos del modal
+
+    // Evento para cerrar el modal
     const closeBtn = modal.querySelector('.close');
-    const cancelBtn = modal.querySelector('.cancel-btn');
-    const form = modal.querySelector('form');
-    
-    // Cerrar modal
-    closeBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-    
-    cancelBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-    
-    // Cerrar al hacer clic fuera del modal
-    window.addEventListener('click', function(event) {
-        if (event.target == modal) {
-            modal.remove();
-        }
-    });
-    
-    // Manejar envío del formulario
-    form.addEventListener('submit', function(e) {
+    const cancelBtn = modal.querySelector('.cancel-button');
+    const closeModal = () => {
+        document.body.removeChild(modal);
+    };
+
+    closeBtn.onclick = closeModal;
+    cancelBtn.onclick = closeModal;
+
+    // Evento para enviar el formulario
+    const form = modal.querySelector('#addItemForm');
+    form.onsubmit = (e) => {
         e.preventDefault();
+        const formData = new FormData(form);
+        const itemData = {};
+        formData.forEach((value, key) => {
+            itemData[key] = value;
+        });
         
-        // Obtener valores del formulario
-        const formData = {
-            name: form.querySelector('#item-name').value,
-            description: form.querySelector('#item-description').value,
-            cost: form.querySelector('#item-cost').value
-        };
-        
-        // Añadir campos específicos según la categoría
-        switch(tabId) {
-            case 'weapons':
-                formData.damage = form.querySelector('#item-damage').value;
-                formData.notes = form.querySelector('#item-notes').value;
-                break;
-            case 'armor':
-                formData.armor = form.querySelector('#item-armor').value;
-                formData.coverage = form.querySelector('#item-coverage').value;
-                break;
-            case 'equipment':
-                formData.effects = form.querySelector('#item-effects').value;
-                break;
-            case 'implants':
-                formData.effects = form.querySelector('#item-effects').value;
-                formData.level = form.querySelector('#item-level').value;
-                break;
-        }
-        
-        // Guardar el item
-        saveItem(formData);
-        
-        // Añadir el item a la tabla
-        addItemToTable(formData, tabId);
-        
-        // Mostrar notificación
-        showNotification('Item añadido correctamente');
-        
-        // Cerrar modal
-        modal.remove();
-    });
+        // Guardar el nuevo item
+        saveNewItem(tabId, itemData);
+        closeModal();
+    };
 }
 
-// Función para guardar un item en localStorage
-function saveItem(item) {
-    // Obtener items existentes
-    let items = JSON.parse(localStorage.getItem('shopItems') || '[]');
-    
-    // Añadir nuevo item con ID único
-    item.id = Date.now();
-    item.createdAt = new Date().toISOString();
-    items.push(item);
-    
-    // Guardar en localStorage
-    localStorage.setItem('shopItems', JSON.stringify(items));
-}
-
-// Función para añadir un item a la tabla
-function addItemToTable(item, category) {
-    const tabSection = document.getElementById(category);
-    const tables = tabSection.querySelectorAll('table');
-    
-    if (tables.length > 0) {
-        const targetTable = tables[0];
-        const tbody = targetTable.querySelector('tbody') || targetTable;
-        
-        // Crear nueva fila
-        const row = document.createElement('tr');
-        
-        // Añadir celdas según la categoría
-        switch(category) {
-            case 'weapons':
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.description}</td>
-                    <td>${item.damage}</td>
-                    <td>${item.notes}</td>
-                    <td class="price">${item.cost} PM</td>
-                `;
-                break;
-            case 'armor':
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.armor}</td>
-                    <td>${item.description}</td>
-                    <td>${item.coverage}</td>
-                    <td class="price">${item.cost} PM</td>
-                `;
-                break;
-            case 'equipment':
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.description}</td>
-                    <td>${item.effects}</td>
-                    <td class="price">${item.cost} PM</td>
-                `;
-                break;
-            case 'implants':
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.description}</td>
-                    <td>${item.effects}</td>
-                    <td>${item.level}</td>
-                    <td class="price">${item.cost} PM</td>
-                `;
-                break;
-            case 'services':
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>${item.description}</td>
-                    <td class="price">${item.cost} PM</td>
-                `;
-                break;
-        }
-        
-        // Añadir la fila a la tabla
-        tbody.appendChild(row);
+// Función para obtener las columnas según la sección
+function getColumnsForSection(tabId) {
+    switch(tabId) {
+        case 'shop-armas':
+            return ['Artículo', 'Descripción', 'Daño', 'Notas', 'Coste'];
+        case 'shop-municion':
+            return ['Artículo', 'Compatible con', 'Cantidad', 'Coste'];
+        case 'shop-armaduras':
+            return ['Artículo', 'Armadura (K/E)', 'Descripción', 'Cobertura', 'Coste'];
+        case 'shop-cyberware':
+            return ['Artículo', 'Descripción', 'Efectos', 'Coste'];
+        case 'shop-equipo':
+            return ['Artículo', 'Descripción', 'Efectos', 'Coste'];
+        case 'shop-servicios':
+            return ['Servicio', 'Descripción', 'Coste'];
+        default:
+            return ['Artículo', 'Descripción', 'Coste'];
     }
 }
 
-// Función para mostrar notificaciones
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
+// Función para guardar un nuevo item
+function saveNewItem(tabId, itemData) {
+    // Obtener items existentes
+    let savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
     
-    document.body.appendChild(notification);
+    // Inicializar el array para la sección si no existe
+    if (!savedItems[tabId]) {
+        savedItems[tabId] = [];
+    }
     
-    // Mostrar la notificación
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
+    // Añadir el nuevo item
+    savedItems[tabId].push(itemData);
     
-    // Ocultar y eliminar la notificación después de 3 segundos
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            notification.remove();
-        }, 300);
-    }, 3000);
+    // Guardar en localStorage
+    localStorage.setItem('shopItems', JSON.stringify(savedItems));
+    
+    // Actualizar la visualización
+    updateShopDisplay(tabId);
 }
 
-// Función para cargar items guardados al iniciar
+// Función para cargar items guardados
 function loadSavedItems() {
-    const items = JSON.parse(localStorage.getItem('shopItems') || '[]');
+    const savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
     
-    items.forEach(item => {
-        // Determinar la categoría del item
-        let category = '';
-        if (item.damage) category = 'weapons';
-        else if (item.armor) category = 'armor';
-        else if (item.level) category = 'implants';
-        else if (item.effects) category = 'equipment';
-        else category = 'services';
-        
-        // Añadir el item a la tabla correspondiente
-        addItemToTable(item, category);
+    // Actualizar cada sección
+    Object.keys(savedItems).forEach(tabId => {
+        updateShopDisplay(tabId);
     });
-} 
+}
+
+// Función para actualizar la visualización de la tienda
+function updateShopDisplay(tabId) {
+    const tab = document.getElementById(tabId);
+    if (!tab) return;
+
+    const savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
+    const items = savedItems[tabId] || [];
+    
+    // Encontrar la tabla en la sección
+    const table = tab.querySelector('table');
+    if (!table) return;
+
+    // Obtener el tbody existente
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    // Guardar los items predefinidos
+    const predefinedRows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Limpiar la tabla
+    tbody.innerHTML = '';
+
+    // Primero añadir los items predefinidos
+    predefinedRows.forEach(row => {
+        tbody.appendChild(row.cloneNode(true));
+    });
+
+    // Luego añadir los items guardados
+    items.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.className = 'custom-item'; // Añadir clase para estilos específicos
+        const columns = getColumnsForSection(tabId);
+        
+        columns.forEach(col => {
+            const cell = document.createElement('td');
+            const value = item[col.toLowerCase()];
+            if (col === 'Coste') {
+                cell.className = 'price';
+                cell.textContent = `${value} PM`;
+            } else {
+                cell.textContent = value;
+            }
+            row.appendChild(cell);
+        });
+
+        // Añadir botón de eliminar
+        const deleteCell = document.createElement('td');
+        deleteCell.className = 'delete-cell';
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-item-button';
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteButton.title = 'Eliminar item';
+        deleteButton.onclick = () => deleteItem(tabId, index);
+        deleteCell.appendChild(deleteButton);
+        row.appendChild(deleteCell);
+
+        tbody.appendChild(row);
+    });
+}
+
+// Función para eliminar un item
+function deleteItem(tabId, index) {
+    // Obtener items existentes
+    let savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
+    
+    // Verificar que la sección existe
+    if (!savedItems[tabId]) return;
+    
+    // Eliminar el item del array
+    savedItems[tabId].splice(index, 1);
+    
+    // Guardar en localStorage
+    localStorage.setItem('shopItems', JSON.stringify(savedItems));
+    
+    // Eliminar la fila directamente del DOM
+    const table = document.querySelector(`#${tabId} table`);
+    if (table) {
+        const tbody = table.querySelector('tbody');
+        if (tbody) {
+            // Obtener todas las filas personalizadas
+            const customRows = tbody.querySelectorAll('tr.custom-item');
+            if (customRows[index]) {
+                // Añadir una clase para la animación de salida
+                customRows[index].classList.add('removing');
+                // Eliminar la fila después de la animación
+                setTimeout(() => {
+                    customRows[index].remove();
+                }, 300);
+            }
+        }
+    }
+}

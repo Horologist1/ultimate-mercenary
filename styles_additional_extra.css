@@ -1,0 +1,284 @@
+/* Estilos adicionales extra para Ultimate Mercenary */
+
+.full-width-image {
+    width: 100%;
+    height: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.3);
+}
+
+.contained-image {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.gallery-item {
+    text-align: center;
+    max-width: 200px;
+}
+
+.gallery-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.gallery-image:hover {
+    transform: scale(1.05);
+}
+
+.gallery-caption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #00ffff;
+    font-weight: bold;
+}
+
+.character-image {
+    width: 220px !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 10px auto !important;
+    display: block !important;
+    max-width: none !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 10px #00ffff, inset 0 0 10px #00ffff;
+}
+
+/* Reglas específicas para imágenes de OCE */
+img[src*="oce"] {
+    width: 220px !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    max-width: none !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    margin: 10px auto !important;
+    display: block !important;
+}
+
+/* Forzar mismo tamaño para todas las imágenes de personajes */
+.character-card img,
+.character-card .character-image,
+img.character-image,
+img[src*="guard_ocemk2"],
+img[src*="oce"] {
+    width: 220px !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    max-width: none !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    margin: 10px auto !important;
+    display: block !important;
+}
+
+.character-image:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #00ffff, inset 0 0 20px #00ffff;
+}
+
+.faction-logo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin: 10px;
+}
+
+/* Ajustar el header para dar espacio al botón de logout */
+header {
+    position: relative;
+    padding-right: 150px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+header nav {
+    width: 100%;
+}
+
+header nav ul {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+header nav ul li {
+    white-space: nowrap;
+}
+
+/* Estilos para el botón de logout */
+.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 50px;
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);
+    display: block !important;
+    margin-right: 10px;
+}
+
+.logout-btn:hover {
+    background-color: #ff6b81;
+    box-shadow: 0 4px 8px rgba(255, 71, 87, 0.5);
+    transform: translateY(-2px);
+}
+
+.logout-btn i {
+    margin-right: 5px;
+}
+
+/* Estilos para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ajuste específico para la imagen de Tanaka */
+#modalImage[src*="guard_ocemk2"] {
+    width: 450px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 450px !important;
+    min-height: auto !important;
+}
+
+.modal-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: #00ffff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    text-shadow: 0 0 10px #00ffff;
+    background: transparent;
+    border: none;
+    padding: 5px;
+    z-index: 1001;
+}
+
+.modal-close:hover {
+    color: #fff;
+    text-shadow: 0 0 20px #00ffff;
+}
+
+/* Estilos para los botones de edición de la tienda */
+.add-item-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #00ffff;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.add-item-button:hover {
+    background-color: #fff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+/* Botón volver al inicio igual que concursantes */
+.back-button {
+    display: inline-block;
+    background-color: #ff4757;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);
+}
+.back-button:hover {
+    background-color: #ff6b81;
+}
+
+/* Mejorar legibilidad de paneles y pestañas en ficha */
+.tab {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: 1px solid #00ffff;
+    border-radius: 4px;
+    color: #00ffff;
+    background: rgba(0, 0, 0, 0.7);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+.tab.active {
+    background: #00ffff;
+    color: #111;
+    font-weight: bold;
+    box-shadow: 0 0 10px #00ffff;
+}
+.tab:hover {
+    background: rgba(0,255,255,0.2);
+    color: #fff;
+}
+.tab-content {
+    background: rgba(0,0,0,0.85);
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    color: #e0f7fa;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0,255,255,0.1);
+} 

@@ -22,53 +22,53 @@ const colorPaleta = [
 ];
 
 const mensajesGenerales = [
-    "¡Vamos, no decepciones a tus fans!",
+    "¡Vamos XIII, no decepciones a tus fans!",
     "¡Estoy apostando todo por ti, no me falles!",
     "Mira esos reflejos, ¡eres una máquina!",
-    "Mi IA predictiva dice que no llegarás a la siguiente ronda...",
+    "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
     "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
-    "OCE debería ponerte un reto REAL",
+    "OCE debería ponerte un reto REAL, XIII",
     "Ese cromo que llevas parece de segunda mano...",
-    "¡Eres mi favorito desde el principio!",
-    "Solo los débiles usan tanto equipo. Demuestra tu valor real.",
-    "Por dios, alguien dé algo de equipo decente a este participante",
+    "¡Eres mi favorita desde el principio!",
+    "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+    "Por dios, alguien dé algo de equipo decente a la XIII",
     "Sácale los ojos al siguiente que veas",
-    "Mi hijo te adora, no mueras por favor",
-    "Ese último movimiento fue ÉPICO",
+    "Mi hija te adora, no mueras por favor",
+    "Ese último movimiento fue ÉPICO, XIII",
     "Tu puntuación de audiencia acaba de subir un 15%",
-    "Kaiser está evaluando tus movimientos, impresiónalos",
+    "Kaiser está evaluando tus movimientos, impresiónalo",
     "A este ritmo acabarás como carne picada",
-    "Empiezo a creer que realmente tienes posibilidades",
-    "Nadie ha pasado la siguiente prueba con vida, serás el primero?",
-    "Llevo viendo este programa 5 temporadas y eres el mejor hasta ahora",
+    "Empiezo a creer que realmente tienes posibilidades, XIII",
+    "Nadie ha pasado la siguiente prueba con vida, ¿serás la primera?",
+    "Llevo viendo este programa 5 temporadas y eres la mejor hasta ahora",
     "¿Has considerado aliarte con el tipo del brazo biónico?",
     "Esa cicatriz te queda genial en cámara",
-    "¡La audiencia de Neo-Kyoto Norte te adora!",
+    "¡La audiencia de Neo-Kyoto Norte te adora, XIII!",
     "Baja el ritmo o te quemarás antes de la prueba final",
     "Acabo de hackear las cámaras de la arena, cuidado con el sector 7",
     "¡MÁTALOS A TODOS!",
     "¿Por qué no intentas algo más arriesgado? Aburres...",
     "Usa ese implante que conseguiste, ¡para eso gastaste PM!",
     "Realmente impresionante tu técnica con esa katana",
-    "Mi IA predice un 32% de posibilidades de supervivencia",
+    "Mi IA predice un 32% de posibilidades de supervivencia para la XIII",
     "Tu puntuación en las apuestas acaba de duplicarse"
 ];
 
 const retosEspecificos = [
-    "¡Haz un striptease para la cámara! ¡+10 PM si lo haces!",
+    "¡Haz un striptease para la cámara, XIII! ¡+10 PM si lo haces!",
     "¡Besa al próximo participante que veas! El público lo pide",
     "Reta a [PARTICIPANTE] a un duelo cuerpo a cuerpo, sin armas",
     "Haz 20 flexiones ahora mismo para demostrar tu fuerza",
     "Rompe tu arma principal - si te atreves, OCE te dará una mejor",
     "Confiesa tu mayor miedo a la cámara, ¡el público quiere drama!",
-    "Háblale a la cámara sobre por qué entraste al programa",
+    "Háblale a la cámara sobre por qué entraste al programa, XIII",
     "¡Intenta hackear el siguiente terminal sin protección!",
     "Cuéntanos tu peor secreto, ¡la audiencia lo exige!",
     "Sabotea el equipo de [PARTICIPANTE] cuando no esté mirando",
     "Llora ante la cámara, real o falso, ¡sube tu popularidad!",
     "Grita el nombre de tu amor a la cámara - ¿alguien especial fuera?",
     "Forma una alianza con el participante que más odias",
-    "Traiciona a tu aliado actual - el público quiere drama",
+    "Traiciona a tu aliada actual - el público quiere drama",
     "Realiza una danza de la victoria cada vez que elimines a alguien",
     "Intenta robar un objeto de la Tienda de Méritos",
     "Cuenta una historia triste de tu pasado - real o inventada",
@@ -82,7 +82,7 @@ const retosEspecificos = [
     "Intenta sobornar a un guardia de OCE frente a la cámara",
     "Insulta a OCE directamente - ¡a ver si te atreves!",
     "Finge tu propia muerte en la próxima prueba - ¡engáñalos a todos!",
-    "Revela las debilidades de tu aliado actual a la cámara",
+    "Revela las debilidades de tu aliada actual a la cámara",
     "Haz un pacto de sangre con otro concursante frente a la cámara",
     "Realiza un discurso político radical contra las corporaciones",
     "Intenta robar el implante personal de [PARTICIPANTE] - ¡+50 PM!",
@@ -94,13 +94,13 @@ const retosEspecificos = [
     "Crea una falsa rivalidad romántica con [PARTICIPANTE] para las cámaras",
     "¡Engaña a Nano para que te dé un implante experimental!",
     "Prueba a combatir con los ojos vendados la próxima prueba",
-    "Convence a Kaiser de que eres un espía encubierto del gobierno",
+    "Convence a Kaiser de que eres una espía encubierta del gobierno",
     "Hackea el servicio de mensajería de OCE para enviar un mensaje propio",
     "Escóndete en los dormitorios por 24 horas - ¡sin que nadie te encuentre!",
     "Convence a [PARTICIPANTE] de que tiene un admirador secreto fuera",
     "Simula una lesión para conseguir atención médica - ¡y medicamentos!",
     "Intenta reclutar concursantes para un motín planificado",
-    "Confiesa a las cámaras que planeabas traicionar a tu aliado",
+    "Confiesa a las cámaras que planeabas traicionar a tu aliada",
     "Crea y comparte tu propio cóctel de drogas de combate con [PARTICIPANTE]",
     "¡Baila sensualmente con [PARTICIPANTE] durante la pausa entre pruebas!",
     "Cambia tu look completamente - ¡irreconocible para las cámaras!",
@@ -148,7 +148,7 @@ function inicializarChatWidget() {
     if (!chatContainer) return;
     
     // Generar mensajes iniciales
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
         agregarMensaje(chatContainer);
     }
     
@@ -156,12 +156,12 @@ function inicializarChatWidget() {
     setInterval(() => {
         agregarMensaje(chatContainer);
         
-        // Mantener solo los últimos 12 mensajes
+        // Mantener solo los últimos 20 mensajes
         const mensajes = chatContainer.querySelectorAll('.chat-message');
-        if (mensajes.length > 12) {
+        if (mensajes.length > 20) {
             mensajes[0].remove();
         }
-    }, 5000); // Nuevo mensaje cada 5 segundos
+    }, 3000); // Nuevo mensaje cada 3 segundos
 }
 
 // Función para agregar un mensaje al chat
@@ -179,9 +179,13 @@ function agregarMensaje(container) {
     mensajeElement.style.opacity = '0';
     container.appendChild(mensajeElement);
     
-    // Trigger animation
+    // Trigger animation and scroll
     setTimeout(() => {
         mensajeElement.style.opacity = '1';
+        // Asegurar que el scroll se realiza después de que el mensaje sea visible
+        requestAnimationFrame(() => {
+            container.scrollTop = container.scrollHeight;
+        });
     }, 50);
 }
 

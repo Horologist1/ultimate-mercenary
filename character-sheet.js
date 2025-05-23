@@ -57,6 +57,46 @@ document.addEventListener('DOMContentLoaded', function() {
             // Initialize contacts
             this.allies = [];
             this.enemies = [];
+
+            // Inicializar el mapa de atributos para habilidades
+            this.skillAttributeMap = {
+                // Combate
+                'Armas Cuerpo a Cuerpo': 'ref',
+                'Pistolas': 'ref',
+                'Rifles': 'ref',
+                'Subfusiles': 'ref',
+                'Escopetas': 'ref',
+                'Arcos': 'ref',
+                'Lanzamiento': 'ref',
+                'Esquivar': 'ref',
+                
+                // Físicas
+                'Atletismo': 'coo',
+                'Fuerza': 'vig',
+                'Infiltración': 'coo',
+                'Sigilo': 'coo',
+                
+                // Sociales
+                'Engaño': 'sav',
+                'Intimidación': 'sav',
+                'Persuación': 'sav',
+                'Protocolo': 'sav',
+                
+                // Técnicas
+                'Conocimiento': 'int',
+                'Interfaz': 'int',
+                'Medicina': 'int',
+                'Percepción': 'int',
+                'Profesión': 'int',
+                'Programación': 'int',
+                'Psicología': 'int',
+                'Resistencia': 'vig',
+                'Sabiduría': 'int',
+                'Tecnología': 'int'
+            };
+
+            // Inicializar habilidades personalizadas
+            this.customSkills = [];
         }
 
         setupEventListeners() {
@@ -209,6 +249,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Random avatar
             document.getElementById('randomize-avatar').addEventListener('click', () => {
                 this.randomizeAvatar();
+            });
+
+            // Botón para añadir habilidad personalizada
+            const addCustomSkillBtn = document.getElementById('add-custom-skill');
+            if (addCustomSkillBtn) {
+                addCustomSkillBtn.addEventListener('click', () => this.addCustomSkill());
+            }
+
+            // Actualizar totales cuando cambien los atributos
+            document.querySelectorAll('.aptitude-value').forEach(input => {
+                input.addEventListener('change', () => this.updateSkillTotals());
+            });
+
+            // Actualizar totales cuando cambien las habilidades
+            document.querySelectorAll('.skill-item input').forEach(input => {
+                input.addEventListener('change', () => {
+                    this.updateSkillTotals();
+                    this.saveCharacterSheet();
+                });
             });
         }
 
@@ -886,137 +945,135 @@ document.addEventListener('DOMContentLoaded', function() {
             return statuses[status] || status;
         }
 
+        calculateSkillTotal(skillName, skillValue) {
+            const attribute = this.skillAttributeMap[skillName];
+            if (!attribute) return skillValue; // Para habilidades personalizadas
+            
+            const attributeValue = parseInt(document.getElementById(attribute).value) || 0;
+            return skillValue + attributeValue;
+        }
+
+        updateSkillTotals() {
+            document.querySelectorAll('.skill-item').forEach(item => {
+                const skillName = item.querySelector('label').textContent;
+                const skillValue = parseInt(item.querySelector('input').value) || 0;
+                const total = this.calculateSkillTotal(skillName, skillValue);
+                
+                // Actualizar o crear el elemento que muestra el total
+                let totalElement = item.querySelector('.skill-total');
+                if (!totalElement) {
+                    totalElement = document.createElement('span');
+                    totalElement.className = 'skill-total';
+                    item.appendChild(totalElement);
+                }
+                totalElement.textContent = `(${total})`;
+            });
+        }
+
+        addCustomSkill(name = '', value = '0') {
+            const customSkillsContainer = document.getElementById('custom-skills');
+            const customSkillDiv = document.createElement('div');
+            customSkillDiv.className = 'custom-skill-item';
+            customSkillDiv.innerHTML = `
+                <input type="text" class="custom-skill-name" value="${name}" placeholder="Nombre de la habilidad">
+                <input type="number" class="custom-skill-value" value="${value}" min="0" max="60">
+                <button class="remove-skill-btn"><i class="fas fa-times"></i></button>
+            `;
+
+            customSkillsContainer.appendChild(customSkillDiv);
+
+            // Añadir eventos
+            const removeBtn = customSkillDiv.querySelector('.remove-skill-btn');
+            removeBtn.addEventListener('click', () => {
+                customSkillDiv.remove();
+                this.saveCharacterSheet();
+            });
+
+            const inputs = customSkillDiv.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    this.saveCharacterSheet();
+                    this.updateSkillTotals();
+                });
+            });
+
+            // Guardar la habilidad personalizada
+            this.customSkills.push({ name, value });
+            this.saveCharacterSheet();
+        }
+
         saveCharacterSheet() {
-            // Gather all data from form fields
+            const user = localStorage.getItem('currentUser');
+            if (!user) return;
+
             const characterData = {
-                // Basic info
-                name: document.getElementById('character-name').value,
-                concept: document.getElementById('character-concept').value,
-                background: document.getElementById('character-background').value,
-                debt: document.getElementById('character-debt').value,
-                
-                // Aptitudes
-                aptitudes: this.aptitudes,
-                attributePoints: this.attributePoints,
-                
-                // Skills
-                skills: this.skills,
-                skillPoints: this.skillPoints,
-                
-                // Equipment
-                weapons: this.weapons,
-                armor: this.armor,
-                gear: this.gear,
-                
-                // Implants
-                implants: this.implants,
-                
-                // Status
-                meritPoints: document.getElementById('merit-points').value,
-                currentHealth: document.getElementById('current-health').value,
-                
-                // Contacts
-                allies: this.allies,
-                enemies: this.enemies,
-                
-                // Notes
-                notes: document.getElementById('character-notes').value
+                basics: {
+                    name: document.getElementById('character-name').value,
+                    concept: document.getElementById('character-concept').value,
+                    background: document.getElementById('character-background').value,
+                    debt: document.getElementById('character-debt').value
+                },
+                attributes: {
+                    vig: document.getElementById('vig').value,
+                    coo: document.getElementById('coo').value,
+                    int: document.getElementById('int').value,
+                    ref: document.getElementById('ref').value,
+                    wil: document.getElementById('wil').value,
+                    sav: document.getElementById('sav').value
+                },
+                skills: {},
+                customSkills: this.customSkills
             };
-            
-            // Convert to JSON string
-            const jsonData = JSON.stringify(characterData);
-            
-            // Save to localStorage
-            localStorage.setItem('ultimateMercenaryCharacter', jsonData);
-            
-            alert('Personaje guardado correctamente.');
+
+            // Guardar habilidades normales
+            document.querySelectorAll('.skill-item').forEach(item => {
+                const skillName = item.querySelector('label').textContent;
+                const skillValue = item.querySelector('input').value;
+                characterData.skills[skillName] = skillValue;
+            });
+
+            // Guardar en localStorage con el prefijo del usuario
+            localStorage.setItem(`characterSheet_${user}`, JSON.stringify(characterData));
         }
 
         loadCharacterSheet() {
-            const jsonData = localStorage.getItem('ultimateMercenaryCharacter');
-            if (!jsonData) {
-                alert('No hay ningún personaje guardado.');
-                return;
-            }
-            
-            try {
-                const characterData = JSON.parse(jsonData);
-                
-                // Load basic info
-                document.getElementById('character-name').value = characterData.name || '';
-                document.getElementById('character-concept').value = characterData.concept || '';
-                document.getElementById('character-background').value = characterData.background || '';
-                document.getElementById('character-debt').value = characterData.debt || '';
-                
-                // Load aptitudes
-                this.aptitudes = characterData.aptitudes || {
-                    vig: 10, coo: 10, int: 10, ref: 10, wil: 10, sav: 10
-                };
-                this.attributePoints = characterData.attributePoints || 20;
-                
-                // Update aptitude display
-                for (const apt in this.aptitudes) {
-                    document.getElementById(apt).value = this.aptitudes[apt];
+            const user = localStorage.getItem('currentUser');
+            if (!user) return;
+
+            const savedData = localStorage.getItem(`characterSheet_${user}`);
+            if (!savedData) return;
+
+            const characterData = JSON.parse(savedData);
+
+            // Cargar datos básicos
+            document.getElementById('character-name').value = characterData.basics.name || '';
+            document.getElementById('character-concept').value = characterData.basics.concept || '';
+            document.getElementById('character-background').value = characterData.basics.background || '';
+            document.getElementById('character-debt').value = characterData.basics.debt || '';
+
+            // Cargar atributos
+            Object.entries(characterData.attributes).forEach(([attr, value]) => {
+                document.getElementById(attr).value = value;
+            });
+
+            // Cargar habilidades normales
+            Object.entries(characterData.skills).forEach(([skill, value]) => {
+                const skillInput = document.querySelector(`.skill-item input[data-skill="${skill}"]`);
+                if (skillInput) {
+                    skillInput.value = value;
                 }
-                this.updateAttributePoints();
-                
-                // Load skills
-                this.skills = characterData.skills || {};
-                this.skillPoints = characterData.skillPoints || 400;
-                
-                // Update skill display
-                document.querySelectorAll('.skill-value').forEach(input => {
-                    const skill = input.getAttribute('data-skill');
-                    if (this.skills[skill]) {
-                        input.value = this.skills[skill];
-                    } else {
-                        input.value = 0;
-                    }
-                });
-                this.updateSkillPoints();
-                
-                // Load equipment
-                this.weapons = characterData.weapons || [];
-                this.armor = characterData.armor || [];
-                this.gear = characterData.gear || [];
-                
-                // Update equipment display
-                this.updateWeaponsList();
-                this.updateArmorList();
-                this.updateGearList();
-                
-                // Load implants
-                this.implants = characterData.implants || [];
-                
-                // Update implants display
-                this.updateImplantsList();
-                this.updateCyberMetrics();
-                
-                // Load status
-                document.getElementById('merit-points').value = characterData.meritPoints || 0;
-                document.getElementById('current-health').value = characterData.currentHealth || this.aptitudes.vig * 2;
-                this.updateHealthBar(document.getElementById('current-health').value, this.aptitudes.vig * 2);
-                
-                // Load contacts
-                this.allies = characterData.allies || [];
-                this.enemies = characterData.enemies || [];
-                
-                // Update contacts display
-                this.updateAlliesList();
-                this.updateEnemiesList();
-                
-                // Load notes
-                document.getElementById('character-notes').value = characterData.notes || '';
-                
-                // Update derived stats
-                this.updateDerivedStats();
-                this.updateArmorStat();
-                
-                alert('Personaje cargado correctamente.');
-            } catch (error) {
-                console.error('Error loading character:', error);
-                alert('Error al cargar el personaje: ' + error.message);
-            }
+            });
+
+            // Cargar habilidades personalizadas
+            this.customSkills = characterData.customSkills || [];
+            const customSkillsContainer = document.getElementById('custom-skills');
+            customSkillsContainer.innerHTML = '';
+            this.customSkills.forEach(skill => {
+                this.addCustomSkill(skill.name, skill.value);
+            });
+
+            // Actualizar totales
+            this.updateSkillTotals();
         }
 
         exportCharacterSheet() {

@@ -476,3 +476,35 @@ nav ul li.dropdown {
     color: var(--darker-bg);
     box-shadow: 0 0 15px var(--primary-color);
 }
+
+/* Estilos para el botón de logout */
+.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 70px;
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.logout-btn:hover {
+    background-color: #ff6b81;
+}
+
+.logout-btn i {
+    font-size: 1rem;
+}
+
+/* Eliminar el padding del header ya que no es necesario */
+header {
+    position: relative;
+}

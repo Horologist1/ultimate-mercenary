@@ -47,17 +47,19 @@ header {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+    padding: 0 20px;
 }
 
 .logo {
     width: 100px;
     height: auto;
-    margin-right: 20px;
+    margin-right: 40px;
     filter: drop-shadow(0 0 5px var(--primary-color));
 }
 
 .title-container {
     flex-grow: 1;
+    margin-left: 20px;
 }
 
 h1, h2 {
@@ -270,6 +272,7 @@ p {
     border-collapse: collapse;
     margin-bottom: 20px;
     background-color: rgba(0, 0, 0, 0.2);
+    table-layout: fixed; /* Forzar ancho fijo de columnas */
 }
 
 .shop-table th {
@@ -282,8 +285,12 @@ p {
 }
 
 .shop-table td {
-    padding: 8px 10px;
+    padding: 8px 12px;
     border-bottom: 1px solid rgba(224, 224, 255, 0.1);
+    white-space: normal; /* Permitir que el texto se envuelva */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
 }
 
 .shop-table tr:hover {
@@ -294,6 +301,66 @@ p {
     font-weight: bold;
     color: var(--secondary-color);
 }
+
+/* Estilos específicos para items personalizados */
+.shop-table tr.custom-item {
+    background-color: rgba(0, 242, 255, 0.05);
+}
+
+.shop-table tr.custom-item:hover {
+    background-color: rgba(0, 242, 255, 0.1);
+}
+
+/* Estilos para el botón de eliminar */
+.delete-cell {
+    width: 40px !important;
+    text-align: center;
+    padding: 4px !important;
+}
+
+.delete-item-button {
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.delete-item-button:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 0, 170, 0.4);
+}
+
+/* Ajustar el ancho de las columnas */
+.shop-table th:nth-child(1),
+.shop-table td:nth-child(1) { width: 25%; } /* Artículo */
+.shop-table th:nth-child(2),
+.shop-table td:nth-child(2) { width: 25%; } /* Descripción/Armadura */
+.shop-table th:nth-child(3),
+.shop-table td:nth-child(3) { width: 35%; } /* Descripción/Efectos */
+.shop-table th:nth-child(4),
+.shop-table td:nth-child(4) { width: 10%; } /* Cobertura/Notas */
+.shop-table th:nth-child(5),
+.shop-table td:nth-child(5) { width: 5%; } /* Coste */
+
+/* Ajustes específicos para la sección de servicios */
+#shop-servicios .shop-table th:nth-child(1),
+#shop-servicios .shop-table td:nth-child(1) { width: 30%; } /* Servicio */
+#shop-servicios .shop-table th:nth-child(2),
+#shop-servicios .shop-table td:nth-child(2) { width: 65%; } /* Descripción */
+#shop-servicios .shop-table th:nth-child(3),
+#shop-servicios .shop-table td:nth-child(3) { width: 5%; } /* Coste */
 
 /* Character sheet */
 .character-sheet {
@@ -442,6 +509,7 @@ header h1 {
 
 .tab-content {
     display: none;
+    position: relative;
 }
 
 .tab-content.active {
@@ -602,11 +670,47 @@ header h1 {
 }
 
 .modal-content {
-    max-width: 90%;
-    max-height: 90vh;
-    object-fit: contain;
-    border: 2px solid var(--primary-color);
-    box-shadow: 0 0 20px var(--primary-color);
+    background-color: var(--darker-bg);
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.modal-content h2 {
+    color: var(--light-text);
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    color: var(--light-text);
+}
+
+.modal-content button {
+    background-color: var(--primary-color);
+    color: var(--dark-text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.modal-content button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
 }
 
 .modal-close {
@@ -652,7 +756,9 @@ header h1 {
 
 /* Estilos para el editor de la tienda */
 .add-item-button {
-    position: relative;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -666,12 +772,18 @@ header h1 {
     justify-content: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
-    margin: 20px auto;
+    margin: 0;
+    z-index: 10;
 }
 
 .add-item-button:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 15px rgba(255, 0, 170, 0.4);
+}
+
+/* Solo mostrar el botón en las secciones de la tienda */
+.tab-content:not([id^="shop"]) .add-item-button {
+    display: none;
 }
 
 /* Modal */
@@ -688,24 +800,34 @@ header h1 {
 }
 
 .modal-content {
-    background-color: rgba(40, 40, 40, 0.95);
+    background-color: var(--darker-bg);
     margin: 10% auto;
     padding: 25px;
-    border: 1px solid var(--secondary-color);
+    border: 2px solid var(--secondary-color);
     border-radius: 8px;
     width: 80%;
     max-width: 600px;
     box-shadow: 0 0 30px rgba(255, 0, 170, 0.3);
     color: var(--light-text);
+    position: relative;
+}
+
+.modal-content h2 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    font-family: var(--header-font);
 }
 
 .close {
-    color: #aaa;
+    color: var(--light-text);
     float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     transition: color 0.3s;
+    position: absolute;
+    right: 20px;
+    top: 15px;
 }
 
 .close:hover {
@@ -721,6 +843,7 @@ header h1 {
     display: block;
     margin-bottom: 5px;
     color: var(--light-text);
+    font-family: var(--header-font);
 }
 
 .form-group input[type="text"],
@@ -729,10 +852,10 @@ header h1 {
 .form-group textarea {
     width: 100%;
     padding: 8px 10px;
-    background-color: rgba(30, 30, 30, 0.8);
-    border: 1px solid #444;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--primary-color);
     border-radius: 4px;
-    color: white;
+    color: var(--light-text);
     font-family: var(--body-font);
 }
 
@@ -743,31 +866,33 @@ header h1 {
     margin-top: 20px;
 }
 
-.button-group button {
-    padding: 8px 16px;
+.cancel-button,
+.confirm-button {
+    padding: 8px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    font-family: var(--body-font);
+    transition: all 0.3s ease;
 }
 
-.cancel-btn {
-    background-color: #333;
-    color: var(--light-text);
+.cancel-button {
+    background-color: #444;
+    color: white;
 }
 
-.cancel-btn:hover {
-    background-color: #555;
-}
-
-.save-btn {
+.confirm-button {
     background-color: var(--secondary-color);
     color: white;
 }
 
-.save-btn:hover {
+.cancel-button:hover {
+    background-color: #555;
+}
+
+.confirm-button:hover {
     background-color: #ff1a8c;
+    box-shadow: 0 0 10px rgba(255, 0, 170, 0.4);
 }
 
 /* Notificaciones */
@@ -790,4 +915,20 @@ header h1 {
 .notification.show {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* Animación para eliminar filas */
+.shop-table tr.removing {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
 }

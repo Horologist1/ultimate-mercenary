@@ -21,9 +21,25 @@
                     <h2>Hoja de Personaje Digital</h2>
                 </div>
             </div>
-            <div class="return-button-container">
-                <a href="index.html" class="return-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
-            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="index.html#facciones"><i class="fas fa-users"></i> Facciones</a></li>
+                    <li><a href="index.html#programa"><i class="fas fa-tv"></i> El Programa</a></li>
+                    <li><a href="concursantes_numerados.html"><i class="fas fa-user-secret"></i> Concursantes</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle"><i class="fas fa-gamepad"></i> Pruebas <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="prueba0.html"><i class="fas fa-arrow-right"></i> Prueba 0: La Caída</a></li>
+                            <li><a href="prueba1.html"><i class="fas fa-arrow-right"></i> Prueba 1: Obstáculos</a></li>
+                            <li><a href="prueba2.html"><i class="fas fa-arrow-right"></i> Prueba 2: Cosecha</a></li>
+                            <li><a href="prueba3.html"><i class="fas fa-arrow-right"></i> Prueba 3: Entrega</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="index.html#tienda"><i class="fas fa-store"></i> Tienda de Méritos</a></li>
+                    <li><a href="character-sheet.html"><i class="fas fa-id-card"></i> Fichas</a></li>
+                </ul>
+            </nav>
         </header>
 
         <main>
@@ -220,213 +236,142 @@
                 </div>
 
                 <div id="skills" class="tab-content">
-                    <div class="sheet-section">
+                    <div class="skills-section">
                         <h3>Habilidades</h3>
-                        <div class="skill-points">
-                            <div class="points-label">Puntos de Habilidad:</div>
-                            <div class="points-value" id="skill-points">400</div>
-                        </div>
-                        
-                        <div class="skills-container">
-                            <div class="skills-column">
+                        <div class="skills-grid">
+                            <!-- Habilidades de Combate -->
+                            <div class="skill-category">
                                 <h4>Combate</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Armas de Fuego</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="firearms">
-                                            <option value="pistols">Pistolas</option>
-                                            <option value="rifles">Rifles</option>
-                                            <option value="smg">Subfusiles</option>
-                                            <option value="shotguns">Escopetas</option>
-                                            <option value="heavy">Armas Pesadas</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="firearms">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Armas Cuerpo a Cuerpo</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Armas Cuerpo a Cuerpo">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Combate Cuerpo a Cuerpo</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="melee">
-                                            <option value="blades">Filos</option>
-                                            <option value="blunt">Contundentes</option>
-                                            <option value="unarmed">Desarmado</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="melee">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Pistolas</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Pistolas">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Explosivos</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="explosives">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Rifles</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Rifles">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Combate Táctico</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="tactics">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Subfusiles</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Subfusiles">
                                 </div>
+                                <div class="skill-item">
+                                    <label>Escopetas</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Escopetas">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Arcos</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Arcos">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Lanzamiento</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Lanzamiento">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Esquivar</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Esquivar">
+                                </div>
+                            </div>
 
+                            <!-- Habilidades Físicas -->
+                            <div class="skill-category">
                                 <h4>Físicas</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Atletismo</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="athletics">
-                                            <option value="climb">Trepar</option>
-                                            <option value="run">Correr</option>
-                                            <option value="jump">Saltar</option>
-                                            <option value="swim">Nadar</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="athletics">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Atletismo</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Atletismo">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Fuerza Bruta</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="brawn">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Fuerza</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Fuerza">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Sigilo</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="stealth">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Infiltración</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Infiltración">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Supervivencia</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="survival">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Sigilo</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Sigilo">
                                 </div>
                             </div>
-                            
-                            <div class="skills-column">
-                                <h4>Técnicas</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Hardware</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="hardware">
-                                            <option value="electronics">Electrónica</option>
-                                            <option value="industrial">Industrial</option>
-                                            <option value="weapons">Armería</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="hardware">
-                                    </div>
-                                </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Medicina</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="medicine">
-                                            <option value="firstaid">Primeros Auxilios</option>
-                                            <option value="trauma">Trauma</option>
-                                            <option value="pharmtech">Farmacología</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="medicine">
-                                    </div>
-                                </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Programación</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="programming">
-                                            <option value="hacking">Hacking</option>
-                                            <option value="security">Seguridad</option>
-                                            <option value="data">Minería de Datos</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="programming">
-                                    </div>
-                                </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Interfaz</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="interface">
-                                    </div>
-                                </div>
 
-                                <h4>Conocimiento</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Investigación</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="research">
-                                    </div>
-                                </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Percepción</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="perception">
-                                    </div>
-                                </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Conocimiento (Especificar)</div>
-                                    <div class="skill-controls">
-                                        <input type="text" class="skill-custom-name" placeholder="Tipo...">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="knowledge">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="skills-column">
+                            <!-- Habilidades Sociales -->
+                            <div class="skill-category">
                                 <h4>Sociales</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Engaño</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="deception">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Engaño</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Engaño">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Intimidación</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="intimidation">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Intimidación</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Intimidación">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Persuasión</div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="persuasion">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Persuasión</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Persuación">
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Contactos</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="contacts">
-                                            <option value="criminal">Criminales</option>
-                                            <option value="corporate">Corporativos</option>
-                                            <option value="street">Callejeros</option>
-                                            <option value="media">Media</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="contacts">
-                                    </div>
+                                <div class="skill-item">
+                                    <label>Protocolo</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Protocolo">
                                 </div>
+                            </div>
 
-                                <h4>Vehículos</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">Pilotaje</div>
-                                    <div class="skill-controls">
-                                        <select class="skill-specialization" data-skill="pilot">
-                                            <option value="ground">Terrestre</option>
-                                            <option value="air">Aéreo</option>
-                                            <option value="sea">Marítimo</option>
-                                        </select>
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="pilot">
-                                    </div>
+                            <!-- Habilidades Técnicas -->
+                            <div class="skill-category">
+                                <h4>Técnicas</h4>
+                                <div class="skill-item">
+                                    <label>Conocimiento</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Conocimiento">
                                 </div>
-                                
+                                <div class="skill-item">
+                                    <label>Interfaz</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Interfaz">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Medicina</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Medicina">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Percepción</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Percepción">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Profesión</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Profesión">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Programación</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Programación">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Psicología</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Psicología">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Resistencia</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Resistencia">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Sabiduría</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Sabiduría">
+                                </div>
+                                <div class="skill-item">
+                                    <label>Tecnología</label>
+                                    <input type="number" min="0" max="60" value="0" data-skill="Tecnología">
+                                </div>
+                            </div>
+
+                            <!-- Habilidades Personalizadas -->
+                            <div class="skill-category">
                                 <h4>Habilidades Personalizadas</h4>
-                                <div class="skill-entry">
-                                    <div class="skill-name">
-                                        <input type="text" class="skill-custom-full" placeholder="Nombre de habilidad...">
-                                    </div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="custom1">
-                                    </div>
+                                <div id="custom-skills">
+                                    <!-- Las habilidades personalizadas se añadirán aquí -->
                                 </div>
-                                <div class="skill-entry">
-                                    <div class="skill-name">
-                                        <input type="text" class="skill-custom-full" placeholder="Nombre de habilidad...">
-                                    </div>
-                                    <div class="skill-controls">
-                                        <input type="number" class="skill-value" value="0" min="0" max="80" data-skill="custom2">
-                                    </div>
-                                </div>
+                                <button id="add-custom-skill" class="add-skill-btn">
+                                    <i class="fas fa-plus"></i> Añadir Habilidad
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -792,6 +737,141 @@
             </div>
         </div>
     </div>
+
+    <style>
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .skill-category {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid var(--primary-color);
+    }
+
+    .skill-category h4 {
+        color: var(--primary-color);
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-family: var(--header-font);
+    }
+
+    .skill-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .skill-item label {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+
+    .skill-item input {
+        width: 60px;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--primary-color);
+        color: var(--light-text);
+        padding: 5px;
+        text-align: center;
+    }
+
+    .add-skill-btn {
+        background-color: var(--primary-color);
+        color: var(--darker-bg);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+        transition: background-color 0.3s;
+    }
+
+    .add-skill-btn:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .custom-skill-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+
+    .custom-skill-item input[type="text"] {
+        flex-grow: 1;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--primary-color);
+        color: var(--light-text);
+        padding: 5px;
+    }
+
+    .custom-skill-item input[type="number"] {
+        width: 60px;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--primary-color);
+        color: var(--light-text);
+        padding: 5px;
+        text-align: center;
+    }
+
+    .remove-skill-btn {
+        background-color: #ff4757;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .remove-skill-btn:hover {
+        background-color: #ff6b81;
+    }
+
+    .tab {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 0 5px;
+        cursor: pointer;
+        border: 1px solid #00ffff;
+        border-radius: 4px;
+        color: #00ffff;
+        background: rgba(0, 0, 0, 0.7);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    .tab.active {
+        background: #00ffff;
+        color: #111;
+        font-weight: bold;
+        box-shadow: 0 0 10px #00ffff;
+    }
+    .tab:hover {
+        background: rgba(0,255,255,0.2);
+        color: #fff;
+    }
+    .tab-content {
+        background: rgba(0,0,0,0.85);
+        border: 1px solid #00ffff;
+        border-radius: 8px;
+        color: #e0f7fa;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(0,255,255,0.1);
+    }
+    </style>
 
     <script src="character-sheet.js"></script>
 </body>

@@ -1,0 +1,55 @@
+/* Estilos para resúmenes de pruebas */
+
+.test-summary {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.test-header {
+    color: #00ffff;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.test-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 20px auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.2);
+}
+
+.test-description {
+    color: #cccccc;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+.objective-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.objective-list li {
+    background: rgba(0, 255, 255, 0.1);
+    border-left: 4px solid #00ffff;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.objective-list li::before {
+    content: "▶ ";
+    color: #00ffff;
+    font-weight: bold;
+} 
