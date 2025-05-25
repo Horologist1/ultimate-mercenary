@@ -1,21 +1,50 @@
+/* Variables globales */
 :root {
-    --primary-color: #00f2ff;
+    --primary-color: #00ffff;
     --secondary-color: #ff00aa;
-    --dark-bg: #0a0a12;
+    --dark-bg: #0a0a0a;
     --darker-bg: #050508;
     --medium-bg: #121224;
     --light-text: #e0e0ff;
+    --accent-color: #ff4757;
     --header-font: 'Orbitron', sans-serif;
     --body-font: 'Roboto', sans-serif;
     --glow-effect: 0 0 10px var(--primary-color), 0 0 20px rgba(0, 242, 255, 0.5);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
 }
 
+/* Logo y encabezado */
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.logo {
+    width: 150px;
+    height: 150px;
+    margin-right: 30px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.title-container {
+    flex: 1;
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Estilos base */
 body {
     background-color: var(--dark-bg);
     background-image: 
@@ -28,10 +57,476 @@ body {
     line-height: 1.6;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+/* Layout y estructura */
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+    align-items: flex-start;
+}
+
+/* Imágenes y galería */
+.full-width-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.3);
+}
+
+.contained-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin: 15px 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.gallery-item {
+    text-align: center;
+    max-width: 200px;
+}
+
+.gallery-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.gallery-image:hover {
+    transform: scale(1.05);
+}
+
+.gallery-caption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Personajes y fichas */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.character-card.featured {
+    grid-column: 1 / -1;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.character-image {
+    width: 220px !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 10px auto !important;
+    display: block !important;
+    max-width: none !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color), inset 0 0 10px var(--primary-color);
+}
+
+.character-image:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px var(--primary-color), inset 0 0 20px var(--primary-color);
+}
+
+.sheet-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin: 0 auto 20px auto;
+    display: block;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Tablas y estadísticas */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.stats-table th {
+    background-color: rgba(0, 242, 255, 0.2);
+    color: var(--light-text);
+    text-align: left;
+    padding: 8px;
+}
+
+.stats-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(224, 224, 255, 0.1);
+}
+
+.aptitude-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.aptitude-grid input {
+    width: 60px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary-color);
+    color: var(--light-text);
+    padding: 5px;
+}
+
+/* Recursos y contenido */
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.resource-card {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.resource-title {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: rgba(0, 242, 255, 0.1);
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.resource-title i {
+    font-size: 1.5rem;
+    margin-right: 15px;
+    color: var(--primary-color);
+}
+
+.resource-title h4 {
+    margin: 0;
+    color: var(--light-text);
+}
+
+.resource-description {
+    padding: 15px;
+}
+
+.resource-content {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.resource-content h5 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Navegación y header */
+header {
+    position: relative;
+    padding-right: 150px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+header nav {
+    width: 100%;
+}
+
+header nav ul {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+header nav ul li {
+    white-space: nowrap;
+}
+
+/* Dropdown menu */
+nav ul li.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.dropdown-toggle .fa-caret-down {
+    transition: transform 0.3s ease;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 10px 0;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+.dropdown-menu li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-menu a {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    color: var(--light-text);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu a .fa-arrow-right {
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* Botones y controles */
+.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 50px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);
+    display: block !important;
+    margin-right: 10px;
+}
+
+.logout-btn:hover {
+    background-color: #ff6b81;
+    box-shadow: 0 4px 8px rgba(255, 71, 87, 0.5);
+    transform: translateY(-2px);
+}
+
+.logout-btn i {
+    margin-right: 5px;
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 255, 255, 0.3);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.5);
+}
+
+/* Modal base */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: #0a0a1a;
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 40px;
+    width: 95%;
+    max-width: 800px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    margin: 40px auto;
+}
+
+.modal-content h2 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-content .form-group {
+    margin-bottom: 20px;
+}
+
+.modal-content label {
+    display: block;
+    color: var(--light-text);
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    color: var(--light-text);
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 10px rgba(255, 0, 170, 0.3);
+}
+
+.modal-content button {
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+}
+
+.modal-content button:hover {
+    background-color: #ff1a8c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 0, 170, 0.4);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: var(--secondary-color);
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    text-shadow: 0 0 10px var(--secondary-color);
+    background: none;
+    border: none;
+    padding: 5px;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 20px var(--secondary-color);
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-grid, .advice-box {
+        grid-template-columns: 1fr;
+    }
+
+    .faction-card {
+        flex-direction: column;
+    }
+
+    .faction-logo {
+        width: 120px;
+        height: 120px;
+    }
+
+    header {
+        padding-right: 0;
+    }
+
+    .logout-btn {
+        position: static;
+        margin: 10px;
+    }
 }
 
 /* Header Styles */
@@ -41,25 +536,6 @@ header {
     padding: 20px 0;
     margin-bottom: 30px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 0 20px;
-}
-
-.logo {
-    width: 100px;
-    height: auto;
-    margin-right: 40px;
-    filter: drop-shadow(0 0 5px var(--primary-color));
-}
-
-.title-container {
-    flex-grow: 1;
-    margin-left: 20px;
 }
 
 h1, h2 {
@@ -176,28 +652,6 @@ p {
     border-left: 3px solid var(--secondary-color);
 }
 
-.character-image {
-    width: 200px;
-    height: 250px;
-    object-fit: cover;
-    object-position: center top;
-    border-right: 1px solid rgba(0, 242, 255, 0.2);
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
-
-.character-image:hover {
-    transform: scale(1.02);
-}
-
-/* Ajuste específico para la doctora Naomi */
-.doctora-image {
-    object-position: 35% 0;
-    object-fit: cover;
-    width: 200px;
-    height: 250px;
-}
-
 .character-info {
     padding: 20px;
     flex-grow: 1;
@@ -269,46 +723,59 @@ p {
 /* Shop tables */
 .shop-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     margin-bottom: 20px;
-    background-color: rgba(0, 0, 0, 0.2);
-    table-layout: fixed; /* Forzar ancho fijo de columnas */
+    position: relative;
+    z-index: 1;
+}
+
+.shop-table th,
+.shop-table td {
+    padding: 8px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid rgba(224, 224, 255, 0.1);
 }
 
 .shop-table th {
     background-color: rgba(0, 242, 255, 0.2);
     color: var(--light-text);
-    text-align: left;
-    padding: 10px;
     font-family: var(--header-font);
     font-size: 0.9rem;
 }
 
-.shop-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid rgba(224, 224, 255, 0.1);
-    white-space: normal; /* Permitir que el texto se envuelva */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.4;
+/* Estilos específicos para la columna de coste en todas las tablas */
+.shop-table th:last-child,
+.shop-table td:last-child {
+    width: 15%;
+    text-align: right;
+    padding-right: 20px;
 }
 
-.shop-table tr:hover {
-    background-color: rgba(0, 242, 255, 0.1);
-}
+/* Estilos específicos para la tabla de munición */
+#shop-municion .shop-table th:nth-child(1),
+#shop-municion .shop-table td:nth-child(1) { width: 20%; }
+#shop-municion .shop-table th:nth-child(2),
+#shop-municion .shop-table td:nth-child(2) { width: 45%; }
+#shop-municion .shop-table th:nth-child(3),
+#shop-municion .shop-table td:nth-child(3) { width: 20%; }
 
-.price {
-    font-weight: bold;
+/* Estilos específicos para las tablas de armas */
+#shop-armas .shop-table th:nth-child(1),
+#shop-armas .shop-table td:nth-child(1) { width: 20%; }
+#shop-armas .shop-table th:nth-child(2),
+#shop-armas .shop-table td:nth-child(2) { width: 30%; }
+#shop-armas .shop-table th:nth-child(3),
+#shop-armas .shop-table td:nth-child(3) { width: 15%; }
+#shop-armas .shop-table th:nth-child(4),
+#shop-armas .shop-table td:nth-child(4) { width: 20%; }
+
+/* Estilo para los precios */
+.shop-table td.price {
     color: var(--secondary-color);
-}
-
-/* Estilos específicos para items personalizados */
-.shop-table tr.custom-item {
-    background-color: rgba(0, 242, 255, 0.05);
-}
-
-.shop-table tr.custom-item:hover {
-    background-color: rgba(0, 242, 255, 0.1);
+    font-weight: bold;
 }
 
 /* Estilos para el botón de eliminar */
@@ -341,26 +808,6 @@ p {
     transform: scale(1.1);
     box-shadow: 0 0 10px rgba(255, 0, 170, 0.4);
 }
-
-/* Ajustar el ancho de las columnas */
-.shop-table th:nth-child(1),
-.shop-table td:nth-child(1) { width: 25%; } /* Artículo */
-.shop-table th:nth-child(2),
-.shop-table td:nth-child(2) { width: 25%; } /* Descripción/Armadura */
-.shop-table th:nth-child(3),
-.shop-table td:nth-child(3) { width: 35%; } /* Descripción/Efectos */
-.shop-table th:nth-child(4),
-.shop-table td:nth-child(4) { width: 10%; } /* Cobertura/Notas */
-.shop-table th:nth-child(5),
-.shop-table td:nth-child(5) { width: 5%; } /* Coste */
-
-/* Ajustes específicos para la sección de servicios */
-#shop-servicios .shop-table th:nth-child(1),
-#shop-servicios .shop-table td:nth-child(1) { width: 30%; } /* Servicio */
-#shop-servicios .shop-table th:nth-child(2),
-#shop-servicios .shop-table td:nth-child(2) { width: 65%; } /* Descripción */
-#shop-servicios .shop-table th:nth-child(3),
-#shop-servicios .shop-table td:nth-child(3) { width: 5%; } /* Coste */
 
 /* Character sheet */
 .character-sheet {
@@ -409,38 +856,6 @@ footer {
     border-top: 1px solid rgba(0, 242, 255, 0.3);
     font-size: 0.8rem;
     color: rgba(224, 224, 255, 0.7);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .logo-container {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .logo {
-        margin-right: 0;
-        margin-bottom: 15px;
-    }
-    
-    header h1 {
-        font-size: 2rem;
-    }
-    
-    header h2 {
-        font-size: 1.1rem;
-    }
-    
-    .character-card {
-        flex-direction: column;
-    }
-    
-    .character-image {
-        width: 100%;
-        height: 300px;
-        border-right: none;
-        border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-    }
 }
 
 /* Animations */
@@ -546,40 +961,6 @@ header h1 {
 .tooltip:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
-}
-
-/* Gallery view */
-.gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin: 20px 0;
-}
-
-.gallery-item {
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease;
-}
-
-.gallery-item:hover {
-    transform: scale(1.05);
-}
-
-.gallery-image {
-    width: 100%;
-    height: 200px; /* Altura consistente */
-    object-fit: cover; /* Llenar el contenedor manteniendo proporciones */
-    object-position: center; /* Centrar la imagen */
-    background-color: rgba(0, 0, 0, 0.2); /* Fondo sutil para imágenes transparentes */
-}
-
-.gallery-caption {
-    padding: 10px;
-    background-color: var(--darker-bg);
-    font-size: 0.9rem;
-    text-align: center;
 }
 
 /* Special elements */
@@ -713,188 +1094,6 @@ header h1 {
     transform: translateY(-2px);
 }
 
-.modal-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    color: var(--primary-color);
-    font-size: 2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.modal-close:hover {
-    color: var(--secondary-color);
-    transform: scale(1.1);
-}
-
-/* Botón de volver arriba */
-.back-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background-color: var(--primary-color);
-    color: var(--darker-bg);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    z-index: 99;
-}
-
-.back-to-top:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4);
-}
-
-/* Estilos para el editor de la tienda */
-.add-item-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    margin: 0;
-    z-index: 10;
-}
-
-.add-item-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(255, 0, 170, 0.4);
-}
-
-/* Solo mostrar el botón en las secciones de la tienda */
-.tab-content:not([id^="shop"]) .add-item-button {
-    display: none;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    overflow: auto;
-}
-
-.modal-content {
-    background-color: var(--darker-bg);
-    margin: 10% auto;
-    padding: 25px;
-    border: 2px solid var(--secondary-color);
-    border-radius: 8px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0 0 30px rgba(255, 0, 170, 0.3);
-    color: var(--light-text);
-    position: relative;
-}
-
-.modal-content h2 {
-    color: var(--secondary-color);
-    margin-bottom: 20px;
-    font-family: var(--header-font);
-}
-
-.close {
-    color: var(--light-text);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s;
-    position: absolute;
-    right: 20px;
-    top: 15px;
-}
-
-.close:hover {
-    color: var(--secondary-color);
-}
-
-/* Formulario */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--light-text);
-    font-family: var(--header-font);
-}
-
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 8px 10px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--primary-color);
-    border-radius: 4px;
-    color: var(--light-text);
-    font-family: var(--body-font);
-}
-
-.button-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.cancel-button,
-.confirm-button {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: var(--body-font);
-    transition: all 0.3s ease;
-}
-
-.cancel-button {
-    background-color: #444;
-    color: white;
-}
-
-.confirm-button {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.cancel-button:hover {
-    background-color: #555;
-}
-
-.confirm-button:hover {
-    background-color: #ff1a8c;
-    box-shadow: 0 0 10px rgba(255, 0, 170, 0.4);
-}
-
 /* Notificaciones */
 .notification {
     position: fixed;
@@ -931,4 +1130,583 @@ header h1 {
         opacity: 0;
         transform: translateX(20px);
     }
+}
+
+/* ===== Estilos para enlaces rápidos ===== */
+.quick-links {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+    border: 1px solid var(--primary-color);
+}
+
+.quick-links p {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.quick-links .button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===== Estilos para resúmenes de pruebas ===== */
+.test-summary {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.test-header {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.test-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 20px auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.2);
+}
+
+.test-description {
+    color: var(--light-text);
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+.objective-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.objective-list li {
+    background: rgba(0, 255, 255, 0.1);
+    border-left: 4px solid var(--primary-color);
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.objective-list li::before {
+    content: "▶ ";
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* ===== Estilos para la introducción cyberpunk ===== */
+.intro-terminal {
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    animation: terminal-glow 2s infinite alternate;
+}
+
+@keyframes terminal-glow {
+    from { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+    to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.3); }
+}
+
+.cyberpunk-list {
+    list-style-type: none;
+    padding-left: 20px;
+    margin: 15px 0;
+}
+
+.cyberpunk-list li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.cyberpunk-list li:before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.warning-box {
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+    margin: 25px 0;
+    overflow: hidden;
+}
+
+.warning-header {
+    background-color: rgba(255, 0, 0, 0.3);
+    color: var(--light-text);
+    padding: 10px 15px;
+    font-weight: bold;
+    font-family: var(--header-font);
+}
+
+.warning-content {
+    padding: 15px;
+    color: #ff6b6b;
+}
+
+/* Ajustes para logos de facciones */
+.faction-logo {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-right: 30px;
+    flex-shrink: 0;
+}
+
+.faction-card {
+    display: flex;
+    align-items: flex-start;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.faction-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.faction-info h3 {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+.faction-info p {
+    margin: 0 0 10px 0;
+}
+
+.faction-info p:last-child {
+    margin-bottom: 0;
+}
+
+/* Estilos básicos para las imágenes en la tienda */
+.shop-table td {
+    position: relative;
+}
+
+.shop-table td img {
+    display: none;
+    position: absolute;
+    width: 200px;
+    height: auto;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    background-color: var(--darker-bg);
+    padding: 5px;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+}
+
+.shop-table td:hover img {
+    display: block;
+}
+
+/* Estilos para el modal de productos */
+.product-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-modal.active {
+    display: flex;
+}
+
+.product-card {
+    background-color: var(--darker-bg);
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 15px;
+}
+
+.product-title {
+    color: var(--primary-color);
+    font-size: 1.8em;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.product-close {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.product-close:hover {
+    transform: scale(1.1);
+    color: var(--primary-color);
+}
+
+.product-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: end;
+}
+
+.product-image-container {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    display: none;
+    cursor: move; /* Indicador de que se puede mover */
+}
+
+.remove-image-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: none;
+    color: var(--light-text);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.product-image-container:hover .remove-image-button {
+    opacity: 0.7;
+    visibility: visible;
+}
+
+.remove-image-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    color: var(--primary-color);
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.product-description {
+    color: var(--light-text);
+    line-height: 1.6;
+    font-size: 1.1em;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.product-stats {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px;
+    color: var(--light-text);
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
+}
+
+.product-stats strong {
+    color: var(--primary-color);
+    font-family: var(--header-font);
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.product-stats span {
+    color: var(--light-text);
+    font-size: 1.1em;
+}
+
+.product-price {
+    color: var(--secondary-color);
+    font-size: 1.4em;
+    font-weight: bold;
+    padding: 15px;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-radius: 4px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 0, 170, 0.5);
+    margin-top: auto;
+}
+
+.product-image-upload {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+}
+
+.image-url-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--neon-blue);
+    color: var(--text-color);
+    border-radius: 4px;
+}
+
+.upload-button {
+    background: var(--neon-blue);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+    background: var(--neon-purple);
+    transform: scale(1.05);
+}
+
+/* Ajuste para el cursor en las celdas de la tabla */
+.shop-table td {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shop-table td:hover {
+    background-color: rgba(0, 255, 255, 0.1);
+}
+
+/* Estilos para efectos especiales en implantes */
+.cyberware-effect {
+    color: var(--primary-color);
+    font-style: italic;
+    margin-top: 5px;
+    padding-left: 10px;
+    border-left: 2px solid var(--primary-color);
+    background-color: rgba(0, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.cyberware-requirement {
+    color: var(--secondary-color);
+    font-size: 0.9em;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
+}
+
+/* Estilos para información de armas */
+.weapon-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.weapon-stat {
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    border-left: 2px solid var(--primary-color);
+}
+
+/* Estilos para información de armaduras */
+.armor-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.armor-stat {
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    border-left: 2px solid var(--secondary-color);
+}
+
+/* Estilos para información de munición */
+.ammo-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.ammo-stat {
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    border-left: 2px solid var(--primary-color);
+}
+
+/* Estilos para información de servicios */
+.service-info {
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
+    margin-top: 10px;
+}
+
+.service-note {
+    color: var(--secondary-color);
+    font-style: italic;
+    margin-top: 10px;
+    padding: 5px;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-radius: 3px;
+}
+
+/* Estilos específicos para implantes en el modal */
+#shop-cyberware .product-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start; /* Alineamos al inicio para implantes */
+}
+
+#shop-cyberware .product-image-container {
+    width: 100%;
+    min-height: 300px;
+    max-height: 400px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+#shop-cyberware .product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: auto; /* Altura automática para implantes */
+}
+
+#shop-cyberware .product-stats {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px;
+    color: var(--light-text);
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
+}
+
+#shop-cyberware .product-price {
+    color: var(--secondary-color);
+    font-size: 1.4em;
+    font-weight: bold;
+    padding: 15px;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-radius: 4px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 0, 170, 0.5);
+    margin-top: 20px; /* Espacio fijo para el precio */
+}
+
+/* Estilos para efectos especiales en implantes */
+.cyberware-effect {
+    color: var(--primary-color);
+    font-style: italic;
+    margin-top: 5px;
+    padding-left: 10px;
+    border-left: 2px solid var(--primary-color);
+    background-color: rgba(0, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.cyberware-requirement {
+    color: var(--secondary-color);
+    font-size: 0.9em;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgba(255, 0, 170, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
 }
