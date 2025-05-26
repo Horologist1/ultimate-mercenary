@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mercenary - Concursante</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chat-publico.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .main-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .ui-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 15px 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            height: 140px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
+            padding: 0;
+        }
+
+        .logo {
+            height: 120px;
+            transition: transform 0.3s ease;
+            object-fit: contain;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .title-container h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #00ccff;
+        }
+
+        .title-container h2 {
+            font-size: 18px;
+            margin: 0;
+            color: #ff4757;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            padding: 10px 20px;
+            gap: 15px;
+            height: calc(100vh - 90px);
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1.5;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: calc(100vh - 110px);
+            min-height: 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            min-height: 0;
+            max-height: calc(100vh - 180px);
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+        }
+
+        .chat-message:hover {
+            transform: translateX(5px);
+        }
+
+        .chat-message .username {
+            color: #00ccff;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-message .content {
+            color: #fff;
+        }
+
+        .chat-message.system {
+            background-color: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+        }
+
+        .chat-message.highlight {
+            background-color: rgba(0, 204, 255, 0.2);
+            border-color: #00ccff;
+            animation: pulse 2s infinite;
+        }
+
+        .chat-message .tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .chat-message .tag.vip {
+            background-color: #ffd700;
+            color: #000;
+        }
+
+        .chat-message .tag.sponsored {
+            background-color: #ff4757;
+            color: #fff;
+        }
+
+        .chat-message .pm-button {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 2px 8px;
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-message .pm-button:hover {
+            background-color: #7bed9f;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 204, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 204, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 204, 255, 0); }
+        }
+
+        .chat-input-container {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #444;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .chat-submit {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 300px;
+            margin-left: auto;
+        }
+
+        .sidebar-section {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 12px;
+        }
+
+        .sidebar-section h3 {
+            color: #00ccff;
+            margin: 0 0 15px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            color: #00ccff;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            color: #ff4757;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .sidebar-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .sidebar-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sidebar-button:hover {
+            background-color: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+        }
+
+        .sidebar-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .objective-display {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+            padding: 15px;
+        }
+
+        .objective-display h4 {
+            color: #00ccff;
+            margin: 0 0 10px 0;
+        }
+
+        .objective-display p {
+            color: #fff;
+            margin: 0 0 15px 0;
+            font-size: 14px;
+        }
+
+        .objective-timer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+        }
+
+        .timer-label {
+            color: #00ccff;
+            font-size: 12px;
+        }
+
+        .timer-value {
+            color: #ff4757;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 100%
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .rules-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .rules-content {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            color: white;
+        }
+
+        .rules-content h1 {
+            color: #00ccff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .rules-content section {
+            margin-bottom: 30px;
+        }
+
+        .rules-content h2 {
+            color: #ff4757;
+            margin-bottom: 15px;
+        }
+
+        .rules-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rules-content li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .accept-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+        }
+
+        .accept-btn:hover {
+            background-color: #ff6b81;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: rgba(255, 71, 87, 0.8);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 71, 87, 1);
+        }
+
+        .messages-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+        }
+
+        .messages-content {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            color: white;
+        }
+
+        .message-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .message-sender {
+            color: #00ccff;
+            font-weight: bold;
+        }
+
+        .message-time {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .message-content {
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        .logout-button {
+            background-color: rgba(255, 71, 87, 0.8);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: rgba(255, 71, 87, 1);
+            transform: translateY(-2px);
+        }
+
+        .current-objective {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        .current-objective h3 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+        }
+
+        .current-objective p {
+            color: #fff;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .cyberpunk-quote {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-left: 4px solid #ff4757;
+            padding: 20px;
+            margin: 20px 0;
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyberpunk-quote::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 0%, rgba(255, 71, 87, 0.1) 50%, transparent 100%);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .messages-section {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .messages-section h3 {
+            color: #00ccff;
+            margin: 0 0 15px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+        }
+
+        .messages-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .message-item {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00ccff;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .message-sender {
+            color: #ff4757;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+        }
+
+        .message-time {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .message-content {
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Estilos específicos para diferentes tipos de mensajes */
+        .message-item[data-type="shop"] {
+            border-left-color: #2ecc71;
+        }
+
+        .message-item[data-type="achievement"] {
+            border-left-color: #f1c40f;
+        }
+
+        .message-item[data-type="warning"] {
+            border-left-color: #e74c3c;
+        }
+
+        /* Estilos para el modal de mensajes directos */
+        .messages-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .tab-button {
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px 15px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background-color: #ff4757;
+            border-color: #ff4757;
+        }
+
+        .messages-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message-item {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00ccff;
+        }
+
+        .message-item[data-type="system"] {
+            border-left-color: #ff4757;
+        }
+
+        .message-item[data-type="shop"] {
+            border-left-color: #2ecc71;
+        }
+
+        .message-item[data-type="achievement"] {
+            border-left-color: #f1c40f;
+        }
+
+        .message-item[data-type="warning"] {
+            border-left-color: #e74c3c;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .message-sender {
+            color: #00ccff;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .message-time {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .message-content {
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-image {
+            width: 100%;
+            max-width: 200px;
+            margin: 10px 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #00ccff;
+        }
+
+        .message-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .message-actions {
+            margin-top: 10px;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .delete-button {
+            background-color: #ff4757;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        .purchase-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #00ccff;
+            color: #00ccff;
+            display: none;
+            z-index: 9999;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
+            min-width: 300px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .purchase-message h4 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            text-transform: uppercase;
+        }
+
+        .purchase-message p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+
+        .purchase-message .warning {
+            color: #ff4757;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .accept-button {
+            background-color: #00ccff;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .accept-button:hover {
+            background-color: #00a3cc;
+            transform: translateY(-2px);
+        }
+
+        .no-messages {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Imagen de fondo -->
+        <img src="app/ultimate-mercenary/pov_running_street.png" alt="POV Runner" class="background-video">
+        
+        <!-- Contenedor de la interfaz -->
+        <div class="ui-container">
+            <!-- Barra superior -->
+            <div class="top-bar">
+                <div class="logo-container">
+                    <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                    <div class="title-container">
+                        <h1>ULTIMATE MERCENARY</h1>
+                        <h2>Concursante #13</h2>
+                    </div>
+                </div>
+                <button class="logout-button" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> CERRAR SESIÓN
+                </button>
+            </div>
+            
+            <!-- Área principal -->
+            <div class="main-area">
+                <!-- Chat -->
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Los mensajes se añadirán dinámicamente -->
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Escribe un mensaje...">
+                        <button class="chat-submit" id="chat-submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Panel lateral -->
+                <div class="sidebar">
+                    <!-- Estadísticas -->
+                    <div class="sidebar-section">
+                        <h3>ESTADÍSTICAS</h3>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <div class="stat-label">Audiencia</div>
+                                <div class="stat-value" id="audience-value">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <div class="stat-label">Rating</div>
+                                <div class="stat-value" id="rating-value">0.0</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <div class="stat-label">PM</div>
+                                <div class="stat-value" id="pm-value">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="sidebar-section">
+                        <h3>ACCIONES</h3>
+                        <div class="sidebar-buttons">
+                            <button class="sidebar-button" onclick="window.location.href='tienda.html'">
+                                <span>Tienda</span>
+                            </button>
+                            <button class="sidebar-button" id="message-btn">
+                                <span>Mensajes</span>
+                            </button>
+                            <button class="sidebar-button" id="objective-btn">
+                                <span>Objetivo</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Objetivo actual -->
+                    <div class="sidebar-section">
+                        <h3>OBJETIVO ACTUAL</h3>
+                        <div class="objective-display" id="current-objective">
+                            <h4 id="objective-title">Cargando...</h4>
+                            <p id="objective-description">Cargando objetivo...</p>
+                            <div class="objective-timer">
+                                <div class="timer-label">Tiempo restante:</div>
+                                <div class="timer-value" id="objective-timer">14:35</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Mensajes Directos -->
+        <div id="messages-modal" class="messages-modal">
+            <div class="messages-content">
+                <h2>MENSAJES DIRECTOS</h2>
+                <div class="messages-tabs">
+                    <button class="tab-button active" data-tab="inbox">Bandeja de Entrada</button>
+                    <button class="tab-button" data-tab="system">Sistema</button>
+                    <button class="tab-button" data-tab="shop">Tienda</button>
+                </div>
+                <div id="messages-list" class="messages-list">
+                    <!-- Los mensajes se añadirán dinámicamente -->
+                </div>
+                <button class="accept-btn" onclick="document.getElementById('messages-modal').style.display='none'">CERRAR</button>
+            </div>
+        </div>
+
+        <!-- Modal de Reglas -->
+        <div id="rules-modal" class="rules-modal">
+            <div class="rules-content">
+                <h1>REGLAS DEL JUEGO</h1>
+                
+                <section>
+                    <h2>BIENVENIDA</h2>
+                    <p>¡Bienvenido, recluta, a ULTIMATE MERCENARY! Has sido seleccionado para participar en la última experiencia de entretenimiento de OmniCorp Entertainment. Este no es un juego cualquiera; es una prueba de supervivencia, astucia y determinación en las calles de una metrópolis cyberpunk.</p>
+                </section>
+                
+                <section>
+                    <h2>CONCEPTO BÁSICO</h2>
+                    <p>Ultimate Mercenary es un reality show transmitido en directo donde tú, como participante, debes completar misiones peligrosas mientras eres seguido por drones de transmisión. Tu objetivo: sobrevivir, completar los objetivos y entretener a la audiencia para ganar rating, seguidores y PM.</p>
+                </section>
+                
+                <section>
+                    <h2>CONDICIONES DEL CONCURSO</h2>
+                    
+                    <h3>Reglas de Supervivencia</h3>
+                    <div class="rules-box">
+                        <ul>
+                            <li><strong>No hay reglas fijas</strong> — Kaiser puede cambiarlas en cualquier momento para aumentar el drama.</li>
+                            <li><strong>La eliminación es permanente</strong> — Fallar una prueba, ser asesinado por otros concursantes (en pruebas PvP), o tener "baja audiencia" (Kaiser puede decidir eliminar a alguien aburrido).</li>
+                            <li><strong>Las pilas corticales son propiedad de OCE</strong> — Al morir, toda tecnología implantada pertenece a la corporación.</li>
+                            <li><strong>No hay salida</strong> — Intentar escapar se considera una violación del contrato y conlleva "consecuencias extremas".</li>
+                            <li><strong>El entretenimiento es prioritario</strong> — Un concursante que genere suficiente interés podría recibir "privilegios especiales".</li>
+                        </ul>
+                    </div>
+
+                    <h3>Sobre las "Segundas Oportunidades"</h3>
+                    <p>Excepcionalmente, un concursante eliminado pero muy entretenido podría ser resleeveado en una funda sintética barata con una deuda de PM masiva (una "segunda oportunidad" que es más bien una condena a servidumbre).</p>
+
+                    <h3>Premio</h3>
+                    <p>El ganador del concurso recibirá un cheque en blanco para implantes y tanto equipo como pueda cargar en sus brazos.</p>
+                </section>
+                
+                <section>
+                    <h2>DESCARGO DE RESPONSABILIDAD</h2>
+                    <p>OmniCorp Entertainment no se hace responsable por daños físicos, psicológicos o materiales sufridos durante la participación en Ultimate Mercenary. Al participar, reconoces y aceptas todos los riesgos inherentes a las actividades propuestas.</p>
+                </section>
+                
+                <section class="text-center">
+                    <h3 class="glowing-text">¿ESTÁS LISTO PARA LA PRUEBA DEFINITIVA?</h3>
+                    <p>Para continuar, debes aceptar estas reglas y firmar el contrato digital. Una vez dentro, no hay vuelta atrás. La ciudad te espera, mercenario. Demuestra tu valor.</p>
+                    
+                    <button id="accept-btn" class="accept-btn">ACEPTAR Y CONTINUAR</button>
+                </section>
+            </div>
+        </div>
+        
+        <!-- Modal de Prueba -->
+        <div id="test-modal" class="rules-modal">
+            <div class="rules-content">
+                <h1 id="test-title">PRUEBA</h1>
+                <div class="test-image-container">
+                    <img id="test-image" src="images/kaiser_intro_new.png" alt="Imagen de la prueba" style="width: 100%; max-height: 300px; object-fit: cover; margin: 20px 0; border-radius: 8px;">
+                </div>
+                <div id="test-description" class="test-description">
+                    <!-- La descripción se cargará dinámicamente -->
+                </div>
+                <button class="accept-btn" onclick="document.getElementById('test-modal').style.display='none'">CERRAR</button>
+            </div>
+        </div>
+        
+        <div class="scanline"></div>
+        <div class="overlay"></div>
+    </div>
+
+    <script src="mensajes-publico.js"></script>
+    <script src="js/stats-manager.js"></script>
+    <script>
+        // Base de datos unificada de mensajes
+        const mensajesUnificados = {
+            nombres: [
+                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22",
+                "RazorGirl", "BlackICE", "HologramGhost", "PunisherX",
+                "RealityShow_Addict", "VoidWalker", "SilverHand_Jr", "ChromeKid",
+                "JapantownRat", "NightCityDreamer", "StimJunkie", "ArasaxaCorp",
+                "SteelSamurai", "NetRunnerWannabe", "FutureShock", "DigitalAssassin",
+                "KaiserFan01", "OCE_VIP", "BioHacker", "SyntheticLover",
+                "CyberPsycho", "MeatSpace", "DigitalNomad", "TechnoMancer",
+                "RichCorp_Kid", "WastelandPunk", "BodyModder", "MilSpecGear",
+                "RetroBlade", "SoloOperative", "Flatline_Prophet", "CHOOMBA_45",
+                "ShadowRunner", "DataPirate", "ToxicWasteland", "DeckHead",
+                "ConsoleKid", "BloodSport_Queen", "ThirstyForBlood", "MeatGrinder69",
+                "DeathDealerPRO", "ChromeAddict", "Zer0Mercy", "CyberDom",
+                "WetWare_Fetish", "SyntheticPleasure", "BladeWorship", "NeonDreamer"
+            ],
+            colores: [
+                "#ff4757", "#2ed573", "#1e90ff", "#ffa502", "#7bed9f", 
+                "#70a1ff", "#ff6b81", "#a4b0be", "#f368e0", "#ff9ff3", 
+                "#00d2d3", "#5352ed", "#6087FF", "#FEC777", "#00bfff",
+                "#FF1493", "#FF00FF", "#FF69B4", "#8B008B", "#9932CC",
+                "#00FF7F", "#00FFFF", "#00CED1", "#1E90FF", "#FF8C00"
+            ],
+            mensajes: [
+                // Mensajes de fans
+                "¡Vamos XIII, no decepciones a tus fans!",
+                "¡Estoy apostando todo por ti, no me falles!",
+                "Mira esos reflejos, ¡eres una máquina!",
+                "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+                "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
+                "OCE debería ponerte un reto REAL, XIII",
+                "Ese cromo que llevas parece de segunda mano...",
+                "¡Eres mi favorita desde el principio!",
+                "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+                "Por dios, alguien dé algo de equipo decente a la XIII",
+                "Sácale los ojos al siguiente que veas",
+                "Mi hija te adora, no mueras por favor",
+                "Ese último movimiento fue ÉPICO, XIII",
+                "Tu puntuación de audiencia acaba de subir un 15%",
+                "Kaiser está evaluando tus movimientos, impresiónalo",
+                "A este ritmo acabarás como carne picada",
+                "Empiezo a creer que realmente tienes posibilidades, XIII",
+                "Nadie ha pasado la siguiente prueba con vida, ¿serás la primera?",
+                "Llevo viendo este programa 5 temporadas y eres la mejor hasta ahora",
+                "¿Has considerado aliarte con el tipo del brazo biónico?",
+                
+                // Mensajes con PM
+                "¡Si eliminas a 3 concursantes en los próximos 30 minutos, te transfiero 75 PM!",
+                "¡Besa a otro concursante en los próximos 10 minutos y te doy 25 PM!",
+                "¡Haz el baile viral 'Chrome Shuffle' y te transfiero 15 PM al instante!",
+                "¡Si recitas el lema completo de OCE, te doy 20 PM ahora mismo!",
+                "¡Rompe tu propio equipo en cámara y te transfiero 40 PM por tu valentía!",
+                "¡Desafía públicamente a #01 Goliath y te doy 50 PM por tu audacia!",
+                "¡Aplica primeros auxilios a un concursante herido y te transfiero 30 PM!",
+                "¡Cuéntanos tu historia más oscura y te doy 35 PM al instante!",
+                "¡Grita 'OCE es mi dios ahora' y te transfiero 10 PM!",
+                "¡Lleva a cabo un ritual con la sangre de un enemigo caído y te doy 45 PM!",
+                
+                // Retos específicos
+                "¡Haz un striptease para la cámara, XIII! ¡Te transfiero 10 PM si lo haces!",
+                "¡Besa al próximo participante que veas y te doy 15 PM!",
+                "Reta a [PARTICIPANTE] a un duelo cuerpo a cuerpo y te transfiero 20 PM!",
+                "Haz 20 flexiones ahora mismo y te doy 5 PM por tu fuerza!",
+                "Rompe tu arma principal y te transfiero 40 PM por tu valentía!",
+                "Confiesa tu mayor miedo a la cámara y te doy 25 PM!",
+                "Háblale a la cámara sobre por qué entraste al programa y te transfiero 15 PM!",
+                "¡Intenta hackear el siguiente terminal sin protección y te doy 30 PM!",
+                "Cuéntanos tu peor secreto y te transfiero 35 PM!",
+                "Sabotea el equipo de [PARTICIPANTE] y te doy 45 PM!",
+                
+                // Mensajes de crítica
+                "Mi abuela con artritis se mueve mejor que tú en combate.",
+                "¿Llamas a eso una estrategia? Mi tostadora tiene mejor planificación.",
+                "Todos mis amigos dicen que eres la peor de la temporada. Demuéstrales que se equivocan.",
+                "¿Te entrenó un niño de 5 años? Porque tus movimientos lo sugieren.",
+                "Si tu puntería fuera un restaurante, tendría cero estrellas y una investigación sanitaria.",
+                
+                // Mensajes de apoyo
+                "¡La audiencia de Neo-Kyoto Norte te adora!",
+                "Baja el ritmo o te quemarás antes de la prueba final",
+                "Acabo de hackear las cámaras de la arena, cuidado con el sector 7",
+                "¡MÁTALOS A TODOS!",
+                "¿Por qué no intentas algo más arriesgado? Aburres...",
+                "Usa ese implante que conseguiste, ¡para eso gastaste PM!",
+                "Realmente impresionante tu técnica con esa katana",
+                "Mi IA predice un 32% de posibilidades de supervivencia",
+                "Tu puntuación en las apuestas acaba de duplicarse"
+            ],
+            participantes: [
+                "Goliath", "Silas", "Raven", "Chispa", "Marcus", "Jinx", "Lin", "Subject Omega",
+                "Echo", "Compound", "Los Gemelos", "Viper", "Phantom", "Titan", "Oracle", "Thunder Fist",
+                "Maven", "Nano", "Participante #23", "Participante #45", "Participante #17", "Participante #9"
+            ]
+        };
+
+        // Función para generar un mensaje aleatorio
+        function generarMensajeAleatorio() {
+            const usuario = mensajesUnificados.nombres[Math.floor(Math.random() * mensajesUnificados.nombres.length)];
+            const color = mensajesUnificados.colores[Math.floor(Math.random() * mensajesUnificados.colores.length)];
+            
+            // 2% de probabilidad de que sea un mensaje con PM (1 de cada 50)
+            const esMensajeConPM = Math.random() < 0.02;
+            
+            // Si es mensaje con PM, seleccionar solo de los mensajes que ofrecen PM
+            let mensaje;
+            if (esMensajeConPM) {
+                const mensajesConPM = mensajesUnificados.mensajes.filter(m => 
+                    m.includes("PM") && (
+                        m.includes("te doy") || 
+                        m.includes("te transfiero") || 
+                        m.includes("te daré") ||
+                        m.includes("te darán") ||
+                        m.includes("te dará") ||
+                        m.includes("te dar") ||
+                        m.includes("te regalo") ||
+                        m.includes("te envío") ||
+                        m.includes("te mando") ||
+                        m.includes("te paso") ||
+                        m.includes("si lo haces") ||
+                        m.includes("si lo realizas") ||
+                        m.includes("si lo completas") ||
+                        m.includes("si lo logras") ||
+                        m.includes("si lo consigues") ||
+                        m.includes("si lo intentas") ||
+                        m.includes("si lo aceptas") ||
+                        m.includes("si te atreves") ||
+                        m.includes("si te animas")
+                    )
+                );
+                mensaje = mensajesConPM[Math.floor(Math.random() * mensajesConPM.length)];
+            } else {
+                // Si no es mensaje con PM, seleccionar de los mensajes que NO ofrecen PM
+                const mensajesSinPM = mensajesUnificados.mensajes.filter(m => 
+                    !m.includes("PM") || !(
+                        m.includes("te doy") || 
+                        m.includes("te transfiero") || 
+                        m.includes("te daré") ||
+                        m.includes("te darán") ||
+                        m.includes("te dará") ||
+                        m.includes("te dar") ||
+                        m.includes("te regalo") ||
+                        m.includes("te envío") ||
+                        m.includes("te mando") ||
+                        m.includes("te paso") ||
+                        m.includes("si lo haces") ||
+                        m.includes("si lo realizas") ||
+                        m.includes("si lo completas") ||
+                        m.includes("si lo logras") ||
+                        m.includes("si lo consigues") ||
+                        m.includes("si lo intentas") ||
+                        m.includes("si lo aceptas") ||
+                        m.includes("si te atreves") ||
+                        m.includes("si te animas")
+                    )
+                );
+                mensaje = mensajesSinPM[Math.floor(Math.random() * mensajesSinPM.length)];
+            }
+            
+            // Reemplazar [PARTICIPANTE] si existe en el mensaje
+            if (mensaje.includes("[PARTICIPANTE]")) {
+                const participante = mensajesUnificados.participantes[Math.floor(Math.random() * mensajesUnificados.participantes.length)];
+                mensaje = mensaje.replace("[PARTICIPANTE]", participante);
+            }
+            
+            return {
+                usuario: usuario,
+                color: color,
+                mensaje: mensaje,
+                destacado: Math.random() < 0.2, // 20% de mensajes destacados
+                esReto: esMensajeConPM
+            };
+        }
+
+        // Función para cargar mensajes del chat
+        function loadChatMessages() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = ''; // Limpiar mensajes existentes
+            
+            // Solo mostrar el mensaje de bienvenida del sistema
+            const systemMessage = {
+                sender: 'SISTEMA',
+                content: 'Bienvenido a Ultimate Mercenary. Enlace establecido. Tu misión comienza ahora.'
+            };
+
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message system';
+            messageElement.innerHTML = `
+                <div class="username">${systemMessage.sender}</div>
+                <div class="content">${systemMessage.content}</div>
+            `;
+            chatMessages.appendChild(messageElement);
+
+            // Función para generar un nuevo mensaje
+            function generateNewMessage() {
+                const mensajeData = generarMensajeAleatorio();
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'chat-message';
+                
+                if (mensajeData.destacado) {
+                    messageElement.className += ' highlight';
+                }
+
+                let tags = '';
+                // 10% de probabilidad de ser VIP
+                if (Math.random() < 0.1) {
+                    tags += '<span class="tag vip">VIP</span>';
+                }
+                // 5% de probabilidad de ser patrocinado
+                if (Math.random() < 0.05) {
+                    tags += '<span class="tag sponsored">Patrocinado</span>';
+                }
+
+                let pmButton = '';
+                // Si el mensaje contiene PM, añadir botón
+                if (mensajeData.esReto) {
+                    const pmMatch = mensajeData.mensaje.match(/(\d+)\s*PM/);
+                    if (pmMatch) {
+                        const pmAmount = pmMatch[1];
+                        pmButton = `<button class="pm-button" onclick="addPM(${pmAmount}, this)">Aceptar ${pmAmount} PM</button>`;
+                    }
+                }
+
+                messageElement.innerHTML = `
+                    <div class="username" style="color: ${mensajeData.color}">
+                        ${mensajeData.usuario}
+                        ${tags}
+                    </div>
+                    <div class="content">
+                        ${mensajeData.mensaje}
+                        ${pmButton}
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Generar un nuevo mensaje cada 2-4 segundos
+            setInterval(generateNewMessage, Math.random() * 2000 + 2000);
+        }
+
+        // Función para añadir PM
+        function addPM(amount, button) {
+            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+            const newPM = currentPM + amount;
+            localStorage.setItem('playerPM', newPM.toString());
+            updateStatusPanel();
+            
+            // Deshabilitar el botón y cambiar su texto
+            button.disabled = true;
+            button.textContent = '✓ Aceptado';
+            button.style.backgroundColor = '#a4b0be';
+            button.style.cursor = 'default';
+
+            // Obtener el mensaje y el usuario del reto
+            const messageElement = button.closest('.chat-message');
+            const username = messageElement.querySelector('.username').textContent.trim();
+            const content = messageElement.querySelector('.content').textContent.trim();
+
+            // Crear mensaje de confirmación del sistema
+            const confirmationMessage = {
+                sender: 'SISTEMA',
+                type: 'system',
+                content: `Has aceptado el reto de ${username}: "${content}"
+
+Recompensa: ${amount} PM
+
+Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o falsear un reto puede incurrir en una penalización.`,
+                time: new Date().toLocaleTimeString()
+            };
+
+            // Añadir el mensaje a la bandeja de entrada
+            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+            messages.push(confirmationMessage);
+            localStorage.setItem('mensajes-directos', JSON.stringify(messages));
+
+            // Si el modal de mensajes está abierto, actualizar la vista
+            const messagesModal = document.getElementById('messages-modal');
+            if (messagesModal && messagesModal.style.display === 'block') {
+                loadDirectMessages();
+            }
+        }
+
+        // Función para cargar mensajes del modal
+        function loadMessages() {
+            const messagesList = document.getElementById('messages-list');
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            messagesList.innerHTML = '';
+            
+            // Obtener solo mensajes directos
+            const directMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+            
+            // Filtrar mensajes según la pestaña activa
+            const filteredMessages = directMessages.filter(msg => {
+                if (activeTab === 'inbox') return true;
+                return msg.type === activeTab;
+            });
+            
+            if (filteredMessages.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'message-item';
+                emptyMessage.innerHTML = `
+                    <div class="message-content" style="text-align: center; color: #666;">
+                        No hay mensajes en esta categoría
+                    </div>
+                `;
+                messagesList.appendChild(emptyMessage);
+                return;
+            }
+            
+            filteredMessages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message-item';
+                messageElement.setAttribute('data-type', msg.type || 'system');
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-sender">${msg.sender}</span>
+                        <span class="message-time">${msg.time}</span>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                `;
+                messagesList.appendChild(messageElement);
+            });
+            
+            // Scroll al último mensaje
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        // Manejar el envío de mensajes
+        document.getElementById('chat-submit').addEventListener('click', function() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                try {
+                    // Guardar mensaje en localStorage
+                    const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    const newMessage = {
+                        sender: 'auri',
+                        content: message,
+                        time: new Date().toLocaleTimeString()
+                    };
+                    messages.push(newMessage);
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+
+                    // Recargar mensajes
+                    loadChatMessages();
+                    input.value = '';
+                } catch (error) {
+                    console.error('Error al guardar mensaje:', error);
+                }
+            }
+        });
+
+        // Función para cerrar sesión
+        function logout() {
+            // Limpiar todos los datos de la sesión
+            localStorage.clear(); // Limpia todo el localStorage
+            
+            // Limpiar también sessionStorage por si acaso
+            sessionStorage.clear();
+            
+            // Limpiar cookies específicas si existen
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            // Redirigir a la página de login
+            window.location.href = 'login.html';
+        }
+
+        // Mostrar modal de reglas al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const rulesModal = document.getElementById('rules-modal');
+            const acceptBtn = document.getElementById('accept-btn');
+            const messageBtn = document.getElementById('message-btn');
+            const messagesModal = document.getElementById('messages-modal');
+            
+            // Verificar si ya se aceptaron las reglas
+            if (!localStorage.getItem('rulesAccepted')) {
+                rulesModal.style.display = 'block';
+            }
+
+            // Manejar la aceptación de reglas
+            acceptBtn.addEventListener('click', function() {
+                localStorage.setItem('rulesAccepted', 'true');
+                rulesModal.style.display = 'none';
+            });
+
+            // Manejar el botón de mensajes
+            messageBtn.addEventListener('click', function() {
+                messagesModal.style.display = 'block';
+                loadMessages();
+            });
+
+            // Cargar mensajes iniciales del chat
+            loadChatMessages();
+        });
+
+        // Función para actualizar los valores del panel de estado
+        function updateStatusPanel() {
+            statsManager.updateUI();
+        }
+
+        // Función para actualizar el objetivo mostrado
+        function updateObjective() {
+            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            const objectiveTitle = document.getElementById('objective-title');
+            const objectiveDescription = document.getElementById('objective-description');
+            
+            switch(currentTest) {
+                case 'prueba0':
+                    objectiveTitle.textContent = 'Prueba 0: La Caída';
+                    objectiveDescription.textContent = 'Sobrevive al entorno hostil, familiarízate con el equipo básico y demuestra tu capacidad de adaptación en condiciones extremas.';
+                    break;
+                case 'prueba1':
+                    objectiveTitle.textContent = 'Prueba 1: Carrera de Obstáculos';
+                    objectiveDescription.textContent = 'Supera los desafíos físicos y mentales de la carrera industrial, demostrando tu agilidad y resistencia bajo presión.';
+                    break;
+                case 'prueba2':
+                    objectiveTitle.textContent = 'Prueba 2: La Cosecha';
+                    objectiveDescription.textContent = 'Identifica y recolecta especímenes valiosos del Jardín Vertical, demostrando precisión y conocimiento en condiciones peligrosas.';
+                    break;
+                case 'prueba3':
+                    objectiveTitle.textContent = 'Prueba 3: La Entrega';
+                    objectiveDescription.textContent = 'Transporta cargamentos valiosos a través del distrito industrial, demostrando sigilo y eficiencia en cada entrega.';
+                    break;
+                default:
+                    objectiveTitle.textContent = 'Prueba 0: La Caída';
+                    objectiveDescription.textContent = 'Sobrevive al entorno hostil, familiarízate con el equipo básico y demuestra tu capacidad de adaptación en condiciones extremas.';
+            }
+        }
+
+        // Actualizar el objetivo al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            updateObjective();
+            // Actualizar el objetivo cada 5 segundos para mantenerlo sincronizado
+            setInterval(updateObjective, 5000);
+        });
+
+        // Datos completos de las pruebas
+        const testData = {
+            'prueba0': {
+                title: 'Prueba 0: La Caída',
+                image: 'images/kaiser_intro_new.png',
+                description: `
+                    <section>
+                        <h2>NARRATIVA</h2>
+                        <p>El eco de los pasos resuena en el hangar subterráneo mientras los 100 concursantes son conducidos al interior. El aire está cargado con el olor a metal y desinfectante, mezclado con el sudor frío del miedo. Las luces neón parpadean, creando sombras danzantes sobre las paredes de acero.</p>
+                        
+                        <p>Las pantallas gigantes que dominan el hangar cobran vida, y la silueta de Kaiser aparece, su rostro oculto tras una máscara de metal pulido que refleja las luces de neón. Su voz, distorsionada por efectos digitales, resuena en el espacio:</p>
+                        
+                        <div class="cyberpunk-quote">
+                            "¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"
+                        </div>
+                        
+                        <p>Mientras Kaiser habla, los concursantes reciben su equipo básico: un mono gris con el logo de OCE, un cuchillo de combate básico, y una pistola de autodefensa "Pocket Pal Mk.II" con 6 balas. El mensaje es claro: están atrapados, pero no desarmados.</p>
+                        
+                        <p>En las esquinas del hangar, las cámaras de OCE giran silenciosamente, capturando cada reacción, cada gesto de miedo o determinación. Los drones de seguridad patrullan el perímetro, sus ojos rojos escaneando constantemente a los concursantes.</p>
+                    </section>
+                    
+                    <section>
+                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
+                        <ul>
+                            <li><strong>Dificultad Base:</strong> Media</li>
+                            <li><strong>Habilidades Principales:</strong> Supervivencia, Adaptación</li>
+                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
+                            <li><strong>Puntos de Mérito:</strong> 100 PM por completar la prueba</li>
+                        </ul>
+                    </section>
+                `
+            },
+            'prueba1': {
+                title: 'Prueba 1: Carrera de Obstáculos',
+                image: 'images/obstacle_course_new.png',
+                description: `
+                    <section>
+                        <h2>NARRATIVA</h2>
+                        <p>El distrito industrial de Neo-Kyoto se ha transformado en un circuito mortal. Las fábricas abandonadas, los contenedores oxidados y las grúas gigantes forman un laberinto vertical que desafía los límites de la resistencia humana. El aire está cargado con el olor a metal quemado y aceite industrial.</p>
+                        
+                        <p>Las pantallas gigantes que rodean el circuito cobran vida, y la silueta de Kaiser aparece, su voz resonando a través de los altavoces industriales:</p>
+                        
+                        <div class="cyberpunk-quote">
+                            "¡Bienvenidos a la primera prueba real, mis queridos mercenarios! Aquí es donde separamos el cromo del metal barato. Este circuito industrial no es solo una carrera, es una declaración. ¿Quién de ustedes tiene lo que se necesita para ascender? ¿Quién caerá en el olvido? ¡Que comience la carrera de obstáculos!"
+                        </div>
+                        
+                        <p>Los concursantes se alinean en la línea de salida, cada uno equipado con su equipo básico y cualquier mejora que hayan podido conseguir. El circuito se extiende ante ellos, una serie de desafíos que combinan agilidad, fuerza y astucia.</p>
+                        
+                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan el perímetro, asegurándose de que nadie intente tomar atajos prohibidos.</p>
+                    </section>
+                    
+                    <section>
+                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
+                        <ul>
+                            <li><strong>Dificultad Base:</strong> Alta</li>
+                            <li><strong>Habilidades Principales:</strong> Agilidad, Resistencia</li>
+                            <li><strong>Habilidades Secundarias:</strong> Fuerza, Coordinación</li>
+                            <li><strong>Puntos de Mérito:</strong> 150 PM por completar la prueba</li>
+                        </ul>
+                    </section>
+                `
+            },
+            'prueba2': {
+                title: 'Prueba 2: La Cosecha',
+                image: 'images/abandoned_greenhouse.png',
+                description: `
+                    <section>
+                        <h2>NARRATIVA</h2>
+                        <p>El Jardín Vertical de Neo-Kyoto es un monumento a la ingeniería biológica. Una torre de 200 pisos que alberga ecosistemas artificiales, cada uno más peligroso que el anterior. Las plantas modificadas genéticamente brillan con colores neón, mientras los especímenes raros se mueven entre la vegetación.</p>
+                        
+                        <p>Las pantallas holográficas que flotan alrededor del jardín cobran vida, y la silueta de Kaiser aparece, su voz resonando a través del sistema de sonido ambiental:</p>
+                        
+                        <div class="cyberpunk-quote">
+                            "¡Bienvenidos al Jardín Vertical, mis queridos recolectores! Aquí es donde la naturaleza se encuentra con la tecnología, donde cada planta es una obra de arte... y un arma potencial. Su misión es simple: recolectar los especímenes más valiosos. Pero recuerden, en este jardín, cada flor tiene su espina, cada fruto su veneno. ¡Que comience la cosecha!"
+                        </div>
+                        
+                        <p>Los concursantes se equipan con sus trajes de protección y herramientas de recolección. El jardín se extiende ante ellos, una maravilla de la ingeniería biológica que oculta tesoros y peligros en igual medida.</p>
+                        
+                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan los niveles superiores, asegurándose de que nadie intente acceder a zonas restringidas.</p>
+                    </section>
+                    
+                    <section>
+                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
+                        <ul>
+                            <li><strong>Dificultad Base:</strong> Alta</li>
+                            <li><strong>Habilidades Principales:</strong> Conocimiento, Precisión</li>
+                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
+                            <li><strong>Puntos de Mérito:</strong> 200 PM por completar la prueba</li>
+                        </ul>
+                    </section>
+                `
+            },
+            'prueba3': {
+                title: 'Prueba 3: La Entrega',
+                image: 'images/city_ruins.png',
+                description: `
+                    <section>
+                        <h2>NARRATIVA</h2>
+                        <p>El distrito industrial de Neo-Kyoto es un laberinto de fábricas abandonadas y zonas de alta seguridad. Las calles están llenas de bandas rivales, drones de seguridad y sistemas de vigilancia automatizados. El aire está cargado con el olor a metal quemado y aceite industrial.</p>
+                        
+                        <p>Las pantallas gigantes que dominan el distrito cobran vida, y la silueta de Kaiser aparece, su voz resonando a través de los altavoces industriales:</p>
+                        
+                        <div class="cyberpunk-quote">
+                            "¡Bienvenidos a la prueba final, mis queridos mensajeros! En este distrito industrial, cada calle es una batalla, cada esquina un peligro. Su misión es simple: entregar los paquetes a tiempo. Pero recuerden, en Neo-Kyoto, nada es lo que parece. ¡Que comience la entrega!"
+                        </div>
+                        
+                        <p>Los concursantes reciben sus paquetes y rutas asignadas. El distrito se extiende ante ellos, un laberinto de peligros y oportunidades. Cada entrega exitosa acerca a los concursantes a la victoria, pero cada error puede ser fatal.</p>
+                        
+                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan las calles, asegurándose de que nadie intente tomar atajos prohibidos.</p>
+                    </section>
+                    
+                    <section>
+                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
+                        <ul>
+                            <li><strong>Dificultad Base:</strong> Muy Alta</li>
+                            <li><strong>Habilidades Principales:</strong> Sigilo, Eficiencia</li>
+                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
+                            <li><strong>Puntos de Mérito:</strong> 250 PM por completar la prueba</li>
+                        </ul>
+                    </section>
+                `
+            }
+        };
+
+        // Función para mostrar la descripción completa de la prueba
+        function showTestDescription() {
+            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            const testInfo = testData[currentTest];
+            
+            document.getElementById('test-title').textContent = testInfo.title;
+            document.getElementById('test-image').src = testInfo.image;
+            document.getElementById('test-description').innerHTML = testInfo.description;
+            document.getElementById('test-modal').style.display = 'block';
+        }
+
+        // Añadir el evento click al botón de objetivo
+        document.getElementById('objective-btn').addEventListener('click', showTestDescription);
+
+        // Función para cargar mensajes directos
+        function loadDirectMessages() {
+            const messagesList = document.getElementById('messages-list');
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+            
+            // Filtrar mensajes según la pestaña activa
+            let filteredMessages = messages;
+            if (activeTab === 'inbox') {
+                filteredMessages = messages.filter(m => m.type === 'shop' || m.type === 'achievement' || m.type === 'warning' || m.type === 'system');
+            } else if (activeTab === 'system') {
+                filteredMessages = messages.filter(m => m.type === 'system');
+            } else if (activeTab === 'shop') {
+                filteredMessages = messages.filter(m => m.type === 'shop');
+            }
+
+            if (filteredMessages.length === 0) {
+                messagesList.innerHTML = '<div class="no-messages">No hay mensajes en esta categoría</div>';
+                return;
+            }
+
+            messagesList.innerHTML = filteredMessages.map((message, index) => {
+                const messageClass = `message-item ${message.type}`;
+                const imageHtml = message.image ? 
+                    `<div class="message-image">
+                        <img src="${message.image}" alt="Imagen del item" onerror="this.style.display='none'">
+                    </div>` : '';
+                
+                return `
+                    <div class="${messageClass}">
+                        <div class="message-header">
+                            <span class="message-sender">${message.sender}</span>
+                            <span class="message-time">${message.time}</span>
+                        </div>
+                        ${imageHtml}
+                        <div class="message-content">${message.content}</div>
+                        <div class="message-actions">
+                            ${message.type === 'challenge' ? `
+                                <button onclick="acceptChallenge('${message.sender}')" class="accept-button">Aceptar Reto</button>
+                            ` : ''}
+                            <button onclick="deleteMessage(${index})" class="delete-button">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteMessage(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
+                const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+                messages.splice(index, 1);
+                localStorage.setItem('mensajes-directos', JSON.stringify(messages));
+                loadDirectMessages();
+            }
+        }
+
+        function acceptChallenge(sender) {
+            // Crear el mensaje de confirmación del sistema
+            const confirmationMessage = {
+                sender: 'SISTEMA',
+                type: 'system',
+                content: `Has aceptado el reto de ${sender}. Hasta que no lo realices, tus PM no están garantizados. Recuerda que fallar o falsear un reto puede incurrir en una penalización.`,
+                time: new Date().toLocaleTimeString()
+            };
+
+            // Obtener mensajes existentes y añadir el nuevo
+            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+            messages.push(confirmationMessage);
+            localStorage.setItem('mensajes-directos', JSON.stringify(messages));
+
+            // Recargar mensajes para mostrar el nuevo mensaje
+            loadDirectMessages();
+
+            // Cambiar a la pestaña de sistema para mostrar el mensaje
+            const systemTab = document.querySelector('.tab-button[data-tab="system"]');
+            if (systemTab) {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                systemTab.classList.add('active');
+                loadDirectMessages();
+            }
+        }
+
+        // Manejar cambio de pestañas
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                loadDirectMessages();
+            });
+        });
+
+        // Cargar mensajes al iniciar y cada 5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDirectMessages();
+            setInterval(loadDirectMessages, 5000);
+        });
+    </script>
+</body>
+</html> 

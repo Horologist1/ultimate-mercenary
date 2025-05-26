@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .shop-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .shop-tab {
+            padding: 10px 20px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .shop-tab:hover {
+            background-color: rgba(0, 204, 255, 0.1);
+            border-color: #00ccff;
+        }
+
+        .shop-tab.active {
+            background-color: rgba(0, 204, 255, 0.2);
+            border-color: #00ccff;
+            color: #00ccff;
+        }
+
+        .shop-section {
+            display: none;
+            margin-bottom: 40px;
+        }
+
+        .shop-section.active {
+            display: block;
+        }
+
+        .shop-section h2 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            border-bottom: 2px solid #00ccff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #444;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-image {
+            width: 200px;
+            height: 200px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .item-image.placeholder {
+            color: #666;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .item-card h3 {
+            color: #00ccff;
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .item-card p {
+            color: #ccc;
+            margin: 5px 0;
+            flex-grow: 1;
+        }
+
+        .item-card .price {
+            color: #ff4757;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .pm-display {
+            background-color: rgba(30, 30, 30, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        .pm-display h3 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .buy-button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .buy-button:hover {
+            background-color: #ff6b81;
+        }
+
+        .buy-button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+
+        .purchase-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00ccff;
+            color: #00ccff;
+            display: none;
+            z-index: 1000;
+        }
+
+        .purchase-message a {
+            color: #ff4757;
+            text-decoration: none;
+        }
+
+        .purchase-message a:hover {
+            text-decoration: underline;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 60px;
+            padding: 10px 20px;
+            background-color: rgba(255, 71, 87, 0.8);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 71, 87, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>Tienda</h2>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="main-container">
+                <button class="back-button" onclick="window.location.href='index-user.html'">VOLVER</button>
+                <div class="shop-container">
+                    <div class="pm-display">
+                        <h3><i class="fas fa-coins"></i> Puntos de Mérito: <span id="current-pm">0</span></h3>
+                    </div>
+
+                    <div class="shop-tabs">
+                        <!-- Las pestañas se cargarán dinámicamente -->
+                    </div>
+
+                    <div id="shop-sections">
+                        <!-- Las secciones se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="purchase-message" class="purchase-message"></div>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+
+    <script>
+        // Items predefinidos de la tienda
+        const defaultShopItems = {
+            'shop-armas': [
+                {
+                    'Artículo': 'Cuchillo de Combate',
+                    'Descripción': 'K-BAR 2100 Neo-Ceramic',
+                    'Daño': '1d10+2',
+                    'Notas': 'Básico pero fiable',
+                    'Coste': 20
+                },
+                {
+                    'Artículo': 'Porra Retráctil',
+                    'Descripción': 'Titanio, extensible',
+                    'Daño': '1d10+1',
+                    'Notas': 'Aturdimiento',
+                    'Coste': 40
+                },
+                {
+                    'Artículo': 'Katana Monomolecular',
+                    'Descripción': '"Filo Espectral"',
+                    'Daño': '2d10+2',
+                    'Notas': 'AP -2, Exclusivo',
+                    'Coste': 350
+                },
+                {
+                    'Artículo': 'Nudillos Cibernéticos',
+                    'Descripción': '"Machacador" (Implante)',
+                    'Daño': '1d10+3',
+                    'Notas': '+10 a golpes',
+                    'Coste': 150
+                },
+                {
+                    'Artículo': 'Pistola Ligera Estándar',
+                    'Descripción': 'Ronin Arms Type-12, 9mm',
+                    'Daño': '2d10',
+                    'Notas': 'Fiable, común',
+                    'Coste': 75
+                },
+                {
+                    'Artículo': 'Pistola Pesada',
+                    'Descripción': 'Ares "Predator V", .45',
+                    'Daño': '2d10+2',
+                    'Notas': 'AP -1',
+                    'Coste': 150
+                },
+                {
+                    'Artículo': 'Pistola de Dardos',
+                    'Descripción': 'Tranquilizantes (3 dardos)',
+                    'Daño': 'Especial',
+                    'Notas': 'Aturdimiento/Veneno',
+                    'Coste': 120
+                },
+                {
+                    'Artículo': 'Subfusil Ligero',
+                    'Descripción': 'Federated Arms Striker, 9mm',
+                    'Daño': '2d10',
+                    'Notas': 'Ráfaga',
+                    'Coste': 350
+                },
+                {
+                    'Artículo': 'Escopeta de Combate',
+                    'Descripción': 'Ronin "Street Sweeper", Cal. 12',
+                    'Daño': '3d10',
+                    'Notas': 'Dispersión',
+                    'Coste': 400
+                },
+                {
+                    'Artículo': 'Rifle de Asalto',
+                    'Descripción': 'Militech "Ronin" M-77',
+                    'Daño': '2d10+4',
+                    'Notas': 'AP -2, Acceso Mayor',
+                    'Coste': 600
+                }
+            ],
+            'shop-municion': [
+                {
+                    'Artículo': 'Cargador Pistola Ligera',
+                    'Compatible con': 'Pistolas 9mm',
+                    'Cantidad': '12 balas',
+                    'Coste': 25
+                },
+                {
+                    'Artículo': 'Cargador Pistola Pesada',
+                    'Compatible con': 'Pistolas .45',
+                    'Cantidad': '10 balas',
+                    'Coste': 35
+                },
+                {
+                    'Artículo': 'Cargador Subfusil',
+                    'Compatible con': 'Subfusiles 9mm',
+                    'Cantidad': '30 balas',
+                    'Coste': 50
+                },
+                {
+                    'Artículo': 'Cartuchos Escopeta',
+                    'Compatible con': 'Escopetas Cal. 12',
+                    'Cantidad': '8 cartuchos',
+                    'Coste': 40
+                },
+                {
+                    'Artículo': 'Cargador Rifle',
+                    'Compatible con': 'Rifles de asalto',
+                    'Cantidad': '20 balas',
+                    'Coste': 70
+                },
+                {
+                    'Artículo': 'Munición Especial',
+                    'Compatible con': 'Cualquier arma',
+                    'Cantidad': 'AP, Expansiva, EMP',
+                    'Coste': '50% extra'
+                }
+            ],
+            'shop-cyberware': [
+                {
+                    'Artículo': 'Ojo Cibernético Avanzado',
+                    'Descripción': 'HawkEye-3',
+                    'Efectos': '+15 Percepción Visual, Térmica, EMF, Smartlink',
+                    'Coste': 500
+                },
+                {
+                    'Artículo': 'Reflejos Cableados',
+                    'Descripción': 'Lynx V.1',
+                    'Efectos': '+5 Iniciativa, +10 Atletismo y Esquiva',
+                    'Coste': 450
+                },
+                {
+                    'Artículo': 'Piel Subdérmica Blindada',
+                    'Descripción': 'Armadura integrada',
+                    'Efectos': 'Armadura +2/+2 natural',
+                    'Coste': 600
+                },
+                {
+                    'Artículo': 'Procesador de Combate Táctico',
+                    'Descripción': 'Ayuda en Puntería/Esquiva',
+                    'Efectos': '+5 a una habilidad de combate',
+                    'Coste': 550
+                },
+                {
+                    'Artículo': 'Pulmones Filtradores Mejorados',
+                    'Descripción': 'Sistema respiratorio avanzado',
+                    'Efectos': 'Resistencia a toxinas, respirar bajo agua poco tiempo',
+                    'Coste': 400
+                },
+                {
+                    'Artículo': 'Implante de Camuflaje Óptico',
+                    'Descripción': 'Básico, corta duración',
+                    'Efectos': 'Invisibilidad parcial (1 minuto), recarga lenta',
+                    'Coste': 700
+                }
+            ],
+            'shop-servicios': [
+                {
+                    'Servicio': 'Información Vaga sobre la Próxima Prueba',
+                    'Descripción': 'Detalles generales, sin especificaciones',
+                    'Coste': 150
+                },
+                {
+                    'Servicio': 'Información Detallada',
+                    'Descripción': 'Sobre un aspecto específico de la próxima prueba',
+                    'Coste': 300
+                },
+                {
+                    'Servicio': 'Mapa Parcial',
+                    'Descripción': 'Del área de la próxima prueba',
+                    'Coste': 250
+                },
+                {
+                    'Servicio': '"Soborno" a un Guardia',
+                    'Descripción': 'Para un pequeño favor (arriesgado)',
+                    'Coste': 100
+                },
+                {
+                    'Servicio': 'Reserva de Funda Sintética Básica',
+                    'Descripción': 'En caso de muerte y si Kaiser lo aprueba',
+                    'Coste': 1000
+                }
+            ],
+            'shop-armaduras': [
+                {
+                    'Artículo': 'Ropa Reforzada',
+                    'Descripción': 'Aspecto de ropa normal pero con protección',
+                    'Armadura (K/E)': '2/2',
+                    'Cobertura': 'Cuerpo',
+                    'Coste': 50
+                },
+                {
+                    'Artículo': 'Chaleco Antibalas Ligero',
+                    'Descripción': 'Aegis-Lite, discreto pero efectivo',
+                    'Armadura (K/E)': '4/6',
+                    'Cobertura': 'Torso',
+                    'Coste': 120
+                },
+                {
+                    'Artículo': 'Chaleco Antibalas Medio',
+                    'Descripción': 'Aegis Standard, protección notable',
+                    'Armadura (K/E)': '6/8',
+                    'Cobertura': 'Torso',
+                    'Coste': 250
+                },
+                {
+                    'Artículo': 'Traje de Combate Ligero',
+                    'Descripción': 'Armadura integral con casco',
+                    'Armadura (K/E)': '5/7',
+                    'Cobertura': 'Cuerpo completo',
+                    'Coste': 450
+                },
+                {
+                    'Artículo': 'Escudo Balístico Ligero',
+                    'Descripción': 'Protección móvil',
+                    'Armadura (K/E)': '8/10',
+                    'Cobertura': 'Parcial (defensa)',
+                    'Coste': 100
+                }
+            ],
+            'shop-equipo': [
+                {
+                    'Artículo': 'Kit Médico Básico',
+                    'Descripción': '1x Trauma-Patch Plus',
+                    'Efectos': 'Cura 1d10 PV',
+                    'Coste': 60
+                },
+                {
+                    'Artículo': 'Kit Médico Avanzado',
+                    'Descripción': 'Spray Medigel, Estimulantes, Analgésicos',
+                    'Efectos': 'Cura 2d10 PV, reduce penalizadores',
+                    'Coste': 150
+                },
+                {
+                    'Artículo': 'Multiherramienta',
+                    'Descripción': 'Herramienta multifunción compacta',
+                    'Efectos': '+10 a reparaciones básicas',
+                    'Coste': 30
+                },
+                {
+                    'Artículo': 'Cuerda (20m) con Gancho',
+                    'Descripción': 'Fibra sintética ultraresistente',
+                    'Efectos': 'Facilita escaladas, soporta hasta 400kg',
+                    'Coste': 40
+                },
+                {
+                    'Artículo': 'Gafas de Visión Nocturna/Térmica',
+                    'Descripción': 'No requiere implante',
+                    'Efectos': 'Visión en oscuridad/calor',
+                    'Coste': 100
+                },
+                {
+                    'Artículo': 'Respirador',
+                    'Descripción': 'Protección gases básicos',
+                    'Efectos': '+10 vs. toxinas inhaladas',
+                    'Coste': 70
+                },
+                {
+                    'Artículo': 'Datapad Básico',
+                    'Descripción': 'Ordenador portátil simple',
+                    'Efectos': 'Funciones básicas de información',
+                    'Coste': 50
+                },
+                {
+                    'Artículo': 'Datapad Encriptado',
+                    'Descripción': 'Con software de hacking básico',
+                    'Efectos': '+10 a intentos de hackeo',
+                    'Coste': 200
+                },
+                {
+                    'Artículo': 'Cyberdeck "Shinigami Micro"',
+                    'Descripción': 'Herramienta de hacking dedicada',
+                    'Efectos': '+20 a intentos de hackeo, funciones avanzadas',
+                    'Coste': 300
+                },
+                {
+                    'Artículo': 'Inhibidor de Señal',
+                    'Descripción': 'Corto alcance, un solo uso',
+                    'Efectos': 'Bloquea comunicaciones en 10m por 2 minutos',
+                    'Coste': 120
+                },
+                {
+                    'Artículo': 'Micro-Dron de Reconocimiento',
+                    'Descripción': 'Básico, tamaño de un insecto',
+                    'Efectos': 'Exploración remota, transmisión de vídeo',
+                    'Coste': 250
+                }
+            ]
+        };
+
+        // Cargar items desde localStorage o usar los predefinidos
+        let shopItems = [];
+        
+        // Función para cargar items guardados
+        function loadSavedItems() {
+            let savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
+            
+            // Si no hay items guardados, usar los predefinidos
+            if (Object.keys(savedItems).length === 0) {
+                savedItems = defaultShopItems;
+                localStorage.setItem('shopItems', JSON.stringify(defaultShopItems));
+            }
+
+            // Convertir el objeto de items en un array plano
+            shopItems = Object.entries(savedItems).flatMap(([section, items]) => 
+                items.map((item, index) => ({
+                    id: `${section}-${index}`,
+                    name: item.Artículo || item.Servicio || '',
+                    description: item.Descripción || '',
+                    price: parseInt(item.Coste) || 0,
+                    details: item.Efectos || item.Notas || item.Daño || item['Armadura (K/E)'] || item.Cobertura || '',
+                    section: section
+                }))
+            );
+        }
+
+        // Función para mostrar mensaje de compra
+        function showPurchaseMessage(item) {
+            const message = document.getElementById('purchase-message');
+            message.innerHTML = `
+                <h4>¡Compra Exitosa!</h4>
+                <p>Has adquirido: ${item.name}</p>
+                <p><a href="#" onclick="showItemDetails('${item.id}')">Ver detalles del item</a></p>
+            `;
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+
+        // Función para mostrar detalles del item
+        function showItemDetails(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            if (item) {
+                alert(`${item.name}\n\n${item.details}`);
+            }
+        }
+
+        // Función para comprar un item
+        function buyItem(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+
+            if (currentPM >= item.price) {
+                // Actualizar PM
+                const newPM = currentPM - item.price;
+                localStorage.setItem('playerPM', newPM);
+                updatePMDisplay();
+
+                // Mostrar mensaje de compra
+                showPurchaseMessage(item);
+
+                // Generar mensaje directo con los detalles de la compra
+                const directMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+                const imageUrl = getItemImageUrl(item.name);
+                const purchaseMessage = {
+                    sender: 'TIENDA',
+                    type: 'shop',
+                    content: `Has adquirido: ${item.name}\n\nDetalles:\n${item.description}\n${item.details ? `\nEspecificaciones: ${item.details}` : ''}\n\nPrecio: ${item.price} PM`,
+                    image: imageUrl || null,
+                    time: new Date().toLocaleTimeString()
+                };
+                directMessages.push(purchaseMessage);
+                localStorage.setItem('mensajes-directos', JSON.stringify(directMessages));
+
+                // Actualizar botones
+                updateBuyButtons();
+            } else {
+                alert('No tienes suficientes PM para realizar esta compra');
+            }
+        }
+
+        // Función para actualizar la visualización de PM
+        function updatePMDisplay() {
+            const currentPM = localStorage.getItem('playerPM') || '0';
+            document.getElementById('current-pm').textContent = currentPM;
+        }
+
+        // Función para actualizar el estado de los botones de compra
+        function updateBuyButtons() {
+            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+            const buttons = document.querySelectorAll('.buy-button');
+            buttons.forEach(button => {
+                const itemId = button.dataset.itemId;
+                const item = shopItems.find(i => i.id === itemId);
+                button.disabled = currentPM < item.price;
+            });
+        }
+
+        // Función para cargar la URL de imagen guardada
+        function getItemImageUrl(itemName) {
+            // Primero intentar obtener la imagen del localStorage (configurada en el admin)
+            const savedUrl = localStorage.getItem(`product_image_url_${itemName}`);
+            if (savedUrl) return savedUrl;
+            
+            // Si no hay URL configurada, usar la imagen local según el tipo de item
+            const defaultImages = {
+                'Katana Monomolecular': 'images/katana.png',
+                'Pistola Pesada': 'images/predator_pistol.png',
+                'Escopeta de Combate': 'images/street_sweeper.png',
+                'Ojo Cibernético Avanzado': 'images/cybereye.png',
+                'Reflejos Cableados': 'images/reflejos.png',
+                'Piel Subdérmica Blindada': 'images/piel_armadura.png',
+                'Procesador de Combate Táctico': 'images/procesador.png',
+                'Pulmones Filtradores Mejorados': 'images/pulmones.png',
+                'Implante de Camuflaje Óptico': 'images/camuflaje.png',
+                'Kit Médico Avanzado': 'images/kit_medico.png',
+                'Cyberdeck "Shinigami Micro"': 'images/cyberdeck.png',
+                'Micro-Dron de Reconocimiento': 'images/dron.png'
+            };
+            
+            return defaultImages[itemName] || '';
+        }
+
+        // Función para renderizar los items de la tienda
+        function renderShopItems() {
+            const sectionsContainer = document.getElementById('shop-sections');
+            const tabsContainer = document.querySelector('.shop-tabs');
+            const sections = {
+                'shop-armas': 'Armas',
+                'shop-municion': 'Munición',
+                'shop-armaduras': 'Armaduras',
+                'shop-cyberware': 'Cyberware',
+                'shop-equipo': 'Equipo',
+                'shop-servicios': 'Servicios'
+            };
+
+            // Renderizar pestañas
+            tabsContainer.innerHTML = Object.entries(sections).map(([sectionId, sectionName], index) => `
+                <div class="shop-tab ${index === 0 ? 'active' : ''}" data-section="${sectionId}">
+                    ${sectionName}
+                </div>
+            `).join('');
+
+            // Renderizar secciones
+            sectionsContainer.innerHTML = Object.entries(sections).map(([sectionId, sectionName], index) => {
+                const sectionItems = shopItems.filter(item => item.section === sectionId);
+                if (sectionItems.length === 0) return '';
+
+                return `
+                    <div class="shop-section ${index === 0 ? 'active' : ''}" id="${sectionId}">
+                        <div class="items-grid">
+                            ${sectionItems.map(item => {
+                                const imageUrl = getItemImageUrl(item.name);
+                                return `
+                                    <div class="item-card">
+                                        <div class="item-image ${imageUrl ? '' : 'placeholder'}">
+                                            ${imageUrl ? 
+                                                `<img src="${imageUrl}" alt="${item.name}" onerror="this.parentElement.classList.add('placeholder'); this.parentElement.innerHTML = '<span>Error al cargar la imagen</span>';">` :
+                                                `<span>Sin imagen</span>`
+                                            }
+                                        </div>
+                                        <h3>${item.name}</h3>
+                                        <p>${item.description}</p>
+                                        ${item.details ? `<p><strong>Detalles:</strong> ${item.details}</p>` : ''}
+                                        <p class="price">${item.price} PM</p>
+                                        <button class="buy-button" data-item-id="${item.id}" onclick="buyItem('${item.id}')">
+                                            Comprar
+                                        </button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Añadir eventos a las pestañas
+            document.querySelectorAll('.shop-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remover clase active de todas las pestañas y secciones
+                    document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
+                    
+                    // Añadir clase active a la pestaña clickeada y su sección correspondiente
+                    tab.classList.add('active');
+                    const sectionId = tab.dataset.section;
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+        }
+
+        // Inicializar la tienda
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedItems();
+            renderShopItems();
+            updatePMDisplay();
+            updateBuyButtons();
+        });
+    </script>
+</body>
+</html> 

@@ -3,6 +3,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Cargar items guardados al iniciar
     loadSavedItems();
+    
+    // Añadir eventos para las URLs de imágenes
+    document.querySelectorAll('input[type="url"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const itemName = this.closest('tr').querySelector('td:first-child').textContent;
+            const imageUrl = this.value;
+            if (imageUrl) {
+                localStorage.setItem(`product_image_url_${itemName}`, imageUrl);
+            } else {
+                localStorage.removeItem(`product_image_url_${itemName}`);
+            }
+        });
+    });
 });
 
 // Función para obtener las columnas según la sección
@@ -71,6 +84,25 @@ function updateShopDisplay(tabId) {
             }
             row.appendChild(cell);
         });
+        
+        // Añadir celda para la URL de la imagen
+        const imageCell = document.createElement('td');
+        const imageInput = document.createElement('input');
+        imageInput.type = 'url';
+        imageInput.placeholder = 'URL de imagen';
+        imageInput.value = localStorage.getItem(`product_image_url_${item.Artículo || item.Servicio}`) || '';
+        imageInput.addEventListener('change', function() {
+            const itemName = item.Artículo || item.Servicio;
+            const imageUrl = this.value;
+            if (imageUrl) {
+                localStorage.setItem(`product_image_url_${itemName}`, imageUrl);
+            } else {
+                localStorage.removeItem(`product_image_url_${itemName}`);
+            }
+        });
+        imageCell.appendChild(imageInput);
+        row.appendChild(imageCell);
+        
         // Añadir botón de eliminar
         const deleteCell = document.createElement('td');
         deleteCell.className = 'delete-cell';

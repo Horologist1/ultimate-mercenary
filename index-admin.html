@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mercenary - Panel de Control</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .main-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 9999;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .back-button i {
+            font-size: 16px;
+        }
+
+        .control-panel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .top-bar {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .title-container h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #00ccff;
+        }
+
+        .title-container h2 {
+            font-size: 18px;
+            margin: 0;
+            color: #ff4757;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 120px);
+            margin-top: 60px;
+        }
+
+        .control-section {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-section h3 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+        }
+
+        .control-group {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+            padding: 15px;
+        }
+
+        .control-group h4 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .control-button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 100%
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .admin-header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            margin-top: 60px;
+        }
+
+        .test-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .test-selector label {
+            color: #00ccff;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .test-selector select {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-selector select:hover {
+            border-color: #00ccff;
+        }
+
+        .test-selector select:focus {
+            outline: none;
+            border-color: #00ccff;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+
+        .current-objective {
+            flex: 1;
+            margin-left: 30px;
+            padding: 15px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .current-objective h3 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .current-objective p {
+            color: #fff;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .objective-text {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Botón de volver -->
+        <button class="back-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> VOLVER
+        </button>
+        
+        <!-- Imagen de fondo -->
+        <img src="app/ultimate-mercenary/pov_running_street.png" alt="POV Runner" class="background-video">
+        
+        <!-- Panel de control -->
+        <div class="control-panel">
+            <!-- Barra superior -->
+            <div class="top-bar">
+                <div class="logo-container">
+                    <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                    <div class="title-container">
+                        <h1>ULTIMATE MERCENARY</h1>
+                        <h2>Panel de Control</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selector de Prueba y Objetivo -->
+            <div class="admin-header">
+                <div class="test-selector">
+                    <label for="current-test">Prueba Actual:</label>
+                    <select id="current-test" onchange="updateCurrentTest(this.value)">
+                        <option value="prueba0">Prueba 0: La Caída</option>
+                        <option value="prueba1">Prueba 1: Carrera de Obstáculos</option>
+                        <option value="prueba2">Prueba 2: La Cosecha</option>
+                        <option value="prueba3">Prueba 3: La Entrega</option>
+                    </select>
+                </div>
+                <div class="current-objective">
+                    <h3>Objetivo Actual:</h3>
+                    <p id="objective-text" class="objective-text">Selecciona una prueba para ver su objetivo.</p>
+                </div>
+            </div>
+            
+            <!-- Área principal -->
+            <div class="main-area">
+                <!-- Sección de Control de Audiencia -->
+                <div class="control-section">
+                    <h3>CONTROL DE AUDIENCIA</h3>
+                    
+                    <div class="control-group">
+                        <h4>ESPECTADORES</h4>
+                        <input type="number" class="control-input" id="spectators-input" placeholder="Número de espectadores">
+                        <button class="control-button" onclick="updateSpectators()">ACTUALIZAR</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>RATING</h4>
+                        <input type="number" class="control-input" id="rating-input" placeholder="Rating (0.0 - 10.0)" step="0.1" min="0" max="10">
+                        <button class="control-button" onclick="updateRating()">ACTUALIZAR</button>
+                    </div>
+                </div>
+                
+                <!-- Sección de Control de Mensajes -->
+                <div class="control-section">
+                    <h3>CONTROL DE MENSAJES</h3>
+                    
+                    <div class="control-group">
+                        <h4>ENVIAR MENSAJE</h4>
+                        <input type="text" class="control-input" id="message-input" placeholder="Escribe un mensaje...">
+                        <button class="control-button" onclick="sendMessage()">ENVIAR</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>OFERTA DE PM</h4>
+                        <input type="number" class="control-input" id="pm-input" placeholder="Cantidad de PM">
+                        <input type="text" class="control-input" id="pm-message-input" placeholder="Mensaje con la oferta...">
+                        <button class="control-button" onclick="sendPMMessage()">ENVIAR OFERTA</button>
+                    </div>
+                </div>
+                
+                <!-- Sección de Control de Objetivos -->
+                <div class="control-section">
+                    <h3>CONTROL DE OBJETIVOS</h3>
+                    
+                    <div class="control-group">
+                        <h4>PRUEBA ACTUAL</h4>
+                        <select id="current-test" class="control-input" onchange="updateCurrentTest(this.value)">
+                            <option value="prueba0">Prueba 0: La Caída</option>
+                            <option value="prueba1">Prueba 1: Carrera de Obstáculos</option>
+                            <option value="prueba2">Prueba 2: La Cosecha</option>
+                            <option value="prueba3">Prueba 3: La Entrega</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <h4>OBJETIVO ACTUAL</h4>
+                        <p id="objective-text" class="objective-text">Selecciona una prueba para ver su objetivo.</p>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>NUEVO OBJETIVO</h4>
+                        <input type="text" class="control-input" id="objective-title-input" placeholder="Título del objetivo">
+                        <input type="text" class="control-input" id="objective-description-input" placeholder="Descripción del objetivo">
+                        <input type="number" class="control-input" id="objective-time-input" placeholder="Tiempo en minutos">
+                        <button class="control-button" onclick="setNewObjective()">ESTABLECER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scanline"></div>
+        <div class="overlay"></div>
+    </div>
+
+    <script>
+        // Función para actualizar espectadores
+        function updateSpectators() {
+            const spectators = document.getElementById('spectators-input').value;
+            localStorage.setItem('spectators', spectators);
+            document.getElementById('spectators-input').value = '';
+        }
+
+        // Función para actualizar rating
+        function updateRating() {
+            const rating = document.getElementById('rating-input').value;
+            localStorage.setItem('rating', rating);
+            document.getElementById('rating-input').value = '';
+        }
+
+        // Función para enviar mensaje
+        function sendMessage() {
+            const message = document.getElementById('message-input').value;
+            if (message) {
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push({
+                    sender: 'SISTEMA',
+                    content: message,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                document.getElementById('message-input').value = '';
+            }
+        }
+
+        // Función para enviar mensaje con PM
+        function sendPMMessage() {
+            const pmAmount = document.getElementById('pm-input').value;
+            const message = document.getElementById('pm-message-input').value;
+            if (pmAmount && message) {
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push({
+                    sender: 'SISTEMA',
+                    content: `${message} ¡Te transfiero ${pmAmount} PM!`,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                document.getElementById('pm-input').value = '';
+                document.getElementById('pm-message-input').value = '';
+            }
+        }
+
+        // Función para establecer nuevo objetivo
+        function setNewObjective() {
+            const title = document.getElementById('objective-title-input').value;
+            const description = document.getElementById('objective-description-input').value;
+            const time = document.getElementById('objective-time-input').value;
+            
+            if (title && description && time) {
+                const objective = {
+                    title: title,
+                    description: description,
+                    time: time,
+                    startTime: new Date().toLocaleTimeString()
+                };
+                localStorage.setItem('current-objective', JSON.stringify(objective));
+                
+                document.getElementById('objective-title-input').value = '';
+                document.getElementById('objective-description-input').value = '';
+                document.getElementById('objective-time-input').value = '';
+            }
+        }
+
+        // Objetivos de cada prueba
+        const testObjectives = {
+            'prueba0': 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
+            'prueba1': 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
+            'prueba2': 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
+            'prueba3': 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.'
+        };
+
+        // Función para actualizar la prueba actual
+        function updateCurrentTest(testId) {
+            localStorage.setItem('currentTest', testId);
+            document.getElementById('objective-text').textContent = testObjectives[testId];
+        }
+
+        // Cargar la prueba actual al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            document.getElementById('current-test').value = currentTest;
+            document.getElementById('objective-text').textContent = testObjectives[currentTest];
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Mercenary - Panel de Control</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .main-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 9999;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .back-button i {
+            font-size: 16px;
+        }
+
+        .control-panel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            border: 1px solid #444;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+
+        .control-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: #00ccff;
+            border-radius: 4px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb:hover {
+            background: #00a3cc;
+        }
+
+        .top-bar {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .title-container h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #00ccff;
+        }
+
+        .title-container h2 {
+            font-size: 18px;
+            margin: 0;
+            color: #ff4757;
+        }
+
+        .test-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .test-selector label {
+            color: #00ccff;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .test-selector select {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-selector select:hover {
+            border-color: #00ccff;
+        }
+
+        .test-selector select:focus {
+            outline: none;
+            border-color: #00ccff;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+
+        .current-objective {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .current-objective h3 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .current-objective p {
+            color: #fff;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 120px);
+            margin-top: 60px;
+        }
+
+        .control-section {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-section h3 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+        }
+
+        .control-group {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            border: 1px solid #444;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-group h4 {
+            color: #ff4757;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+
+        .control-input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .control-button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 100%
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Estilos para la sección de DMs */
+        .control-section textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            resize: vertical;
+        }
+
+        .control-section select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .pm-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pm-controls input {
+            flex: 1;
+        }
+
+        .pm-controls button {
+            flex: 0 0 auto;
+        }
+
+        .user-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .user-list h4 {
+            color: #00ccff;
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .user-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 8px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            align-items: center;
+        }
+
+        .user-name {
+            color: #00ccff;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-pm, .user-audience, .user-rating {
+            color: #ff4757;
+            text-align: right;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            min-width: 60px;
+        }
+
+        .user-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 0 8px 5px 8px;
+            color: #00ccff;
+            font-size: 11px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #444;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+
+        .user-header div {
+            text-align: right;
+        }
+
+        .user-header div:first-child {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Botón de volver -->
+        <button class="back-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> VOLVER
+        </button>
+        
+        <!-- Panel de control -->
+        <div class="control-panel">
+            <!-- Barra superior -->
+            <div class="top-bar">
+                <div class="logo-container">
+                    <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                    <div class="title-container">
+                        <h1>ULTIMATE MERCENARY</h1>
+                        <h2>Panel de Control</h2>
+                    </div>
+                </div>
+                <div class="test-selector">
+                    <label for="current-test">Prueba Actual:</label>
+                    <select id="current-test" onchange="updateCurrentTest(this.value)">
+                        <option value="prueba0">Prueba 0: La Caída</option>
+                        <option value="prueba1">Prueba 1: Carrera de Obstáculos</option>
+                        <option value="prueba2">Prueba 2: La Cosecha</option>
+                        <option value="prueba3">Prueba 3: La Entrega</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="current-objective">
+                <h3>Objetivo Actual:</h3>
+                <p id="objective-text">Selecciona una prueba para ver su objetivo.</p>
+            </div>
+            
+            <!-- Área principal -->
+            <div class="main-area">
+                <!-- Sección de Control de Audiencia -->
+                <div class="control-section" style="flex: 1;">
+                    <h3>CONTROL DE AUDIENCIA</h3>
+                    
+                    <div class="control-group">
+                        <h4>ESPECTADORES</h4>
+                        <input type="number" class="control-input" id="spectators-input" placeholder="Número de espectadores">
+                        <button class="control-button" onclick="updateSpectators()">ACTUALIZAR</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h4>RATING</h4>
+                        <input type="number" class="control-input" id="rating-input" placeholder="Rating (0.0 - 10.0)" step="0.1" min="0" max="10">
+                        <button class="control-button" onclick="updateRating()">ACTUALIZAR</button>
+                    </div>
+
+                    <div class="control-group">
+                        <h4>GESTIÓN DE PUNTOS DE MÉRITO (PM)</h4>
+                        <div class="pm-controls">
+                            <input type="number" class="control-input" id="pm-add-input" placeholder="Cantidad a sumar/restar">
+                            <button class="control-button" onclick="addPM()">+</button>
+                            <button class="control-button" onclick="subtractPM()">-</button>
+                        </div>
+                        <input type="number" class="control-input" id="pm-direct-input" placeholder="Establecer PM total">
+                        <button class="control-button" onclick="updateDirectPM()">ESTABLECER PM</button>
+                        
+                        <h4 style="margin-top: 15px; color: #00ccff;">USUARIOS Y ESTADÍSTICAS</h4>
+                        <div class="user-list">
+                            <h4>USUARIOS Y ESTADÍSTICAS</h4>
+                            <div class="user-header">
+                                <div>Usuario</div>
+                                <div>PM</div>
+                                <div>Audiencia</div>
+                                <div>Rating</div>
+                            </div>
+                            <div id="user-list-content">
+                                <!-- Los usuarios se añadirán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección de Control de Mensajes -->
+                <div class="control-section" style="flex: 1;">
+                    <h3>CONTROL DE MENSAJES</h3>
+                    
+                    <div class="control-group">
+                        <h4>ENVIAR MENSAJE</h4>
+                        <input type="text" class="control-input" id="message-input" placeholder="Escribe un mensaje...">
+                        <button class="control-button" onclick="sendMessage()">ENVIAR</button>
+                    </div>
+
+                    <div class="control-group">
+                        <h4>ENVIAR OFERTA DE PM</h4>
+                        <input type="number" class="control-input" id="pm-input" placeholder="Cantidad de PM">
+                        <input type="text" class="control-input" id="pm-message-input" placeholder="Mensaje con la oferta...">
+                        <button class="control-button" onclick="sendPMMessage()">ENVIAR OFERTA</button>
+                    </div>
+
+                    <!-- Sección de Mensajes Directos -->
+                    <div class="control-group">
+                        <h4>MENSAJES DIRECTOS</h4>
+                        <select id="dm-sender" class="control-input">
+                            <option value="SISTEMA">Sistema</option>
+                            <option value="TIENDA">Tienda</option>
+                            <option value="KAISER">Kaiser</option>
+                            <option value="OCE">OCE</option>
+                            <option value="SPONSOR">Patrocinador</option>
+                        </select>
+                        <select id="dm-type" class="control-input">
+                            <option value="system">Sistema</option>
+                            <option value="shop">Tienda</option>
+                            <option value="achievement">Logro</option>
+                            <option value="warning">Advertencia</option>
+                        </select>
+                        <textarea id="dm-content" class="control-input" placeholder="Contenido del mensaje"></textarea>
+                        <button class="control-button" onclick="sendDirectMessage()">ENVIAR DM</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scanline"></div>
+        <div class="overlay"></div>
+    </div>
+
+    <script src="js/stats-manager.js"></script>
+    <script>
+        // Sistema de almacenamiento persistente
+        const persistentStorage = {
+            data: {
+                playerPM: 0,
+                audience: 0,
+                rating: 0
+            },
+
+            init() {
+                // Obtener valores actuales
+                const currentPM = localStorage.getItem('playerPM') || '0';
+                const currentAudience = localStorage.getItem('spectators') || '0';
+                const currentRating = localStorage.getItem('rating') || '0.0';
+
+                // Actualizar datos
+                this.data.playerPM = parseInt(currentPM);
+                this.data.audience = parseInt(currentAudience);
+                this.data.rating = parseFloat(currentRating);
+
+                // Sincronizar con statsManager si existe y tiene las funciones necesarias
+                if (window.statsManager && typeof statsManager.updateUI === 'function') {
+                    if (typeof statsManager.updatePM === 'function') {
+                        statsManager.updatePM(this.data.playerPM);
+                    }
+                    if (typeof statsManager.updateSpectators === 'function') {
+                        statsManager.updateSpectators(this.data.audience);
+                    }
+                    if (typeof statsManager.updateRating === 'function') {
+                        statsManager.updateRating(this.data.rating);
+                    }
+                    statsManager.updateUI();
+                }
+            },
+
+            updatePM(amount) {
+                this.data.playerPM = amount;
+                localStorage.setItem('playerPM', amount.toString());
+                if (window.statsManager && typeof statsManager.updatePM === 'function') {
+                    statsManager.updatePM(amount);
+                    if (typeof statsManager.updateUI === 'function') {
+                        statsManager.updateUI();
+                    }
+                }
+            },
+
+            updateAudience(value) {
+                const newValue = parseInt(value) || 0;
+                this.data.audience = newValue;
+                localStorage.setItem('spectators', newValue.toString());
+                if (window.statsManager && typeof statsManager.updateSpectators === 'function') {
+                    statsManager.updateSpectators(newValue);
+                    if (typeof statsManager.updateUI === 'function') {
+                        statsManager.updateUI();
+                    }
+                }
+            },
+
+            updateRating(value) {
+                const newValue = parseFloat(value) || 0;
+                this.data.rating = newValue;
+                localStorage.setItem('rating', newValue.toString());
+                if (window.statsManager && typeof statsManager.updateRating === 'function') {
+                    statsManager.updateRating(newValue);
+                    if (typeof statsManager.updateUI === 'function') {
+                        statsManager.updateUI();
+                    }
+                }
+            }
+        };
+
+        // Función para actualizar la lista de usuarios
+        function updateUserList() {
+            const userListContent = document.getElementById('user-list-content');
+            if (!userListContent) return;
+
+            // Obtener valores actuales
+            const currentPM = localStorage.getItem('playerPM') || '0';
+            const currentAudience = localStorage.getItem('spectators') || '0';
+            const currentRating = localStorage.getItem('rating') || '0.0';
+
+            // Crear elemento para el usuario auri
+            userListContent.innerHTML = `
+                <div class="user-item">
+                    <div class="user-name">auri</div>
+                    <div class="user-pm">${currentPM}</div>
+                    <div class="user-audience">${currentAudience}</div>
+                    <div class="user-rating">${parseFloat(currentRating).toFixed(1)}</div>
+                </div>
+            `;
+        }
+
+        // Inicializar inmediatamente al cargar la página
+        persistentStorage.init();
+        updateUserList();
+
+        // También inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            persistentStorage.init();
+            updateUserList();
+            
+            // Cargar valores actuales en los inputs
+            document.getElementById('spectators-input').value = persistentStorage.data.audience;
+            document.getElementById('rating-input').value = persistentStorage.data.rating;
+            
+            // Cargar la prueba actual
+            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            document.getElementById('current-test').value = currentTest;
+            document.getElementById('objective-text').textContent = testObjectives[currentTest];
+        });
+
+        // Objetivos de cada prueba
+        const testObjectives = {
+            'prueba0': 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
+            'prueba1': 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
+            'prueba2': 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
+            'prueba3': 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.'
+        };
+
+        // Función para actualizar la prueba actual
+        function updateCurrentTest(testId) {
+            localStorage.setItem('currentTest', testId);
+            document.getElementById('objective-text').textContent = testObjectives[testId];
+        }
+
+        // Función para enviar mensaje
+        function sendMessage() {
+            const message = document.getElementById('message-input').value;
+            if (message) {
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push({
+                    sender: 'SISTEMA',
+                    content: message,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                document.getElementById('message-input').value = '';
+            }
+        }
+
+        // Función para enviar mensaje con PM
+        function sendPMMessage() {
+            const pmAmount = document.getElementById('pm-input').value;
+            const message = document.getElementById('pm-message-input').value;
+            if (pmAmount && message) {
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push({
+                    sender: 'SISTEMA',
+                    content: `${message} ¡Te transfiero ${pmAmount} PM!`,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                statsManager.updatePM(pmAmount);
+                document.getElementById('pm-input').value = '';
+                document.getElementById('pm-message-input').value = '';
+            }
+        }
+
+        // Función para enviar mensaje directo
+        function sendDirectMessage() {
+            const sender = document.getElementById('dm-sender').value;
+            const type = document.getElementById('dm-type').value;
+            const content = document.getElementById('dm-content').value;
+            
+            if (!content) {
+                alert('Por favor, escribe un mensaje');
+                return;
+            }
+            
+            try {
+                const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+                const newMessage = {
+                    sender: sender,
+                    type: type,
+                    content: content,
+                    time: new Date().toLocaleTimeString()
+                };
+                messages.push(newMessage);
+                localStorage.setItem('mensajes-directos', JSON.stringify(messages));
+                
+                // Limpiar el formulario
+                document.getElementById('dm-content').value = '';
+                
+                // Notificar éxito
+                alert('Mensaje directo enviado correctamente');
+            } catch (error) {
+                console.error('Error al enviar mensaje directo:', error);
+                alert('Error al enviar el mensaje');
+            }
+        }
+
+        // Modificar las funciones existentes para usar el almacenamiento persistente
+        function updateDirectPM() {
+            const pmAmount = document.getElementById('pm-direct-input').value;
+            if (pmAmount && !isNaN(pmAmount)) {
+                persistentStorage.updatePM(parseInt(pmAmount));
+                document.getElementById('pm-direct-input').value = '';
+                updateUserList();
+            }
+        }
+
+        function addPM() {
+            const pmAmount = document.getElementById('pm-add-input').value;
+            if (pmAmount && !isNaN(pmAmount)) {
+                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+                const newPM = currentPM + parseInt(pmAmount);
+                persistentStorage.updatePM(newPM);
+                document.getElementById('pm-add-input').value = '';
+                updateUserList();
+            }
+        }
+
+        function subtractPM() {
+            const pmAmount = document.getElementById('pm-add-input').value;
+            if (pmAmount && !isNaN(pmAmount)) {
+                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+                const newPM = Math.max(0, currentPM - parseInt(pmAmount));
+                persistentStorage.updatePM(newPM);
+                document.getElementById('pm-add-input').value = '';
+                updateUserList();
+            }
+        }
+
+        function updateSpectators() {
+            const spectators = document.getElementById('spectators-input').value;
+            persistentStorage.updateAudience(spectators);
+            document.getElementById('spectators-input').value = '';
+            updateUserList();
+        }
+
+        function updateRating() {
+            const rating = document.getElementById('rating-input').value;
+            persistentStorage.updateRating(rating);
+            document.getElementById('rating-input').value = '';
+            updateUserList();
+        }
+    </script>
+</body>
+</html> 

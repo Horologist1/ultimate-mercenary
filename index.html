@@ -387,7 +387,10 @@ CONCURSANTES ACTIVADOS: 100/100
                     </div>
 
                     <h3>Sobre las "Segundas Oportunidades"</h3>
-                    <p>El gran premio final es el "resleeving": la posibilidad de transferir la conciencia a un nuevo cuerpo si el original es destruido. Excepcionalmente, un concursante eliminado pero muy entretenido podría ser resleeveado en una funda sintética barata con una deuda de PM masiva (una "segunda oportunidad" que es más bien una condena a servidumbre).</p>
+                    <p>Excepcionalmente, un concursante eliminado pero muy entretenido podría ser resleeveado en una funda sintética barata con una deuda de PM masiva (una "segunda oportunidad" que es más bien una condena a servidumbre).</p>
+
+                    <h3>Premio</h3>
+                    <p>El ganador del concurso recibirá un cheque en blanco para implantes y tanto equipo como pueda cargar en sus brazos.</p>
 
                     <div class="data-terminal">
 AVISO INTERNO OCE - CONFIDENCIAL
@@ -396,32 +399,6 @@ LAS "SEGUNDAS OPORTUNIDADES" SON FUNDAMENTALMENTE UN EXPERIMENTO
 ESTABILIDAD PSICOLÓGICA POST-TRANSFERENCIA: 31%
 RENTABILIDAD ESTIMADA: ALTA
 </div>
-
-                    <div class="interactive-element">
-                        <h3>Calculadora de Puntos de Mérito</h3>
-                        <form id="merit-calculator">
-                            <div class="form-group">
-                                <label for="base-points">Puntos Base:</label>
-                                <input type="number" id="base-points" min="0" value="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="tasks-completed">Objetivos completados:</label>
-                                <input type="number" id="tasks-completed" min="0" value="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="bonus-points">Puntos por espectáculo:</label>
-                                <input type="number" id="bonus-points" min="0" value="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="penalties">Penalizaciones:</label>
-                                <input type="number" id="penalties" min="0" value="0">
-                            </div>
-                            <button type="submit" class="button">Calcular</button>
-                        </form>
-                        <div id="result-container" style="display: none;">
-                            <h4>Total de Puntos de Mérito: <span id="total-points">0</span> PM</h4>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -956,6 +933,7 @@ NOTA INTERNA: IMPLANTACIÓN DE KILLSWITCH OBLIGATORIA
     <script src="mensajes-publico.js"></script>
     <script src="auth.js"></script>
     <script src="js/shop_editor.js"></script>
+    <script src="js/stats-manager.js"></script>
     <script>
         // Funcionalidad del modal de imágenes
         const modal = document.getElementById('imageModal');
