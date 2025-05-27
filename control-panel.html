@@ -540,9 +540,6 @@
 
                 // Sincronizar con statsManager si existe y tiene las funciones necesarias
                 if (window.statsManager && typeof statsManager.updateUI === 'function') {
-                    if (typeof statsManager.updatePM === 'function') {
-                        statsManager.updatePM(this.data.playerPM);
-                    }
                     if (typeof statsManager.updateSpectators === 'function') {
                         statsManager.updateSpectators(this.data.audience);
                     }
@@ -556,11 +553,8 @@
             updatePM(amount) {
                 this.data.playerPM = amount;
                 localStorage.setItem('playerPM', amount.toString());
-                if (window.statsManager && typeof statsManager.updatePM === 'function') {
-                    statsManager.updatePM(amount);
-                    if (typeof statsManager.updateUI === 'function') {
-                        statsManager.updateUI();
-                    }
+                if (window.statsManager && typeof statsManager.updateUI === 'function') {
+                    statsManager.updateUI();
                 }
             },
 

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personaje</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .character-sheet {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sheet-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sheet-header h1 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .sheet-header h2 {
+            color: #ff4757;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            margin: 10px 0 0 0;
+        }
+
+        .section {
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .item {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+        }
+
+        .item h3 {
+            color: #ff4757;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item p {
+            color: #fff;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .item .value {
+            color: #00ccff;
+            font-weight: bold;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.3) 100%
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 1px solid #00ffff;
+            border-radius: 4px;
+            color: #00ffff;
+            background: rgba(0, 0, 0, 0.7);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #00ffff;
+            color: #111;
+            font-weight: bold;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .tab:hover {
+            background: rgba(0,255,255,0.2);
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(0,0,0,0.85);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            color: #e0f7fa;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,255,255,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .skill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .skill-total {
+            color: #00ccff;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .skill-value {
+            width: 50px;
+            padding: 2px;
+            font-size: 14px;
+        }
+
+        .skill-group {
+            margin-bottom: 15px;
+        }
+
+        .skill-group .item {
+            margin-bottom: 8px;
+            padding: 8px;
+        }
+
+        .skill-group .item h3 {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .points-counter {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ccff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .points-counter h3 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+        }
+
+        .points-counters {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .save-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #00ccff;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 99999;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        .save-button:hover {
+            background-color: #ff4757;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.7);
+        }
+
+
+
+        .reset-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: rgba(255, 165, 0, 0.8);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            z-index: 99999;
+            transition: all 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background-color: rgba(255, 165, 0, 1);
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.7);
+        }
+
+        .field-input {
+            background-color: #333;
+            color: #00ccff;
+            border: 1px solid #555;
+            border-radius: 2px;
+            padding: 2px 4px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: #00ccff;
+            box-shadow: 0 0 3px rgba(0, 204, 255, 0.3);
+        }
+
+        .custom-skill-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .custom-skill-item input[type="text"] {
+            flex: 1;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 2px;
+            padding: 4px;
+            font-size: 12px;
+        }
+
+        .custom-skill-item input[type="number"] {
+            width: 50px;
+        }
+
+        .custom-skill-item .remove-skill {
+            background-color: #ff4757;
+            color: #fff;
+            border: none;
+            border-radius: 2px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="character-sheet">
+        <div class="sheet-header">
+            <h1>FICHA DE PERSONAJE</h1>
+            <h2>Concursante #13</h2>
+        </div>
+
+        <button id="saveButton" class="save-button">GUARDAR FICHA</button>
+
+
+        
+        <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="basics">Básicos</div>
+            <div class="tab" data-tab="skills">Habilidades</div>
+            <div class="tab" data-tab="gear">Equipo</div>
+            <div class="tab" data-tab="cyber">Implantes</div>
+        </div>
+
+        <div id="basics" class="tab-content active">
+            <div class="section">
+                <h2>ATRIBUTOS</h2>
+                <div class="points-counters">
+                    <div class="points-counter">
+                        <span>Puntos de Atributos: </span>
+                        <span id="attribute-points" class="points-available">20</span>
+                        <span id="attribute-points-total">/20</span>
+                    </div>
+                </div>
+                
+                <!-- Plantilla de Atributos -->
+                <div class="points-counter" style="margin-bottom: 20px;">
+                    <h3 style="color: #00ccff; margin-bottom: 10px;">Plantilla de Atributos</h3>
+                    <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">
+                        Las plantillas representan diferentes arquetipos de personaje. Cada plantilla otorga valores base superiores a 10, 
+                        reduciendo los puntos de personalización disponibles. Los puntos restantes pueden usarse para ajustar los atributos.
+                    </p>
+                    <select id="aptitude-template" style="width: 100%; padding: 8px; background-color: #333; color: #fff; border: 1px solid #00ccff; border-radius: 4px;">
+                        <option value="actioneer">Actioneer (COG 15, INT 15, REF 20, SAV 10, SOM 15, WIL 15)</option>
+                        <option value="extrovert">Extrovert (COG 15, INT 15, REF 15, SAV 20, SOM 15, WIL 15)</option>
+                        <option value="facilitator">Facilitator (COG 10, INT 15, REF 10, SAV 20, SOM 20, WIL 20)</option>
+                        <option value="factotum">Factotum (COG 15, INT 15, REF 15, SAV 15, SOM 10, WIL 15)</option>
+                        <option value="inquirer">Inquirer (COG 10, INT 20, REF 10, SAV 15, SOM 15, WIL 15)</option>
+                        <option value="survivor">Survivor (COG 20, INT 10, REF 15, SAV 10, SOM 20, WIL 20)</option>
+                        <option value="thrill-seeker">Thrill Seeker (COG 20, INT 15, REF 20, SAV 15, SOM 10, WIL 15)</option>
+                    </select>
+                </div>
+                
+                <div class="grid">
+                    <div class="item">
+                        <h3>COG</h3>
+                        <input type="number" id="cog" value="10" min="0" max="20">
+                    </div>
+                    <div class="item">
+                        <h3>INT</h3>
+                        <input type="number" id="int" value="10" min="0" max="20">
+                    </div>
+                    <div class="item">
+                        <h3>REF</h3>
+                        <input type="number" id="ref" value="10" min="0" max="20">
+                    </div>
+                    <div class="item">
+                        <h3>SAV</h3>
+                        <input type="number" id="sav" value="10" min="0" max="20">
+                    </div>
+                    <div class="item">
+                        <h3>SOM</h3>
+                        <input type="number" id="som" value="10" min="0" max="20">
+                    </div>
+                    <div class="item">
+                        <h3>WIL</h3>
+                        <input type="number" id="wil" value="10" min="0" max="20">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>ESTADÍSTICAS DERIVADAS</h2>
+                <div class="grid">
+                    <div class="item">
+                        <h3>Puntos de Vida</h3>
+                        <p class="value" id="health-points">20</p>
+                    </div>
+                    <div class="item">
+                        <h3>Iniciativa</h3>
+                        <p class="value" id="initiative">7</p>
+                    </div>
+                    <div class="item">
+                        <h3>Umbral de Heridas</h3>
+                        <p class="value" id="wound-threshold">4</p>
+                    </div>
+                    <div class="item">
+                        <h3>MOV</h3>
+                        <p class="value" id="movement">4</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="skills" class="tab-content">
+            <div class="section">
+                <h2>HABILIDADES ACTIVAS</h2>
+                <div class="points-counters">
+                    <div class="points-counter">
+                        <span>Puntos de Habilidades: </span>
+                        <span id="skill-points" class="points-available">400</span>
+                        <span>/400</span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <!-- Columna 1: REF y COG -->
+                    <div>
+                        <!-- Habilidades de REF -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">REFLEXOS (REF)</h3>
+                            <div class="item">
+                                <h3>Esquivar</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Esquivar" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Esquivar">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Armas de Fuego</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Armas de Fuego" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Armas de Fuego">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Infiltración</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Infiltración" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Infiltración">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Pilotar: <input type="text" class="field-input" data-field="Pilotar" placeholder="Campo" style="width: 80px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Pilotar" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Pilotar">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Habilidades de COG -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">COGNICIÓN (COG)</h3>
+                            <div class="item">
+                                <h3>Hardware: <input type="text" class="field-input" data-field="Hardware" placeholder="Campo" style="width: 80px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Hardware" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Hardware">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Infosec</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Infosec" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Infosec">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Interfaz</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Interfaz" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Interfaz">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Medicina: <input type="text" class="field-input" data-field="Medicina" placeholder="Campo" style="width: 80px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Medicina" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Medicina">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Programación</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Programación" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Programación">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: SOM, INT, SAV -->
+                    <div>
+                        <!-- Habilidades de SOM -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">SOMÁTICA (SOM)</h3>
+                            <div class="item">
+                                <h3>Atletismo</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Atletismo" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Atletismo">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Caída Libre</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Caída Libre" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Caída Libre">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Combate Cuerpo a Cuerpo</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Combate Cuerpo a Cuerpo" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Combate Cuerpo a Cuerpo">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Habilidades de INT -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">INTUICIÓN (INT)</h3>
+                            <div class="item">
+                                <h3>Percepción</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Percepción" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Percepción">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Investigación</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Investigación" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Investigación">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Supervivencia</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Supervivencia" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Supervivencia">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Habilidades de SAV -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">ASTUCIA (SAV)</h3>
+                            <div class="item">
+                                <h3>Engaño</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Engaño" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Engaño">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Kinésica</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Kinésica" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Kinésica">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Persuasión</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Persuasión" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Persuasión">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Provocación</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Provocación" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Provocación">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: WIL, Exóticas, Conocimiento -->
+                    <div>
+                        <!-- Habilidades de WIL -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">VOLUNTAD (WIL)</h3>
+                            <div class="item">
+                                <h3>Psi</h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Psi" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Psi">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Habilidades Exóticas -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">HABILIDADES EXÓTICAS</h3>
+                            <div class="item">
+                                <h3>Exótica: <input type="text" class="field-input" data-field="Exótica" placeholder="Campo" style="width: 80px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Exótica" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Exótica">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Habilidades de Conocimiento -->
+                        <div class="skill-group">
+                            <h3 class="skill-group-title">CONOCIMIENTO</h3>
+                            <div class="item">
+                                <h3>Académico (COG): <input type="text" class="field-input" data-field="Académico" placeholder="Campo" style="width: 60px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Académico" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Académico">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Arte (INT): <input type="text" class="field-input" data-field="Arte" placeholder="Campo" style="width: 60px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Arte" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Arte">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Interés (COG): <input type="text" class="field-input" data-field="Interés" placeholder="Campo" style="width: 60px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Interés" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Interés">0</span></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h3>Profesional (COG): <input type="text" class="field-input" data-field="Profesional" placeholder="Campo" style="width: 60px; font-size: 10px;"></h3>
+                                <div class="skill-row">
+                                    <input type="number" class="skill-value" data-skill="Profesional" value="0" min="0" max="60">
+                                    <span class="skill-total">Total: <span class="value" data-skill-total="Profesional">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habilidades Personalizadas -->
+                <div class="section" style="margin-top: 20px;">
+                    <h3 style="color: #00ccff; margin-bottom: 15px;">HABILIDADES PERSONALIZADAS</h3>
+                    <div id="custom-skills-container">
+                        <!-- Las habilidades personalizadas se añadirán aquí dinámicamente -->
+                    </div>
+                    <button id="add-custom-skill" style="padding: 5px 10px; background-color: #00ccff; color: #000; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">+ Añadir Habilidad</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="gear" class="tab-content">
+            <div class="section">
+                <h2>EQUIPO</h2>
+                <div class="grid">
+                    <div class="item">
+                        <h3>Armas</h3>
+                        <div id="weapons-list">
+                            <p>Sin armas equipadas</p>
+                        </div>
+                        <button class="button add-item" data-type="weapon">+ Añadir Arma</button>
+                    </div>
+                    <div class="item">
+                        <h3>Armadura</h3>
+                        <div id="armor-list">
+                            <p>Sin armadura equipada</p>
+                        </div>
+                        <button class="button add-item" data-type="armor">+ Añadir Armadura</button>
+                    </div>
+                    <div class="item">
+                        <h3>Equipo Misceláneo</h3>
+                        <div id="misc-list">
+                            <p>Sin equipo adicional</p>
+                        </div>
+                        <button class="button add-item" data-type="misc">+ Añadir Equipo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cyber" class="tab-content">
+            <div class="section">
+                <h2>IMPLANTES</h2>
+                <div class="grid">
+                    <div class="item">
+                        <h3>Implantes Cibernéticos</h3>
+                        <div id="implants-list">
+                            <p>Sin implantes instalados</p>
+                        </div>
+                        <button class="button add-item" data-type="implant">+ Añadir Implante</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scanline"></div>
+    <div class="overlay"></div>
+
+    <script src="character-sheet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const contentId = this.getAttribute('data-tab');
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

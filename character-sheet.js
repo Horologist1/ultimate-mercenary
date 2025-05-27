@@ -1,1205 +1,789 @@
+    class CharacterSheet {
+        constructor() {
+            this.aptitudes = {
+            cog: 10,
+                int: 10,
+                ref: 10,
+            sav: 10,
+            som: 10,
+            wil: 10
+            };
+            
+            this.skills = {};
+            this.skillFields = {}; // Para almacenar los campos de las habilidades [Field]
+            this.customSkills = []; // Para habilidades personalizadas
+        this.equipment = [];
+            this.implants = [];
+        this.attributePoints = 20; // Customization Points para atributos (1 CP = 1 punto de aptitud)
+        this.skillPoints = 400; // Total de puntos de habilidades (Background + Career + Interest, sin CP)
+        this.aptitudeTemplate = 'actioneer'; // Plantilla seleccionada por defecto
+        
+        // Aplicar plantilla por defecto
+        this.applyAptitudeTemplate('actioneer');
+    }
+    
+    updateAptitude(apt, value) {
+        const oldValue = this.aptitudes[apt];
+        const newValue = parseInt(value) || 10;
+        
+        // Calcular cuántos puntos se están usando actualmente
+        const templates = this.getAptitudeTemplates();
+        const currentTemplate = templates[this.aptitudeTemplate];
+        
+        // Calcular puntos usados por encima de la plantilla base
+        let totalUsed = 0;
+        for (const attribute in this.aptitudes) {
+            if (attribute === apt) {
+                // Para el atributo que estamos cambiando, usar el nuevo valor
+                totalUsed += Math.max(0, newValue - currentTemplate[attribute]);
+                    } else {
+                // Para los demás, usar el valor actual
+                totalUsed += Math.max(0, this.aptitudes[attribute] - currentTemplate[attribute]);
+            }
+        }
+        
+        // Verificar si hay suficientes puntos (máximo 20)
+        if (totalUsed > 20) {
+            return false; // No hay suficientes puntos
+        }
+        
+        this.aptitudes[apt] = newValue;
+        this.attributePoints = 20 - totalUsed;
+        this.updateDerivedStats();
+        return true;
+    }
+    
+    addSkill(name, value) {
+        const oldValue = this.skills[name] || 0;
+        const diff = value - oldValue;
+        
+        // Verificar si hay suficientes puntos
+        if (diff > 0 && diff > this.skillPoints) {
+            return false; // No hay suficientes puntos
+        }
+        
+        this.skills[name] = value;
+                            this.skillPoints -= diff;
+        return true;
+    }
+    
+    updateDerivedStats() {
+        // Calculate initiative (REF + INT) ÷ 5
+        this.initiative = Math.floor((this.aptitudes.ref + this.aptitudes.int) / 5);
+        
+        // Health points and wound threshold depend on morph, not ego
+        // Setting default values for display purposes
+        this.healthPoints = 30; // Default morph durability
+        this.woundThreshold = 6; // Default wound threshold (DUR ÷ 5)
+        this.movement = 4; // Default movement rate
+        
+        // Calculate pools (these are derived from aptitudes)
+        this.insightPool = Math.floor(this.aptitudes.int / 5);
+        this.moxyPool = Math.floor(this.aptitudes.wil / 5);
+        this.vigorPool = Math.floor(this.aptitudes.som / 5);
+        this.flexPool = 1; // Base flex pool
+        
+        // Calculate other derived stats
+        this.lucidity = this.aptitudes.wil * 2;
+        this.traumaThreshold = Math.floor(this.lucidity / 5);
+        this.insanityRating = this.lucidity * 2;
+    }
+    
+    exportToJSON() {
+        return JSON.stringify({
+            aptitudes: this.aptitudes,
+            skills: this.skills,
+            skillFields: this.skillFields,
+            customSkills: this.customSkills,
+            equipment: this.equipment,
+            implants: this.implants,
+            healthPoints: this.healthPoints,
+            initiative: this.initiative,
+            woundThreshold: this.woundThreshold,
+            attributePoints: this.attributePoints,
+            skillPoints: this.skillPoints,
+            aptitudeTemplate: this.aptitudeTemplate
+        });
+    }
+    
+    // Recalcular puntos disponibles basándose en la plantilla actual
+    recalculateAttributePoints() {
+        const templates = this.getAptitudeTemplates();
+        const currentTemplate = templates[this.aptitudeTemplate];
+        
+        let totalUsed = 0;
+        for (const attribute in this.aptitudes) {
+            totalUsed += Math.max(0, this.aptitudes[attribute] - currentTemplate[attribute]);
+        }
+        
+        this.attributePoints = 20 - totalUsed;
+    }
+    
+    importFromJSON(json) {
+        const data = JSON.parse(json);
+        this.aptitudes = data.aptitudes || { cog: 10, int: 10, ref: 10, sav: 10, som: 10, wil: 10 };
+        this.skills = data.skills || {};
+        this.skillFields = data.skillFields || {};
+        this.customSkills = data.customSkills || {};
+        this.equipment = data.equipment || [];
+        this.implants = data.implants || [];
+        this.healthPoints = data.healthPoints || 30;
+        this.initiative = data.initiative || 7;
+        this.woundThreshold = data.woundThreshold || 6;
+        this.skillPoints = data.skillPoints || 400;
+        this.aptitudeTemplate = data.aptitudeTemplate || 'actioneer';
+        
+        // Recalcular puntos de atributos basándose en la plantilla actual
+        this.recalculateAttributePoints();
+            this.updateDerivedStats();
+        }
+
+    // Plantillas de atributos disponibles
+    getAptitudeTemplates() {
+        return {
+            actioneer: { cog: 15, int: 15, ref: 20, sav: 10, som: 15, wil: 15 },
+            extrovert: { cog: 15, int: 15, ref: 15, sav: 20, som: 15, wil: 15 },
+            facilitator: { cog: 10, int: 15, ref: 10, sav: 20, som: 20, wil: 20 },
+            factotum: { cog: 15, int: 15, ref: 15, sav: 15, som: 10, wil: 15 },
+            inquirer: { cog: 10, int: 20, ref: 10, sav: 15, som: 15, wil: 15 },
+            survivor: { cog: 20, int: 10, ref: 15, sav: 10, som: 20, wil: 20 },
+            'thrill-seeker': { cog: 20, int: 15, ref: 20, sav: 15, som: 10, wil: 15 }
+        };
+    }
+    
+    // Aplicar plantilla de atributos
+    applyAptitudeTemplate(templateName) {
+        const templates = this.getAptitudeTemplates();
+        if (templates[templateName]) {
+            this.aptitudeTemplate = templateName;
+            this.aptitudes = { ...templates[templateName] };
+            
+            // Calcular puntos disponibles (siempre empezamos con 20 puntos disponibles)
+            this.attributePoints = 20;
+            
+            this.updateDerivedStats();
+            return true;
+        }
+        return false;
+    }
+}
+
+// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     // Tab switching functionality
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            // Remove active class from all tabs and tab contents
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            // Add active class to clicked tab
             this.classList.add('active');
-            
-            // Show corresponding tab content
             const contentId = this.getAttribute('data-tab');
             document.getElementById(contentId).classList.add('active');
         });
     });
 
-    // Character Sheet Core Logic
-    class CharacterSheet {
-        constructor() {
-            this.initialize();
-            this.setupEventListeners();
+    // Initialize character sheet
+    window.characterSheet = new CharacterSheet();
+
+    // Load saved data if exists
+    const savedData = localStorage.getItem('characterSheet');
+    if (savedData) {
+        try {
+            window.characterSheet.importFromJSON(savedData);
+        } catch (e) {
+            console.error('Error loading saved data:', e);
         }
+    }
 
-        initialize() {
-            // Initialize aptitudes
-            this.aptitudes = {
-                vig: 10,
-                coo: 10,
-                int: 10,
-                ref: 10,
-                wil: 10,
-                sav: 10
-            };
-            
-            // Initialize attribute points
-            this.attributePoints = 20;
-            this.updateAttributePoints();
-            
-            // Initialize skills
-            this.skills = {};
-            this.skillPoints = 400;
-            this.updateSkillPoints();
-            
-            // Initialize equipment
-            this.weapons = [];
-            this.armor = [];
-            this.gear = [];
-            
-            // Initialize implants
-            this.implants = [];
-            this.updateCyberMetrics();
-            
-            // Initialize health
-            this.updateDerivedStats();
-            
-            // Initialize contacts
-            this.allies = [];
-            this.enemies = [];
-
-            // Inicializar el mapa de atributos para habilidades
-            this.skillAttributeMap = {
-                // Combate
-                'Armas Cuerpo a Cuerpo': 'ref',
-                'Pistolas': 'ref',
-                'Rifles': 'ref',
-                'Subfusiles': 'ref',
-                'Escopetas': 'ref',
-                'Arcos': 'ref',
-                'Lanzamiento': 'ref',
-                'Esquivar': 'ref',
-                
-                // Físicas
-                'Atletismo': 'coo',
-                'Fuerza': 'vig',
-                'Infiltración': 'coo',
-                'Sigilo': 'coo',
-                
-                // Sociales
-                'Engaño': 'sav',
-                'Intimidación': 'sav',
-                'Persuación': 'sav',
-                'Protocolo': 'sav',
-                
-                // Técnicas
-                'Conocimiento': 'int',
-                'Interfaz': 'int',
-                'Medicina': 'int',
-                'Percepción': 'int',
-                'Profesión': 'int',
-                'Programación': 'int',
-                'Psicología': 'int',
-                'Resistencia': 'vig',
-                'Sabiduría': 'int',
-                'Tecnología': 'int'
-            };
-
-            // Inicializar habilidades personalizadas
-            this.customSkills = [];
+    // Update attribute points counter
+    function updateAttributePoints() {
+        document.getElementById('attribute-points').textContent = window.characterSheet.attributePoints;
+        
+        // Los puntos totales siempre son 20 (Customization Points)
+        document.getElementById('attribute-points-total').textContent = '/20';
+        
+        // Change color if points are negative
+        const pointsElement = document.getElementById('attribute-points');
+        if (window.characterSheet.attributePoints < 0) {
+            pointsElement.style.color = '#ff4757';
+        } else {
+            pointsElement.style.color = '#00ccff';
         }
+    }
 
-        setupEventListeners() {
-            // Aptitude buttons
-            document.querySelectorAll('.aptitude-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const aptitude = e.target.getAttribute('data-aptitude');
-                    const operation = e.target.classList.contains('plus') ? 'plus' : 'minus';
-                    this.modifyAptitude(aptitude, operation);
-                });
-            });
-            
-            // Aptitude direct input
-            document.querySelectorAll('.aptitude-value').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const aptitude = e.target.getAttribute('data-aptitude');
-                    const oldValue = this.aptitudes[aptitude];
-                    const newValue = parseInt(e.target.value);
-                    
-                    if (isNaN(newValue) || newValue < 5) {
-                        e.target.value = oldValue;
-                        return;
+    // Update skill points counter
+    function updateSkillPoints() {
+        document.getElementById('skill-points').textContent = window.characterSheet.skillPoints;
+        
+        // Change color if points are negative
+        const pointsElement = document.getElementById('skill-points');
+        if (window.characterSheet.skillPoints < 0) {
+            pointsElement.style.color = '#ff4757';
+        } else {
+            pointsElement.style.color = '#00ccff';
+        }
+    }
+
+    // Update UI with current values
+    function updateUI() {
+        // Sumar efectos de implantes
+        const {mods, skillMods} = getImplantModsSum();
+        // Update template selector
+        document.getElementById('aptitude-template').value = window.characterSheet.aptitudeTemplate;
+        // Update attributes (con mods)
+        for (const apt in window.characterSheet.aptitudes) {
+            const input = document.getElementById(apt);
+            if (input) {
+                input.value = window.characterSheet.aptitudes[apt] + (mods[apt]||0);
+            }
+        }
+        // Update skill fields
+        for (const fieldName in window.characterSheet.skillFields) {
+            const input = document.querySelector(`[data-field="${fieldName}"]`);
+            if (input) {
+                input.value = window.characterSheet.skillFields[fieldName];
+            }
+        }
+        // Restore custom skills
+        restoreCustomSkills();
+        // Renderizar equipo y armas (asegura persistencia visual)
+        updateEquipmentUI();
+        // Mapeo de habilidades a atributos según Eclipse Phase 2e
+        const skillToAttribute = {
+            'Esquivar': 'ref', 'Armas de Fuego': 'ref', 'Infiltración': 'ref', 'Pilotar': 'ref',
+            'Hardware': 'cog', 'Infosec': 'cog', 'Interfaz': 'cog', 'Medicina': 'cog', 'Programación': 'cog',
+            'Atletismo': 'som', 'Caída Libre': 'som', 'Combate Cuerpo a Cuerpo': 'som',
+            'Percepción': 'int', 'Investigación': 'int', 'Supervivencia': 'int',
+            'Engaño': 'sav', 'Kinésica': 'sav', 'Persuasión': 'sav', 'Provocación': 'sav',
+            'Psi': 'wil', 'Exótica': 'ref', 'Académico': 'cog', 'Arte': 'int', 'Interés': 'cog', 'Profesional': 'cog'
+        };
+        // Update skills and their totals
+        for (const skill in window.characterSheet.skills) {
+            const input = document.querySelector(`[data-skill="${skill}"]`);
+            if (input) {
+                let base = window.characterSheet.skills[skill];
+                input.value = base; // Solo el valor base editable
+                // Get the attribute for this skill
+                const attribute = skillToAttribute[skill];
+                if (attribute && window.characterSheet.aptitudes[attribute]) {
+                    const attributeValue = (parseInt(window.characterSheet.aptitudes[attribute])||0) + (mods[attribute]||0);
+                    const skillValue = parseInt(base) || 0;
+                    const bonus = skillMods[skill]||0;
+                    const total = attributeValue + skillValue + bonus;
+                    // Update the total display
+                    const totalElement = document.querySelector(`[data-skill-total="${skill}"]`);
+                    if (totalElement) {
+                        totalElement.textContent = total;
                     }
-                    
-                    if (newValue > 20) {
-                        e.target.value = 20;
-                        this.aptitudes[aptitude] = 20;
-                    } else {
-                        const diff = newValue - oldValue;
-                        if (diff > this.attributePoints) {
-                            e.target.value = oldValue + this.attributePoints;
-                            this.aptitudes[aptitude] = oldValue + this.attributePoints;
-                            this.attributePoints = 0;
-                        } else {
-                            this.aptitudes[aptitude] = newValue;
-                            this.attributePoints -= diff;
-                        }
-                    }
-                    
-                    this.updateAttributePoints();
-                    this.updateDerivedStats();
-                });
-            });
-            
-            // Health tracker
-            document.getElementById('current-health').addEventListener('change', (e) => {
-                const value = parseInt(e.target.value);
-                const maxHealth = this.aptitudes.vig * 2;
-                
-                if (isNaN(value) || value < 0) {
-                    e.target.value = 0;
-                    this.updateHealthBar(0, maxHealth);
-                } else if (value > maxHealth) {
-                    e.target.value = maxHealth;
-                    this.updateHealthBar(maxHealth, maxHealth);
-                } else {
-                    this.updateHealthBar(value, maxHealth);
-                }
-            });
-            
-            // Wound checkboxes
-            document.querySelectorAll('.wound-checkbox input').forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    // Logic for wound effects could go here
-                });
-            });
-            
-            // Merit points
-            document.getElementById('merit-points').addEventListener('change', (e) => {
-                const value = parseInt(e.target.value);
-                if (isNaN(value) || value < 0) {
-                    e.target.value = 0;
-                }
-            });
-            
-            // Skill values
-            document.querySelectorAll('.skill-value').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const skillName = e.target.getAttribute('data-skill');
-                    const oldValue = this.skills[skillName] || 0;
-                    const newValue = parseInt(e.target.value);
-                    
-                    if (isNaN(newValue) || newValue < 0) {
-                        e.target.value = oldValue;
-                        return;
-                    }
-                    
-                    if (newValue > 80) {
-                        e.target.value = 80;
-                        this.skills[skillName] = 80;
-                    } else {
-                        const diff = newValue - oldValue;
-                        if (diff > this.skillPoints) {
-                            e.target.value = oldValue + this.skillPoints;
-                            this.skills[skillName] = oldValue + this.skillPoints;
-                            this.skillPoints = 0;
-                        } else {
-                            this.skills[skillName] = newValue;
-                            this.skillPoints -= diff;
-                        }
-                    }
-                    
-                    this.updateSkillPoints();
-                });
-            });
-            
-            // Add item buttons
-            document.querySelectorAll('.add-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    this.showAddItemDialog(type);
-                });
-            });
-            
-            // Add contact buttons
-            document.querySelectorAll('.add-contact').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    this.showAddContactDialog(type);
-                });
-            });
-            
-            // Save button
-            document.getElementById('save-sheet').addEventListener('click', () => {
-                this.saveCharacterSheet();
-            });
-            
-            // Load button
-            document.getElementById('load-sheet').addEventListener('click', () => {
-                this.loadCharacterSheet();
-            });
-            
-            // Print button
-            document.getElementById('print-sheet').addEventListener('click', () => {
-                window.print();
-            });
-            
-            // Export button
-            document.getElementById('export-sheet').addEventListener('click', () => {
-                this.exportCharacterSheet();
-            });
-            
-            // New button
-            document.getElementById('new-sheet').addEventListener('click', () => {
-                if (confirm('¿Estás seguro de que quieres crear una nueva hoja? Se perderán todos los datos no guardados.')) {
-                    this.resetCharacterSheet();
-                }
-            });
-            
-            // Random avatar
-            document.getElementById('randomize-avatar').addEventListener('click', () => {
-                this.randomizeAvatar();
-            });
-
-            // Botón para añadir habilidad personalizada
-            const addCustomSkillBtn = document.getElementById('add-custom-skill');
-            if (addCustomSkillBtn) {
-                addCustomSkillBtn.addEventListener('click', () => this.addCustomSkill());
-            }
-
-            // Actualizar totales cuando cambien los atributos
-            document.querySelectorAll('.aptitude-value').forEach(input => {
-                input.addEventListener('change', () => this.updateSkillTotals());
-            });
-
-            // Actualizar totales cuando cambien las habilidades
-            document.querySelectorAll('.skill-item input').forEach(input => {
-                input.addEventListener('change', () => {
-                    this.updateSkillTotals();
-                    this.saveCharacterSheet();
-                });
-            });
-        }
-
-        modifyAptitude(aptitude, operation) {
-            if (operation === 'plus') {
-                if (this.aptitudes[aptitude] < 20 && this.attributePoints > 0) {
-                    this.aptitudes[aptitude]++;
-                    this.attributePoints--;
-                    document.getElementById(aptitude).value = this.aptitudes[aptitude];
-                }
-            } else {
-                if (this.aptitudes[aptitude] > 5) {
-                    this.aptitudes[aptitude]--;
-                    this.attributePoints++;
-                    document.getElementById(aptitude).value = this.aptitudes[aptitude];
                 }
             }
-            
-            this.updateAttributePoints();
-            this.updateDerivedStats();
         }
-
-        updateAttributePoints() {
-            document.getElementById('attribute-points').textContent = this.attributePoints;
-        }
-
-        updateSkillPoints() {
-            document.getElementById('skill-points').textContent = this.skillPoints;
-        }
-
-        updateDerivedStats() {
-            // Calculate health points
-            const healthPoints = this.aptitudes.vig * 2;
-            document.getElementById('health-points').textContent = healthPoints;
-            document.getElementById('current-health').value = healthPoints;
-            this.updateHealthBar(healthPoints, healthPoints);
-            
-            // Calculate initiative
-            const initiative = Math.floor((this.aptitudes.ref + this.aptitudes.int) / 3);
-            document.getElementById('initiative').textContent = initiative;
-            
-            // Calculate wound threshold
-            const woundThreshold = Math.floor((this.aptitudes.vig + this.aptitudes.wil) / 5);
-            document.getElementById('wound-threshold').textContent = woundThreshold;
-            
-            // Update trauma threshold
-            const maxTraumas = Math.floor(this.aptitudes.wil / 2);
-            document.getElementById('traumas').textContent = `0/${maxTraumas}`;
-            
-            // Update wound checkboxes
-            this.updateWoundCheckboxes(woundThreshold);
-        }
-
-        updateHealthBar(current, max) {
-            const percentage = (current / max) * 100;
-            const healthBar = document.querySelector('.health-bar-fill');
-            healthBar.style.width = `${percentage}%`;
-            
-            // Update color based on health percentage
-            if (percentage <= 25) {
-                healthBar.style.background = 'red';
-            } else if (percentage <= 50) {
-                healthBar.style.background = 'orange';
-            } else if (percentage <= 75) {
-                healthBar.style.background = 'yellow';
-            } else {
-                healthBar.style.background = 'linear-gradient(90deg, #ff0, #0f0)';
-            }
-        }
-
-        updateWoundCheckboxes(threshold) {
-            const woundContainer = document.querySelector('.wounds-tracker');
-            woundContainer.innerHTML = '';
-            
-            for (let i = 1; i <= threshold; i++) {
-                const woundDiv = document.createElement('div');
-                woundDiv.className = 'wound-checkbox';
-                woundDiv.setAttribute('data-wound', i);
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `wound-${i}`;
-                
-                const label = document.createElement('label');
-                label.htmlFor = `wound-${i}`;
-                label.textContent = `Herida ${i}`;
-                
-                woundDiv.appendChild(checkbox);
-                woundDiv.appendChild(label);
-                woundContainer.appendChild(woundDiv);
-            }
-        }
-
-        updateCyberMetrics() {
-            const implantCount = this.implants.length;
-            const maxImplants = 10;
-            
-            document.getElementById('cyber-count').textContent = `${implantCount}/${maxImplants}`;
-            
-            // Calculate cyber level (infection)
-            const cyberLevel = implantCount * 10;
-            document.getElementById('cyber-level').textContent = `${cyberLevel}%`;
-            
-            // Calculate vulnerability
-            let vulnLevel = 'Baja';
-            if (cyberLevel > 60) {
-                vulnLevel = 'Alta';
-            } else if (cyberLevel > 30) {
-                vulnLevel = 'Media';
-            }
-            document.getElementById('cyber-vuln').textContent = vulnLevel;
-            
-            // Update markers on the body diagram
-            this.updateCyberMarkers();
-        }
-
-        updateCyberMarkers() {
-            const markersContainer = document.querySelector('.cyber-markers');
-            markersContainer.innerHTML = '';
-            
-            // Define body part positions (percentages)
-            const positions = {
-                'head': { x: 50, y: 15 },
-                'eyes': { x: 50, y: 10 },
-                'ears': { x: 65, y: 15 },
-                'arm-r': { x: 70, y: 35 },
-                'arm-l': { x: 30, y: 35 },
-                'torso': { x: 50, y: 40 },
-                'leg-r': { x: 60, y: 70 },
-                'leg-l': { x: 40, y: 70 },
-                'skin': { x: 50, y: 90 }
-            };
-            
-            // Create markers for each implant
-            this.implants.forEach(implant => {
-                const location = implant.location;
-                if (positions[location]) {
-                    const marker = document.createElement('div');
-                    marker.className = 'cyber-marker';
-                    marker.style.left = `${positions[location].x}%`;
-                    marker.style.top = `${positions[location].y}%`;
-                    marker.setAttribute('data-implant', implant.name);
-                    marker.title = implant.name;
-                    
-                    // Set color based on implant status
-                    if (implant.status === 'damaged') {
-                        marker.style.backgroundColor = 'orange';
-                    } else if (implant.status === 'disabled') {
-                        marker.style.backgroundColor = 'red';
-                    }
-                    
-                    markersContainer.appendChild(marker);
+        // Update all skill totals even if they're not in the skills object
+        document.querySelectorAll('.skill-value').forEach(input => {
+            const skill = input.dataset.skill;
+            if (skill.startsWith('custom-')) return; // Skip custom skills, handled separately
+            const attribute = skillToAttribute[skill];
+            if (attribute && window.characterSheet.aptitudes[attribute]) {
+                const attributeValue = (parseInt(window.characterSheet.aptitudes[attribute])||0) + (mods[attribute]||0);
+                const skillValue = parseInt(input.value) || 0;
+                const bonus = skillMods[skill]||0;
+                const total = attributeValue + skillValue + bonus;
+                // Update the total display
+                const totalElement = document.querySelector(`[data-skill-total="${skill}"]`);
+                if (totalElement) {
+                    totalElement.textContent = total;
                 }
-            });
-        }
-
-        showAddItemDialog(type) {
-            // Create overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'dialog-overlay';
-            
-            // Clone the appropriate template
-            let template;
-            switch (type) {
-                case 'weapon':
-                    template = document.getElementById('weapon-dialog-template').cloneNode(true);
-                    break;
-                case 'armor':
-                    template = document.getElementById('armor-dialog-template').cloneNode(true);
-                    break;
-                case 'misc':
-                    template = document.getElementById('gear-dialog-template').cloneNode(true);
-                    break;
-                case 'cyber':
-                    template = document.getElementById('implant-dialog-template').cloneNode(true);
-                    break;
-                default:
-                    return;
             }
-            
-            // Create dialog from template
-            const dialog = document.createElement('div');
-            dialog.className = 'dialog';
-            dialog.innerHTML = template.innerHTML;
-            
-            // Add dialog to overlay
-            overlay.appendChild(dialog);
-            document.body.appendChild(overlay);
-            
-            // Setup buttons
-            dialog.querySelector('.cancel-button').addEventListener('click', () => {
-                document.body.removeChild(overlay);
-            });
-            
-            dialog.querySelector('.confirm-button').addEventListener('click', () => {
-                // Process form data based on type
-                switch (type) {
-                    case 'weapon':
-                        this.addWeapon(dialog);
-                        break;
-                    case 'armor':
-                        this.addArmor(dialog);
-                        break;
-                    case 'misc':
-                        this.addGear(dialog);
-                        break;
-                    case 'cyber':
-                        this.addImplant(dialog);
-                        break;
-                }
-                
-                document.body.removeChild(overlay);
-            });
+        });
+        // Update custom skills
+        for (const skillId in window.characterSheet.customSkills) {
+            updateCustomSkillTotal(skillId);
         }
-
-        showAddContactDialog(type) {
-            // Create overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'dialog-overlay';
-            
-            // Clone the template
-            const template = document.getElementById('contact-dialog-template').cloneNode(true);
-            
-            // Create dialog from template
-            const dialog = document.createElement('div');
-            dialog.className = 'dialog';
-            dialog.innerHTML = template.innerHTML;
-            
-            // Update dialog title based on type
-            dialog.querySelector('.dialog-header h4').textContent = type === 'ally' ? 'Añadir Aliado' : 'Añadir Enemigo';
-            
-            // Add dialog to overlay
-            overlay.appendChild(dialog);
-            document.body.appendChild(overlay);
-            
-            // Setup buttons
-            dialog.querySelector('.cancel-button').addEventListener('click', () => {
-                document.body.removeChild(overlay);
-            });
-            
-            dialog.querySelector('.confirm-button').addEventListener('click', () => {
-                this.addContact(dialog, type);
-                document.body.removeChild(overlay);
-            });
+        // Update derived stats (con mods)
+        document.getElementById('health-points').textContent = (window.characterSheet.healthPoints||0) + (mods.healthPoints||0);
+        document.getElementById('initiative').textContent = (window.characterSheet.initiative||0) + (mods.initiative||0);
+        document.getElementById('wound-threshold').textContent = (window.characterSheet.woundThreshold||0) + (mods.woundThreshold||0);
+        document.getElementById('movement').textContent = (window.characterSheet.movement||0) + (mods.movement||0);
+        // Update points counters
+        updateAttributePoints();
+        updateSkillPoints();
+        // Save to localStorage
+        try {
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+        } catch (e) {
+            console.error('Error saving data:', e);
         }
+    }
 
-        addWeapon(dialog) {
-            const name = dialog.querySelector('#weapon-name').value;
-            if (!name) return;
-            
-            const type = dialog.querySelector('#weapon-type').value;
-            const damage = dialog.querySelector('#weapon-damage').value;
-            const range = dialog.querySelector('#weapon-range').value;
-            const notes = dialog.querySelector('#weapon-notes').value;
-            
-            const weapon = { name, type, damage, range, notes };
-            this.weapons.push(weapon);
-            
-            // Update the weapons list
-            this.updateWeaponsList();
+    // Función para restaurar habilidades personalizadas
+    function restoreCustomSkills() {
+        const container = document.getElementById('custom-skills-container');
+        // Limpiar habilidades existentes
+        container.innerHTML = '';
+        
+        // Recrear cada habilidad personalizada
+        for (const skillId in window.characterSheet.customSkills) {
+            const customSkill = window.characterSheet.customSkills[skillId];
+            createCustomSkillElement(skillId, customSkill);
         }
+    }
 
-        addArmor(dialog) {
-            const name = dialog.querySelector('#armor-name').value;
-            if (!name) return;
-            
-            const location = dialog.querySelector('#armor-location').value;
-            const kinetic = dialog.querySelector('#armor-kinetic').value;
-            const energy = dialog.querySelector('#armor-energy').value;
-            const notes = dialog.querySelector('#armor-notes').value;
-            
-            const armor = { name, location, kinetic, energy, notes };
-            this.armor.push(armor);
-            
-            // Update the armor list
-            this.updateArmorList();
-            
-            // Update the armor stat display
-            this.updateArmorStat();
-        }
-
-        addGear(dialog) {
-            const name = dialog.querySelector('#gear-name').value;
-            if (!name) return;
-            
-            const type = dialog.querySelector('#gear-type').value;
-            const description = dialog.querySelector('#gear-desc').value;
-            
-            const gear = { name, type, description };
-            this.gear.push(gear);
-            
-            // Update the gear list
-            this.updateGearList();
-        }
-
-        addImplant(dialog) {
-            const name = dialog.querySelector('#implant-name').value;
-            if (!name) return;
-            
-            const location = dialog.querySelector('#implant-location').value;
-            const level = dialog.querySelector('#implant-level').value;
-            const effects = dialog.querySelector('#implant-effects').value;
-            const status = dialog.querySelector('#implant-status').value;
-            
-            const implant = { name, location, level, effects, status };
-            this.implants.push(implant);
-            
-            // Update the implants list and metrics
-            this.updateImplantsList();
-            this.updateCyberMetrics();
-        }
-
-        addContact(dialog, type) {
-            const name = dialog.querySelector('#contact-name').value;
-            if (!name) return;
-            
-            const relation = dialog.querySelector('#contact-relation').value;
-            const description = dialog.querySelector('#contact-desc').value;
-            
-            const contact = { name, relation, description };
-            
-            if (type === 'ally') {
-                this.allies.push(contact);
-                this.updateAlliesList();
-            } else {
-                this.enemies.push(contact);
-                this.updateEnemiesList();
+    // Función para crear elemento de habilidad personalizada
+    function createCustomSkillElement(skillId, customSkill = null) {
+        const container = document.getElementById('custom-skills-container');
+        
+        const skillDiv = document.createElement('div');
+        skillDiv.className = 'custom-skill-item';
+        skillDiv.innerHTML = `
+            <input type="text" placeholder="Nombre de la habilidad" class="custom-skill-name" data-skill-id="${skillId}" value="${customSkill ? customSkill.name || '' : ''}">
+            <select class="custom-skill-attribute" data-skill-id="${skillId}">
+                <option value="cog" ${customSkill && customSkill.attribute === 'cog' ? 'selected' : ''}>COG</option>
+                <option value="int" ${customSkill && customSkill.attribute === 'int' ? 'selected' : ''}>INT</option>
+                <option value="ref" ${customSkill && customSkill.attribute === 'ref' ? 'selected' : ''}>REF</option>
+                <option value="sav" ${customSkill && customSkill.attribute === 'sav' ? 'selected' : ''}>SAV</option>
+                <option value="som" ${customSkill && customSkill.attribute === 'som' ? 'selected' : ''}>SOM</option>
+                <option value="wil" ${customSkill && customSkill.attribute === 'wil' ? 'selected' : ''}>WIL</option>
+            </select>
+            <input type="number" class="skill-value custom-skill-value" data-skill="${skillId}" value="${customSkill ? customSkill.value || 0 : 0}" min="0" max="60">
+            <span class="skill-total">Total: <span class="value" data-skill-total="${skillId}">0</span></span>
+            <button class="remove-skill" onclick="removeCustomSkill('${skillId}')">×</button>
+        `;
+        
+        container.appendChild(skillDiv);
+        
+        // Añadir event listeners
+        const nameInput = skillDiv.querySelector('.custom-skill-name');
+        const attrSelect = skillDiv.querySelector('.custom-skill-attribute');
+        const valueInput = skillDiv.querySelector('.custom-skill-value');
+        
+        nameInput.addEventListener('change', function() {
+            if (!window.characterSheet.customSkills[skillId]) {
+                window.characterSheet.customSkills[skillId] = {
+                    name: '',
+                    attribute: 'cog',
+                    value: 0
+                };
             }
-        }
-
-        updateWeaponsList() {
-            const list = document.getElementById('weapons-list');
-            list.innerHTML = '';
+            window.characterSheet.customSkills[skillId].name = this.value;
+            updateUI();
+        });
+        
+        attrSelect.addEventListener('change', function() {
+            if (!window.characterSheet.customSkills[skillId]) {
+                window.characterSheet.customSkills[skillId] = {
+                    name: nameInput.value,
+                    attribute: 'cog',
+                    value: 0
+                };
+            }
+            window.characterSheet.customSkills[skillId].attribute = this.value;
+            updateCustomSkillTotal(skillId);
+            updateUI();
+        });
+        
+        valueInput.addEventListener('change', function() {
+            const oldValue = window.characterSheet.customSkills[skillId] ? window.characterSheet.customSkills[skillId].value : 0;
+            const newValue = parseInt(this.value) || 0;
+            const diff = newValue - oldValue;
             
-            if (this.weapons.length === 0) {
-                const row = document.createElement('tr');
-                row.className = 'empty-row';
-                row.innerHTML = '<td colspan="5"><em>Sin armas equipadas</em></td>';
-                list.appendChild(row);
+            if (diff > 0 && diff > window.characterSheet.skillPoints) {
+                this.value = oldValue;
+                alert('No tienes suficientes puntos de habilidad disponibles');
                 return;
             }
             
-            this.weapons.forEach((weapon, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${weapon.name}</td>
-                    <td>${this.getWeaponTypeName(weapon.type)}</td>
-                    <td>${weapon.damage}</td>
-                    <td>${weapon.range}</td>
-                    <td>
-                        <span>${weapon.notes}</span>
-                        <button class="button small-button delete-item" data-type="weapon" data-index="${index}">✕</button>
-                    </td>
-                `;
-                
-                list.appendChild(row);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteItem(type, index);
-                });
-            });
-        }
-
-        updateArmorList() {
-            const list = document.getElementById('armor-list');
-            list.innerHTML = '';
-            
-            if (this.armor.length === 0) {
-                const row = document.createElement('tr');
-                row.className = 'empty-row';
-                row.innerHTML = '<td colspan="4"><em>Sin armadura equipada</em></td>';
-                list.appendChild(row);
-                return;
+            if (!window.characterSheet.customSkills[skillId]) {
+                window.characterSheet.customSkills[skillId] = {
+                    name: nameInput.value,
+                    attribute: attrSelect.value,
+                    value: 0
+                };
             }
             
-            this.armor.forEach((armor, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${armor.name}</td>
-                    <td>${this.getArmorLocationName(armor.location)}</td>
-                    <td>${armor.kinetic}/${armor.energy}</td>
-                    <td>
-                        <span>${armor.notes}</span>
-                        <button class="button small-button delete-item" data-type="armor" data-index="${index}">✕</button>
-                    </td>
-                `;
-                
-                list.appendChild(row);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteItem(type, index);
-                });
-            });
+            window.characterSheet.customSkills[skillId].value = newValue;
+            window.characterSheet.skillPoints -= diff;
+            updateCustomSkillTotal(skillId);
+            updateSkillPoints();
+            updateUI();
+        });
+        
+        // Actualizar el total inicial si ya existe la habilidad
+        if (customSkill) {
+            updateCustomSkillTotal(skillId);
         }
+    }
 
-        updateGearList() {
-            const list = document.getElementById('misc-list');
-            list.innerHTML = '';
-            
-            if (this.gear.length === 0) {
-                const row = document.createElement('tr');
-                row.className = 'empty-row';
-                row.innerHTML = '<td colspan="3"><em>Sin equipo adicional</em></td>';
-                list.appendChild(row);
-                return;
-            }
-            
-            this.gear.forEach((gear, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${gear.name}</td>
-                    <td>${this.getGearTypeName(gear.type)}</td>
-                    <td>
-                        <span>${gear.description}</span>
-                        <button class="button small-button delete-item" data-type="gear" data-index="${index}">✕</button>
-                    </td>
-                `;
-                
-                list.appendChild(row);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteItem(type, index);
-                });
-            });
-        }
-
-        updateImplantsList() {
-            const list = document.getElementById('implants-list');
-            list.innerHTML = '';
-            
-            if (this.implants.length === 0) {
-                const row = document.createElement('tr');
-                row.className = 'empty-row';
-                row.innerHTML = '<td colspan="5"><em>Sin implantes cibernéticos</em></td>';
-                list.appendChild(row);
-                return;
-            }
-            
-            this.implants.forEach((implant, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${implant.name}</td>
-                    <td>${this.getImplantLocationName(implant.location)}</td>
-                    <td>${this.getImplantLevelName(implant.level)}</td>
-                    <td>${implant.effects}</td>
-                    <td>
-                        <span class="status-${implant.status}">${this.getImplantStatusName(implant.status)}</span>
-                        <button class="button small-button delete-item" data-type="implant" data-index="${index}">✕</button>
-                    </td>
-                `;
-                
-                list.appendChild(row);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteItem(type, index);
-                });
-            });
-        }
-
-        updateAlliesList() {
-            const list = document.getElementById('allies-list');
-            list.innerHTML = '';
-            
-            if (this.allies.length === 0) {
-                list.innerHTML = '<div class="empty-contacts">Sin aliados registrados</div>';
-                return;
-            }
-            
-            this.allies.forEach((ally, index) => {
-                const card = document.createElement('div');
-                card.className = 'contact-card';
-                
-                card.innerHTML = `
-                    <div class="contact-name">${ally.name}</div>
-                    <div class="contact-relation">${ally.relation}</div>
-                    <div class="contact-desc">${ally.description}</div>
-                    <button class="delete-contact" data-type="ally" data-index="${index}">✕</button>
-                `;
-                
-                list.appendChild(card);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-contact').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteContact(type, index);
-                });
-            });
-        }
-
-        updateEnemiesList() {
-            const list = document.getElementById('enemies-list');
-            list.innerHTML = '';
-            
-            if (this.enemies.length === 0) {
-                list.innerHTML = '<div class="empty-contacts">Sin enemigos registrados</div>';
-                return;
-            }
-            
-            this.enemies.forEach((enemy, index) => {
-                const card = document.createElement('div');
-                card.className = 'contact-card';
-                
-                card.innerHTML = `
-                    <div class="contact-name">${enemy.name}</div>
-                    <div class="contact-relation">${enemy.relation}</div>
-                    <div class="contact-desc">${enemy.description}</div>
-                    <button class="delete-contact" data-type="enemy" data-index="${index}">✕</button>
-                `;
-                
-                list.appendChild(card);
-            });
-            
-            // Add event listeners to delete buttons
-            list.querySelectorAll('.delete-contact').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const type = e.target.getAttribute('data-type');
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    this.deleteContact(type, index);
-                });
-            });
-        }
-
-        updateArmorStat() {
-            let highestKinetic = 0;
-            let highestEnergy = 0;
-            
-            // Calculate the best armor values based on coverage
-            // This is a simplified version, a real implementation would need to handle overlapping armor
-            this.armor.forEach(armor => {
-                const kinetic = parseInt(armor.kinetic) || 0;
-                const energy = parseInt(armor.energy) || 0;
-                
-                if (armor.location === 'full') {
-                    // Full body armor provides base protection everywhere
-                    highestKinetic = Math.max(highestKinetic, kinetic);
-                    highestEnergy = Math.max(highestEnergy, energy);
-                } else {
-                    // Other armor pieces provide additional protection to specific areas
-                    // For simplicity, we're just taking the highest values here
-                    highestKinetic = Math.max(highestKinetic, kinetic);
-                    highestEnergy = Math.max(highestEnergy, energy);
+    // Add event listeners for attribute changes
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.id in window.characterSheet.aptitudes) {
+                const success = window.characterSheet.updateAptitude(this.id, parseInt(this.value) || 10);
+                if (!success) {
+                    // Si no hay suficientes puntos, revertir el cambio
+                    this.value = window.characterSheet.aptitudes[this.id];
+                    alert('No tienes suficientes puntos de atributo disponibles');
                 }
-            });
-            
-            document.getElementById('armor').textContent = `${highestKinetic}/${highestEnergy}`;
-        }
-
-        deleteItem(type, index) {
-            switch (type) {
-                case 'weapon':
-                    this.weapons.splice(index, 1);
-                    this.updateWeaponsList();
-                    break;
-                case 'armor':
-                    this.armor.splice(index, 1);
-                    this.updateArmorList();
-                    this.updateArmorStat();
-                    break;
-                case 'gear':
-                    this.gear.splice(index, 1);
-                    this.updateGearList();
-                    break;
-                case 'implant':
-                    this.implants.splice(index, 1);
-                    this.updateImplantsList();
-                    this.updateCyberMetrics();
-                    break;
-            }
-        }
-
-        deleteContact(type, index) {
-            if (type === 'ally') {
-                this.allies.splice(index, 1);
-                this.updateAlliesList();
-            } else {
-                this.enemies.splice(index, 1);
-                this.updateEnemiesList();
-            }
-        }
-
-        getWeaponTypeName(type) {
-            const types = {
-                'melee': 'Cuerpo a Cuerpo',
-                'pistol': 'Pistola',
-                'smg': 'Subfusil',
-                'shotgun': 'Escopeta',
-                'rifle': 'Rifle',
-                'heavy': 'Arma Pesada',
-                'exotic': 'Exótica'
-            };
-            return types[type] || type;
-        }
-
-        getArmorLocationName(location) {
-            const locations = {
-                'full': 'Cuerpo Completo',
-                'torso': 'Torso',
-                'head': 'Cabeza',
-                'arms': 'Brazos',
-                'legs': 'Piernas'
-            };
-            return locations[location] || location;
-        }
-
-        getGearTypeName(type) {
-            const types = {
-                'medical': 'Médico',
-                'tech': 'Tecnología',
-                'survival': 'Supervivencia',
-                'tools': 'Herramientas',
-                'comms': 'Comunicaciones',
-                'misc': 'Misceláneo'
-            };
-            return types[type] || type;
-        }
-
-        getImplantLocationName(location) {
-            const locations = {
-                'head': 'Cabeza/Cerebro',
-                'eyes': 'Ojos',
-                'ears': 'Oídos',
-                'arm-r': 'Brazo Derecho',
-                'arm-l': 'Brazo Izquierdo',
-                'torso': 'Torso',
-                'leg-r': 'Pierna Derecha',
-                'leg-l': 'Pierna Izquierda',
-                'skin': 'Piel/Sistema'
-            };
-            return locations[location] || location;
-        }
-
-        getImplantLevelName(level) {
-            const levels = {
-                'basic': 'Básico',
-                'standard': 'Estándar',
-                'advanced': 'Avanzado',
-                'bleeding': 'Bleeding Edge'
-            };
-            return levels[level] || level;
-        }
-
-        getImplantStatusName(status) {
-            const statuses = {
-                'active': 'Activo',
-                'damaged': 'Dañado',
-                'disabled': 'Desactivado'
-            };
-            return statuses[status] || status;
-        }
-
-        calculateSkillTotal(skillName, skillValue) {
-            const attribute = this.skillAttributeMap[skillName];
-            if (!attribute) return skillValue; // Para habilidades personalizadas
-            
-            const attributeValue = parseInt(document.getElementById(attribute).value) || 0;
-            return skillValue + attributeValue;
-        }
-
-        updateSkillTotals() {
-            document.querySelectorAll('.skill-item').forEach(item => {
-                const skillName = item.querySelector('label').textContent;
-                const skillValue = parseInt(item.querySelector('input').value) || 0;
-                const total = this.calculateSkillTotal(skillName, skillValue);
-                
-                // Actualizar o crear el elemento que muestra el total
-                let totalElement = item.querySelector('.skill-total');
-                if (!totalElement) {
-                    totalElement = document.createElement('span');
-                    totalElement.className = 'skill-total';
-                    item.appendChild(totalElement);
+            } else if (this.classList.contains('skill-value')) {
+                const success = window.characterSheet.addSkill(this.dataset.skill, parseInt(this.value) || 0);
+                if (!success) {
+                    // Si no hay suficientes puntos, revertir el cambio
+                    this.value = window.characterSheet.skills[this.dataset.skill] || 0;
+                    alert('No tienes suficientes puntos de habilidad disponibles');
                 }
-                totalElement.textContent = `(${total})`;
-            });
-        }
+            }
+            updateUI();
+        });
+    });
 
-        addCustomSkill(name = '', value = '0') {
-            const customSkillsContainer = document.getElementById('custom-skills');
-            const customSkillDiv = document.createElement('div');
-            customSkillDiv.className = 'custom-skill-item';
-            customSkillDiv.innerHTML = `
-                <input type="text" class="custom-skill-name" value="${name}" placeholder="Nombre de la habilidad">
-                <input type="number" class="custom-skill-value" value="${value}" min="0" max="60">
-                <button class="remove-skill-btn"><i class="fas fa-times"></i></button>
-            `;
+    // Event listener para plantilla de atributos
+    document.getElementById('aptitude-template').addEventListener('change', function() {
+        window.characterSheet.applyAptitudeTemplate(this.value);
+        updateUI();
+    });
 
-            customSkillsContainer.appendChild(customSkillDiv);
-
-            // Añadir eventos
-            const removeBtn = customSkillDiv.querySelector('.remove-skill-btn');
-            removeBtn.addEventListener('click', () => {
-                customSkillDiv.remove();
-                this.saveCharacterSheet();
-            });
-
-            const inputs = customSkillDiv.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('change', () => {
-                    this.saveCharacterSheet();
-                    this.updateSkillTotals();
+    // Event listeners para campos de texto de habilidades
+    document.querySelectorAll('.field-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const fieldName = this.dataset.field;
+            window.characterSheet.skillFields[fieldName] = this.value;
+            updateUI();
                 });
             });
 
-            // Guardar la habilidad personalizada
-            this.customSkills.push({ name, value });
-            this.saveCharacterSheet();
-        }
+    // Event listener para botón de añadir habilidad personalizada
+    document.getElementById('add-custom-skill').addEventListener('click', addCustomSkill);
 
-        saveCharacterSheet() {
-            const user = localStorage.getItem('currentUser');
-            if (!user) return;
-
-            const characterData = {
-                basics: {
-                    name: document.getElementById('character-name').value,
-                    concept: document.getElementById('character-concept').value,
-                    background: document.getElementById('character-background').value,
-                    debt: document.getElementById('character-debt').value
-                },
-                attributes: {
-                    vig: document.getElementById('vig').value,
-                    coo: document.getElementById('coo').value,
-                    int: document.getElementById('int').value,
-                    ref: document.getElementById('ref').value,
-                    wil: document.getElementById('wil').value,
-                    sav: document.getElementById('sav').value
-                },
-                skills: {},
-                customSkills: this.customSkills
-            };
-
-            // Guardar habilidades normales
-            document.querySelectorAll('.skill-item').forEach(item => {
-                const skillName = item.querySelector('label').textContent;
-                const skillValue = item.querySelector('input').value;
-                characterData.skills[skillName] = skillValue;
-            });
-
-            // Guardar en localStorage con el prefijo del usuario
-            localStorage.setItem(`characterSheet_${user}`, JSON.stringify(characterData));
-        }
-
-        loadCharacterSheet() {
-            const user = localStorage.getItem('currentUser');
-            if (!user) return;
-
-            const savedData = localStorage.getItem(`characterSheet_${user}`);
-            if (!savedData) return;
-
-            const characterData = JSON.parse(savedData);
-
-            // Cargar datos básicos
-            document.getElementById('character-name').value = characterData.basics.name || '';
-            document.getElementById('character-concept').value = characterData.basics.concept || '';
-            document.getElementById('character-background').value = characterData.basics.background || '';
-            document.getElementById('character-debt').value = characterData.basics.debt || '';
-
-            // Cargar atributos
-            Object.entries(characterData.attributes).forEach(([attr, value]) => {
-                document.getElementById(attr).value = value;
-            });
-
-            // Cargar habilidades normales
-            Object.entries(characterData.skills).forEach(([skill, value]) => {
-                const skillInput = document.querySelector(`.skill-item input[data-skill="${skill}"]`);
-                if (skillInput) {
-                    skillInput.value = value;
-                }
-            });
-
-            // Cargar habilidades personalizadas
-            this.customSkills = characterData.customSkills || [];
-            const customSkillsContainer = document.getElementById('custom-skills');
-            customSkillsContainer.innerHTML = '';
-            this.customSkills.forEach(skill => {
-                this.addCustomSkill(skill.name, skill.value);
-            });
-
-            // Actualizar totales
-            this.updateSkillTotals();
-        }
-
-        exportCharacterSheet() {
-            // Gather all data from form fields (same as saveCharacterSheet)
-            const characterData = {
-                name: document.getElementById('character-name').value,
-                concept: document.getElementById('character-concept').value,
-                background: document.getElementById('character-background').value,
-                debt: document.getElementById('character-debt').value,
-                aptitudes: this.aptitudes,
-                attributePoints: this.attributePoints,
-                skills: this.skills,
-                skillPoints: this.skillPoints,
-                weapons: this.weapons,
-                armor: this.armor,
-                gear: this.gear,
-                implants: this.implants,
-                meritPoints: document.getElementById('merit-points').value,
-                currentHealth: document.getElementById('current-health').value,
-                allies: this.allies,
-                enemies: this.enemies,
-                notes: document.getElementById('character-notes').value
-            };
-            
-            // Convert to JSON string
-            const jsonData = JSON.stringify(characterData, null, 2);
-            
-            // Create blob and download link
-            const blob = new Blob([jsonData], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${characterData.name || 'personaje'}_ultimate_mercenary.json`;
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
+    // Save button functionality
+    const saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', function() {
+        try {
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+            this.textContent = '¡GUARDADO!';
             setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
+                this.textContent = 'GUARDAR FICHA';
+            }, 2000);
+        } catch (e) {
+            console.error('Error saving data:', e);
+            this.textContent = 'ERROR AL GUARDAR';
+            setTimeout(() => {
+                this.textContent = 'GUARDAR FICHA';
+            }, 2000);
         }
+    });
 
-        resetCharacterSheet() {
-            // Reset all fields to default values
-            document.getElementById('character-name').value = '';
-            document.getElementById('character-concept').value = '';
-            document.getElementById('character-background').value = '';
-            document.getElementById('character-debt').value = '';
+    // Reset button functionality
+    const resetButton = document.getElementById('resetButton');
+    resetButton.addEventListener('click', function() {
+        if (confirm('¿Estás seguro de que quieres reiniciar la ficha? Se perderán todos los datos actuales.')) {
+            // Limpiar localStorage
+            localStorage.removeItem('characterSheet');
             
-            // Reset aptitudes
-            this.aptitudes = {
-                vig: 10, coo: 10, int: 10, ref: 10, wil: 10, sav: 10
-            };
-            this.attributePoints = 20;
+            // Reiniciar el objeto characterSheet
+            window.characterSheet = new CharacterSheet();
             
-            // Update aptitude display
-            for (const apt in this.aptitudes) {
-                document.getElementById(apt).value = this.aptitudes[apt];
+            // Limpiar habilidades personalizadas del DOM
+            const customSkillsContainer = document.getElementById('custom-skills-container');
+            customSkillsContainer.innerHTML = '';
+            
+            // Actualizar la interfaz
+            updateUI();
+            
+            // Mostrar mensaje de confirmación
+            this.textContent = '¡REINICIADO!';
+            setTimeout(() => {
+                this.textContent = 'REINICIAR FICHA';
+            }, 2000);
+        }
+    });
+
+    // Función para añadir habilidad personalizada
+    function addCustomSkill() {
+        const skillId = 'custom-' + Date.now();
+        
+        // Crear la habilidad en el objeto
+        window.characterSheet.customSkills[skillId] = {
+            name: '',
+            attribute: 'cog',
+            value: 0
+        };
+        
+        // Crear el elemento visual
+        createCustomSkillElement(skillId, window.characterSheet.customSkills[skillId]);
+    }
+
+    // Función para eliminar habilidad personalizada
+    function removeCustomSkill(skillId) {
+        if (window.characterSheet.customSkills[skillId]) {
+            window.characterSheet.skillPoints += window.characterSheet.customSkills[skillId].value;
+            delete window.characterSheet.customSkills[skillId];
+        }
+        
+        const skillDiv = document.querySelector(`[data-skill-id="${skillId}"]`).closest('.custom-skill-item');
+        if (skillDiv) {
+            skillDiv.remove();
+        }
+        updateSkillPoints();
+        updateUI();
+    }
+
+    // Función para actualizar total de habilidad personalizada
+    function updateCustomSkillTotal(skillId) {
+        const customSkill = window.characterSheet.customSkills[skillId];
+        if (customSkill) {
+            const attributeValue = window.characterSheet.aptitudes[customSkill.attribute] || 0;
+            const total = attributeValue + customSkill.value;
+            const totalElement = document.querySelector(`[data-skill-total="${skillId}"]`);
+            if (totalElement) {
+                totalElement.textContent = total;
             }
-            this.updateAttributePoints();
-            
-            // Reset skills
-            this.skills = {};
-            this.skillPoints = 400;
-            
-            // Update skill display
-            document.querySelectorAll('.skill-value').forEach(input => {
-                input.value = 0;
-            });
-            this.updateSkillPoints();
-            
-            // Reset equipment
-            this.weapons = [];
-            this.armor = [];
-            this.gear = [];
-            
-            // Update equipment display
-            this.updateWeaponsList();
-            this.updateArmorList();
-            this.updateGearList();
-            
-            // Reset implants
-            this.implants = [];
-            
-            // Update implants display
-            this.updateImplantsList();
-            this.updateCyberMetrics();
-            
-            // Reset status
-            document.getElementById('merit-points').value = 0;
-            document.getElementById('current-health').value = this.aptitudes.vig * 2;
-            this.updateHealthBar(this.aptitudes.vig * 2, this.aptitudes.vig * 2);
-            
-            // Reset contacts
-            this.allies = [];
-            this.enemies = [];
-            
-            // Update contacts display
-            this.updateAlliesList();
-            this.updateEnemiesList();
-            
-            // Reset notes
-            document.getElementById('character-notes').value = '';
-            
-            // Update derived stats
-            this.updateDerivedStats();
-            document.getElementById('armor').textContent = '0/0';
-            
-            alert('Nueva hoja de personaje creada.');
-        }
-
-        randomizeAvatar() {
-            // This is a placeholder for a more advanced avatar generation feature
-            // In a real application, this might use an API to generate a character portrait
-            alert('Función no implementada - En una versión completa, esta función generaría un avatar aleatorio para tu personaje.');
         }
     }
 
-    // Initialize the character sheet
-    const characterSheet = new CharacterSheet();
-
-    // Add missing cyber diagram image
-    const cyberDiagram = document.querySelector('.body-image');
-    if (cyberDiagram) {
-        cyberDiagram.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMzAwIj48c3R5bGU+LmJvZHktb3V0bGluZXtmaWxsOm5vbmU7c3Ryb2tlOiMwMGYyZmY7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO30uYm9keS1wYXJ0e2ZpbGw6cmdiYSgwLDI0MiwyNTUsMC4xKTtzdHJva2U6IzAwZjJmZjtzdHJva2Utd2lkdGg6MTt9PC9zdHlsZT48cGF0aCBjbGFzcz0iYm9keS1vdXRsaW5lIiBkPSJNMTAwLDI4MCBMMTAwLDI0MCBMNjAsMTYwIEw2MCw3MCBBNDAsNDAgMCAwIDEgMTAwLDMwIEwxMDAsMTAgTDEwMCwzMCBBNDAsNDAgMCAwIDEgMTQwLDcwIEwxNDAsODAgTDE0MCwxNjAgTDEwMCwyNDAgTDEwMCwyODAiIC8+PHBhdGggY2xhc3M9ImJvZHktb3V0bGluZSIgZD0iTTYwLDgwIEw1MCw4MCBMNDA8MTAwIEwyMCwxMDAgTDQwLDEwMCBMNDAsMTMwIEw2MCwxNDAiIC8+PHBhdGggY2xhc3M9ImJvZHktb3V0bGluZSIgZD0iTTE0MCw4MCBMMTUwLDgwIEwxNjA8MTAwIEwxODAsMTAwIEwxNjAsMTAwIEwxNjAsMTMwIEwxNDAsODAiIC8+PHBhdGggY2xhc3M9ImJvZHktb3V0bGluZSIgZD0iTTEwMCwyNDAgTDcwLDI0MCBMNjAsMjgwIiBkPSJNMTAwLDI0MCBMMTMwLDI0MCBMMTQwLDI4MCIgLz48Y2lyY2xlIGNsYXNzPSJib2R5LXBhcnQiIGN4PSIxMDAiIGN5PSIzMCIgcj0iMjAiIC8+PHJlY3QgY2xhc3M9ImJvZHktcGFydCIgeD0iNzAiIHk9IjgwIiB3aWR0aD0iNjAiIGhlaWdodD0iODAiIHJ4PSIxMCIgLz48cmVjdCBjbGFzcz0iYm9keS1wYXJ0IiB4PSI3MCIgeT0iMTYwIiB3aWR0aD0iNjAiIGhlaWdodD0iODAiIHJ4PSIxMCIgLz48cGF0aCBjbGFzcz0iYm9keS1wYXJ0IiBkPSJNNjAsODAgTDIwLDEwMCBMMzAsMTMwIEw2MCwxNDAiIC8+PHBhdGggY2xhc3M9ImJvZHktcGFydCIgZD0iTTE0MCw4MCBMMTgwLDEwMCBMMTcwLDEzMCBMMTQwLDE0MCIgLz48cGF0aCBjbGFzcz0iYm9keS1wYXJ0IiBkPSJNNzAsMjQwIEw1MCwyODAgTDcwLDI5MCBMODAsMjUwIiBkPSJNMTMwLDI0MCBMMTUwLDI4MCBMMTMwLDI5MCBMMTIwLDI1MCIgLz48L3N2Zz4=';
+    // --- NUEVO: Eliminar ítems de equipo/implantes ---
+    function removeEquipmentItem(index) {
+        window.characterSheet.equipment.splice(index, 1);
+        localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+        updateEquipmentUI();
     }
+    function removeImplant(index) {
+        window.characterSheet.implants.splice(index, 1);
+        localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+        updateEquipmentUI();
+        updateUI();
+    }
+
+    // --- NUEVO: Efectos de implantes ---
+    function getImplantEffectFields(effects = {}) {
+        // Atributos primarios
+        const attrs = ['cog','int','ref','sav','som','wil'];
+        // Derivados
+        const derived = ['healthPoints','initiative','woundThreshold','movement'];
+        // Habilidades oficiales
+        const skills = [
+            'Esquivar','Armas de Fuego','Infiltración','Pilotar','Hardware','Infosec','Interfaz','Medicina','Programación',
+            'Atletismo','Caída Libre','Combate Cuerpo a Cuerpo','Percepción','Investigación','Supervivencia',
+            'Engaño','Kinésica','Persuasión','Provocación','Psi','Exótica','Académico','Arte','Interés','Profesional'
+        ];
+        let html = `<div style='margin-top:8px;'><b>Efectos sobre atributos/habilidades:</b></div>`;
+        html += attrs.map(a => `<label style='margin-right:8px;'>${a.toUpperCase()}: <input type='number' style='width:40px' class='effect-input' data-effect='${a}' value='${effects[a]||0}'></label>`).join('');
+        html += '<br>';
+        html += derived.map(a => `<label style='margin-right:8px;'>${a}: <input type='number' style='width:40px' class='effect-input' data-effect='${a}' value='${effects[a]||0}'></label>`).join('');
+        html += `<div style='margin-top:6px;'>Habilidad: <select class='effect-skill-name' style='width:120px'>`;
+        html += `<option value=''>--Selecciona--</option>`;
+        skills.forEach(skill => {
+            html += `<option value='${skill}'${effects.skillName===skill?" selected":''}>${skill}</option>`;
+        });
+        html += `</select> <input type='number' class='effect-skill-value' style='width:40px' value='${effects.skillValue||0}'> </div>`;
+        return html;
+    }
+
+    // --- MODIFICADO: Añadir equipo, armas, armaduras, implantes ---
+    const addItemButtons = document.querySelectorAll('.add-item');
+    let currentForm = null;
+
+    addItemButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (currentForm) return; // Solo un formulario a la vez
+            const type = btn.getAttribute('data-type');
+            let container, fields, suggestEffects = {};
+            if (type === 'weapon') {
+                container = document.getElementById('weapons-list');
+                fields = [
+                    {label: 'Nombre', id: 'weapon-name'},
+                    {label: 'Daño', id: 'weapon-damage'},
+                    {label: 'Notas', id: 'weapon-notes'}
+                ];
+            } else if (type === 'armor') {
+                container = document.getElementById('armor-list');
+                fields = [
+                    {label: 'Nombre', id: 'armor-name'},
+                    {label: 'Protección', id: 'armor-prot'},
+                    {label: 'Notas', id: 'armor-notes'}
+                ];
+            } else if (type === 'misc') {
+                container = document.getElementById('misc-list');
+                fields = [
+                    {label: 'Nombre', id: 'misc-name'},
+                    {label: 'Descripción', id: 'misc-desc'}
+                ];
+            } else if (type === 'implant') {
+                container = document.getElementById('implants-list');
+                fields = [
+                    {label: 'Nombre', id: 'implant-name'},
+                    {label: 'Efectos', id: 'implant-effects'}
+                ];
+                // Sugerir efectos si el nombre coincide con uno conocido
+                // (ejemplo simple, puedes ampliar la lógica)
+                setTimeout(() => {
+                    const nameInput = document.getElementById('implant-name');
+                    if (nameInput) {
+                        nameInput.addEventListener('input', function() {
+                            if (this.value.toLowerCase().includes('reflejos cableados')) {
+                                // Ejemplo: Reflejos Cableados
+                                document.querySelector(".effect-input[data-effect='ref']").value = 5;
+                                document.querySelector(".effect-input[data-effect='initiative']").value = 5;
+                                document.querySelector(".effect-skill-name").value = 'Atletismo';
+                                document.querySelector(".effect-skill-value").value = 10;
+                                document.querySelectorAll('.effect-input').forEach(inp => inp.dispatchEvent(new Event('change')));
+                            }
+                        });
+                    }
+                }, 100);
+            }
+            // Crear formulario
+            const form = document.createElement('div');
+            form.className = 'add-item-form';
+            form.style.margin = '10px 0';
+            form.style.background = 'rgba(30,30,30,0.8)';
+            form.style.padding = '10px';
+            form.style.borderRadius = '6px';
+            form.innerHTML = fields.map(f => `<label style='display:block;margin-bottom:4px;'>${f.label}: <input type='text' id='${f.id}' style='margin-left:5px;'></label>`).join('');
+            if (type === 'implant') form.innerHTML += getImplantEffectFields();
+            form.innerHTML += `<button class='button' id='confirm-add-item' style='margin-right:8px;'>Añadir</button><button class='button' id='cancel-add-item'>Cancelar</button>`;
+            container.appendChild(form);
+            currentForm = form;
+            // Cancelar
+            form.querySelector('#cancel-add-item').onclick = function() {
+                form.remove();
+                currentForm = null;
+            };
+            // Confirmar
+            form.querySelector('#confirm-add-item').onclick = function() {
+                // Recoger datos
+                const values = {};
+                fields.forEach(f => { values[f.id] = form.querySelector(`#${f.id}`).value.trim(); });
+                if (!values[fields[0].id]) { alert('El nombre es obligatorio'); return; }
+                // Efectos de implante
+                let effects = {};
+                if (type === 'implant') {
+                    form.querySelectorAll('.effect-input').forEach(inp => { effects[inp.dataset.effect] = parseInt(inp.value)||0; });
+                    effects.skillName = form.querySelector('.effect-skill-name').value.trim();
+                    effects.skillValue = parseInt(form.querySelector('.effect-skill-value').value)||0;
+                }
+                // Añadir a la ficha
+                if (type === 'weapon') {
+                    window.characterSheet.equipment = window.characterSheet.equipment || [];
+                    window.characterSheet.equipment.push({tipo: 'arma', nombre: values['weapon-name'], dano: values['weapon-damage'], notas: values['weapon-notes']});
+                } else if (type === 'armor') {
+                    window.characterSheet.equipment = window.characterSheet.equipment || [];
+                    window.characterSheet.equipment.push({tipo: 'armadura', nombre: values['armor-name'], proteccion: values['armor-prot'], notas: values['armor-notes']});
+                } else if (type === 'misc') {
+                    window.characterSheet.equipment = window.characterSheet.equipment || [];
+                    window.characterSheet.equipment.push({tipo: 'equipo', nombre: values['misc-name'], descripcion: values['misc-desc']});
+                } else if (type === 'implant') {
+                    window.characterSheet.implants = window.characterSheet.implants || [];
+                    window.characterSheet.implants.push({nombre: values['implant-name'], efectos: values['implant-effects'], mod: effects});
+                }
+                // Guardar y actualizar UI
+                localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                updateEquipmentUI();
+                updateUI();
+                form.remove();
+                currentForm = null;
+            };
+        });
+    });
+
+    // --- MODIFICADO: Renderizar equipo y armas con botón eliminar y efectos de implantes ---
+    function updateEquipmentUI() {
+        console.log('Renderizando equipment:', window.characterSheet.equipment);
+        // Armas
+        const weaponsList = document.getElementById('weapons-list');
+        weaponsList.innerHTML = '';
+        const armas = (window.characterSheet.equipment||[]).filter(e => e.tipo === 'arma');
+        if (armas.length === 0) weaponsList.innerHTML = '<p>Sin armas equipadas</p>';
+        else armas.forEach((a,i) => {
+            const div = document.createElement('div');
+            div.className = 'gear-item';
+            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#00ccff'>${a.dano||''}</span> <span style='color:#aaa'>${a.notas||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            weaponsList.appendChild(div);
+        });
+        // Armaduras
+        const armorList = document.getElementById('armor-list');
+        armorList.innerHTML = '';
+        const armaduras = (window.characterSheet.equipment||[]).filter(e => e.tipo === 'armadura');
+        if (armaduras.length === 0) armorList.innerHTML = '<p>Sin armadura equipada</p>';
+        else armaduras.forEach((a,i) => {
+            const div = document.createElement('div');
+            div.className = 'gear-item';
+            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#00ccff'>${a.proteccion||''}</span> <span style='color:#aaa'>${a.notas||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            armorList.appendChild(div);
+        });
+        // Equipo
+        const miscList = document.getElementById('misc-list');
+        miscList.innerHTML = '';
+        const equipos = (window.characterSheet.equipment||[]).filter(e => e.tipo === 'equipo');
+        if (equipos.length === 0) miscList.innerHTML = '<p>Sin equipo adicional</p>';
+        else equipos.forEach((a,i) => {
+            const div = document.createElement('div');
+            div.className = 'gear-item';
+            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#aaa'>${a.descripcion||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            miscList.appendChild(div);
+        });
+        // Implantes
+        const implantsList = document.getElementById('implants-list');
+        implantsList.innerHTML = '';
+        const implantes = (window.characterSheet.implants||[]);
+        if (implantes.length === 0) implantsList.innerHTML = '<p>Sin implantes instalados</p>';
+        else implantes.forEach((a,i) => {
+            const div = document.createElement('div');
+            div.className = 'gear-item';
+            let modStr = '';
+            if (a.mod) {
+                modStr = Object.entries(a.mod).filter(([k,v])=>v&&k!=='skillName'&&k!=='skillValue').map(([k,v])=>`${k.toUpperCase()}: ${v>0?'+':''}${v}`).join(' ');
+                if (a.mod.skillName && a.mod.skillValue) modStr += ` ${a.mod.skillName}: ${a.mod.skillValue>0?'+':''}${a.mod.skillValue}`;
+            }
+            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#aaa'>${a.efectos||''}</span> <span style='color:#00ccff'>${modStr}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeImplant(${i})'>🗑️</button>`;
+            implantsList.appendChild(div);
+        });
+    }
+
+    // --- MODIFICADO: Aplicar efectos de implantes a la ficha ---
+    function getImplantModsSum() {
+        // Devuelve un objeto con la suma de todos los mods de implantes
+        const mods = {cog:0,int:0,ref:0,sav:0,som:0,wil:0,healthPoints:0,initiative:0,woundThreshold:0,movement:0};
+        (window.characterSheet.implants||[]).forEach(imp => {
+            if (imp.mod) {
+                Object.keys(mods).forEach(k => { mods[k] += parseInt(imp.mod[k]||0); });
+            }
+        });
+        // Habilidades: suma por nombre
+        const skillMods = {};
+        (window.characterSheet.implants||[]).forEach(imp => {
+            if (imp.mod && imp.mod.skillName && imp.mod.skillValue) {
+                const n = imp.mod.skillName.trim();
+                if (n) skillMods[n] = (skillMods[n]||0) + parseInt(imp.mod.skillValue||0);
+            }
+        });
+        return {mods, skillMods};
+    }
+
+    // Initial UI update
+    updateUI();
+
+    // Hacer funciones globales
+    window.addCustomSkill = addCustomSkill;
+    window.removeCustomSkill = removeCustomSkill;
+    window.removeEquipmentItem = removeEquipmentItem;
+    window.removeImplant = removeImplant;
+
+    // Al final del DOMContentLoaded, antes de cerrar la función
+    window.addEventListener('message', function(event) {
+        console.log('Mensaje recibido en ficha:', event.data);
+        if (event.data && event.data.type === 'addItem' && event.data.item) {
+            const item = event.data.item;
+            if (item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo') {
+                window.characterSheet.equipment = window.characterSheet.equipment || [];
+                window.characterSheet.equipment.push(item);
+                console.log('Añadido a equipment:', item, window.characterSheet.equipment);
+            } else if (item.tipo === 'implant' || item.tipo === 'implante') {
+                window.characterSheet.implants = window.characterSheet.implants || [];
+                window.characterSheet.implants.push(item);
+                console.log('Añadido a implants:', item, window.characterSheet.implants);
+            }
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+            updateEquipmentUI();
+            updateUI();
+        }
+    });
 });

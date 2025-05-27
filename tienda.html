@@ -608,6 +608,53 @@
                 directMessages.push(purchaseMessage);
                 localStorage.setItem('mensajes-directos', JSON.stringify(directMessages));
 
+                // --- INTEGRACIÓN FICHA ---
+                // Intentar enviar a la ficha a través del iframe en el padre
+                if (window.parent && window.parent.fichaIframe) {
+                    let tipo = '';
+                    let fichaItem = {};
+                    if (item.section === 'shop-armas') {
+                        tipo = 'arma';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            dano: item.details || '',
+                            notas: item.description || ''
+                        };
+                    } else if (item.section === 'shop-armaduras') {
+                        tipo = 'armadura';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            proteccion: item.details || '',
+                            notas: item.description || ''
+                        };
+                    } else if (item.section === 'shop-cyberware') {
+                        tipo = 'implant';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            efectos: item.details || ''
+                        };
+                    } else if (item.section === 'shop-equipo') {
+                        tipo = 'equipo';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            descripcion: item.details || ''
+                        };
+                    }
+                    if (tipo) {
+                        window.parent.fichaIframe.contentWindow.postMessage({
+                            type: 'addItem',
+                            item: fichaItem
+                        }, '*');
+                    }
+                } else {
+                    console.log('No se pudo encontrar la ficha para añadir el item');
+                }
+                // --- FIN INTEGRACIÓN FICHA ---
+
                 // Actualizar botones
                 updateBuyButtons();
             } else {

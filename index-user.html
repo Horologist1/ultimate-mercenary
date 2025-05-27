@@ -842,6 +842,100 @@
             padding: 20px;
             font-style: italic;
         }
+
+        /* Estilos para los botones de acción */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        /* Estilos para el modal de estadísticas */
+        .modal {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.95);
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 1000px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .modal-header h2 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+        }
+
+        .close-button {
+            padding: 10px 20px !important;
+            background-color: rgba(255, 71, 87, 0.8) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            font-family: 'Orbitron', sans-serif !important;
+            font-weight: bold !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .close-button:hover {
+            background-color: rgba(255, 71, 87, 1) !important;
+            color: white !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .modal-body {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 4px;
+            padding: 20px;
+            min-height: 600px;
+        }
     </style>
 </head>
 <body>
@@ -906,16 +1000,11 @@
                     <!-- Botones -->
                     <div class="sidebar-section">
                         <h3>ACCIONES</h3>
-                        <div class="sidebar-buttons">
-                            <button class="sidebar-button" onclick="window.location.href='tienda.html'">
-                                <span>Tienda</span>
-                            </button>
-                            <button class="sidebar-button" id="message-btn">
-                                <span>Mensajes</span>
-                            </button>
-                            <button class="sidebar-button" id="objective-btn">
-                                <span>Objetivo</span>
-                            </button>
+                        <div class="action-buttons">
+                            <button class="action-button" onclick="openShop()">TIENDA</button>
+                            <button class="action-button" id="message-btn">MENSAJES</button>
+                            <button class="action-button" id="objective-btn">OBJETIVO</button>
+                            <button class="action-button" onclick="openStats()">ESTADÍSTICAS</button>
                         </div>
                     </div>
                     
@@ -1402,6 +1491,7 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             const rulesModal = document.getElementById('rules-modal');
             const acceptBtn = document.getElementById('accept-btn');
             const messageBtn = document.getElementById('message-btn');
+            const objectiveBtn = document.getElementById('objective-btn');
             const messagesModal = document.getElementById('messages-modal');
             
             // Verificar si ya se aceptaron las reglas
@@ -1420,6 +1510,9 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
                 messagesModal.style.display = 'block';
                 loadMessages();
             });
+
+            // Manejar el botón de objetivo
+            objectiveBtn.addEventListener('click', showTestDescription);
 
             // Cargar mensajes iniciales del chat
             loadChatMessages();
@@ -1601,9 +1694,6 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             document.getElementById('test-modal').style.display = 'block';
         }
 
-        // Añadir el evento click al botón de objetivo
-        document.getElementById('objective-btn').addEventListener('click', showTestDescription);
-
         // Función para cargar mensajes directos
         function loadDirectMessages() {
             const messagesList = document.getElementById('messages-list');
@@ -1702,6 +1792,46 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             loadDirectMessages();
             setInterval(loadDirectMessages, 5000);
         });
+
+        // Función para abrir la ventana de estadísticas
+        function openStats() {
+            const statsWindow = document.createElement('div');
+            statsWindow.className = 'modal';
+            statsWindow.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>ESTADÍSTICAS</h2>
+                        <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe src="character-sheet-modal.html" style="width: 100%; height: 600px; border: none;"></iframe>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(statsWindow);
+            // Guardar referencia al iframe
+            window.fichaIframe = statsWindow.querySelector('iframe');
+        }
+
+        // Función para abrir la tienda
+        function openShop() {
+            const shopWindow = document.createElement('div');
+            shopWindow.className = 'modal';
+            shopWindow.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>TIENDA</h2>
+                        <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe src="tienda.html" style="width: 100%; height: 600px; border: none;"></iframe>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(shopWindow);
+            // Guardar referencia al iframe
+            window.tiendaIframe = shopWindow.querySelector('iframe');
+        }
     </script>
 </body>
 </html> 
