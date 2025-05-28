@@ -528,6 +528,57 @@
     </div>
 
     <script src="js/stats-manager.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Referencias a los datos en Firebase
+        const conocidosRef = ref(database, 'conocidosSeleccionados');
+        const conocimientosRef = ref(database, 'conocimientosSeleccionados');
+        const mensajesRef = ref(database, 'mensajes-directos');
+        const currentTestRef = ref(database, 'currentTest');
+
+        // Función para guardar los conocidos seleccionados en Firebase
+        window.saveConocidosSeleccionados = function(conocidos) {
+            set(conocidosRef, conocidos);
+        };
+
+        // Función para guardar los conocimientos seleccionados en Firebase
+        window.saveConocimientosSeleccionados = function(conocimientos) {
+            set(conocimientosRef, conocimientos);
+        };
+
+        // Función para guardar los mensajes directos en Firebase
+        window.saveMensajesDirectos = function(mensajes) {
+            set(mensajesRef, mensajes);
+        };
+
+        // Función para guardar la prueba actual en Firebase
+        window.saveCurrentTest = function(test) {
+            set(currentTestRef, test);
+        };
+
+        // Función para guardar el nombre del concursante en Firebase
+        window.saveConcursanteName = function(numero, nombre) {
+            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
+            set(nombreRef, nombre);
+        };
+    </script>
     <script>
         // Sistema de almacenamiento persistente
         const persistentStorage = {
@@ -855,6 +906,49 @@
         }
         function setConocimientosSeleccionados(arr) {
             localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
+        }
+
+        // Actualizar las funciones de guardado para usar Firebase
+        function guardarConocidosSeleccionados() {
+            const conocidos = Array.from(document.querySelectorAll('.character-card.selected')).map(card => card.dataset.nombre);
+            localStorage.setItem('conocidosSeleccionados', JSON.stringify(conocidos));
+            // Guardar en Firebase
+            if (window.saveConocidosSeleccionados) {
+                window.saveConocidosSeleccionados(conocidos);
+            }
+        }
+
+        function guardarConocimientosSeleccionados() {
+            const conocimientos = Array.from(document.querySelectorAll('.faction-card.selected')).map(card => card.dataset.nombre);
+            localStorage.setItem('conocimientosSeleccionados', JSON.stringify(conocimientos));
+            // Guardar en Firebase
+            if (window.saveConocimientosSeleccionados) {
+                window.saveConocimientosSeleccionados(conocimientos);
+            }
+        }
+
+        function guardarMensajesDirectos(mensajes) {
+            localStorage.setItem('mensajes-directos', JSON.stringify(mensajes));
+            // Guardar en Firebase
+            if (window.saveMensajesDirectos) {
+                window.saveMensajesDirectos(mensajes);
+            }
+        }
+
+        function guardarCurrentTest(test) {
+            localStorage.setItem('currentTest', test);
+            // Guardar en Firebase
+            if (window.saveCurrentTest) {
+                window.saveCurrentTest(test);
+            }
+        }
+
+        function guardarNombreConcursante(numero, nombre) {
+            localStorage.setItem(`nombreConcursante_${numero}`, nombre);
+            // Guardar en Firebase
+            if (window.saveConcursanteName) {
+                window.saveConcursanteName(numero, nombre);
+            }
         }
     </script>
 </body>

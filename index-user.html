@@ -961,6 +961,86 @@
     </style>
 </head>
 <body>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Referencias a los datos en Firebase
+        const conocidosRef = ref(database, 'conocidosSeleccionados');
+        const conocimientosRef = ref(database, 'conocimientosSeleccionados');
+        const mensajesRef = ref(database, 'mensajes-directos');
+        const currentTestRef = ref(database, 'currentTest');
+
+        // Escuchar cambios en los conocidos seleccionados
+        onValue(conocidosRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
+                renderTarjetasSeleccionadas();
+            }
+        });
+
+        // Escuchar cambios en los conocimientos seleccionados
+        onValue(conocimientosRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
+                renderTarjetasSeleccionadas();
+            }
+        });
+
+        // Escuchar cambios en los mensajes directos
+        onValue(mensajesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('mensajes-directos', JSON.stringify(data));
+                loadDirectMessages();
+            }
+        });
+
+        // Escuchar cambios en la prueba actual
+        onValue(currentTestRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('currentTest', data);
+                updateObjective();
+            }
+        });
+
+        // Función para guardar el nombre del concursante en Firebase
+        window.saveConcursanteName = function(numero, nombre) {
+            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
+            set(nombreRef, nombre);
+        };
+
+        // Escuchar cambios en los nombres de los concursantes
+        const nombresRef = ref(database, 'nombresConcursantes');
+        onValue(nombresRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.entries(data).forEach(([numero, nombre]) => {
+                    localStorage.setItem(`nombreConcursante_${numero}`, nombre);
+                });
+                renderTarjetasSeleccionadas();
+            }
+        });
+    </script>
     <div class="main-container">
         <!-- Video de fondo -->
         <video id="background-video" class="background-video" autoplay loop muted playsinline>
@@ -1144,6 +1224,15 @@
     <script src="mensajes-publico.js"></script>
     <script src="js/stats-manager.js"></script>
     <script>
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            // Aquí irán tus credenciales de Firebase
+            // Las encontrarás en la consola de Firebase > Configuración del proyecto
+        };
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // Base de datos unificada de mensajes
         const mensajesUnificados = {
             nombres: [
@@ -1939,7 +2028,6 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
             const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
             document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
-                // Mapeo de número de concursante
                 const numeros = {
                     'Auri': 13,
                     'Boris "Goliath" Volkov': 42,
@@ -1961,8 +2049,7 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
                     'Aria "Maven" Chen': 19
                 };
                 const numero = numeros[p.nombre] ? `#${numeros[p.nombre]}` : '';
-                const clave = `nombreConcursante_${numero}`;
-                const valorGuardado = localStorage.getItem(clave) || '';
+                const valorGuardado = localStorage.getItem(`nombreConcursante_${numero}`) || '';
                 return `
                     <div class="character-card">
                         <div class="character-info">
@@ -1971,14 +2058,21 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
                     </div>
                 `;
             }).join('');
+
             // Listeners para guardar el nombre al escribir
             document.querySelectorAll('.nombre-concursante-input').forEach(input => {
                 input.addEventListener('input', function() {
                     const num = this.getAttribute('data-numero');
-                    localStorage.setItem(`nombreConcursante_${num}`, this.value);
+                    const nombre = this.value;
+                    localStorage.setItem(`nombreConcursante_${num}`, nombre);
+                    // Guardar en Firebase
+                    if (window.saveConcursanteName) {
+                        window.saveConcursanteName(num, nombre);
+                    }
                 });
             });
-            // Conocimientos (igual que antes)
+
+            // Conocimientos
             const conocimientosSel = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
             const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
             document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => `
