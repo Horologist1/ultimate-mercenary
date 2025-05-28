@@ -1098,7 +1098,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.27</h1>
+                        <h1>ULTIMATE MERCENARY 0.28</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1187,74 +1187,24 @@
             </div>
         </div>
 
-        <!-- Modal de Reglas -->
-        <div id="rules-modal" class="rules-modal">
-            <div class="rules-content">
-                <h1>REGLAS DEL JUEGO</h1>
-                
-                <section>
-                    <h2>BIENVENIDA</h2>
-                    <p>¡Bienvenido, recluta, a ULTIMATE MERCENARY! Has sido seleccionado para participar en la última experiencia de entretenimiento de OmniCorp Entertainment. Este no es un juego cualquiera; es una prueba de supervivencia, astucia y determinación en las calles de una metrópolis cyberpunk.</p>
-                </section>
-                
-                <section>
-                    <h2>CONCEPTO BÁSICO</h2>
-                    <p>Ultimate Mercenary es un reality show transmitido en directo donde tú, como participante, debes completar misiones peligrosas mientras eres seguido por drones de transmisión. Tu objetivo: sobrevivir, completar los objetivos y entretener a la audiencia para ganar rating, seguidores y PM.</p>
-                </section>
-                
-                <section>
-                    <h2>CONDICIONES DEL CONCURSO</h2>
-                    
-                    <h3>Reglas de Supervivencia</h3>
-                    <div class="rules-box">
-                        <ul>
-                            <li><strong>No hay reglas fijas</strong> — Kaiser puede cambiarlas en cualquier momento para aumentar el drama.</li>
-                            <li><strong>La eliminación es permanente</strong> — Fallar una prueba, ser asesinado por otros concursantes (en pruebas PvP), o tener "baja audiencia" (Kaiser puede decidir eliminar a alguien aburrido).</li>
-                            <li><strong>Las pilas corticales son propiedad de OCE</strong> — Al morir, toda tecnología implantada pertenece a la corporación.</li>
-                            <li><strong>No hay salida</strong> — Intentar escapar se considera una violación del contrato y conlleva "consecuencias extremas".</li>
-                            <li><strong>El entretenimiento es prioritario</strong> — Un concursante que genere suficiente interés podría recibir "privilegios especiales".</li>
-                        </ul>
-                    </div>
-
-                    <h3>Sobre las "Segundas Oportunidades"</h3>
-                    <p>Excepcionalmente, un concursante eliminado pero muy entretenido podría ser resleeveado en una funda sintética barata con una deuda de PM masiva (una "segunda oportunidad" que es más bien una condena a servidumbre).</p>
-
-                    <h3>Premio</h3>
-                    <p>El ganador del concurso recibirá un cheque en blanco para implantes y tanto equipo como pueda cargar en sus brazos.</p>
-                </section>
-                
-                <section>
-                    <h2>DESCARGO DE RESPONSABILIDAD</h2>
-                    <p>OmniCorp Entertainment no se hace responsable por daños físicos, psicológicos o materiales sufridos durante la participación en Ultimate Mercenary. Al participar, reconoces y aceptas todos los riesgos inherentes a las actividades propuestas.</p>
-                </section>
-                
-                <section class="text-center">
-                    <h3 class="glowing-text">¿ESTÁS LISTO PARA LA PRUEBA DEFINITIVA?</h3>
-                    <p>Para continuar, debes aceptar estas reglas y firmar el contrato digital. Una vez dentro, no hay vuelta atrás. La ciudad te espera, mercenario. Demuestra tu valor.</p>
-                    
-                    <button id="accept-btn" class="accept-btn">ACEPTAR Y CONTINUAR</button>
-                </section>
-            </div>
-        </div>
-        
-        <!-- Modal de Prueba -->
-        <div id="test-modal" class="modal" style="display: none; z-index: 4000;">
-            <div class="modal-content" style="background: rgba(0,0,0,0.95); max-width: 800px; margin: 50px auto; padding: 30px; border-radius: 8px; border: 1px solid #444;">
-                <div class="modal-header" style="margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #444;">
-                    <h2 id="test-title" style="color: #00ccff; margin: 0; font-family: 'Orbitron', sans-serif; font-size: 24px;">OBJETIVO</h2>
-                    <button class="close-button" onclick="document.getElementById('test-modal').style.display='none'">CERRAR</button>
+        <!-- NEW Objective Modal - Ensure any old #test-modal is removed -->
+        <div id="test-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 5000; overflow-y: auto; padding-top: 50px;">
+            <div style="background-color: #111; color: #fff; max-width: 700px; margin: 0 auto; padding: 25px; border: 1px solid #ff4757; border-radius: 8px; box-shadow: 0 0 20px rgba(255,71,87,0.5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #444;">
+                    <h2 id="objective-modal-title" style="color: #ff4757; font-family: 'Orbitron', sans-serif; margin: 0; font-size: 22px;">OBJETIVO</h2>
+                    <button onclick="document.getElementById('test-modal').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 14px;">CERRAR</button>
                 </div>
-                <div class="modal-body" style="background: rgba(30,30,30,0.8); border-radius: 4px; padding: 20px;">
-                    <div class="test-image-container" style="margin-bottom: 20px;">
-                        <img id="test-image" src="" alt="Imagen de la prueba" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px;">
-                    </div>
-                    <div id="test-description" class="test-description" style="color: #fff; line-height: 1.6;">
-                        <!-- La descripción se cargará dinámicamente -->
-                    </div>
+                <img id="objective-modal-image" src="" alt="Imagen del Objetivo" style="width: 100%; max-height: 280px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; border: 1px solid #333;">
+                <div id="objective-modal-description" style="font-size: 15px; line-height: 1.6; min-height: 100px;">
+                    <!-- Descripción del objetivo -->
+                </div>
+                <div id="objective-modal-kaiser-quote" style="font-style: italic; color: #00ccff; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #444; font-size: 14px;">
+                    <!-- Cita de Kaiser -->
                 </div>
             </div>
         </div>
-        
+        <!-- END OF NEW Objective Modal -->
+
         <div class="overlay" style="z-index:50;"></div>
     </div>
 
