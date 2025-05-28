@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.29</h1>
+                        <h1>ULTIMATE MERCENARY 0.3</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1311,45 +1311,33 @@
             console.error('Objective modal not found!');
             return;
         }
-        const objectivesData = {
-            'prueba0': {
-                title: 'Prueba 0: La Caída',
-                image: 'images/kaiser_intro_new.png',
-                description: `Supervivencia inicial en el hangar subterráneo.\n\nLos concursantes despiertan en un entorno hostil, rodeados de maquinaria industrial y sin información clara sobre su situación.\n\nDeben adaptarse rápidamente, buscar recursos básicos y formar alianzas temporales para sobrevivir a las primeras horas del concurso.\n\nEl entorno es oscuro, húmedo y peligroso: cualquier error puede ser fatal.`,
-                kaiserQuote: '“Bienvenidos al matadero, novatos. Demostrad que no sois solo carne fresca.”'
-            },
-            'prueba1': {
-                title: 'Prueba 1: Carrera de Obstáculos',
-                image: 'images/obstacle_course_new.png',
-                description: `Completar la carrera de obstáculos industrial.\n\nLos concursantes deben superar una serie de desafíos físicos y mentales: saltar sobre maquinaria en movimiento, esquivar trampas eléctricas y resolver acertijos bajo presión.\n\nLa cooperación puede ser útil, pero solo los más rápidos y astutos llegarán al final.\n\nEl público espera espectáculo y caídas espectaculares.`,
-                kaiserQuote: '“Corred, pequeños conejos. Solo los más rápidos evitan convertirse en papilla.”'
-            },
-            'prueba2': {
-                title: 'Prueba 2: La Cosecha',
-                image: 'images/abandoned_greenhouse.png',
-                description: `Recolectar plantas y materiales valiosos del Jardín Vertical.\n\nEl entorno está plagado de trampas biológicas y toxinas.\n\nLos concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, enfrentándose a criaturas mutadas y a la competencia de otros jugadores.\n\nLa precisión y el conocimiento científico serán clave para sobrevivir.`,
-                kaiserQuote: '“¿Veis esas bonitas plantas? Algunas os darán créditos. Otras... bueno, digamos que os darán una muerte colorida.”'
-            },
-            'prueba3': {
-                title: 'Prueba 3: La Entrega',
-                image: 'images/city_ruins.png',
-                description: `Realizar entregas de paquetes en el distrito industrial.\n\nLos concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, evitando bandas hostiles, drones de vigilancia y trampas explosivas.\n\nLa sigilo y la eficiencia serán recompensados, pero el menor error puede atraer la atención de los cazadores.`,
-                kaiserQuote: '“Un paquete, un destino. Fácil, ¿verdad? Si no fuera por todo lo que intentará mataros por el camino.”'
-            }
-        };
-        const data = objectivesData[currentTestKey] || objectivesData['prueba0'];
-        document.getElementById('objective-modal-title').textContent = data.title;
-        const imgElement = document.getElementById('objective-modal-image');
-        imgElement.src = data.image;
-        imgElement.alt = `Imagen de ${data.title}`;
-        document.getElementById('objective-modal-description').innerHTML = data.description.replace(/\n/g, '<br>');
-        const quoteElement = document.getElementById('objective-modal-kaiser-quote');
-        if (data.kaiserQuote) {
-            quoteElement.textContent = data.kaiserQuote;
-            quoteElement.style.display = 'block';
-        } else {
-            quoteElement.style.display = 'none';
-        }
+        // Cargar el HTML de la prueba correspondiente
+        fetch(`prueba${currentTestKey.replace('prueba','')}.html`)
+            .then(res => res.text())
+            .then(html => {
+                // Extraer el primer bloque narrativo relevante
+                let content = '';
+                // Buscar .narrative-section
+                const match = html.match(/<div class="narrative-section">([\s\S]*?)<\/div>/i);
+                if (match) {
+                    content = '<div class="narrative-section">' + match[1] + '</div>';
+                } else {
+                    // Si no hay bloque narrativo, usar el primer <main> o <body>
+                    const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+                    if (mainMatch) content = mainMatch[1];
+                    else {
+                        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                        if (bodyMatch) content = bodyMatch[1];
+                    }
+                }
+                document.getElementById('objective-modal-description').innerHTML = content;
+                // Ocultar imagen y cita de Kaiser del modal, ya que están dentro del bloque HTML
+                document.getElementById('objective-modal-image').style.display = 'none';
+                document.getElementById('objective-modal-kaiser-quote').style.display = 'none';
+            })
+            .catch(() => {
+                document.getElementById('objective-modal-description').innerHTML = '<div style="color:#f55;">No se pudo cargar la información de la prueba.</div>';
+            });
         modal.style.display = 'block';
     }
     window.showObjectiveModal = showObjectiveModal;
@@ -1468,7 +1456,7 @@
     <!-- NEW CONSOLIDATED CHAT SYSTEM SCRIPT -->
     <script>
         function initChatSystem() {
-            console.log("[SYSTEM] Initializing New Chat System v0.29...");
+            console.log("[SYSTEM] Initializing New Chat System v0.3...");
             const chatMessagesContainer = document.getElementById('chat-messages');
             const chatInput = document.getElementById('chat-input');
             const chatSubmitBtn = document.getElementById('chat-submit');
