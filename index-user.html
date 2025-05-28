@@ -1060,14 +1060,23 @@
             if (data !== null) {
                 localStorage.setItem('playerPM', data);
                 if (window.updateStatusPanel) window.updateStatusPanel();
-                if (window.updateUserList) window.updateUserList();
             }
         });
         onValue(chatRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
-                if (window.loadChatMessages) window.loadChatMessages();
+            // Ensure data is an array, or provide an empty array if null/undefined
+            // Firebase Realtime Database often returns objects for lists unless pushed with numeric keys.
+            // If 'data' is an object of messages, convert to array.
+            const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
+
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesArray));
+            if (window.renderGlobalChatMessages) {
+                console.log("[Firebase Chat Listener] Calling renderGlobalChatMessages.");
+                window.renderGlobalChatMessages(messagesArray);
+            } else {
+                // This might happen if Firebase loads and fires this event before the main DOM is fully parsed.
+                // The initChatSystem on DOMContentLoaded should handle initial rendering from localStorage anyway.
+                console.warn("[Firebase Chat Listener] renderGlobalChatMessages function not found at the moment of Firebase data arrival. Chat will render on DOMContentLoaded or next update.");
             }
         });
 
@@ -1260,7 +1269,7 @@
     window.openStats = openStats;
     </script>
     <script>
-    // --- MODALES Y FUNCIONES GLOBALES ---
+    // --- MODALES Y FUNCIONES GLOBALES (openShop, openMessages, openObjective) ---
     function openShop() {
         console.log('[DEBUG] openShop called');
         const shopWindow = document.createElement('div');
@@ -1290,9 +1299,65 @@
 
     function openObjective() {
         console.log('[DEBUG] openObjective called');
-        if (window.showTestDescription) window.showTestDescription();
+        if (window.showObjectiveModal) window.showObjectiveModal();
     }
     window.openObjective = openObjective;
+
+    // NEW showObjectiveModal function for the refactored modal
+    function showObjectiveModal() {
+        const currentTestKey = localStorage.getItem('currentTest') || 'prueba0';
+        const modal = document.getElementById('test-modal');
+        if (!modal) {
+            console.error('Objective modal not found!');
+            return;
+        }
+
+        const objectivesData = {
+            'prueba0': {
+                title: 'Prueba 0: La Caída',
+                image: 'images/kaiser_intro_new.png',
+                description: 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
+                kaiserQuote: '"Bienvenidos al matadero, novatos. Demostrad que no sois solo carne fresca."'
+            },
+            'prueba1': {
+                title: 'Prueba 1: Carrera de Obstáculos',
+                image: 'images/obstacle_course_new.png',
+                description: 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
+                kaiserQuote: '"Corred, pequeños conejos. Solo los más rápidos evitan convertirse en papilla."'
+            },
+            'prueba2': {
+                title: 'Prueba 2: La Cosecha',
+                image: 'images/abandoned_greenhouse.png',
+                description: 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
+                kaiserQuote: '"¿Veis esas bonitas plantas? Algunas os darán créditos. Otras... bueno, digamos que os darán una muerte colorida."'
+            },
+            'prueba3': {
+                title: 'Prueba 3: La Entrega',
+                image: 'images/city_ruins.png',
+                description: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.',
+                kaiserQuote: '"Un paquete, un destino. Fácil, ¿verdad? Si no fuera por todo lo que intentará mataros por el camino."'
+            }
+        };
+
+        const data = objectivesData[currentTestKey] || objectivesData['prueba0'];
+
+        document.getElementById('objective-modal-title').textContent = data.title;
+        const imgElement = document.getElementById('objective-modal-image');
+        imgElement.src = data.image;
+        imgElement.alt = `Imagen de ${data.title}`;
+        document.getElementById('objective-modal-description').innerHTML = data.description.replace(/\n/g, '<br>');
+        
+        const quoteElement = document.getElementById('objective-modal-kaiser-quote');
+        if (data.kaiserQuote) {
+            quoteElement.textContent = data.kaiserQuote;
+            quoteElement.style.display = 'block';
+        } else {
+            quoteElement.style.display = 'none';
+        }
+
+        modal.style.display = 'block';
+    }
+    window.showObjectiveModal = showObjectiveModal;
 
     // Exponer funciones de UI globalmente para los listeners de Firebase
     if (typeof updateStatusPanel === 'function') window.updateStatusPanel = updateStatusPanel;
@@ -1301,7 +1366,6 @@
     if (typeof renderTarjetasSeleccionadas === 'function') window.renderTarjetasSeleccionadas = renderTarjetasSeleccionadas;
     if (typeof loadDirectMessages === 'function') window.loadDirectMessages = loadDirectMessages;
     if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
-    if (typeof showTestDescription === 'function') window.showTestDescription = showTestDescription;
     </script>
     <script>
     // Actualiza los valores de audiencia, rating y PM en el panel lateral
@@ -1345,67 +1409,6 @@
         if (imgElem && imgElem.parentNode) imgElem.parentNode.removeChild(imgElem);
     }
     window.updateObjective = updateObjective;
-
-    // Cargar contenido relevante de pruebaX.html en el modal de objetivo
-    function showTestDescription() {
-        const currentTest = localStorage.getItem('currentTest') || 'prueba0';
-        const modal = document.getElementById('test-modal');
-        if (!modal) return;
-        const descDiv = document.getElementById('test-description');
-        if (!descDiv) return;
-        document.getElementById('test-title').textContent = 'OBJETIVO';
-        // Imagen: mostrar la imagen correcta para la prueba
-        const img = document.getElementById('test-image');
-        if (img) {
-            let pruebaImg = '';
-            switch(currentTest) {
-                case 'prueba0': pruebaImg = 'images/kaiser_intro_new.png'; break;
-                case 'prueba1': pruebaImg = 'images/obstacle_course_new.png'; break;
-                case 'prueba2': pruebaImg = 'images/abandoned_greenhouse.png'; break;
-                case 'prueba3': pruebaImg = 'images/city_ruins.png'; break;
-                default: pruebaImg = 'images/kaiser_intro_new.png';
-            }
-            img.src = pruebaImg;
-            img.style.display = '';
-        }
-        descDiv.innerHTML = '<div style="color:#888;">Cargando...</div>';
-        fetch(`prueba${currentTest.replace('prueba','')}.html`)
-            .then(res => res.text())
-            .then(html => {
-                let content = html;
-                const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-                if (mainMatch) content = mainMatch[1];
-                else {
-                    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-                    if (bodyMatch) content = bodyMatch[1];
-                }
-                content = content.replace(/<div class=\"logo-container\">[\s\S]*?<\/div>/i, '');
-                content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '');
-                content = content.replace(/<img[^>]*>[\s\S]*?(<\/div>|<br>|<hr>|<p>|<h2>|<h3>|<section>|<main>|<body>|$)/i, '');
-                content = content.replace(/<div class=\"technical-section[\s\S]*?<\/div>/i, '');
-                content = content.replace(/<h2[^>]*>Mecánicas[\s\S]*?(<h2|$)/gi, '');
-                content = content.replace(/<h2[^>]*>Niveles de Peligro[\s\S]*?(<h2|$)/gi, '');
-                content = content.replace(/<h2[^>]*>Generadores de Eventos[\s\S]*?(<h2|$)/gi, '');
-                content = content.replace(/<h2[^>]*>Amenazas Principales[\s\S]*?(<h2|$)/gi, '');
-                descDiv.innerHTML = content;
-            })
-            .catch(() => {
-                descDiv.innerHTML = '<div style="color:#f55;">No se pudo cargar la información de la prueba.</div>';
-            });
-        modal.style.display = 'block';
-        // Permitir cerrar el modal haciendo clic fuera o Escape
-        modal.onclick = function(e) {
-            if (e.target.classList.contains('rules-modal')) {
-                modal.style.display = 'none';
-            }
-        };
-        document.onkeydown = function(e) {
-            if (e.key === 'Escape') {
-                modal.style.display = 'none';
-            }
-        };
-    }
-    window.showTestDescription = showTestDescription;
 
     // Refuerza la carga de mensajes de ejemplo en el chat si no hay mensajes reales
     window.loadChatMessages = function() {
@@ -1463,295 +1466,183 @@
     updateObjective();
     renderTarjetasSeleccionadas();
     loadDirectMessages();
-    loadChatMessages();
     </script>
+
+    <!-- NEW CONSOLIDATED CHAT SYSTEM SCRIPT -->
     <script>
-    // Añadir mensajes de ejemplo de uno en uno cada 3 segundos si el chat está vacío
-    (function() {
-        const nombresUsuarios = [
-            "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
-            "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
-            "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
-        ];
-        const ejemplos = [
-            "¡Vamos XIII, no decepciones a tus fans!",
-            "¡Estoy apostando todo por ti, no me falles!",
-            "Mira esos reflejos, ¡eres una máquina!",
-            "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
-            "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
-            "OCE debería ponerte un reto REAL, XIII",
-            "Ese cromo que llevas parece de segunda mano...",
-            "¡Eres mi favorita desde el principio!",
-            "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
-            "Por dios, alguien dé algo de equipo decente a la XIII"
-        ];
-        let ejemploIndex = 0;
-        let autoMsgInterval = null;
-        function startAutoMessages() {
-            if (autoMsgInterval) return;
-            autoMsgInterval = setInterval(() => {
-                let mensajes = [];
-                try {
-                    mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                    if (!Array.isArray(mensajes)) mensajes = [];
-                } catch (e) { mensajes = []; }
-                // Si hay mensajes reales, detener
-                if (mensajes.length > 0) {
-                    clearInterval(autoMsgInterval);
-                    autoMsgInterval = null;
-                    return;
-                }
-                // Añadir uno nuevo
-                const msg = {
-                    sender: nombresUsuarios[ejemploIndex % nombresUsuarios.length],
-                    content: ejemplos[ejemploIndex % ejemplos.length],
-                    time: new Date().toLocaleTimeString()
-                };
-                ejemploIndex++;
-                mensajes.push(msg);
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajes));
-                if (window.saveChat) window.saveChat(mensajes);
-                if (window.loadChatMessages) window.loadChatMessages();
-            }, 3000);
-        }
-        // Iniciar solo si no hay mensajes reales
-        document.addEventListener('DOMContentLoaded', function() {
-            let mensajes = [];
-            try {
-                mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                if (!Array.isArray(mensajes)) mensajes = [];
-            } catch (e) { mensajes = []; }
-            if (mensajes.length === 0) startAutoMessages();
-        });
-        // Si el usuario o el admin escribe, detener el auto-mensaje
-        window.sendChatMessage = (function(orig) {
-            return function() {
-                if (autoMsgInterval) {
-                    clearInterval(autoMsgInterval);
-                    autoMsgInterval = null;
-                }
-                return orig.apply(this, arguments);
-            };
-        })(window.sendChatMessage);
-    })();
-    </script>
-    <script>
-    (function() {
-        // --- Lógica de chat global con PM y animación ---
-        function generarMensajeAleatorioConPMRaro() {
-            // 15% de probabilidad de PM, 85% normal
-            if (Math.random() < 0.15) {
-                let data;
-                let intentos = 0;
-                do {
-                    data = generarMensajeAleatorio();
-                    intentos++;
-                } while (!data.mensaje.match(/([+][0-9]+)\s*PM/) && intentos < 10);
-                return data;
-            } else {
-                let data;
-                let intentos = 0;
-                do {
-                    data = generarMensajeAleatorio();
-                    intentos++;
-                } while (data.mensaje.match(/([+][0-9]+)\s*PM/) && intentos < 10);
-                return data;
-            }
-        }
-        function iniciarChatGlobal() {
-            const chatContainer = document.getElementById('chat-messages');
-            if (!chatContainer) {
-                console.error('[CHAT] No se encontró el contenedor #chat-messages');
-                const fallback = document.createElement('div');
-                fallback.style.color = '#f55';
-                fallback.style.padding = '20px';
-                fallback.textContent = 'Error: No se pudo inicializar el chat global (falta el contenedor).';
-                document.body.appendChild(fallback);
+        function initChatSystem() {
+            console.log("[SYSTEM] Initializing New Chat System v0.28...");
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const chatSubmitBtn = document.getElementById('chat-submit');
+
+            if (!chatMessagesContainer || !chatInput || !chatSubmitBtn) {
+                console.error("[CHAT] Critical chat elements missing (chat-messages, chat-input, or chat-submit). Aborting initialization.");
                 return;
             }
-            let pmAceptados = JSON.parse(localStorage.getItem('pmAceptados') || '[]');
-            function guardarPMAceptados() {
-                localStorage.setItem('pmAceptados', JSON.stringify(pmAceptados));
-            }
+
+            // 1. Clear previous chat display and specific localStorage items for a clean session start
+            chatMessagesContainer.innerHTML = '';
+            localStorage.removeItem('mensajes-jugador-sesion'); // Player messages for this session only
+            localStorage.removeItem('pmSumadosParaBotones'); // Reset PM button states for this session
+            // 'mensajes-publico-expanded' is initially cleared by Firebase listener or if not, this init will clear it before rendering.
+            // 'playerPM' (total PM points) is NOT cleared here.
+            console.log("[CHAT] Chat display and session-specific localStorage cleared.");
+
+            // Function to extract PM value from message string
             function extraerPM(mensaje) {
+                if (typeof mensaje !== 'string') return null;
                 const match = mensaje.match(/([+][0-9]+)\s*PM/);
-                return match ? parseInt(match[1].replace('+','')) : null;
+                return match ? parseInt(match[1].replace('+', '')) : null;
             }
-            function agregarMensajeAlChat(mensajeData, id) {
-                const chatContainer = document.getElementById('chat-messages');
-                const mensajeElement = document.createElement('div');
-                mensajeElement.className = `chat-message${mensajeData.destacado ? ' destacado' : ''}${mensajeData.esReto ? ' reto' : ''}`;
-                mensajeElement.style.opacity = '0';
-                mensajeElement.innerHTML = `
-                    <span class="username" style="color:${mensajeData.color}">${mensajeData.usuario}:</span>
-                    <span class="content">${mensajeData.mensaje}</span>
-                    <span style="float:right;font-size:11px;color:#888;">${mensajeData.hora || ''}</span>
+            // window.extraerPM = extraerPM; // Not strictly needed globally if only used within this scope
+
+            // Function to add a message to the chat display
+            window.agregarMensajeAlChatDisplay = function(msgData, msgId) { // Renamed to avoid conflict if old one is cached
+                if (!chatMessagesContainer) return; // Guard clause
+                const div = document.createElement('div');
+                div.className = 'chat-message';
+                if (msgData.destacado) div.classList.add('destacado');
+                if (msgData.esReto) div.classList.add('reto');
+                div.style.opacity = '0';
+
+                let userColor = msgData.color || '#cccccc'; // A general default color
+                if (msgData.usuario === 'TÚ') userColor = '#00ccff';
+                else if (msgData.usuario === 'Kaiser') userColor = '#ff4757';
+                else if (msgData.esReto) userColor = '#ffd700'; // Color for PM challenge senders
+
+                div.innerHTML = `
+                    <span class="username" style="color:${userColor};">${msgData.usuario || 'Anónimo'}:</span>
+                    <span class="content">${msgData.mensaje || ''}</span>
+                    <span style="float:right;font-size:11px;color:#888;">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                 `;
-                const pm = extraerPM(mensajeData.mensaje);
-                // --- PM: mostrar botón de aceptar siempre, pero verificar si ya se sumaron los PM ---
-                if (pm) {
+
+                const pmValue = extraerPM(msgData.mensaje);
+                if (pmValue) {
                     const btn = document.createElement('button');
-                    let pmSumados = JSON.parse(localStorage.getItem('pmSumados') || '{}');
-                    if (pmSumados[id]) {
+                    btn.textContent = `Aceptar +${pmValue} PM`;
+                    btn.className = 'pm-accept-btn';
+                    Object.assign(btn.style, {
+                        marginLeft: '10px', fontSize: '12px', background: '#222', color: '#2ed573',
+                        border: '1px solid #2ed573', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.3s ease'
+                    });
+                    
+                    let pmButtonStates = JSON.parse(localStorage.getItem('pmSumadosParaBotones') || '{}');
+                    if (pmButtonStates[msgId]) { // Check if this specific button was already clicked
                         btn.textContent = 'Aceptado';
                         btn.disabled = true;
-                        btn.style.background = '#444';
-                        btn.style.color = '#aaa';
+                        Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
                     } else {
-                        btn.textContent = 'Aceptar +' + pm + ' PM';
-                        btn.style.background = '#222';
-                        btn.style.color = '#2ed573';
                         btn.onclick = function() {
-                            let actual = parseInt(localStorage.getItem('playerPM') || '0');
-                            localStorage.setItem('playerPM', actual + pm);
-                            pmSumados[id] = true;
-                            localStorage.setItem('pmSumados', JSON.stringify(pmSumados));
+                            let currentTotalPM = parseInt(localStorage.getItem('playerPM') || '0');
+                            localStorage.setItem('playerPM', currentTotalPM + pmValue);
+                            
+                            pmButtonStates[msgId] = true; // Mark this button as clicked for this session
+                            localStorage.setItem('pmSumadosParaBotones', JSON.stringify(pmButtonStates));
+
                             btn.textContent = 'Aceptado';
                             btn.disabled = true;
-                            btn.style.background = '#444';
-                            btn.style.color = '#aaa';
+                            Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
+
                             if (window.updateStatusPanel) window.updateStatusPanel();
-                            if (window.savePM) window.savePM(actual + pm);
+                            if (window.savePM) window.savePM(currentTotalPM + pmValue); 
+                            console.log(`[PM] Clicked Accept. PM Value: +${pmValue}. New playerPM: ${currentTotalPM + pmValue}. Button ID: ${msgId}`);
                         };
                     }
-                    btn.className = 'pm-accept-btn';
-                    btn.style.marginLeft = '10px';
-                    btn.style.fontSize = '12px';
-                    btn.style.border = '1px solid #2ed573';
-                    btn.style.borderRadius = '4px';
-                    btn.style.cursor = 'pointer';
-                    mensajeElement.appendChild(btn);
+                    div.appendChild(btn);
                 }
-                chatContainer.appendChild(mensajeElement);
-                setTimeout(() => { mensajeElement.style.opacity = '1'; }, 50);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                chatMessagesContainer.appendChild(div);
+                setTimeout(() => div.style.opacity = '1', 50);
+                if(chatMessagesContainer.children.length > 100) { // Keep chat log to a reasonable size
+                    chatMessagesContainer.removeChild(chatMessagesContainer.firstChild);
+                }
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
             }
-            let mensajes = [];
-            let mensajeId = 0;
-            function cargarMensajesAdmin() {
-                let adminMsgs = [];
-                try {
-                    adminMsgs = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                    if (!Array.isArray(adminMsgs)) adminMsgs = [];
-                } catch (e) { adminMsgs = []; }
-                adminMsgs.forEach(msg => {
-                    mensajes.push({
-                        ...msg,
-                        usuario: msg.sender || msg.user || 'SISTEMA',
-                        color: '#ff4757',
-                        mensaje: msg.content || msg.text || '',
-                        hora: msg.time || ''
-                    });
-                });
-            }
-            function cicloMensajes() {
-                setInterval(() => {
-                    if (mensajes.length > 0) {
-                        agregarMensajeAlChat(mensajes.shift(), mensajeId++);
-                        return;
-                    }
-                    const data = generarMensajeAleatorioConPMRaro();
-                    data.hora = new Date().toLocaleTimeString();
-                    agregarMensajeAlChat(data, mensajeId++);
-                }, 3000);
-                setTimeout(() => {
-                    if (!chatContainer.hasChildNodes()) {
-                        chatContainer.innerHTML = '<div style="color:#f55;font-size:15px;text-align:center;">(No se están generando mensajes. Revisa la consola para más información.)</div>';
-                    }
-                }, 5000);
-            }
-            chatContainer.innerHTML = '';
-            cargarMensajesAdmin();
-            cicloMensajes();
-            if (window.saveChat) {
-                const originalSaveChat = window.saveChat;
-                window.saveChat = function(arr) {
-                    originalSaveChat.apply(this, arguments);
-                    arr.forEach(msg => {
-                        mensajes.push({
-                            ...msg,
-                            usuario: msg.sender || msg.user || 'SISTEMA',
-                            color: '#ff4757',
-                            mensaje: msg.content || msg.text || '',
-                            hora: msg.time || ''
-                        });
-                    });
+
+            // Function to handle player sending a message
+            window.enviarMensajeJugador = function() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                const playerMsg = {
+                    usuario: 'TÚ',
+                    mensaje: text,
+                    color: '#00ccff',
+                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 };
+                const uniqueMsgId = `player-${Date.now()}`;
+                
+                window.agregarMensajeAlChatDisplay(playerMsg, uniqueMsgId);
+                chatInput.value = '';
+
+                // Save to Firebase (which will then trigger onValue to update all clients including this one)
+                if (window.saveChat) {
+                    let fbChatMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    fbChatMessages.push({ sender: 'TÚ', content: text, time: playerMsg.hora, msg_id: uniqueMsgId });
+                    window.saveChat(fbChatMessages); // This should also update localStorage via onValue
+                }
+                console.log("[CHAT] Player message sent and display updated: ", playerMsg);
             }
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', iniciarChatGlobal);
-        } else {
-            iniciarChatGlobal();
-        }
-    })();
-    </script>
-    <script>
-    // --- MENSAJES DEL JUGADOR ---
-    function enviarMensajeJugador() {
-        const input = document.getElementById('chat-input');
-        const valor = input.value.trim();
-        if (!valor) return;
 
-        // Crear el mensaje
-        const msg = {
-            usuario: 'TÚ',
-            color: '#00ccff',
-            mensaje: valor,
-            hora: new Date().toLocaleTimeString(),
-            destacado: false,
-            esReto: false
-        };
-
-        // Añadir al chat inmediatamente
-        agregarMensajeAlChat(msg, 'jugador-' + Date.now());
-
-        // Guardar en localStorage
-        let mensajesJugador = JSON.parse(localStorage.getItem('mensajes-jugador') || '[]');
-        mensajesJugador.push(msg);
-        localStorage.setItem('mensajes-jugador', JSON.stringify(mensajesJugador));
-
-        // Sincronizar con Firebase si está disponible
-        if (window.saveChat) {
-            let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-            mensajesPublicos.push({ 
-                sender: 'TÚ', 
-                content: valor, 
-                time: msg.hora 
-            });
-            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
-            window.saveChat(mensajesPublicos);
-        }
-
-        // Limpiar el input
-        input.value = '';
-    }
-
-    // Asegurar que los event listeners estén correctamente asignados
-    document.addEventListener('DOMContentLoaded', function() {
-        const submitBtn = document.getElementById('chat-submit');
-        const input = document.getElementById('chat-input');
-        
-        if (submitBtn) {
-            submitBtn.onclick = enviarMensajeJugador;
-        }
-        
-        if (input) {
-            input.addEventListener('keydown', function(e) {
+            // 2. Setup event listeners for chat input
+            chatSubmitBtn.onclick = window.enviarMensajeJugador;
+            chatInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    enviarMensajeJugador();
+                    e.preventDefault(); // Prevent form submission if chat input is in a form
+                    window.enviarMensajeJugador();
                 }
             });
-        }
-    });
+            console.log("[CHAT] Event listeners for chat input attached.");
 
-    // Limpiar mensajes antiguos al cargar
-    window.addEventListener('load', function() {
-        localStorage.removeItem('mensajes-jugador');
-        if (window.loadChatMessages) {
-            window.loadChatMessages();
+            // 3. Initial load/rendering of messages from Firebase via localStorage
+            // The Firebase onValue listener for 'chatRef' is responsible for populating 'mensajes-publico-expanded'
+            // and then calling a global render function. Let's refine that part.
+            
+            // This function will be called by Firebase onValue listener
+            window.renderGlobalChatMessages = function(messagesArray) {
+                if (!chatMessagesContainer) return;
+                chatMessagesContainer.innerHTML = ''; // Clear display before re-rendering all messages
+                console.log(`[CHAT] Rendering ${messagesArray.length} global messages from Firebase.`);
+                messagesArray.forEach((msg, index) => {
+                    // Generate a consistent ID for PM buttons based on message content and time, or a unique ID if available
+                    const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
+                    window.agregarMensajeAlChatDisplay({
+                        usuario: msg.sender,
+                        mensaje: msg.content,
+                        hora: msg.time,
+                        color: msg.sender === 'TÚ' ? '#00ccff' : (msg.sender === 'Kaiser' ? '#ff4757' : '#cccccc'), // Example coloring
+                        esReto: !!extraerPM(msg.content) // Mark as challenge if PM is found
+                    }, msgId);
+                });
+            };
+
+            // Trigger initial render if messages are already in localStorage (from Firebase initial load)
+            const initialFbMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+            if (initialFbMessages.length > 0) {
+                window.renderGlobalChatMessages(initialFbMessages);
+            } else {
+                console.log("[CHAT] No initial messages in 'mensajes-publico-expanded'. Waiting for Firebase.");
+            }
+            
+            // Ensure Firebase listener for chatRef calls window.renderGlobalChatMessages
+            // Example for onValue listener structure (actual listener is higher in the HTML):
+            /*
+            onValue(chatRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
+                    if (window.renderGlobalChatMessages) window.renderGlobalChatMessages(data);
+                }
+            });
+            */
+
+            console.log("[SYSTEM] New Chat System Initialized and Ready.");
         }
-    });
+
+        // Initialize the system once the DOM is ready
+        document.addEventListener('DOMContentLoaded', initChatSystem);
     </script>
+
 </body>
 </html> 
