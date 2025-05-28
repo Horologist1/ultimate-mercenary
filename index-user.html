@@ -972,7 +972,8 @@
             projectId: "ultimatemercenary-1e212",
             storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
             messagingSenderId: "683730871364",
-            appId: "1:683730871364:web:350aaf7a296ad34db28811"
+            appId: "1:683730871364:web:350aaf7a296ad34db28811",
+            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
         };
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
@@ -1262,6 +1263,37 @@
     if (typeof renderTarjetasSeleccionadas === 'function') window.renderTarjetasSeleccionadas = renderTarjetasSeleccionadas;
     if (typeof loadDirectMessages === 'function') window.loadDirectMessages = loadDirectMessages;
     if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
+    </script>
+    <script>
+    function logout() {
+        // Solo elimina claves de login (ajusta los nombres si usas otros)
+        localStorage.removeItem('user');
+        localStorage.removeItem('sessionToken');
+        sessionStorage.clear();
+        document.cookie.split(';').forEach(function(c) {
+            document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/');
+        });
+        window.location.replace('login.html');
+    }
+    window.logout = logout;
+    function openStats() {
+        const statsWindow = document.createElement('div');
+        statsWindow.className = 'modal';
+        statsWindow.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>ESTADÍSTICAS</h2>
+                    <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="character-sheet-modal.html" style="width: 100%; height: 600px; border: none;"></iframe>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(statsWindow);
+        window.fichaIframe = statsWindow.querySelector('iframe');
+    }
+    window.openStats = openStats;
     </script>
 </body>
 </html> 
