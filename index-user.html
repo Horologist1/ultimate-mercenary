@@ -359,22 +359,6 @@
             line-height: 1.4;
         }
 
-        .scanline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom,
-                transparent 50%,
-                rgba(0, 0, 0, 0.1) 50%
-            );
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
         .overlay {
             position: fixed;
             top: 0;
@@ -1098,7 +1082,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.25</h1>
+                        <h1>ULTIMATE MERCENARY 0.26</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1251,8 +1235,6 @@
             </div>
         </div>
         
-        <div class="scanline"></div>
-        <!-- El overlay NO debe estar por encima del modal de objetivo -->
         <div class="overlay" style="z-index:50;"></div>
     </div>
 
@@ -1740,8 +1722,8 @@
         const input = document.getElementById('chat-input');
         const valor = input.value.trim();
         if (!valor) return;
-        // Guardar en localStorage y en la cola de mensajes
-        let mensajesJugador = JSON.parse(localStorage.getItem('mensajes-jugador') || '[]');
+
+        // Crear el mensaje
         const msg = {
             usuario: 'TÚ',
             color: '#00ccff',
@@ -1750,25 +1732,59 @@
             destacado: false,
             esReto: false
         };
-        mensajesJugador.push(msg);
-        localStorage.setItem('mensajes-jugador', JSON.stringify(mensajesJugador));
+
+        // Añadir al chat inmediatamente
         agregarMensajeAlChat(msg, 'jugador-' + Date.now());
-        input.value = '';
-        // --- Sincronizar con Firebase si está disponible ---
+
+        // Guardar en localStorage
+        let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+        mensajesPublicos.push({ 
+            sender: 'TÚ', 
+            content: valor, 
+            time: msg.hora 
+        });
+        localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
+
+        // Sincronizar con Firebase si está disponible
         if (window.saveChat) {
-            let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-            mensajesPublicos.push({ sender: 'TÚ', content: valor, time: msg.hora });
-            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
             window.saveChat(mensajesPublicos);
         }
+
+        // Limpiar el input
+        input.value = '';
     }
-    document.getElementById('chat-submit').onclick = enviarMensajeJugador;
-    document.getElementById('chat-input').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') enviarMensajeJugador();
+
+    // Configurar los event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitBtn = document.getElementById('chat-submit');
+        const input = document.getElementById('chat-input');
+        
+        if (submitBtn) {
+            submitBtn.onclick = enviarMensajeJugador;
+        }
+        
+        if (input) {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    enviarMensajeJugador();
+                }
+            });
+        }
     });
-    // Al iniciar, mostrar los mensajes del jugador guardados
-    let mensajesJugador = JSON.parse(localStorage.getItem('mensajes-jugador') || '[]');
-    mensajesJugador.forEach((msg, idx) => agregarMensajeAlChat(msg, 'jugador-' + idx));
+
+    // Función para reiniciar el chat al cargar la página
+    function reiniciarChat() {
+        const chatContainer = document.getElementById('chat-messages');
+        if (chatContainer) {
+            chatContainer.innerHTML = '';
+        }
+        // Limpiar mensajes antiguos
+        localStorage.removeItem('mensajes-jugador');
+    }
+
+    // Llamar a reiniciarChat cuando se carga la página
+    document.addEventListener('DOMContentLoaded', reiniciarChat);
     </script>
 </body>
+</html> 
 </html> 
