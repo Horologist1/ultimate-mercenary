@@ -1141,8 +1141,8 @@
                         <h3>ACCIONES</h3>
                         <div class="action-buttons">
                             <button class="action-button" onclick="openShop()">TIENDA</button>
-                            <button class="action-button" id="message-btn">MENSAJES</button>
-                            <button class="action-button" id="objective-btn">OBJETIVO</button>
+                            <button class="action-button" onclick="openMessages()">MENSAJES</button>
+                            <button class="action-button" onclick="openObjective()">OBJETIVO</button>
                             <button class="action-button" onclick="openStats()">ESTADÍSTICAS</button>
                         </div>
                     </div>
@@ -1294,6 +1294,47 @@
         window.fichaIframe = statsWindow.querySelector('iframe');
     }
     window.openStats = openStats;
+    </script>
+    <script>
+    // --- MODALES Y FUNCIONES GLOBALES ---
+    function openShop() {
+        const shopWindow = document.createElement('div');
+        shopWindow.className = 'modal';
+        shopWindow.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>TIENDA</h2>
+                    <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
+                </div>
+                <div class="modal-body">
+                    <iframe src="tienda.html" style="width: 100%; height: 600px; border: none;"></iframe>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(shopWindow);
+        window.tiendaIframe = shopWindow.querySelector('iframe');
+    }
+    window.openShop = openShop;
+
+    function openMessages() {
+        document.getElementById('messages-modal').style.display = 'block';
+        if (window.loadDirectMessages) window.loadDirectMessages();
+    }
+    window.openMessages = openMessages;
+
+    function openObjective() {
+        if (window.showTestDescription) window.showTestDescription();
+    }
+    window.openObjective = openObjective;
+
+    // Exponer funciones de UI globalmente para los listeners de Firebase
+    if (typeof updateStatusPanel === 'function') window.updateStatusPanel = updateStatusPanel;
+    if (typeof updateObjective === 'function') window.updateObjective = updateObjective;
+    if (typeof loadChatMessages === 'function') window.loadChatMessages = loadChatMessages;
+    if (typeof renderTarjetasSeleccionadas === 'function') window.renderTarjetasSeleccionadas = renderTarjetasSeleccionadas;
+    if (typeof loadDirectMessages === 'function') window.loadDirectMessages = loadDirectMessages;
+    if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
+    if (typeof showTestDescription === 'function') window.showTestDescription = showTestDescription;
     </script>
 </body>
 </html> 
