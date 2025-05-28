@@ -1098,7 +1098,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY</h1>
+                        <h1>ULTIMATE MERCENARY 0.1</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1240,7 +1240,7 @@
         <!-- Modal de Prueba -->
         <div id="test-modal" class="rules-modal">
             <div class="rules-content">
-                <h1 id="test-title">PRUEBA</h1>
+                <h1 id="test-title">OBJETIVO</h1>
                 <div class="test-image-container">
                     <img id="test-image" src="images/kaiser_intro_new.png" alt="Imagen de la prueba" style="width: 100%; max-height: 300px; object-fit: cover; margin: 20px 0; border-radius: 8px;">
                 </div>
@@ -1400,33 +1400,49 @@
         if (!modal) return;
         const descDiv = document.getElementById('test-description');
         if (!descDiv) return;
+        // Cambiar el título SIEMPRE a 'Objetivo'
+        document.getElementById('test-title').textContent = 'OBJETIVO';
+        // Cambiar la imagen según la prueba
+        const img = document.getElementById('test-image');
+        if (img) img.src = `images/prueba${currentTest.replace('prueba','')}.jpg`;
         descDiv.innerHTML = '<div style="color:#888;">Cargando...</div>';
         fetch(`prueba${currentTest.replace('prueba','')}.html`)
             .then(res => res.text())
             .then(html => {
-                // Extraer solo el contenido relevante (main, body, o un div especial)
                 let content = html;
-                // Intenta extraer <main>...</main> o <body>...</body>
                 const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
                 if (mainMatch) content = mainMatch[1];
                 else {
                     const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
                     if (bodyMatch) content = bodyMatch[1];
                 }
-                // Quitar la imagen del header (logo y cabecera)
+                // Quitar cabecera, títulos, imágenes, técnicas, mecánicas, amenazas, eventos, etc.
                 content = content.replace(/<div class=\"logo-container\">[\s\S]*?<\/div>/i, '');
-                // Quitar el título principal (h1 o h2 grande al principio)
                 content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '');
-                // Quitar la primera imagen (img o div con imagen al principio)
                 content = content.replace(/<img[^>]*>[\s\S]*?(<\/div>|<br>|<hr>|<p>|<h2>|<h3>|<section>|<main>|<body>|$)/i, '');
-                // Quitar el recuadro de especificaciones técnicas
                 content = content.replace(/<div class=\"technical-section[\s\S]*?<\/div>/i, '');
+                content = content.replace(/<h2[^>]*>Mecánicas[\s\S]*?(<h2|$)/gi, '');
+                content = content.replace(/<h2[^>]*>Niveles de Peligro[\s\S]*?(<h2|$)/gi, '');
+                content = content.replace(/<h2[^>]*>Generadores de Eventos[\s\S]*?(<h2|$)/gi, '');
+                content = content.replace(/<h2[^>]*>Amenazas Principales[\s\S]*?(<h2|$)/gi, '');
                 descDiv.innerHTML = content;
             })
             .catch(() => {
                 descDiv.innerHTML = '<div style="color:#f55;">No se pudo cargar la información de la prueba.</div>';
             });
         modal.style.display = 'block';
+        // Permitir mover y cerrar el modal siempre
+        modal.onclick = function(e) {
+            if (e.target.classList.contains('rules-modal')) {
+                modal.style.display = 'none';
+            }
+        };
+        document.addEventListener('keydown', function escClose(ev) {
+            if (ev.key === 'Escape') {
+                modal.style.display = 'none';
+                document.removeEventListener('keydown', escClose);
+            }
+        });
     }
     window.showTestDescription = showTestDescription;
 
@@ -1556,6 +1572,141 @@
                 return orig.apply(this, arguments);
             };
         })(window.sendChatMessage);
+    })();
+    </script>
+    <script>
+    (function() {
+        // --- Lógica de chat global con PM y animación ---
+        function iniciarChatGlobal() {
+            const chatContainer = document.getElementById('chat-messages');
+            if (!chatContainer) {
+                console.error('[CHAT] No se encontró el contenedor #chat-messages');
+                const fallback = document.createElement('div');
+                fallback.style.color = '#f55';
+                fallback.style.padding = '20px';
+                fallback.textContent = 'Error: No se pudo inicializar el chat global (falta el contenedor).';
+                document.body.appendChild(fallback);
+                return;
+            }
+            // Estado de PM aceptados (persistente)
+            let pmAceptados = JSON.parse(localStorage.getItem('pmAceptados') || '[]');
+            function guardarPMAceptados() {
+                localStorage.setItem('pmAceptados', JSON.stringify(pmAceptados));
+            }
+            function extraerPM(mensaje) {
+                const match = mensaje.match(/([+][0-9]+)\s*PM/);
+                return match ? parseInt(match[1].replace('+','')) : null;
+            }
+            function agregarMensajeAlChat(mensajeData, id) {
+                const mensajeElement = document.createElement('div');
+                mensajeElement.className = `chat-message${mensajeData.destacado ? ' destacado' : ''}${mensajeData.esReto ? ' reto' : ''}`;
+                mensajeElement.style.opacity = '0';
+                mensajeElement.innerHTML = `
+                    <span class="username" style="color:${mensajeData.color}">${mensajeData.usuario}:</span>
+                    <span class="content">${mensajeData.mensaje}</span>
+                    <span style="float:right;font-size:11px;color:#888;">${mensajeData.hora || ''}</span>
+                `;
+                const pm = extraerPM(mensajeData.mensaje);
+                if (pm && !pmAceptados.includes(id)) {
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Aceptar +' + pm + ' PM';
+                    btn.className = 'pm-accept-btn';
+                    btn.style.marginLeft = '10px';
+                    btn.style.fontSize = '12px';
+                    btn.style.background = '#222';
+                    btn.style.color = '#2ed573';
+                    btn.style.border = '1px solid #2ed573';
+                    btn.style.borderRadius = '4px';
+                    btn.style.cursor = 'pointer';
+                    btn.onclick = function() {
+                        let actual = parseInt(localStorage.getItem('playerPM') || '0');
+                        localStorage.setItem('playerPM', actual + pm);
+                        pmAceptados.push(id);
+                        guardarPMAceptados();
+                        btn.textContent = 'Aceptado';
+                        btn.disabled = true;
+                        btn.style.background = '#444';
+                        btn.style.color = '#aaa';
+                        if (window.updateStatusPanel) window.updateStatusPanel();
+                    };
+                    mensajeElement.appendChild(btn);
+                } else if (pm && pmAceptados.includes(id)) {
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Aceptado';
+                    btn.className = 'pm-accept-btn';
+                    btn.disabled = true;
+                    btn.style.marginLeft = '10px';
+                    btn.style.fontSize = '12px';
+                    btn.style.background = '#444';
+                    btn.style.color = '#aaa';
+                    btn.style.border = '1px solid #2ed573';
+                    btn.style.borderRadius = '4px';
+                    mensajeElement.appendChild(btn);
+                }
+                chatContainer.appendChild(mensajeElement);
+                setTimeout(() => { mensajeElement.style.opacity = '1'; }, 50);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            let mensajes = [];
+            let mensajeId = 0;
+            function cargarMensajesAdmin() {
+                let adminMsgs = [];
+                try {
+                    adminMsgs = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    if (!Array.isArray(adminMsgs)) adminMsgs = [];
+                } catch (e) { adminMsgs = []; }
+                adminMsgs.forEach(msg => {
+                    mensajes.push({
+                        ...msg,
+                        usuario: msg.sender || msg.user || 'SISTEMA',
+                        color: '#ff4757',
+                        mensaje: msg.content || msg.text || '',
+                        hora: msg.time || ''
+                    });
+                });
+            }
+            function cicloMensajes() {
+                setInterval(() => {
+                    if (mensajes.length > 0) {
+                        agregarMensajeAlChat(mensajes.shift(), mensajeId++);
+                        return;
+                    }
+                    const data = generarMensajeAleatorio();
+                    data.hora = new Date().toLocaleTimeString();
+                    agregarMensajeAlChat(data, mensajeId++);
+                }, 3000);
+                // Si tras 5 segundos no hay mensajes, mostrar aviso
+                setTimeout(() => {
+                    if (!chatContainer.hasChildNodes()) {
+                        chatContainer.innerHTML = '<div style="color:#f55;font-size:15px;text-align:center;">(No se están generando mensajes. Revisa la consola para más información.)</div>';
+                    }
+                }, 5000);
+            }
+            chatContainer.innerHTML = '';
+            cargarMensajesAdmin();
+            cicloMensajes();
+            // Escuchar cambios en mensajes del admin (Firebase)
+            if (window.saveChat) {
+                const originalSaveChat = window.saveChat;
+                window.saveChat = function(arr) {
+                    originalSaveChat.apply(this, arguments);
+                    arr.forEach(msg => {
+                        mensajes.push({
+                            ...msg,
+                            usuario: msg.sender || msg.user || 'SISTEMA',
+                            color: '#ff4757',
+                            mensaje: msg.content || msg.text || '',
+                            hora: msg.time || ''
+                        });
+                    });
+                };
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', iniciarChatGlobal);
+        } else {
+            iniciarChatGlobal();
+        }
     })();
     </script>
 </body>
