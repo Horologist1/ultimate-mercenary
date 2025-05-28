@@ -958,6 +958,14 @@
             padding: 20px;
             min-height: 600px;
         }
+
+        /* Forzar visibilidad y z-index de los modales */
+        #test-modal, .modal, .messages-modal {
+            z-index: 3000 !important;
+        }
+        #test-modal[style*="display: block"], .modal[style*="display: block"] {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
@@ -1298,8 +1306,10 @@
     <script>
     // --- MODALES Y FUNCIONES GLOBALES ---
     function openShop() {
+        console.log('[DEBUG] openShop called');
         const shopWindow = document.createElement('div');
         shopWindow.className = 'modal';
+        shopWindow.style.zIndex = 3000;
         shopWindow.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
@@ -1323,6 +1333,7 @@
     window.openMessages = openMessages;
 
     function openObjective() {
+        console.log('[DEBUG] openObjective called');
         if (window.showTestDescription) window.showTestDescription();
     }
     window.openObjective = openObjective;
@@ -1437,7 +1448,7 @@
     window.loadDirectMessages = loadDirectMessages;
 
     // Carga los mensajes públicos en el chat
-    function loadChatMessages() {
+    window.loadChatMessages = function() {
         let mensajes = [];
         try {
             mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
@@ -1448,26 +1459,43 @@
         const chat = document.getElementById('chat-messages');
         if (!chat) return;
         if (mensajes.length === 0) {
-            chat.innerHTML = '<div style="color:#888;font-size:13px;">No hay mensajes públicos.</div>';
+            // Mensajes de ejemplo locales si el chat está vacío
+            const nombresUsuarios = [
+                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
+            ];
+            const ejemplos = [
+                "¡Vamos XIII, no decepciones a tus fans!",
+                "¡Estoy apostando todo por ti, no me falles!",
+                "Mira esos reflejos, ¡eres una máquina!",
+                "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+                "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
+                "OCE debería ponerte un reto REAL, XIII",
+                "Ese cromo que llevas parece de segunda mano...",
+                "¡Eres mi favorita desde el principio!",
+                "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+                "Por dios, alguien dé algo de equipo decente a la XIII"
+            ];
+            const ejemploMensajes = Array.from({length: 10}).map((_,i) => ({
+                sender: nombresUsuarios[i % nombresUsuarios.length],
+                content: ejemplos[i % ejemplos.length],
+                time: new Date().toLocaleTimeString()
+            }));
+            chat.innerHTML = ejemploMensajes.map(msg =>
+                `<div class=\"chat-message\"><span class=\"username\">${msg.sender}:</span> <span class=\"content\">${msg.content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
+            ).join('') + '<div style="color:#888;font-size:13px;">(Mensajes de ejemplo: el chat global está vacío)</div>';
         } else {
             chat.innerHTML = mensajes.map(msg => {
                 // Compatibilidad flexible
                 const sender = msg.sender || msg.user || 'SISTEMA';
                 const content = msg.content || msg.text || '';
                 const time = msg.time || '';
-                return `<div class="chat-message"><span class="username">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;">${time}</span></div>`;
+                return `<div class=\"chat-message\"><span class=\"username\">${sender}:</span> <span class=\"content\">${content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${time}</span></div>`;
             }).join('');
         }
         chat.scrollTop = chat.scrollHeight;
-    }
-    window.loadChatMessages = loadChatMessages;
-
-    // Llama a las funciones al cargar la página para inicializar la UI
-    updateStatusPanel();
-    updateObjective();
-    renderTarjetasSeleccionadas();
-    loadDirectMessages();
-    loadChatMessages();
+    };
     </script>
     <script>
     function showTestDescription() {
