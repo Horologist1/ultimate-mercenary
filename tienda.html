@@ -191,21 +191,20 @@
             text-decoration: underline;
         }
 
-        .back-button {
-            position: absolute;
-            top: 20px;
-            right: 60px;
-            padding: 10px 20px;
-            background-color: rgba(255, 71, 87, 0.8);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            z-index: 1000;
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
         }
 
-        .back-button:hover {
-            background-color: rgba(255, 71, 87, 1);
+        .modal-header h2 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
         }
     </style>
 </head>
@@ -223,7 +222,6 @@
 
         <main>
             <div class="main-container">
-                <button class="back-button" onclick="window.location.href='index-user.html'">VOLVER</button>
                 <div class="shop-container">
                     <div class="pm-display">
                         <h3><i class="fas fa-coins"></i> Puntos de Mérito: <span id="current-pm">0</span></h3>
@@ -252,6 +250,13 @@
         // Items predefinidos de la tienda
         const defaultShopItems = {
             'shop-armas': [
+                {
+                    'Artículo': 'Pistola de Autodefensa "Pocket Pal Mk.II"',
+                    'Descripción': 'Arma básica de autodefensa entregada a todos los concursantes',
+                    'Daño': '1d10',
+                    'Notas': '6 balas, básica',
+                    'Coste': 0
+                },
                 {
                     'Artículo': 'Cuchillo de Combate',
                     'Descripción': 'K-BAR 2100 Neo-Ceramic',
@@ -554,7 +559,8 @@
                     description: item.Descripción || '',
                     price: parseInt(item.Coste) || 0,
                     details: item.Efectos || item.Notas || item.Daño || item['Armadura (K/E)'] || item.Cobertura || '',
-                    section: section
+                    section: section,
+                    damage: item.Daño || ''
                 }))
             );
         }
@@ -595,7 +601,7 @@
                 // Mostrar mensaje de compra
                 showPurchaseMessage(item);
 
-                // Generar mensaje directo con los detalles de la compra
+                // Añadir mensaje al buzón (localStorage)
                 const directMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
                 const imageUrl = getItemImageUrl(item.name);
                 const purchaseMessage = {
@@ -609,49 +615,58 @@
                 localStorage.setItem('mensajes-directos', JSON.stringify(directMessages));
 
                 // --- INTEGRACIÓN FICHA ---
-                // Intentar enviar a la ficha a través del iframe en el padre
-                if (window.parent && window.parent.fichaIframe) {
-                    let tipo = '';
-                    let fichaItem = {};
-                    if (item.section === 'shop-armas') {
-                        tipo = 'arma';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            dano: item.details || '',
-                            notas: item.description || ''
-                        };
-                    } else if (item.section === 'shop-armaduras') {
-                        tipo = 'armadura';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            proteccion: item.details || '',
-                            notas: item.description || ''
-                        };
-                    } else if (item.section === 'shop-cyberware') {
-                        tipo = 'implant';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            efectos: item.details || ''
-                        };
-                    } else if (item.section === 'shop-equipo') {
-                        tipo = 'equipo';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            descripcion: item.details || ''
-                        };
-                    }
-                    if (tipo) {
-                        window.parent.fichaIframe.contentWindow.postMessage({
-                            type: 'addItem',
-                            item: fichaItem
-                        }, '*');
-                    }
-                } else {
-                    console.log('No se pudo encontrar la ficha para añadir el item');
+                // Enviar a la ficha a través de postMessage al padre
+                let tipo = '';
+                let fichaItem = {};
+                if (item.section === 'shop-armas') {
+                    tipo = 'arma';
+                    fichaItem = {
+                        tipo,
+                        nombre: item.name,
+                        dano: item.damage || item.details || '',
+                        notas: item.details || '',
+                        descripcion: item.description || ''
+                    };
+                } else if (item.section === 'shop-armaduras') {
+                    tipo = 'armadura';
+                    fichaItem = {
+                        tipo,
+                        nombre: item.name,
+                        proteccion: item.details || '',
+                        notas: item.description || ''
+                    };
+                } else if (item.section === 'shop-cyberware') {
+                    tipo = 'implant';
+                    fichaItem = {
+                        tipo,
+                        nombre: item.name,
+                        efectos: item.details || ''
+                    };
+                } else if (item.section === 'shop-equipo') {
+                    tipo = 'equipo';
+                    fichaItem = {
+                        tipo,
+                        nombre: item.name,
+                        descripcion: item.details || ''
+                    };
+                } else if (item.section === 'shop-municion') {
+                    tipo = 'equipo';
+                    fichaItem = {
+                        tipo,
+                        nombre: item.name,
+                        descripcion: `${item['Compatible con'] ? 'Compatible: ' + item['Compatible con'] + '. ' : ''}${item['Cantidad'] ? 'Cantidad: ' + item['Cantidad'] + '. ' : ''}${item.details || ''}`
+                    };
+                }
+                if (tipo) {
+                    // Guardar en la cola de pendientes
+                    const pending = JSON.parse(localStorage.getItem('pendingItems') || '[]');
+                    pending.push(fichaItem);
+                    localStorage.setItem('pendingItems', JSON.stringify(pending));
+                    // Intentar enviar por postMessage (por si la ficha está abierta)
+                    window.parent.postMessage({
+                        type: 'addItem',
+                        item: fichaItem
+                    }, '*');
                 }
                 // --- FIN INTEGRACIÓN FICHA ---
 
@@ -744,7 +759,9 @@
                                         </div>
                                         <h3>${item.name}</h3>
                                         <p>${item.description}</p>
-                                        ${item.details ? `<p><strong>Detalles:</strong> ${item.details}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.damage) ? `<p><strong>Daño:</strong> ${item.damage}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.details) ? `<p><strong>Notas:</strong> ${item.details}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.notas) ? `<p><strong>Notas:</strong> ${item.notas}</p>` : ''}
                                         <p class="price">${item.price} PM</p>
                                         <button class="buy-button" data-item-id="${item.id}" onclick="buyItem('${item.id}')">
                                             Comprar

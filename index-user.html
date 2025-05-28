@@ -31,7 +31,20 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
-            opacity: 0.3;
+            opacity: 0.4;
+            pointer-events: none;
+            background-color: #000;
+        }
+
+        video#background-video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .ui-container {
@@ -217,13 +230,33 @@
             cursor: pointer;
         }
 
+        .opacity-toggle {
+            background-color: #00ccff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .opacity-toggle:hover {
+            background-color: #00a3cc;
+        }
+
+        .chat-container.transparent {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
         .sidebar {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            justify-content: space-between;
+            gap: 10px;
             max-width: 300px;
             margin-left: auto;
+            height: 100%;
         }
 
         .sidebar-section {
@@ -305,37 +338,25 @@
             background-color: rgba(30, 30, 30, 0.8);
             border-radius: 4px;
             border: 1px solid #444;
-            padding: 15px;
+            padding: 10px 10px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            min-height: 170px;
         }
 
         .objective-display h4 {
-            color: #00ccff;
+            color: #ff4757;
             margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
         }
 
         .objective-display p {
             color: #fff;
-            margin: 0 0 15px 0;
-            font-size: 14px;
-        }
-
-        .objective-timer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid #444;
-        }
-
-        .timer-label {
-            color: #00ccff;
-            font-size: 12px;
-        }
-
-        .timer-value {
-            color: #ff4757;
-            font-size: 18px;
-            font-weight: bold;
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
         }
 
         .scanline {
@@ -517,6 +538,7 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 14px;
             transition: all 0.3s ease;
+            margin-right: 65px;
         }
 
         .logout-button:hover {
@@ -940,8 +962,10 @@
 </head>
 <body>
     <div class="main-container">
-        <!-- Imagen de fondo -->
-        <img src="app/ultimate-mercenary/pov_running_street.png" alt="POV Runner" class="background-video">
+        <!-- Video de fondo -->
+        <video id="background-video" class="background-video" autoplay loop muted playsinline>
+            <source src="videos/prueba0.mp4" type="video/mp4">
+        </video>
         
         <!-- Contenedor de la interfaz -->
         <div class="ui-container">
@@ -969,6 +993,9 @@
                     <div class="chat-input-container">
                         <input type="text" class="chat-input" id="chat-input" placeholder="Escribe un mensaje...">
                         <button class="chat-submit" id="chat-submit"><i class="fas fa-paper-plane"></i></button>
+                        <button class="opacity-toggle" id="opacity-toggle" title="Alternar transparencia del chat">
+                            <i class="fas fa-adjust"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -998,7 +1025,7 @@
                     </div>
                     
                     <!-- Botones -->
-                    <div class="sidebar-section">
+                    <div class="sidebar-section" style="margin-top:auto; margin-bottom:auto;">
                         <h3>ACCIONES</h3>
                         <div class="action-buttons">
                             <button class="action-button" onclick="openShop()">TIENDA</button>
@@ -1009,15 +1036,11 @@
                     </div>
                     
                     <!-- Objetivo actual -->
-                    <div class="sidebar-section">
+                    <div class="sidebar-section" style="margin-top:auto; flex-grow:1; min-height:200px;">
                         <h3>OBJETIVO ACTUAL</h3>
-                        <div class="objective-display" id="current-objective">
-                            <h4 id="objective-title">Cargando...</h4>
-                            <p id="objective-description">Cargando objetivo...</p>
-                            <div class="objective-timer">
-                                <div class="timer-label">Tiempo restante:</div>
-                                <div class="timer-value" id="objective-timer">14:35</div>
-                            </div>
+                        <div class="objective-display" id="current-objective" style="font-size:13px; padding:10px;">
+                            <h4 id="objective-title" style="font-size:15px;">Cargando...</h4>
+                            <p id="objective-description" style="font-size:13px;">Cargando objetivo...</p>
                         </div>
                     </div>
                 </div>
@@ -1106,6 +1129,16 @@
         
         <div class="scanline"></div>
         <div class="overlay"></div>
+    </div>
+
+    <!-- Secciones de Conocidos y Conocimientos -->
+    <div class="sheet-section">
+        <h3>Conocidos</h3>
+        <div id="conocidos-tarjetas" class="personajes-container"></div>
+    </div>
+    <div class="sheet-section">
+        <h3>Conocimientos</h3>
+        <div id="conocimientos-tarjetas" class="facciones-container"></div>
     </div>
 
     <script src="mensajes-publico.js"></script>
@@ -1450,18 +1483,20 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             
             if (message) {
                 try {
-                    // Guardar mensaje en localStorage
-                    const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                    const newMessage = {
-                        sender: 'auri',
-                        content: message,
-                        time: new Date().toLocaleTimeString()
-                    };
-                    messages.push(newMessage);
-                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                    // Crear y añadir el mensaje directamente al chat
+                    const chatMessages = document.getElementById('chat-messages');
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'chat-message';
+                    messageElement.innerHTML = `
+                        <div class="username" style="color: #ff4757">
+                            XIII
+                            <span class="tag vip">VIP</span>
+                        </div>
+                        <div class="content">${message}</div>
+                    `;
+                    chatMessages.appendChild(messageElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                    // Recargar mensajes
-                    loadChatMessages();
                     input.value = '';
                 } catch (error) {
                     console.error('Error al guardar mensaje:', error);
@@ -1469,21 +1504,27 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             }
         });
 
+        // También permitir enviar mensaje con Enter
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('chat-submit').click();
+            }
+        });
+
         // Función para cerrar sesión
         function logout() {
-            // Limpiar todos los datos de la sesión
-            localStorage.clear(); // Limpia todo el localStorage
-            
-            // Limpiar también sessionStorage por si acaso
+            // Solo elimina claves de login (ajusta los nombres si usas otros)
+            localStorage.removeItem('user');
+            localStorage.removeItem('sessionToken');
             sessionStorage.clear();
-            
-            // Limpiar cookies específicas si existen
-            document.cookie.split(";").forEach(function(c) { 
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+
+            // Limpia cookies de sesión (opcional)
+            document.cookie.split(';').forEach(function(c) {
+                document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/');
             });
-            
-            // Redirigir a la página de login
-            window.location.href = 'login.html';
+
+            // Redirige a login
+            window.location.replace('login.html');
         }
 
         // Mostrar modal de reglas al cargar la página
@@ -1528,6 +1569,12 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             const currentTest = localStorage.getItem('currentTest') || 'prueba0';
             const objectiveTitle = document.getElementById('objective-title');
             const objectiveDescription = document.getElementById('objective-description');
+            const backgroundVideo = document.getElementById('background-video');
+            
+            // Actualizar el video de fondo
+            const videoSource = backgroundVideo.querySelector('source');
+            videoSource.src = `videos/${currentTest}.mp4`;
+            backgroundVideo.load();
             
             switch(currentTest) {
                 case 'prueba0':
@@ -1832,6 +1879,89 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             // Guardar referencia al iframe
             window.tiendaIframe = shopWindow.querySelector('iframe');
         }
+
+        // Listener global para reenviar mensajes de la tienda a la ficha
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'addItem' && window.fichaIframe) {
+                window.fichaIframe.contentWindow.postMessage(event.data, '*');
+            }
+        });
+
+        // Manejar el toggle de opacidad del chat
+        document.getElementById('opacity-toggle').addEventListener('click', function() {
+            const chatContainer = document.querySelector('.chat-container');
+            chatContainer.classList.toggle('transparent');
+            
+            // Guardar la preferencia en localStorage
+            const isTransparent = chatContainer.classList.contains('transparent');
+            localStorage.setItem('chatTransparent', isTransparent);
+        });
+
+        // Cargar la preferencia de opacidad al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.querySelector('.chat-container');
+            const isTransparent = localStorage.getItem('chatTransparent') === 'true';
+            if (isTransparent) {
+                chatContainer.classList.add('transparent');
+            }
+        });
+
+        // Datos de personajes y facciones (deben coincidir con los del panel de control)
+        const personajes = [
+            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
+            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
+            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
+            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
+            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
+            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
+            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
+            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
+            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
+            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
+            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
+            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
+        ];
+        const facciones = [
+            { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
+            { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
+            { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
+            { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
+            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
+        ];
+        function renderTarjetasSeleccionadas() {
+            // Conocidos
+            const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
+            const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
+            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => `
+                <div class="character-card">
+                    <img src="${p.img}" alt="${p.nombre}" class="character-image">
+                    <div class="character-info">
+                        <h4 class="character-name">${p.nombre}</h4>
+                        <div class="character-description">${p.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+            // Conocimientos
+            const conocimientosSel = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
+            const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
+            document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => `
+                <div class="faction-card">
+                    <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
+                    <div class="faction-info">
+                        <h3>${f.nombre}</h3>
+                        <p>${f.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        document.addEventListener('DOMContentLoaded', renderTarjetasSeleccionadas);
+        window.addEventListener('storage', renderTarjetasSeleccionadas);
     </script>
 </body>
 </html> 

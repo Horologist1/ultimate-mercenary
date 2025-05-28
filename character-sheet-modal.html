@@ -344,6 +344,8 @@
             <div class="tab" data-tab="skills">Habilidades</div>
             <div class="tab" data-tab="gear">Equipo</div>
             <div class="tab" data-tab="cyber">Implantes</div>
+            <div class="tab" data-tab="conocidos">Conocidos</div>
+            <div class="tab" data-tab="conocimientos">Conocimientos</div>
         </div>
 
         <div id="basics" class="tab-content active">
@@ -677,7 +679,7 @@
         <div id="gear" class="tab-content">
             <div class="section">
                 <h2>EQUIPO</h2>
-                <div class="grid">
+                <div>
                     <div class="item">
                         <h3>Armas</h3>
                         <div id="weapons-list">
@@ -706,7 +708,7 @@
         <div id="cyber" class="tab-content">
             <div class="section">
                 <h2>IMPLANTES</h2>
-                <div class="grid">
+                <div>
                     <div class="item">
                         <h3>Implantes Cibernéticos</h3>
                         <div id="implants-list">
@@ -715,6 +717,19 @@
                         <button class="button add-item" data-type="implant">+ Añadir Implante</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="conocidos" class="tab-content" style="display:none;">
+            <div class="sheet-section">
+                <h3>Conocidos</h3>
+                <div id="conocidos-tarjetas" class="personajes-container"></div>
+            </div>
+        </div>
+        <div id="conocimientos" class="tab-content" style="display:none;">
+            <div class="sheet-section">
+                <h3>Conocimientos</h3>
+                <div id="conocimientos-tarjetas" class="facciones-container"></div>
             </div>
         </div>
     </div>
@@ -737,6 +752,76 @@
                 });
             });
         });
+
+        // Utilidades para cookies globales
+        function setCookie(name, value, days = 365) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days*24*60*60*1000));
+            const expires = "expires="+ d.toUTCString();
+            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+        }
+        function getCookie(name) {
+            const cname = name + "=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1);
+                if (c.indexOf(cname) == 0) return c.substring(cname.length, c.length);
+            }
+            return null;
+        }
+        // Reemplazar localStorage por cookies globales para conocidos/conocimientos
+        function getConocidosSeleccionados() {
+            const val = getCookie('conocidosSeleccionados');
+            return val ? JSON.parse(val) : [];
+        }
+        function getConocimientosSeleccionados() {
+            const val = getCookie('conocimientosSeleccionados');
+            return val ? JSON.parse(val) : [];
+        }
+        function setConocidosSeleccionados(arr) {
+            setCookie('conocidosSeleccionados', JSON.stringify(arr));
+        }
+        function setConocimientosSeleccionados(arr) {
+            setCookie('conocimientosSeleccionados', JSON.stringify(arr));
+        }
+        function renderTarjetasSeleccionadas() {
+            // Conocidos
+            const conocidosSel = getConocidosSeleccionados();
+            const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
+            const conocidosCont = document.getElementById('conocidos-tarjetas');
+            if (conocidos.length === 0) {
+                conocidosCont.innerHTML = '<div class="no-items">No hay conocidos seleccionados.</div>';
+            } else {
+                conocidosCont.innerHTML = conocidos.map(p => `
+                    <div class="character-card">
+                        <img src="${p.img}" alt="${p.nombre}" class="character-image">
+                        <div class="character-info">
+                            <h4 class="character-name">${p.nombre}</h4>
+                            <div class="character-description">${p.desc}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            // Conocimientos
+            const conocimientosSel = getConocimientosSeleccionados();
+            const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
+            const conocimientosCont = document.getElementById('conocimientos-tarjetas');
+            if (conocimientos.length === 0) {
+                conocimientosCont.innerHTML = '<div class="no-items">No hay conocimientos seleccionados.</div>';
+            } else {
+                conocimientosCont.innerHTML = conocimientos.map(f => `
+                    <div class="faction-card">
+                        <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
+                        <div class="faction-info">
+                            <h3>${f.nombre}</h3>
+                            <p>${f.desc}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
     </script>
 </body>
 </html> 

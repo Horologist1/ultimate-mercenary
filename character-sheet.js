@@ -185,6 +185,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize character sheet
     window.characterSheet = new CharacterSheet();
 
+    // Añadir arma inicial si no existe
+    function addInitialWeapon() {
+        const exists = (window.characterSheet.equipment||[]).some(e => e.tipo === 'arma' && e.nombre && e.nombre.toLowerCase().includes('pocket pal'));
+        if (!exists) {
+            window.characterSheet.equipment = window.characterSheet.equipment || [];
+            window.characterSheet.equipment.push({
+                tipo: 'arma',
+                nombre: 'Pistola de Autodefensa "Pocket Pal Mk.II"',
+                dano: '1d10',
+                notas: '6 balas, básica',
+                descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
+            });
+        }
+    }
+
     // Load saved data if exists
     const savedData = localStorage.getItem('characterSheet');
     if (savedData) {
@@ -192,7 +207,26 @@ document.addEventListener('DOMContentLoaded', function() {
             window.characterSheet.importFromJSON(savedData);
         } catch (e) {
             console.error('Error loading saved data:', e);
-        }
+                }
+            } else {
+        addInitialWeapon();
+    }
+
+    // --- NUEVO: Procesar objetos pendientes de la tienda ---
+    const pending = JSON.parse(localStorage.getItem('pendingItems') || '[]');
+    if (pending.length > 0) {
+        pending.forEach(item => {
+            if (item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo') {
+                window.characterSheet.equipment = window.characterSheet.equipment || [];
+                window.characterSheet.equipment.push(item);
+            } else if (item.tipo === 'implant' || item.tipo === 'implante') {
+                window.characterSheet.implants = window.characterSheet.implants || [];
+                window.characterSheet.implants.push(item);
+            }
+        });
+        localStorage.removeItem('pendingItems');
+        updateEquipmentUI();
+        updateUI();
     }
 
     // Update attribute points counter
@@ -219,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const pointsElement = document.getElementById('skill-points');
         if (window.characterSheet.skillPoints < 0) {
             pointsElement.style.color = '#ff4757';
-        } else {
+            } else {
             pointsElement.style.color = '#00ccff';
         }
     }
@@ -686,7 +720,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- MODIFICADO: Renderizar equipo y armas con botón eliminar y efectos de implantes ---
     function updateEquipmentUI() {
-        console.log('Renderizando equipment:', window.characterSheet.equipment);
         // Armas
         const weaponsList = document.getElementById('weapons-list');
         weaponsList.innerHTML = '';
@@ -695,7 +728,16 @@ document.addEventListener('DOMContentLoaded', function() {
         else armas.forEach((a,i) => {
             const div = document.createElement('div');
             div.className = 'gear-item';
-            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#00ccff'>${a.dano||''}</span> <span style='color:#aaa'>${a.notas||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '18px';
+            div.style.padding = '8px 0';
+            div.innerHTML = `
+                <span style='font-weight:bold; color:#ff4757; min-width:120px;'>${a.nombre}</span>
+                <span style='color:#00ccff; min-width:80px;'>${a.dano ? 'Daño: ' + a.dano : ''}</span>
+                <span style='color:#aaa; min-width:120px;'>${a.notas ? 'Notas: ' + a.notas : ''}</span>
+                <button class='remove-skill' title='Eliminar' style='margin-left:auto;' onclick='removeEquipmentItem(${i})'>🗑️</button>
+            `;
             weaponsList.appendChild(div);
         });
         // Armaduras
@@ -706,7 +748,16 @@ document.addEventListener('DOMContentLoaded', function() {
         else armaduras.forEach((a,i) => {
             const div = document.createElement('div');
             div.className = 'gear-item';
-            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#00ccff'>${a.proteccion||''}</span> <span style='color:#aaa'>${a.notas||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '18px';
+            div.style.padding = '8px 0';
+            div.innerHTML = `
+                <span style='font-weight:bold; color:#ff4757; min-width:120px;'>${a.nombre}</span>
+                <span style='color:#00ccff; min-width:80px;'>${a.proteccion ? 'Protección: ' + a.proteccion : ''}</span>
+                <span style='color:#aaa; min-width:120px;'>${a.notas ? 'Notas: ' + a.notas : ''}</span>
+                <button class='remove-skill' title='Eliminar' style='margin-left:auto;' onclick='removeEquipmentItem(${i})'>🗑️</button>
+            `;
             armorList.appendChild(div);
         });
         // Equipo
@@ -717,8 +768,36 @@ document.addEventListener('DOMContentLoaded', function() {
         else equipos.forEach((a,i) => {
             const div = document.createElement('div');
             div.className = 'gear-item';
-            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#aaa'>${a.descripcion||''}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeEquipmentItem(${i})'>🗑️</button>`;
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '18px';
+            div.style.padding = '8px 0';
+            // Detectar si es munición
+            const isAmmo = /cargador|cartucho|munici[óo]n|balas|escopeta|rifle|pistola|subfusil|cal\.?/i.test(a.nombre);
+            let ammoField = '';
+            if (isAmmo) {
+                // Campo editable para balas restantes
+                if (a.balasRestantes === undefined) a.balasRestantes = '';
+                ammoField = `<label style='margin-left:10px;'>Balas: <input type='number' min='0' max='999' value='${a.balasRestantes}' data-ammo-index='${i}' style='width:50px;'></label>`;
+            }
+            div.innerHTML = `
+                <span style='font-weight:bold; color:#ff4757; min-width:120px;'>${a.nombre}</span>
+                <span style='color:#aaa; min-width:220px;'>${a.descripcion ? 'Descripción: ' + a.descripcion : ''}</span>
+                ${ammoField}
+                <button class='remove-skill' title='Eliminar' style='margin-left:auto;' onclick='removeEquipmentItem(${i})'>🗑️</button>
+            `;
             miscList.appendChild(div);
+        });
+        // Listener para campos de balas
+        document.querySelectorAll('input[data-ammo-index]').forEach(input => {
+            input.addEventListener('change', function() {
+                const idx = parseInt(this.getAttribute('data-ammo-index'));
+                const value = this.value;
+                if (window.characterSheet.equipment[idx]) {
+                    window.characterSheet.equipment[idx].balasRestantes = value;
+                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                }
+            });
         });
         // Implantes
         const implantsList = document.getElementById('implants-list');
@@ -728,12 +807,21 @@ document.addEventListener('DOMContentLoaded', function() {
         else implantes.forEach((a,i) => {
             const div = document.createElement('div');
             div.className = 'gear-item';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '18px';
+            div.style.padding = '8px 0';
             let modStr = '';
             if (a.mod) {
                 modStr = Object.entries(a.mod).filter(([k,v])=>v&&k!=='skillName'&&k!=='skillValue').map(([k,v])=>`${k.toUpperCase()}: ${v>0?'+':''}${v}`).join(' ');
                 if (a.mod.skillName && a.mod.skillValue) modStr += ` ${a.mod.skillName}: ${a.mod.skillValue>0?'+':''}${a.mod.skillValue}`;
             }
-            div.innerHTML = `<b>${a.nombre}</b> <span style='color:#aaa'>${a.efectos||''}</span> <span style='color:#00ccff'>${modStr}</span> <button class='remove-skill' title='Eliminar' style='margin-left:8px;' onclick='removeImplant(${i})'>🗑️</button>`;
+            div.innerHTML = `
+                <span style='font-weight:bold; color:#ff4757; min-width:120px;'>${a.nombre}</span>
+                <span style='color:#aaa; min-width:220px;'>${a.efectos ? 'Efectos: ' + a.efectos : ''}</span>
+                <span style='color:#00ccff; min-width:120px;'>${modStr}</span>
+                <button class='remove-skill' title='Eliminar' style='margin-left:auto;' onclick='removeImplant(${i})'>🗑️</button>
+            `;
             implantsList.appendChild(div);
         });
     }

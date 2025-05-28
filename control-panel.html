@@ -412,15 +412,15 @@
                         <h1>ULTIMATE MERCENARY</h1>
                         <h2>Panel de Control</h2>
                     </div>
-                </div>
-                <div class="test-selector">
-                    <label for="current-test">Prueba Actual:</label>
-                    <select id="current-test" onchange="updateCurrentTest(this.value)">
-                        <option value="prueba0">Prueba 0: La Caída</option>
-                        <option value="prueba1">Prueba 1: Carrera de Obstáculos</option>
-                        <option value="prueba2">Prueba 2: La Cosecha</option>
-                        <option value="prueba3">Prueba 3: La Entrega</option>
-                    </select>
+                    <div class="test-selector" style="margin-left: 30px;">
+                        <label for="current-test">Prueba Actual:</label>
+                        <select id="current-test" onchange="updateCurrentTest(this.value)">
+                            <option value="prueba0">Prueba 0: La Caída</option>
+                            <option value="prueba1">Prueba 1: Carrera de Obstáculos</option>
+                            <option value="prueba2">Prueba 2: La Cosecha</option>
+                            <option value="prueba3">Prueba 3: La Entrega</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -479,12 +479,14 @@
                     
                     <div class="control-group">
                         <h4>ENVIAR MENSAJE</h4>
+                        <input type="text" class="control-input" id="public-username-input" placeholder="Usuario" style="margin-bottom: 8px;">
                         <input type="text" class="control-input" id="message-input" placeholder="Escribe un mensaje...">
                         <button class="control-button" onclick="sendMessage()">ENVIAR</button>
                     </div>
 
                     <div class="control-group">
                         <h4>ENVIAR OFERTA DE PM</h4>
+                        <input type="text" class="control-input" id="pm-username-input" placeholder="Usuario" style="margin-bottom: 8px;">
                         <input type="number" class="control-input" id="pm-input" placeholder="Cantidad de PM">
                         <input type="text" class="control-input" id="pm-message-input" placeholder="Mensaje con la oferta...">
                         <button class="control-button" onclick="sendPMMessage()">ENVIAR OFERTA</button>
@@ -509,6 +511,16 @@
                         <textarea id="dm-content" class="control-input" placeholder="Contenido del mensaje"></textarea>
                         <button class="control-button" onclick="sendDirectMessage()">ENVIAR DM</button>
                     </div>
+                </div>
+
+                <!-- Sección de Conocidos y Conocimientos -->
+                <div class="control-section" style="flex: 1;">
+                    <h3>CONOCIDOS</h3>
+                    <div id="conocidos-list" class="control-group"></div>
+                    <div id="conocidos-debug" style="color:#ff4757;font-size:12px;margin-bottom:10px;"></div>
+                    <h3>CONOCIMIENTOS</h3>
+                    <div id="conocimientos-list" class="control-group"></div>
+                    <div id="conocimientos-debug" style="color:#ff4757;font-size:12px;margin-bottom:10px;"></div>
                 </div>
             </div>
         </div>
@@ -621,6 +633,12 @@
             const currentTest = localStorage.getItem('currentTest') || 'prueba0';
             document.getElementById('current-test').value = currentTest;
             document.getElementById('objective-text').textContent = testObjectives[currentTest];
+
+            // Cargar el último usuario usado en los campos de usuario
+            const lastPublicUsername = localStorage.getItem('lastPublicUsername') || '';
+            document.getElementById('public-username-input').value = lastPublicUsername;
+            const lastPMUsername = localStorage.getItem('lastPMUsername') || '';
+            document.getElementById('pm-username-input').value = lastPMUsername;
         });
 
         // Objetivos de cada prueba
@@ -640,15 +658,19 @@
         // Función para enviar mensaje
         function sendMessage() {
             const message = document.getElementById('message-input').value;
+            const usernameInput = document.getElementById('public-username-input');
+            let sender = usernameInput.value.trim() || 'SISTEMA';
             if (message) {
                 const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 messages.push({
-                    sender: 'SISTEMA',
+                    sender: sender,
                     content: message,
                     time: new Date().toLocaleTimeString()
                 });
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
                 document.getElementById('message-input').value = '';
+                // Guardar el último usuario usado
+                localStorage.setItem('lastPublicUsername', sender);
             }
         }
 
@@ -656,10 +678,12 @@
         function sendPMMessage() {
             const pmAmount = document.getElementById('pm-input').value;
             const message = document.getElementById('pm-message-input').value;
+            const usernameInput = document.getElementById('pm-username-input');
+            let sender = usernameInput.value.trim() || 'SISTEMA';
             if (pmAmount && message) {
                 const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 messages.push({
-                    sender: 'SISTEMA',
+                    sender: sender,
                     content: `${message} ¡Te transfiero ${pmAmount} PM!`,
                     time: new Date().toLocaleTimeString()
                 });
@@ -667,6 +691,8 @@
                 statsManager.updatePM(pmAmount);
                 document.getElementById('pm-input').value = '';
                 document.getElementById('pm-message-input').value = '';
+                // Guardar el último usuario usado
+                localStorage.setItem('lastPMUsername', sender);
             }
         }
 
@@ -747,6 +773,102 @@
             persistentStorage.updateRating(rating);
             document.getElementById('rating-input').value = '';
             updateUserList();
+        }
+
+        // Datos de personajes y facciones (resumidos, puedes ampliar luego)
+        const personajes = [
+            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
+            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
+            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
+            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
+            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
+            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
+            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
+            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
+            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
+            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
+            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
+            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
+        ];
+        const facciones = [
+            { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
+            { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
+            { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
+            { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
+            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
+        ];
+
+        // Renderizar checkboxes
+        function renderCheckboxList(list, containerId, cookieKey) {
+            const container = document.getElementById(containerId);
+            const selected = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
+            container.innerHTML = list.map((item, idx) => `
+                <label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">
+                    <input type="checkbox" value="${item.nombre}" ${selected.includes(item.nombre) ? 'checked' : ''} onchange="window.toggleSelection('${cookieKey}', '${item.nombre}')">
+                    <img src="${item.img}" alt="${item.nombre}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">
+                    <span style="font-weight:bold;color:#00ccff;">${item.nombre}</span>
+                    <span style="font-size:12px;color:#aaa;margin-left:8px;">${item.desc}</span>
+                </label>
+            `).join('');
+            // Depuración visual de cookies
+            if(cookieKey === 'conocidosSeleccionados') {
+                document.getElementById('conocidos-debug').textContent = 'Cookie conocidosSeleccionados: ' + JSON.stringify(selected);
+            } else {
+                document.getElementById('conocimientos-debug').textContent = 'Cookie conocimientosSeleccionados: ' + JSON.stringify(selected);
+            }
+        }
+        window.toggleSelection = function(cookieKey, nombre) {
+            let list = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
+            const idx = list.indexOf(nombre);
+            if(idx > -1) list.splice(idx,1); else list.push(nombre);
+            if(cookieKey === 'conocidosSeleccionados') setConocidosSeleccionados(list);
+            else setConocimientosSeleccionados(list);
+            // Volver a renderizar para reflejar el cambio
+            if(cookieKey === 'conocidosSeleccionados') renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
+            else renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
+            renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
+        });
+
+        // Utilidades para cookies globales
+        function setCookie(name, value, days = 365) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days*24*60*60*1000));
+            const expires = "expires="+ d.toUTCString();
+            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+        }
+        function getCookie(name) {
+            const cname = name + "=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1);
+                if (c.indexOf(cname) == 0) return c.substring(cname.length, c.length);
+            }
+            return null;
+        }
+        function getConocidosSeleccionados() {
+            const val = getCookie('conocidosSeleccionados');
+            return val ? JSON.parse(val) : [];
+        }
+        function getConocimientosSeleccionados() {
+            const val = getCookie('conocimientosSeleccionados');
+            return val ? JSON.parse(val) : [];
+        }
+        function setConocidosSeleccionados(arr) {
+            setCookie('conocidosSeleccionados', JSON.stringify(arr));
+        }
+        function setConocimientosSeleccionados(arr) {
+            setCookie('conocimientosSeleccionados', JSON.stringify(arr));
         }
     </script>
 </body>
