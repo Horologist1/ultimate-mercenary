@@ -1364,23 +1364,19 @@
         const testObjectives = {
             'prueba0': {
                 title: 'Prueba 0: La Caída',
-                desc: 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
-                img: 'images/kaiser_intro_new.png'
+                desc: 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.'
             },
             'prueba1': {
                 title: 'Prueba 1: Carrera de Obstáculos',
-                desc: 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
-                img: 'images/prueba1.png'
+                desc: 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.'
             },
             'prueba2': {
                 title: 'Prueba 2: La Cosecha',
-                desc: 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
-                img: 'images/prueba2.png'
+                desc: 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.'
             },
             'prueba3': {
                 title: 'Prueba 3: La Entrega',
-                desc: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.',
-                img: 'images/prueba3.png'
+                desc: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.'
             }
         };
         const currentTest = localStorage.getItem('currentTest') || 'prueba0';
@@ -1388,86 +1384,90 @@
         // Barra lateral
         if (document.getElementById('objective-title')) document.getElementById('objective-title').textContent = obj.title;
         if (document.getElementById('objective-description')) document.getElementById('objective-description').textContent = obj.desc;
-        // Imagen en la barra lateral: solo añadir si no existe
-        const container = document.getElementById('current-objective');
-        if (container) {
-            let imgElem = document.getElementById('objective-image');
-            if (!imgElem) {
-                imgElem = document.createElement('img');
-                imgElem.id = 'objective-image';
-                imgElem.style.width = '100%';
-                imgElem.style.maxHeight = '120px';
-                imgElem.style.objectFit = 'cover';
-                imgElem.style.borderRadius = '8px';
-                imgElem.style.marginBottom = '10px';
-                container.insertBefore(imgElem, container.firstChild);
-            }
-            imgElem.src = obj.img;
-            imgElem.alt = obj.title;
-        }
-        // Modal: NO abrir aquí
+        // Eliminar imagen si existe
+        const imgElem = document.getElementById('objective-image');
+        if (imgElem && imgElem.parentNode) imgElem.parentNode.removeChild(imgElem);
     }
     window.updateObjective = updateObjective;
 
+    // Cargar contenido relevante de pruebaX.html en el modal de objetivo
     function showTestDescription() {
-        // Cargar el HTML de la prueba correspondiente en el modal usando un iframe
         const currentTest = localStorage.getItem('currentTest') || 'prueba0';
         const modal = document.getElementById('test-modal');
         if (!modal) return;
-        let iframe = document.getElementById('test-iframe');
-        if (!iframe) {
-            // Elimina contenido anterior
-            const descDiv = document.getElementById('test-description');
-            if (descDiv) descDiv.innerHTML = '';
-            // Crea el iframe
-            iframe = document.createElement('iframe');
-            iframe.id = 'test-iframe';
-            iframe.style.width = '100%';
-            iframe.style.height = '400px';
-            iframe.style.border = 'none';
-            iframe.style.borderRadius = '8px';
-            iframe.style.background = 'transparent';
-            // Inserta el iframe en el div de descripción
-            if (descDiv) descDiv.appendChild(iframe);
-        }
-        iframe.src = `prueba${currentTest.replace('prueba','')}.html`;
+        const descDiv = document.getElementById('test-description');
+        if (!descDiv) return;
+        descDiv.innerHTML = '<div style="color:#888;">Cargando...</div>';
+        fetch(`prueba${currentTest.replace('prueba','')}.html`)
+            .then(res => res.text())
+            .then(html => {
+                // Extraer solo el contenido relevante (main, body, o un div especial)
+                let content = html;
+                // Intenta extraer <main>...</main> o <body>...</body>
+                const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+                if (mainMatch) content = mainMatch[1];
+                else {
+                    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                    if (bodyMatch) content = bodyMatch[1];
+                }
+                descDiv.innerHTML = content;
+            })
+            .catch(() => {
+                descDiv.innerHTML = '<div style="color:#f55;">No se pudo cargar la información de la prueba.</div>';
+            });
         modal.style.display = 'block';
     }
     window.showTestDescription = showTestDescription;
 
-    // Enviar mensajes al chat
-    function sendChatMessage() {
-        const input = document.getElementById('chat-input');
-        if (!input) return;
-        const value = input.value.trim();
-        if (!value) return;
-        // Cargar mensajes actuales
+    // Refuerza la carga de mensajes de ejemplo en el chat si no hay mensajes reales
+    window.loadChatMessages = function() {
         let mensajes = [];
         try {
             mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
             if (!Array.isArray(mensajes)) mensajes = [];
-        } catch (e) { mensajes = []; }
-        // Añadir mensaje
-        mensajes.push({ sender: 'Jugador', content: value, time: new Date().toLocaleTimeString() });
-        // Guardar en localStorage y Firebase si existe
-        localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajes));
-        if (window.saveChat) window.saveChat(mensajes);
-        // Limpiar input y recargar chat
-        input.value = '';
-        loadChatMessages();
-    }
-    window.sendChatMessage = sendChatMessage;
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Botón enviar
-        const btn = document.getElementById('chat-submit');
-        if (btn) btn.addEventListener('click', sendChatMessage);
-        // Enter en input
-        const input = document.getElementById('chat-input');
-        if (input) input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') sendChatMessage();
-        });
-    });
+        } catch (e) {
+            mensajes = [];
+        }
+        const chat = document.getElementById('chat-messages');
+        if (!chat) return;
+        if (!mensajes || mensajes.length === 0) {
+            // Mensajes de ejemplo locales si el chat está vacío
+            const nombresUsuarios = [
+                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
+            ];
+            const ejemplos = [
+                "¡Vamos XIII, no decepciones a tus fans!",
+                "¡Estoy apostando todo por ti, no me falles!",
+                "Mira esos reflejos, ¡eres una máquina!",
+                "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+                "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
+                "OCE debería ponerte un reto REAL, XIII",
+                "Ese cromo que llevas parece de segunda mano...",
+                "¡Eres mi favorita desde el principio!",
+                "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+                "Por dios, alguien dé algo de equipo decente a la XIII"
+            ];
+            const ejemploMensajes = Array.from({length: 10}).map((_,i) => ({
+                sender: nombresUsuarios[i % nombresUsuarios.length],
+                content: ejemplos[i % ejemplos.length],
+                time: new Date().toLocaleTimeString()
+            }));
+            chat.innerHTML = ejemploMensajes.map(msg =>
+                `<div class=\"chat-message\"><span class=\"username\">${msg.sender}:</span> <span class=\"content\">${msg.content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
+            ).join('') + '<div style="color:#888;font-size:13px;">(Mensajes de ejemplo: el chat global está vacío)</div>';
+        } else {
+            chat.innerHTML = mensajes.map(msg => {
+                // Compatibilidad flexible
+                const sender = msg.sender || msg.user || 'SISTEMA';
+                const content = msg.content || msg.text || '';
+                const time = msg.time || '';
+                return `<div class=\"chat-message\"><span class=\"username\">${sender}:</span> <span class=\"content\">${content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${time}</span></div>`;
+            }).join('');
+        }
+        chat.scrollTop = chat.scrollHeight;
+    };
     </script>
     <script>
     // Llama a las funciones al cargar la página para inicializar la UI
