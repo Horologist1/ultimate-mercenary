@@ -1400,11 +1400,15 @@
         if (!modal) return;
         const descDiv = document.getElementById('test-description');
         if (!descDiv) return;
-        // Cambiar el título SIEMPRE a 'Objetivo'
         document.getElementById('test-title').textContent = 'OBJETIVO';
-        // Cambiar la imagen según la prueba
+        // Imagen: fallback si no existe
         const img = document.getElementById('test-image');
-        if (img) img.src = `images/prueba${currentTest.replace('prueba','')}.jpg`;
+        if (img) {
+            const pruebaImg = `images/prueba${currentTest.replace('prueba','')}.jpg`;
+            img.onerror = function() { img.style.display = 'none'; };
+            img.style.display = '';
+            img.src = pruebaImg;
+        }
         descDiv.innerHTML = '<div style="color:#888;">Cargando...</div>';
         fetch(`prueba${currentTest.replace('prueba','')}.html`)
             .then(res => res.text())
@@ -1416,7 +1420,6 @@
                     const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
                     if (bodyMatch) content = bodyMatch[1];
                 }
-                // Quitar cabecera, títulos, imágenes, técnicas, mecánicas, amenazas, eventos, etc.
                 content = content.replace(/<div class=\"logo-container\">[\s\S]*?<\/div>/i, '');
                 content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '');
                 content = content.replace(/<img[^>]*>[\s\S]*?(<\/div>|<br>|<hr>|<p>|<h2>|<h3>|<section>|<main>|<body>|$)/i, '');
@@ -1431,7 +1434,7 @@
                 descDiv.innerHTML = '<div style="color:#f55;">No se pudo cargar la información de la prueba.</div>';
             });
         modal.style.display = 'block';
-        // Permitir mover y cerrar el modal siempre
+        // Permitir cerrar el modal haciendo clic fuera o Escape
         modal.onclick = function(e) {
             if (e.target.classList.contains('rules-modal')) {
                 modal.style.display = 'none';
@@ -1577,6 +1580,26 @@
     <script>
     (function() {
         // --- Lógica de chat global con PM y animación ---
+        function generarMensajeAleatorioConPMRaro() {
+            // 15% de probabilidad de PM, 85% normal
+            if (Math.random() < 0.15) {
+                let data;
+                let intentos = 0;
+                do {
+                    data = generarMensajeAleatorio();
+                    intentos++;
+                } while (!data.mensaje.match(/([+][0-9]+)\s*PM/) && intentos < 10);
+                return data;
+            } else {
+                let data;
+                let intentos = 0;
+                do {
+                    data = generarMensajeAleatorio();
+                    intentos++;
+                } while (data.mensaje.match(/([+][0-9]+)\s*PM/) && intentos < 10);
+                return data;
+            }
+        }
         function iniciarChatGlobal() {
             const chatContainer = document.getElementById('chat-messages');
             if (!chatContainer) {
@@ -1588,7 +1611,6 @@
                 document.body.appendChild(fallback);
                 return;
             }
-            // Estado de PM aceptados (persistente)
             let pmAceptados = JSON.parse(localStorage.getItem('pmAceptados') || '[]');
             function guardarPMAceptados() {
                 localStorage.setItem('pmAceptados', JSON.stringify(pmAceptados));
@@ -1671,11 +1693,10 @@
                         agregarMensajeAlChat(mensajes.shift(), mensajeId++);
                         return;
                     }
-                    const data = generarMensajeAleatorio();
+                    const data = generarMensajeAleatorioConPMRaro();
                     data.hora = new Date().toLocaleTimeString();
                     agregarMensajeAlChat(data, mensajeId++);
                 }, 3000);
-                // Si tras 5 segundos no hay mensajes, mostrar aviso
                 setTimeout(() => {
                     if (!chatContainer.hasChildNodes()) {
                         chatContainer.innerHTML = '<div style="color:#f55;font-size:15px;text-align:center;">(No se están generando mensajes. Revisa la consola para más información.)</div>';
@@ -1685,7 +1706,6 @@
             chatContainer.innerHTML = '';
             cargarMensajesAdmin();
             cicloMensajes();
-            // Escuchar cambios en mensajes del admin (Firebase)
             if (window.saveChat) {
                 const originalSaveChat = window.saveChat;
                 window.saveChat = function(arr) {
