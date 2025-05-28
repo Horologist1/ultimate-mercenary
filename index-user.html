@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.28</h1>
+                        <h1>ULTIMATE MERCENARY 0.29</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1197,17 +1197,17 @@
         </div>
 
         <!-- NEW Objective Modal - Ensure any old #test-modal is removed -->
-        <div id="test-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 5000; overflow-y: auto; padding-top: 50px;">
-            <div style="background-color: #111; color: #fff; max-width: 700px; margin: 0 auto; padding: 25px; border: 1px solid #ff4757; border-radius: 8px; box-shadow: 0 0 20px rgba(255,71,87,0.5);">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #444;">
-                    <h2 id="objective-modal-title" style="color: #ff4757; font-family: 'Orbitron', sans-serif; margin: 0; font-size: 22px;">OBJETIVO</h2>
-                    <button onclick="document.getElementById('test-modal').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 14px;">CERRAR</button>
+        <div id="test-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 5000; overflow-y: auto; padding-top: 40px;">
+            <div style="background-color: #111; color: #fff; max-width: 900px; min-width: 350px; margin: 0 auto; padding: 40px 40px 30px 40px; border: 2px solid #ff4757; border-radius: 12px; box-shadow: 0 0 40px 10px rgba(255,71,87,0.25);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1.5px solid #444;">
+                    <h2 id="objective-modal-title" style="color: #ff4757; font-family: 'Orbitron', sans-serif; margin: 0; font-size: 28px; letter-spacing: 1px;">OBJETIVO</h2>
+                    <button onclick="document.getElementById('test-modal').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 10px 22px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 16px;">CERRAR</button>
                 </div>
-                <img id="objective-modal-image" src="" alt="Imagen del Objetivo" style="width: 100%; max-height: 280px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; border: 1px solid #333;">
-                <div id="objective-modal-description" style="font-size: 15px; line-height: 1.6; min-height: 100px;">
+                <img id="objective-modal-image" src="" alt="Imagen del Objetivo" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; margin-bottom: 22px; border: 1.5px solid #333;">
+                <div id="objective-modal-description" style="font-size: 18px; line-height: 1.7; min-height: 120px; margin-bottom: 18px;">
                     <!-- Descripción del objetivo -->
                 </div>
-                <div id="objective-modal-kaiser-quote" style="font-style: italic; color: #00ccff; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #444; font-size: 14px;">
+                <div id="objective-modal-kaiser-quote" style="font-style: italic; color: #00ccff; margin-top: 18px; padding-top: 15px; border-top: 1.5px dashed #444; font-size: 16px; display: none;">
                     <!-- Cita de Kaiser -->
                 </div>
             </div>
@@ -1311,42 +1311,38 @@
             console.error('Objective modal not found!');
             return;
         }
-
         const objectivesData = {
             'prueba0': {
                 title: 'Prueba 0: La Caída',
                 image: 'images/kaiser_intro_new.png',
-                description: 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
-                kaiserQuote: '"Bienvenidos al matadero, novatos. Demostrad que no sois solo carne fresca."'
+                description: `Supervivencia inicial en el hangar subterráneo.\n\nLos concursantes despiertan en un entorno hostil, rodeados de maquinaria industrial y sin información clara sobre su situación.\n\nDeben adaptarse rápidamente, buscar recursos básicos y formar alianzas temporales para sobrevivir a las primeras horas del concurso.\n\nEl entorno es oscuro, húmedo y peligroso: cualquier error puede ser fatal.`,
+                kaiserQuote: '“Bienvenidos al matadero, novatos. Demostrad que no sois solo carne fresca.”'
             },
             'prueba1': {
                 title: 'Prueba 1: Carrera de Obstáculos',
                 image: 'images/obstacle_course_new.png',
-                description: 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
-                kaiserQuote: '"Corred, pequeños conejos. Solo los más rápidos evitan convertirse en papilla."'
+                description: `Completar la carrera de obstáculos industrial.\n\nLos concursantes deben superar una serie de desafíos físicos y mentales: saltar sobre maquinaria en movimiento, esquivar trampas eléctricas y resolver acertijos bajo presión.\n\nLa cooperación puede ser útil, pero solo los más rápidos y astutos llegarán al final.\n\nEl público espera espectáculo y caídas espectaculares.`,
+                kaiserQuote: '“Corred, pequeños conejos. Solo los más rápidos evitan convertirse en papilla.”'
             },
             'prueba2': {
                 title: 'Prueba 2: La Cosecha',
                 image: 'images/abandoned_greenhouse.png',
-                description: 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
-                kaiserQuote: '"¿Veis esas bonitas plantas? Algunas os darán créditos. Otras... bueno, digamos que os darán una muerte colorida."'
+                description: `Recolectar plantas y materiales valiosos del Jardín Vertical.\n\nEl entorno está plagado de trampas biológicas y toxinas.\n\nLos concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, enfrentándose a criaturas mutadas y a la competencia de otros jugadores.\n\nLa precisión y el conocimiento científico serán clave para sobrevivir.`,
+                kaiserQuote: '“¿Veis esas bonitas plantas? Algunas os darán créditos. Otras... bueno, digamos que os darán una muerte colorida.”'
             },
             'prueba3': {
                 title: 'Prueba 3: La Entrega',
                 image: 'images/city_ruins.png',
-                description: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.',
-                kaiserQuote: '"Un paquete, un destino. Fácil, ¿verdad? Si no fuera por todo lo que intentará mataros por el camino."'
+                description: `Realizar entregas de paquetes en el distrito industrial.\n\nLos concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, evitando bandas hostiles, drones de vigilancia y trampas explosivas.\n\nLa sigilo y la eficiencia serán recompensados, pero el menor error puede atraer la atención de los cazadores.`,
+                kaiserQuote: '“Un paquete, un destino. Fácil, ¿verdad? Si no fuera por todo lo que intentará mataros por el camino.”'
             }
         };
-
         const data = objectivesData[currentTestKey] || objectivesData['prueba0'];
-
         document.getElementById('objective-modal-title').textContent = data.title;
         const imgElement = document.getElementById('objective-modal-image');
         imgElement.src = data.image;
         imgElement.alt = `Imagen de ${data.title}`;
         document.getElementById('objective-modal-description').innerHTML = data.description.replace(/\n/g, '<br>');
-        
         const quoteElement = document.getElementById('objective-modal-kaiser-quote');
         if (data.kaiserQuote) {
             quoteElement.textContent = data.kaiserQuote;
@@ -1354,7 +1350,6 @@
         } else {
             quoteElement.style.display = 'none';
         }
-
         modal.style.display = 'block';
     }
     window.showObjectiveModal = showObjectiveModal;
@@ -1438,7 +1433,9 @@
                 "Ese cromo que llevas parece de segunda mano...",
                 "¡Eres mi favorita desde el principio!",
                 "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
-                "Por dios, alguien dé algo de equipo decente a la XIII"
+                "Por dios, alguien dé algo de equipo decente a la XIII",
+                "¡Actúa como si tuvieras múltiples personalidades por 12 horas! ¡+70 PM!",
+                "¡Marca territorios con sangre como un animal y defiéndelos a muerte! ¡+80 PM!"
             ];
             const ejemploMensajes = Array.from({length: 10}).map((_,i) => ({
                 sender: nombresUsuarios[i % nombresUsuarios.length],
@@ -1471,7 +1468,7 @@
     <!-- NEW CONSOLIDATED CHAT SYSTEM SCRIPT -->
     <script>
         function initChatSystem() {
-            console.log("[SYSTEM] Initializing New Chat System v0.28...");
+            console.log("[SYSTEM] Initializing New Chat System v0.29...");
             const chatMessagesContainer = document.getElementById('chat-messages');
             const chatInput = document.getElementById('chat-input');
             const chatSubmitBtn = document.getElementById('chat-submit');
@@ -1485,6 +1482,7 @@
             chatMessagesContainer.innerHTML = '';
             localStorage.removeItem('mensajes-jugador-sesion'); // Player messages for this session only
             localStorage.removeItem('pmSumadosParaBotones'); // Reset PM button states for this session
+            localStorage.removeItem('mensajes-auto-sesion');
             // 'mensajes-publico-expanded' is initially cleared by Firebase listener or if not, this init will clear it before rendering.
             // 'playerPM' (total PM points) is NOT cleared here.
             console.log("[CHAT] Chat display and session-specific localStorage cleared.");
