@@ -1938,16 +1938,47 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
             // Conocidos
             const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
             const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
-            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => `
-                <div class="character-card">
-                    <img src="${p.img}" alt="${p.nombre}" class="character-image">
-                    <div class="character-info">
-                        <h4 class="character-name">${p.nombre}</h4>
-                        <div class="character-description">${p.desc}</div>
+            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
+                // Mapeo de número de concursante
+                const numeros = {
+                    'Auri': 13,
+                    'Boris "Goliath" Volkov': 42,
+                    'Silas "Glitch" Vance': 17,
+                    'Raven (Mizuki Tanaka)': 89,
+                    'Chispa (Anya Sharma)': 31,
+                    'Marcus "Old Man" Thorne': 76,
+                    'Jinx': 23,
+                    'Lin Mayfair': 58,
+                    'Subject Omega': 91,
+                    'Ekaterina "Echo" Petrov': 37,
+                    'Dr. Felix "Compound" Reyes': 64,
+                    'Los Gemelos (Jin & Jun)': 82,
+                    'Sofía "Viper" Nakamura': 45,
+                    'Alex "Phantom" Mercer': 29,
+                    'Marcus "Titan" Graves': 71,
+                    'Faith "Oracle" Lee': 53,
+                    'Darius "Thunder Fist" Jackson': 68,
+                    'Aria "Maven" Chen': 19
+                };
+                const numero = numeros[p.nombre] ? `#${numeros[p.nombre]}` : '';
+                const clave = `nombreConcursante_${numero}`;
+                const valorGuardado = localStorage.getItem(clave) || '';
+                return `
+                    <div class="character-card">
+                        <div class="character-info">
+                            <h4 class="character-name">${numero} <input type='text' class='nombre-concursante-input' data-numero='${numero}' placeholder='Nombre del concursante' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
+                        </div>
                     </div>
-                </div>
-            `).join('');
-            // Conocimientos
+                `;
+            }).join('');
+            // Listeners para guardar el nombre al escribir
+            document.querySelectorAll('.nombre-concursante-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const num = this.getAttribute('data-numero');
+                    localStorage.setItem(`nombreConcursante_${num}`, this.value);
+                });
+            });
+            // Conocimientos (igual que antes)
             const conocimientosSel = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
             const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
             document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => `
@@ -1962,6 +1993,17 @@ Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o
         }
         document.addEventListener('DOMContentLoaded', renderTarjetasSeleccionadas);
         window.addEventListener('storage', renderTarjetasSeleccionadas);
+
+        // Añadir lógica para guardar y cargar el nombre del concursante
+        const nombreInput = document.getElementById('nombre-concursante-input');
+        if (nombreInput) {
+          // Cargar valor guardado
+          const guardado = localStorage.getItem('nombreConcursante') || '';
+          nombreInput.value = guardado;
+          nombreInput.addEventListener('input', function() {
+            localStorage.setItem('nombreConcursante', this.value);
+          });
+        }
     </script>
 </body>
 </html> 

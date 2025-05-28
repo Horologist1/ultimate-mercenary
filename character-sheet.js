@@ -68,22 +68,21 @@
     }
     
     updateDerivedStats() {
-        // Calculate initiative (REF + INT) ÷ 5
+        // Initiative: (REF + INT) ÷ 5
         this.initiative = Math.floor((this.aptitudes.ref + this.aptitudes.int) / 5);
-        
-        // Health points and wound threshold depend on morph, not ego
-        // Setting default values for display purposes
-        this.healthPoints = 30; // Default morph durability
-        this.woundThreshold = 6; // Default wound threshold (DUR ÷ 5)
-        this.movement = 4; // Default movement rate
-        
-        // Calculate pools (these are derived from aptitudes)
+        // DUR editable, por defecto 30
+        this.dur = typeof this.dur === 'number' ? this.dur : 30;
+        // Wound Threshold (WT): DUR ÷ 5
+        this.woundThreshold = Math.floor(this.dur / 5);
+        // Death Rating (DR): DUR × 1.5 (biomorph estándar)
+        this.deathRating = Math.floor(this.dur * 1.5);
+        // Movement estándar
+        this.movement = 4;
+        // Pools y otros stats
         this.insightPool = Math.floor(this.aptitudes.int / 5);
         this.moxyPool = Math.floor(this.aptitudes.wil / 5);
         this.vigorPool = Math.floor(this.aptitudes.som / 5);
-        this.flexPool = 1; // Base flex pool
-        
-        // Calculate other derived stats
+        this.flexPool = 1;
         this.lucidity = this.aptitudes.wil * 2;
         this.traumaThreshold = Math.floor(this.lucidity / 5);
         this.insanityRating = this.lucidity * 2;
@@ -97,9 +96,10 @@
             customSkills: this.customSkills,
             equipment: this.equipment,
             implants: this.implants,
-            healthPoints: this.healthPoints,
+            dur: this.dur,
             initiative: this.initiative,
             woundThreshold: this.woundThreshold,
+            deathRating: this.deathRating,
             attributePoints: this.attributePoints,
             skillPoints: this.skillPoints,
             aptitudeTemplate: this.aptitudeTemplate
@@ -127,9 +127,10 @@
         this.customSkills = data.customSkills || {};
         this.equipment = data.equipment || [];
         this.implants = data.implants || [];
-        this.healthPoints = data.healthPoints || 30;
+        this.dur = data.dur || 30;
         this.initiative = data.initiative || 7;
         this.woundThreshold = data.woundThreshold || 6;
+        this.deathRating = data.deathRating || Math.floor(this.dur * 1.5);
         this.skillPoints = data.skillPoints || 400;
         this.aptitudeTemplate = data.aptitudeTemplate || 'actioneer';
         
@@ -334,9 +335,10 @@ document.addEventListener('DOMContentLoaded', function() {
             updateCustomSkillTotal(skillId);
         }
         // Update derived stats (con mods)
-        document.getElementById('health-points').textContent = (window.characterSheet.healthPoints||0) + (mods.healthPoints||0);
-        document.getElementById('initiative').textContent = (window.characterSheet.initiative||0) + (mods.initiative||0);
+        document.getElementById('dur').value = (window.characterSheet.dur||30) + (mods.dur||0);
         document.getElementById('wound-threshold').textContent = (window.characterSheet.woundThreshold||0) + (mods.woundThreshold||0);
+        document.getElementById('death-rating').textContent = (window.characterSheet.deathRating||0);
+        document.getElementById('initiative').textContent = (window.characterSheet.initiative||0) + (mods.initiative||0);
         document.getElementById('movement').textContent = (window.characterSheet.movement||0) + (mods.movement||0);
         // Update points counters
         updateAttributePoints();
@@ -874,4 +876,15 @@ document.addEventListener('DOMContentLoaded', function() {
             updateUI();
         }
     });
+
+    // Listener para DUR editable
+    const durInput = document.getElementById('dur');
+    if (durInput) {
+        durInput.addEventListener('change', function() {
+            const val = parseInt(this.value) || 30;
+            window.characterSheet.dur = val;
+            window.characterSheet.updateDerivedStats();
+            updateUI();
+        });
+    }
 });

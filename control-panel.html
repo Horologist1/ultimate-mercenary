@@ -517,10 +517,8 @@
                 <div class="control-section" style="flex: 1;">
                     <h3>CONOCIDOS</h3>
                     <div id="conocidos-list" class="control-group"></div>
-                    <div id="conocidos-debug" style="color:#ff4757;font-size:12px;margin-bottom:10px;"></div>
                     <h3>CONOCIMIENTOS</h3>
                     <div id="conocimientos-list" class="control-group"></div>
-                    <div id="conocimientos-debug" style="color:#ff4757;font-size:12px;margin-bottom:10px;"></div>
                 </div>
             </div>
         </div>
@@ -808,20 +806,25 @@
         function renderCheckboxList(list, containerId, cookieKey) {
             const container = document.getElementById(containerId);
             const selected = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
-            container.innerHTML = list.map((item, idx) => `
-                <label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">
-                    <input type="checkbox" value="${item.nombre}" ${selected.includes(item.nombre) ? 'checked' : ''} onchange="window.toggleSelection('${cookieKey}', '${item.nombre}')">
-                    <img src="${item.img}" alt="${item.nombre}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">
-                    <span style="font-weight:bold;color:#00ccff;">${item.nombre}</span>
-                    <span style="font-size:12px;color:#aaa;margin-left:8px;">${item.desc}</span>
-                </label>
-            `).join('');
-            // Depuración visual de cookies
-            if(cookieKey === 'conocidosSeleccionados') {
-                document.getElementById('conocidos-debug').textContent = 'Cookie conocidosSeleccionados: ' + JSON.stringify(selected);
-            } else {
-                document.getElementById('conocimientos-debug').textContent = 'Cookie conocimientosSeleccionados: ' + JSON.stringify(selected);
-            }
+            container.innerHTML = list.map((item, idx) => {
+                const isSelected = selected.includes(item.nombre);
+                return '<label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">' +
+                    '<input type="checkbox" value="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" ' + (isSelected ? 'checked' : '') +
+                    ' data-nombre="' + encodeURIComponent(item.nombre) + '" data-cookiekey="' + cookieKey + '">' +
+                    '<img src="' + item.img + '" alt="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">' +
+                    '<span style="font-weight:bold;color:#00ccff;">' + item.nombre + '</span>' +
+                    '<span style="font-size:12px;color:#aaa;margin-left:8px;">' + item.desc + '</span>' +
+                    '</label>';
+            }).join('');
+            // Agregar listeners después de renderizar
+            const checkboxes = container.querySelectorAll('input[type="checkbox"][data-nombre][data-cookiekey]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const nombre = decodeURIComponent(this.getAttribute('data-nombre'));
+                    const key = this.getAttribute('data-cookiekey');
+                    window.toggleSelection(key, nombre);
+                });
+            });
         }
         window.toggleSelection = function(cookieKey, nombre) {
             let list = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
@@ -838,37 +841,20 @@
             renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
         });
 
-        // Utilidades para cookies globales
-        function setCookie(name, value, days = 365) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days*24*60*60*1000));
-            const expires = "expires="+ d.toUTCString();
-            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
-        }
-        function getCookie(name) {
-            const cname = name + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const ca = decodedCookie.split(';');
-            for(let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') c = c.substring(1);
-                if (c.indexOf(cname) == 0) return c.substring(cname.length, c.length);
-            }
-            return null;
-        }
+        // Utilidades para localStorage
         function getConocidosSeleccionados() {
-            const val = getCookie('conocidosSeleccionados');
+            const val = localStorage.getItem('conocidosSeleccionados');
             return val ? JSON.parse(val) : [];
         }
         function getConocimientosSeleccionados() {
-            const val = getCookie('conocimientosSeleccionados');
+            const val = localStorage.getItem('conocimientosSeleccionados');
             return val ? JSON.parse(val) : [];
         }
         function setConocidosSeleccionados(arr) {
-            setCookie('conocidosSeleccionados', JSON.stringify(arr));
+            localStorage.setItem('conocidosSeleccionados', JSON.stringify(arr));
         }
         function setConocimientosSeleccionados(arr) {
-            setCookie('conocimientosSeleccionados', JSON.stringify(arr));
+            localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
         }
     </script>
 </body>

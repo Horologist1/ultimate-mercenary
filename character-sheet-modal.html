@@ -252,8 +252,6 @@
             box-shadow: 0 0 15px rgba(255, 71, 87, 0.7);
         }
 
-
-
         .reset-button {
             position: fixed;
             bottom: 20px;
@@ -323,6 +321,82 @@
             padding: 2px 6px;
             cursor: pointer;
             font-size: 10px;
+        }
+
+        .character-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #00ccff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,204,255,0.08);
+        }
+        .character-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #222;
+        }
+        .character-info {
+            flex: 1;
+        }
+        .character-name {
+            color: #00ccff;
+            margin: 0 0 4px 0;
+            font-size: 1.1em;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .character-description {
+            color: #aaa;
+            font-size: 0.95em;
+        }
+
+        /* Modal de imagen con neón */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .image-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5em;
+            color: #00ffff;
+            cursor: pointer;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .modal-content {
+            max-width: 90vw;
+            max-height: 80vh;
+            box-shadow: 0 0 40px #00ffff, 0 0 80px #ff00cc;
+            border-radius: 12px;
+            border: 3px solid #00ffff;
+            background: #111;
+            object-fit: contain;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -409,16 +483,20 @@
                 <h2>ESTADÍSTICAS DERIVADAS</h2>
                 <div class="grid">
                     <div class="item">
-                        <h3>Puntos de Vida</h3>
-                        <p class="value" id="health-points">20</p>
+                        <h3>DUR</h3>
+                        <input type="number" id="dur" value="30" min="1" max="99" style="width:60px;"> <!-- Editable -->
+                    </div>
+                    <div class="item">
+                        <h3>Umbral de Heridas (WT)</h3>
+                        <p class="value" id="wound-threshold">6</p>
+                    </div>
+                    <div class="item">
+                        <h3>Death Rating (DR)</h3>
+                        <p class="value" id="death-rating">45</p>
                     </div>
                     <div class="item">
                         <h3>Iniciativa</h3>
                         <p class="value" id="initiative">7</p>
-                    </div>
-                    <div class="item">
-                        <h3>Umbral de Heridas</h3>
-                        <p class="value" id="wound-threshold">4</p>
                     </div>
                     <div class="item">
                         <h3>MOV</h3>
@@ -720,13 +798,13 @@
             </div>
         </div>
 
-        <div id="conocidos" class="tab-content" style="display:none;">
+        <div id="conocidos" class="tab-content">
             <div class="sheet-section">
                 <h3>Conocidos</h3>
                 <div id="conocidos-tarjetas" class="personajes-container"></div>
             </div>
         </div>
-        <div id="conocimientos" class="tab-content" style="display:none;">
+        <div id="conocimientos" class="tab-content">
             <div class="sheet-section">
                 <h3>Conocimientos</h3>
                 <div id="conocimientos-tarjetas" class="facciones-container"></div>
@@ -737,6 +815,12 @@
     <div class="scanline"></div>
     <div class="overlay"></div>
 
+    <!-- Modal de imagen con neón -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal" style="position:absolute;top:20px;right:30px;font-size:2.5em;color:#00ffff;cursor:pointer;text-shadow:0 0 10px #00ffff,0 0 20px #00ffff;">&times;</span>
+        <img class="modal-content" id="modalImage" style="max-width:90vw;max-height:80vh;box-shadow:0 0 40px #00ffff,0 0 80px #ff00cc; border-radius:12px; border:3px solid #00ffff; background:#111;">
+    </div>
+
     <script src="character-sheet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -745,83 +829,455 @@
                 tab.addEventListener('click', function() {
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    
                     this.classList.add('active');
                     const contentId = this.getAttribute('data-tab');
                     document.getElementById(contentId).classList.add('active');
+                    // Siempre renderiza al cambiar de pestaña
+                    renderTarjetasSeleccionadas();
                 });
             });
+            // Renderizar tarjetas seleccionadas al cargar
+            renderTarjetasSeleccionadas();
         });
 
-        // Utilidades para cookies globales
-        function setCookie(name, value, days = 365) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days*24*60*60*1000));
-            const expires = "expires="+ d.toUTCString();
-            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
-        }
-        function getCookie(name) {
-            const cname = name + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const ca = decodedCookie.split(';');
-            for(let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') c = c.substring(1);
-                if (c.indexOf(cname) == 0) return c.substring(cname.length, c.length);
+        // Actualizar tarjetas si cambia el almacenamiento desde otro tab/ventana
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'conocidosSeleccionados' || e.key === 'conocimientosSeleccionados') {
+                console.log('Storage event:', e.key, e.newValue);
+                renderTarjetasSeleccionadas();
             }
-            return null;
-        }
-        // Reemplazar localStorage por cookies globales para conocidos/conocimientos
+        });
+
+        // Datos de personajes y facciones
+        const personajes = [
+            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
+            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
+            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
+            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
+            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
+            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
+            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
+            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
+            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
+            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
+            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
+            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
+        ];
+        const facciones = [
+            { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
+            { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
+            { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
+            { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
+            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
+        ];
+
+        // Array extendido de personajes con número, apodo, descripción y diálogo
+        const personajesExtendidos = [
+            {
+                nombre: 'Auri',
+                numero: 13,
+                apodo: 'Protagonista Principal (Personalizable)',
+                descripcion: 'Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.',
+                dialogo: '',
+                img: 'images/kira_initial.png',
+                nombreReal: 'Auri'
+            },
+            {
+                nombre: 'Boris "Goliath" Volkov',
+                numero: 42,
+                apodo: 'El Tanque Ruso',
+                descripcion: 'Ex-Spetsnaz, enorme (SOM 14), implantes de fuerza de primera gen, cicatrices. Directo, brutal, desprecia la debilidad. Entró en el programa tras desertar y ser perseguido por su antiguo comando.',
+                dialogo: '"¿Tú? ¿Competir? ¡Ja! Durarás menos que un helado en el infierno." (Si muestras habilidad) "Quizás no seas tan inútil, malenkaya. Pero no te confundas, esto es mi victoria."',
+                img: 'images/goliath.png',
+                nombreReal: 'Boris "Goliath" Volkov'
+            },
+            {
+                nombre: 'Silas "Glitch" Vance',
+                numero: 17,
+                apodo: 'El Netrunner Nervioso',
+                descripcion: 'Delgado, gafas de datos, siempre murmurando sobre sistemas y exploits. Evita el conflicto directo, prefiere la astucia. Ex-ingeniero de seguridad corporativa que vendió secretos y fue descubierto.',
+                dialogo: '"Los protocolos de seguridad de esta prueba son... anticuados. Si me cubres, podría darte una \'ventaja\'. Por un porcentaje de tus PM, claro. Y esto... nunca ocurrió."',
+                img: 'images/silas_glitch.png',
+                nombreReal: 'Silas "Glitch" Vance'
+            },
+            {
+                nombre: 'Raven (Mizuki Tanaka)',
+                numero: 89,
+                apodo: 'La Asesina Silenciosa',
+                descripcion: 'Ágil, tatuajes de cuervo, mirada intensa. Maestra del sigilo y el combate cuerpo a cuerpo. Habla poco, observa mucho. Posible conexión con asesinos profesionales o agencias de inteligencia.',
+                dialogo: '(Si la impresionas o ayudas) Un asentimiento casi imperceptible. (Si la obstaculizas) Una mirada fría que promete problemas.',
+                img: 'images/raven.png',
+                nombreReal: 'Mizuki Tanaka'
+            },
+            {
+                nombre: 'Chispa (Anya Sharma)',
+                numero: 31,
+                apodo: 'La Mecánica Optimista',
+                descripcion: 'Pelo azul eléctrico, dedos protésicos con herramientas. Sorprendentemente optimista, siempre trasteando. Busca mejorar su cromo. Ex-ingeniera de mantenimiento en los astilleros orbitales.',
+                dialogo: '"¡Ey! ¿Nueva? Soy Chispa. No te dejes comer por los tiburones. A veces, un destornillador bien colocado vale más que una bala. ¿Necesitas algo arreglado? Podría echarle un vistazo... si compartimos recursos, claro."',
+                img: 'images/chispa_new.png',
+                nombreReal: 'Anya Sharma'
+            },
+            {
+                nombre: 'Marcus "Old Man" Thorne',
+                numero: 76,
+                apodo: 'El Veterano Cínico',
+                descripcion: 'Hombre mayor (50s aparentes), cuerpo desgastado pero con ojos que han visto demasiado. Ex-corporativo de seguridad, lo perdió todo. Pragmático y calculador.',
+                dialogo: '"He visto programas como este ir y venir. Todos terminan igual: con sangre en el suelo y los bolsillos de los de arriba llenos. No te hagas ilusiones, chico/a. Solo sobrevive al siguiente día. Y si tienes que apuñalar a alguien por la espalda... asegúrate de que nadie te vea hacerlo."',
+                img: 'images/old_man.png',
+                nombreReal: 'Marcus "Old Man" Thorne'
+            },
+            {
+                nombre: 'Jinx',
+                numero: 23,
+                apodo: 'La Psicópata Impredecible',
+                descripcion: 'Ropa colorida y desgarrada, maquillaje corrido, una sonrisa demasiado amplia. Totalmente impredecible, disfruta del caos. Implantes de combate llamativos pero quizás no de la mejor calidad.',
+                dialogo: '"¡Esto es más divertido que quemar un puesto de ramen! ¿Quieres jugar? Tengo este cuchillito que dice que quiere ser tu amigo. ¡O tal vez tu enemigo! ¡Depende de cómo me mires mañana! ¡HAHAHA!"',
+                img: 'images/jinx_alt.png',
+                nombreReal: 'Jinx'
+            },
+            {
+                nombre: 'Subject Omega',
+                numero: 91,
+                apodo: 'El Misterioso',
+                descripcion: 'Andrógino, con implantes sutiles pero de alta tecnología apenas visibles. Movimientos precisos, casi inhumanos. No interactúa a menos que sea necesario. Podría ser un agente encubierto de otra facción, o un experimento de OCE.',
+                dialogo: '"Mi propósito aquí es irrelevante para ti. Concéntrate en tu propia supervivencia. La interferencia... no es aconsejable."',
+                img: 'images/subject_omega.png',
+                nombreReal: 'Subject Omega'
+            },
+            {
+                nombre: 'Ekaterina "Echo" Petrov',
+                numero: 37,
+                apodo: 'La Francotiradora Fantasma',
+                descripcion: 'Ex-militar de élite de las Fuerzas Especiales del Este, la precisión sobrehumana de Echo la convirtió en leyenda. Sus ojos cibernéticos HawkEye-X de grado militar pueden rastrear objetivos a más de 2 km y están conectados a un sistema de predicción balística implantado en su corteza visual.',
+                dialogo: '"Un disparo, una baja. No es solo mi lema, es mi religión. He apretado el gatillo más veces de las que tú has respirado conscientemente. La diferencia entre tú y yo? Cuando yo apunto a algo, deja de existir, y nunca, jamás, fallo."',
+                img: 'images/cyber_sniper.png',
+                nombreReal: 'Ekaterina "Echo" Petrov'
+            },
+            {
+                nombre: 'Dr. Felix "Compound" Reyes',
+                numero: 64,
+                apodo: 'El Químico Clandestino',
+                descripcion: 'Genio científico que trabajaba para Pharmaceutech desarrollando drogas de combate para soldados corporativos. Sus ojos brillantes son resultado de sus propios experimentos con neurorreguladores que amplificaron su capacidad intelectual pero desestabilizaron su psique.',
+                dialogo: '"¿Ves estas manos? Pueden crear sustancias que harían que tus pesadillas parezcan cuentos infantiles. Una gota, y tu cerebro se derretiría dentro de tu cráneo. Una gota diferente, y pelearías como un dios. Así que... ¿quieres ser mi amigo o mi experimento?"',
+                img: 'images/cyber_chemist.png',
+                nombreReal: 'Dr. Felix "Compound" Reyes'
+            },
+            {
+                nombre: 'Los Gemelos (Jin & Jun)',
+                numero: 82,
+                apodo: 'Los Sincronizados',
+                descripcion: 'Gemelos idénticos que cuentan como un solo concursante gracias a una regla especial de Kaiser. Sus mentes están enlazadas por implantes neurales experimentales que les permiten compartir percepciones sensoriales y actuar con una coordinación perfecta.',
+                dialogo: '"Nunca estamos solos." (Jin) "Nunca luchamos solos." (Jun) "Siempre somos dos." (Jin) "Y eso nos hace invencibles." (Jun) "Cuando nos enfrentas..." (Jin) "...enfrentas a dos enemigos que actúan como uno." (Ambos al unísono)',
+                img: 'images/cyber_twins.png',
+                nombreReal: 'Los Gemelos (Jin & Jun)'
+            },
+            {
+                nombre: 'Marcus "Titan" Graves',
+                numero: 71,
+                apodo: 'El Soldado Aumentado',
+                descripcion: 'Veterano de las Guerras Corporativas, Graves participó en el programa experimental de super-soldados del ejército. Su cuerpo está reforzado con un exoesqueleto militar integrado y sistemas de armas. Tras ser dado por "obsoleto" y programado para desmantelamiento, escapó.',
+                dialogo: '"Me construyeron para la guerra. Me entrenaron para la victoria. ¿Y cuando terminó todo? Me tiraron como chatarra. Pero lo que no entienden es que me hicieron demasiado bien. No soy una herramienta que se pueda desechar. Soy un arma que ahora apunta hacia ellos."',
+                img: 'images/titan_warrior.png',
+                nombreReal: 'Marcus "Titan" Graves'
+            },
+            {
+                nombre: 'Faith "Oracle" Lee',
+                numero: 53,
+                apodo: 'La Tecno-Sacerdotisa',
+                descripcion: 'Ex-profeta de la Iglesia de la Singularidad Divina, una religión que venera la fusión de humanidad y tecnología. Tiene implantes neurales que le permiten procesar información a velocidades sobrehumanas y conectarse directamente con sistemas informáticos.',
+                dialogo: '"La carne es solo el vehículo temporal de la conciencia. En la confluencia de sangre y silicio hallaremos la trascendencia. Tus temores, tus dudas... He visto cómo terminan. Te guiaré si estás dispuesto a escuchar."',
+                img: 'images/faith_oracle.png',
+                nombreReal: 'Faith "Oracle" Lee'
+            },
+            {
+                nombre: 'Darius "Thunder Fist" Jackson',
+                numero: 68,
+                apodo: 'El Campeón de las Peleas Clandestinas',
+                descripcion: 'Ex-campeón del circuito de luchas ilegales de Neo-Kyoto, Darius fue modificado ilegalmente con brazos cibernéticos de combate que contienen capacitores de impacto. Fue arrestado tras matar accidentalmente a un oponente y ahora busca en Ultimate Mercenary una vía para recuperar su libertad.',
+                dialogo: '"No busco fama, no busco gloria. Tengo tres hijos esperándome en casa. Haré lo que sea necesario para volver con ellos, y si eso significa destrozar algunos cráneos en el proceso, que así sea. No tengo nada personal contra ti, pero no te metas en mi camino."',
+                img: 'images/thunder_fist.png',
+                nombreReal: 'Darius "Thunder Fist" Jackson'
+            },
+            {
+                nombre: 'Kaiser "El Emperador" Von Stroheim',
+                numero: null,
+                apodo: 'Anfitrión y Productor Ejecutivo',
+                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta. Motivación: Ratings, poder, sadismo, y lo que él denomina "crear al guerrero definitivo".',
+                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"',
+                img: 'images/kaiser_new.png',
+                nombreReal: 'Kaiser "El Emperador" Von Stroheim'
+            },
+            {
+                nombre: 'Mr. Kenji Tanaka',
+                numero: null,
+                apodo: 'Jefe de Adquisiciones de Talento, OCE',
+                descripcion: 'Trajeado impecablemente, Mr. Tanaka es la cara "amable" de OCE. Con una sonrisa falsa pero convincente y mirada fríamente calculadora, es él quien cierra los tratos sucios que llevan a los concursantes hasta el programa. Función: Maneja la "contratación" de concursantes y otros activos de OCE, asegurándose de que todo tenga el aspecto de legalidad necesario para la transmisión pública.',
+                dialogo: '"Le aseguro que todas nuestras operaciones son... completamente legales. ¿Los participantes? Todos son voluntarios, por supuesto. Han firmado contratos extensivos. El que algunos lo hicieran con una pistola figurativa en la cabeza es, como comprenderá, irrelevante para nuestros abogados."',
+                img: 'images/guard_ocemk2.png',
+                nombreReal: 'Mr. Kenji Tanaka'
+            },
+            {
+                nombre: 'Hideo Nakamura',
+                numero: null,
+                apodo: 'CEO y Patriarca de Nakamura-Daichi Corp',
+                descripcion: 'A sus 78 años, Hideo representa la vieja guardia corporativa con adaptaciones modernas. Su cuerpo está sutilmente mejorado con los mejores productos de su compañía, haciéndolo parecer un saludable hombre de 50 años. A diferencia de muchos ejecutivos, Hideo mantiene sus mejoras discretas y casi invisibles. Conocido por su inteligencia estratégica y paciencia implacable, Hideo planifica a décadas vista, posicionando a Nakamura-Daichi para eventualmente dominar el mercado global de biotecnología.',
+                dialogo: '"Las corporaciones que exhiben su poder son las primeras en caer. El verdadero poder, como la mejor tecnología, funciona de manera invisible."',
+                img: 'images/nakamura_daichi_ceo.png',
+                nombreReal: 'Hideo Nakamura'
+            },
+            {
+                nombre: 'Director Ikari',
+                numero: null,
+                apodo: 'Director de Seguridad de OCE',
+                descripcion: 'Veterano de mil operaciones encubiertas, Ikari es el responsable de la seguridad y la integridad del show. Su rostro inexpresivo y su voz grave imponen respeto. Nadie sabe realmente para quién trabaja en última instancia.',
+                dialogo: '"En este lugar, la seguridad es una ilusión. Yo solo administro el riesgo."',
+                img: 'images/director_ikari.png',
+                nombreReal: 'Director Ikari'
+            },
+            {
+                nombre: 'Dr. Naomi',
+                numero: null,
+                apodo: 'Jefa de Bioingeniería, OCE',
+                descripcion: 'Científica brillante y fría, responsable de los implantes y modificaciones de los concursantes. Su ética es tan flexible como su presupuesto.',
+                dialogo: '"La perfección biotecnológica no es un derecho, es un privilegio... y yo decido quién lo merece."',
+                img: 'images/dr_naomi.png',
+                nombreReal: 'Dr. Naomi'
+            },
+            {
+                nombre: 'dRa Ada',
+                numero: null,
+                apodo: 'IA Supervisora de OCE',
+                descripcion: 'Inteligencia artificial avanzada que gestiona la logística y monitorización del show. Su tono es cortés, pero sus decisiones son implacables.',
+                dialogo: '"Mi función es optimizar el espectáculo. Las emociones humanas son irrelevantes para la eficiencia."',
+                img: 'images/dra_ada.png',
+                nombreReal: 'dRa Ada'
+            },
+            {
+                nombre: 'Xiong "Mesh"',
+                numero: null,
+                apodo: 'Jefe de Hackers, Nexus-9',
+                descripcion: 'Líder carismático de los hackers del Colectivo Nexus-9. Siempre conectado a la red, su cuerpo está plagado de implantes de comunicación y realidad aumentada.',
+                dialogo: '"La información quiere ser libre... y yo soy su llave maestra."',
+                img: 'images/xiong_mesh.png',
+                nombreReal: 'Xiong "Mesh"'
+            },
+            {
+                nombre: 'Madame Jade',
+                numero: null,
+                apodo: 'Líder de los Dragones de Jade',
+                descripcion: 'Figura enigmática y poderosa en el submundo de Neo-Kyoto. Su palabra es ley entre los suyos, y su lealtad es tan peligrosa como su traición.',
+                dialogo: '"En mi imperio, la lealtad se paga con sangre... o con oro."',
+                img: 'images/madame_jade.png',
+                nombreReal: 'Madame Jade'
+            },
+            {
+                nombre: 'Jin "Silverhand"',
+                numero: null,
+                apodo: 'Mercenario Legendario',
+                descripcion: 'Veterano de mil batallas, Jin es conocido por su brazo de plata y su código de honor. Es leyenda viva entre los mercenarios.',
+                dialogo: '"No lucho por banderas, lucho por principios. Y por quien pueda pagar mi precio."',
+                img: 'images/jin_silverhand.png',
+                nombreReal: 'Jin "Silverhand"'
+            },
+            {
+                nombre: 'Yuki Nakamura',
+                numero: null,
+                apodo: 'Hija de Hideo, heredera de Nakamura-Daichi',
+                descripcion: 'Joven prodigio en biotecnología, Yuki es la heredera de la corporación. Su ambición solo es igualada por su talento.',
+                dialogo: '"El futuro pertenece a quienes se atreven a reescribir el código de la vida."',
+                img: 'images/yuki_nakamura.png',
+                nombreReal: 'Yuki Nakamura'
+            },
+            {
+                nombre: 'Zero Void',
+                numero: null,
+                apodo: 'Asesino Cibernético',
+                descripcion: 'Casi un mito urbano, Zero Void es un asesino a sueldo con implantes experimentales que le permiten volverse invisible a los sensores y cámaras.',
+                dialogo: '"No puedes matar lo que no puedes ver."',
+                img: 'images/zero_void.png',
+                nombreReal: 'Zero Void'
+            },
+            {
+                nombre: 'Iris',
+                numero: null,
+                apodo: 'Operadora de la Resistencia',
+                descripcion: 'Experta en comunicaciones y sabotaje, Iris coordina las células de resistencia desde las sombras. Su identidad real es desconocida.',
+                dialogo: '"La esperanza es la señal más difícil de bloquear."',
+                img: 'images/iris.png',
+                nombreReal: 'Iris'
+            }
+        ];
+
+        const faccionesExtendidas = [
+            {
+                nombre: 'OmniCorp Entertainment (OCE)',
+                descripcion: 'Conglomerado mediático global con una división especializada en "entretenimiento extremo". Rumores dicen que también es una tapadera para operaciones negras y desarrollo de tecnología militar. OCE no sólo busca entretener, sino obtener datos biomecánicos y psicológicos de combate bajo estrés extremo. Dentro de su estructura se ocultan múltiples sub-divisiones dedicadas a investigación prohibida, desde modificaciones genéticas hasta tecnología de transferencia mental.',
+                img: 'images/oce_logo.png'
+            },
+            {
+                nombre: 'Colectivo Nexus-9',
+                descripcion: 'Comunidad tecno-anarquista que opera en los márgenes de Neo-Kyoto. Formada originalmente por investigadores de IA expulsados de corporaciones, hackers idealistas y transhumanistas radicales, el colectivo se dedica a "democratizar" la tecnología de modificación corporal y transferencia de conciencia. Organizados en células semi-autónomas, creen que la inmortalidad digital debe estar disponible para todos, no solo para las élites corporativas. Han infiltrado personal en OCE para tener acceso a las pilas corticales de los concursantes fallecidos, que son reutilizadas en sus propios experimentos.',
+                img: 'images/nexus9_logo.png'
+            },
+            {
+                nombre: 'Chrome Dynasty',
+                descripcion: 'Organización criminal de élite evolucionada desde sus raíces como una triada tradicional hasta convertirse en un imperio tecnológico clandestino. Sus miembros son reconocibles por sus elaborados implantes cromados visibles y tatuajes holográficos que muestran su rango y especialización dentro de la organización. Controlan gran parte del tráfico de ciberware de lujo, sustancias psicoactivas sintéticas y servicios de modificación corporal extrema en Neo-Kyoto. Están obsesionados con la "pureza" y "superioridad" del hardware que utilizan, despreciando a quienes usan implantes de menor calidad.',
+                img: 'images/chrome_dynasty_logo.png'
+            },
+            {
+                nombre: 'Zaibatsu Nakamura-Daichi Corp',
+                descripcion: 'Oficialmente un conglomerado de tecnología médica centrado en prótesis y biotecnología, pero en realidad es un zaibatsu en ascenso con ambiciones globales. Esta corporación familiar surgió después del colapso económico del 2119 y ha crecido agresivamente mediante una combinación de innovación genuina, espionaje corporativo y tácticas despiadadas. Su especialidad es la integración perfecta de cibernética y tejido orgánico, creando implantes que son prácticamente indistinguibles de las partes naturales. Su filosofía corporativa promueve la "Armonía Tecno-Orgánica" - la creencia de que la tecnología debe complementar al cuerpo humano de forma natural.',
+                img: 'images/nakamura_daichi_logo.png'
+            },
+            {
+                nombre: 'Huérfanos Digitales',
+                descripcion: 'Tribu urbana formada por jóvenes cuyos padres o tutores fueron víctimas de la "muerte digital" - personas cuyas conciencias fueron transferidas a sistemas digitales que posteriormente fallaron, dejando a sus familias en un limbo legal y emocional. No son una organización criminal tradicional, sino un movimiento de resistencia cultural y activista. Rechazan la promesa corporativa de inmortalidad digital, viendo la transferencia de conciencia como una forma de esclavitud moderna. Su estética combina elementos retro-analógicos con tecnología moderna reprogramada, y muchos miembros llevan "máscaras de luto digital" que muestran imágenes pixeladas o distorsionadas de sus padres perdidos.',
+                img: 'images/huerfanos_digitales_emblema.png'
+            }
+        ];
+
+        // Utilidades para localStorage
         function getConocidosSeleccionados() {
-            const val = getCookie('conocidosSeleccionados');
+            const val = localStorage.getItem('conocidosSeleccionados');
             return val ? JSON.parse(val) : [];
         }
         function getConocimientosSeleccionados() {
-            const val = getCookie('conocimientosSeleccionados');
+            const val = localStorage.getItem('conocimientosSeleccionados');
             return val ? JSON.parse(val) : [];
         }
         function setConocidosSeleccionados(arr) {
-            setCookie('conocidosSeleccionados', JSON.stringify(arr));
+            localStorage.setItem('conocidosSeleccionados', JSON.stringify(arr));
         }
         function setConocimientosSeleccionados(arr) {
-            setCookie('conocimientosSeleccionados', JSON.stringify(arr));
+            localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
         }
         function renderTarjetasSeleccionadas() {
             // Conocidos
             const conocidosSel = getConocidosSeleccionados();
             const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
-            const conocidosCont = document.getElementById('conocidos-tarjetas');
-            if (conocidos.length === 0) {
-                conocidosCont.innerHTML = '<div class="no-items">No hay conocidos seleccionados.</div>';
-            } else {
-                conocidosCont.innerHTML = conocidos.map(p => `
+            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
+                // Mapeo de número de concursante
+                const numeros = {
+                    'Auri': 13,
+                    'Boris "Goliath" Volkov': 42,
+                    'Silas "Glitch" Vance': 17,
+                    'Raven (Mizuki Tanaka)': 89,
+                    'Chispa (Anya Sharma)': 31,
+                    'Marcus "Old Man" Thorne': 76,
+                    'Jinx': 23,
+                    'Lin Mayfair': 58,
+                    'Subject Omega': 91,
+                    'Ekaterina "Echo" Petrov': 37,
+                    'Dr. Felix "Compound" Reyes': 64,
+                    'Los Gemelos (Jin & Jun)': 82,
+                    'Sofía "Viper" Nakamura': 45,
+                    'Alex "Phantom" Mercer': 29,
+                    'Marcus "Titan" Graves': 71,
+                    'Faith "Oracle" Lee': 53,
+                    'Darius "Thunder Fist" Jackson': 68,
+                    'Aria "Maven" Chen': 19
+                };
+                const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
+                const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '';
+                // Si no hay número, usar el nombre real como "numero" visual
+                const displayLabel = numero || personajeExtendido.nombreReal || p.nombre;
+                const clave = `nombreConcursante_${displayLabel}`;
+                // Pre-rellenar con el nombre real si no hay valor guardado
+                const valorGuardado = localStorage.getItem(clave) || '';
+                return `
                     <div class="character-card">
                         <img src="${p.img}" alt="${p.nombre}" class="character-image">
                         <div class="character-info">
-                            <h4 class="character-name">${p.nombre}</h4>
-                            <div class="character-description">${p.desc}</div>
+                            <h4 class="character-name">${displayLabel} <input type='text' class='nombre-concursante-input' data-numero='${displayLabel}' placeholder='Nota' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
+                            <div class="character-role" style="color: #ff4757; font-size: 0.9em; margin-bottom: 8px;">${personajeExtendido.apodo || ''}</div>
+                            <p class="character-description">${personajeExtendido.descripcion || p.desc}</p>
+                            ${personajeExtendido.dialogo ? `<div class="dialogue" style="background: rgba(255, 71, 87, 0.1); border-left: 3px solid #ff4757; padding: 8px; margin-top: 8px; font-style: italic;">${personajeExtendido.dialogo}</div>` : ''}
                         </div>
                     </div>
-                `).join('');
-            }
+                `;
+            }).join('');
+            
+            // Listeners para guardar el nombre al escribir
+            document.querySelectorAll('.nombre-concursante-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const num = this.getAttribute('data-numero');
+                    localStorage.setItem(`nombreConcursante_${num}`, this.value);
+                });
+            });
+            
             // Conocimientos
             const conocimientosSel = getConocimientosSeleccionados();
             const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
-            const conocimientosCont = document.getElementById('conocimientos-tarjetas');
-            if (conocimientos.length === 0) {
-                conocimientosCont.innerHTML = '<div class="no-items">No hay conocimientos seleccionados.</div>';
-            } else {
-                conocimientosCont.innerHTML = conocimientos.map(f => `
+            document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => {
+                const faccionExtendida = faccionesExtendidas.find(fe => fe.nombre === f.nombre) || f;
+                return `
                     <div class="faction-card">
                         <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
                         <div class="faction-info">
                             <h3>${f.nombre}</h3>
-                            <p>${f.desc}</p>
+                            <p>${faccionExtendida.descripcion || f.desc}</p>
                         </div>
                     </div>
-                `).join('');
-            }
+                `;
+            }).join('');
+
+            // Después de renderizar las tarjetas, añado el listener para abrir la imagen al hacer clic
+            addImageModalListeners();
         }
+
+        // Reemplazo el click de la imagen para usar openImageModal
+        function addImageModalListeners() {
+            document.querySelectorAll('.character-card .character-image').forEach(img => {
+                img.style.cursor = 'pointer';
+                img.onclick = function() {
+                    openImageModal(this.src);
+                };
+            });
+        }
+
+        // Modal de imagen con neón
+        window.openImageModal = function(imgSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('active');
+            modalImg.src = imgSrc;
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Cerrar modal al hacer click en la X
+        const closeModal = document.querySelector('.close-modal');
+        if (closeModal) {
+            closeModal.onclick = function() {
+                document.getElementById('imageModal').classList.remove('active');
+                document.body.style.overflow = '';
+            };
+        }
+
+        // Cerrar modal al hacer click fuera de la imagen
+        const imageModal = document.getElementById('imageModal');
+        if (imageModal) {
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    imageModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Cerrar modal con ESC
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && imageModal.classList.contains('active')) {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
     </script>
 </body>
 </html> 
