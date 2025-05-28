@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.36</h1>
+                        <h1>ULTIMATE MERCENARY 0.37</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1452,10 +1452,7 @@
             if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
             localStorage.removeItem('mensajes-jugador-sesion');
             localStorage.removeItem('pmSumadosParaBotones');
-            localStorage.removeItem('mensajes-auto-sesion');
-            localStorage.removeItem('mensajes-publico-expanded');
-            // Borra también los mensajes del jugador
-            localStorage.removeItem('mensajes-jugador');
+            localStorage.removeItem('mensajes-jugador'); // Borra solo los mensajes del jugador
         }
         function agregarMensajeAlChatDisplay(msgData, msgId) {
             const chatMessagesContainer = document.getElementById('chat-messages');
@@ -1475,19 +1472,18 @@
                 {label: 'INFLUENCER', style: 'background:#eccc68;color:#222;border:1px solid #eccc68;'},
                 {label: 'EXPERTO', style: 'background:#5352ed;color:#fff;border:1px solid #5352ed;'}
             ];
-            // Si el mensaje ya tiene un tag (de mensajes-publico-expanded), respétalo
             if (msgData.tagImmersivo) {
                 tagLabel = msgData.tagImmersivo;
                 const found = tagsImmersivos.find(t => t.label === tagLabel);
                 tagStyle = found ? found.style : tagsImmersivos[0].style;
-            } else if (msgData.automatico) {
-                // Selecciona un tag aleatorio para mensajes automáticos
+            } else if (msgData.automatico && msgData.showTag) {
+                // Solo si showTag está en true
                 const tagObj = tagsImmersivos[Math.floor(Math.random() * tagsImmersivos.length)];
                 tagLabel = tagObj.label;
                 tagStyle = tagObj.style;
             }
             if (tagLabel) {
-                tag = `<span class="tag" style="${tagStyle}margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">${tagLabel}</span>`;
+                tag = `<span class=\"tag\" style=\"${tagStyle}margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;\">${tagLabel}</span>`;
             }
             if (msgData.usuario === 'TÚ') {
                 userColor = '#00ccff';
@@ -1503,9 +1499,9 @@
             if (pmValue || tagLabel) div.classList.add('destacado');
             div.className += ' chat-message';
             div.innerHTML = `
-                <span class="username" style="color:${userColor};font-weight:bold;">${msgData.usuario || 'Anónimo'}:${tag}</span>
-                <span class="content">${msgData.mensaje || ''}</span>
-                <span style="float:right;font-size:11px;color:#888;">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span class=\"username\" style=\"color:${userColor};font-weight:bold;\">${msgData.usuario || 'Anónimo'}:${tag}</span>
+                <span class=\"content\">${msgData.mensaje || ''}</span>
+                <span style=\"float:right;font-size:11px;color:#888;\">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             `;
             if (pmValue) {
                 const btn = document.createElement('button');
@@ -1567,15 +1563,20 @@
             let autoMsgIndex = 0;
             autoMsgInterval = setInterval(() => {
                 const idx = autoMsgIndex % ejemplos.length;
-                // Tag immersivo aleatorio
-                const tagsImmersivos = ["VIP","PATROCINADO","FAN","SPONSOR","INFLUENCER","EXPERTO"];
-                const tagImmersivo = tagsImmersivos[Math.floor(Math.random()*tagsImmersivos.length)];
+                // Tag immersivo solo en 1 de cada 5
+                const showTag = (autoMsgIndex % 5 === 0);
+                let tagImmersivo = undefined;
+                if (showTag) {
+                    const tagsImmersivos = ["VIP","PATROCINADO","FAN","SPONSOR","INFLUENCER","EXPERTO"];
+                    tagImmersivo = tagsImmersivos[Math.floor(Math.random()*tagsImmersivos.length)];
+                }
                 const msg = {
                     usuario: nombresUsuarios[idx % nombresUsuarios.length],
                     mensaje: ejemplos[idx],
                     color: coloresAuto[idx % coloresAuto.length],
                     hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                     automatico: true,
+                    showTag,
                     tagImmersivo
                 };
                 const msgId = `auto-${autoMsgIndex}`;
