@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.33</h1>
+                        <h1>ULTIMATE MERCENARY 0.35</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1198,12 +1198,12 @@
 
         <!-- NEW Objective Modal - Ensure any old #test-modal is removed -->
         <div id="test-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 5000;">
-            <div style="background-color: #111; color: #fff; max-width: 900px; min-width: 350px; margin: 40px auto; padding: 40px 40px 30px 40px; border: 2px solid #ff4757; border-radius: 12px; box-shadow: 0 0 40px 10px rgba(255,71,87,0.25); height: 90vh; display: flex; flex-direction: column;">
+            <div style="background-color: #111; color: #fff; max-width: 900px; width: 95vw; min-width: 320px; margin: 40px auto; padding: 40px 40px 30px 40px; border: 2px solid #ff4757; border-radius: 12px; box-shadow: 0 0 40px 10px rgba(255,71,87,0.25); max-height: 90vh; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1.5px solid #444;">
                     <h2 id="objective-modal-title" style="color: #ff4757; font-family: 'Orbitron', sans-serif; margin: 0; font-size: 28px; letter-spacing: 1px;">OBJETIVO</h2>
                     <button onclick="document.getElementById('test-modal').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 10px 22px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 16px;">CERRAR</button>
                 </div>
-                <div id="objective-modal-description" style="font-size: 18px; line-height: 1.7; flex: 1 1 auto; overflow-y: auto; max-height: 75vh;">
+                <div id="objective-modal-description" style="font-size: 18px; line-height: 1.7; flex: 1 1 auto; overflow-y: auto; max-height: 70vh;">
                     <!-- Descripción del objetivo -->
                 </div>
             </div>
@@ -1454,21 +1454,37 @@
             localStorage.removeItem('pmSumadosParaBotones');
             localStorage.removeItem('mensajes-auto-sesion');
             localStorage.removeItem('mensajes-publico-expanded');
+            // Borra también los mensajes del jugador
+            localStorage.removeItem('mensajes-jugador');
         }
         function agregarMensajeAlChatDisplay(msgData, msgId) {
             const chatMessagesContainer = document.getElementById('chat-messages');
             if (!chatMessagesContainer) return;
             const div = document.createElement('div');
-            div.className = 'chat-message';
-            let userColor = msgData.color || '#cccccc';
-            if (msgData.usuario === 'TÚ') userColor = '#00ccff';
-            else if (msgData.usuario === 'Kaiser') userColor = '#ff4757';
+            // Colores de nicks
+            let userColor = '#cccccc';
+            let tag = '';
+            if (msgData.usuario === 'TÚ') {
+                userColor = '#00ccff';
+                tag = '<span class="tag" style="background:#222;color:#00ccff;border:1px solid #00ccff;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">JUGADOR</span>';
+            } else if (msgData.usuario === 'Kaiser') {
+                userColor = '#ff4757';
+                tag = '<span class="tag" style="background:#222;color:#ff4757;border:1px solid #ff4757;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">KAISER</span>';
+            } else if (msgData.automatico) {
+                userColor = msgData.color || '#ffd700';
+                tag = '<span class="tag" style="background:#222;color:#ffd700;border:1px solid #ffd700;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">AUTOMÁTICO</span>';
+            } else {
+                userColor = msgData.color || '#cccccc';
+            }
+            // Mensaje destacado si es PM
+            const pmValue = (msgData.mensaje||'').match(/([+][0-9]+)\s*PM/) ? parseInt((msgData.mensaje.match(/([+][0-9]+)\s*PM/)||[])[1].replace('+','')) : null;
+            if (pmValue) div.classList.add('destacado');
+            div.className += ' chat-message';
             div.innerHTML = `
-                <span class="username" style="color:${userColor};">${msgData.usuario || 'Anónimo'}:</span>
+                <span class="username" style="color:${userColor};font-weight:bold;">${msgData.usuario || 'Anónimo'}:${tag}</span>
                 <span class="content">${msgData.mensaje || ''}</span>
                 <span style="float:right;font-size:11px;color:#888;">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             `;
-            const pmValue = (msgData.mensaje||'').match(/([+][0-9]+)\s*PM/) ? parseInt((msgData.mensaje.match(/([+][0-9]+)\s*PM/)||[])[1].replace('+','')) : null;
             if (pmValue) {
                 const btn = document.createElement('button');
                 btn.textContent = `Aceptar +${pmValue} PM`;
@@ -1509,6 +1525,9 @@
                 "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
                 "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
             ];
+            const coloresAuto = [
+                '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
+            ];
             const ejemplos = [
                 "¡Vamos XIII, no decepciones a tus fans!",
                 "¡Estoy apostando todo por ti, no me falles!",
@@ -1529,8 +1548,9 @@
                 const msg = {
                     usuario: nombresUsuarios[idx % nombresUsuarios.length],
                     mensaje: ejemplos[idx],
-                    color: idx >= 10 ? '#ffb347' : '#cccccc',
-                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                    color: coloresAuto[idx % coloresAuto.length],
+                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    automatico: true
                 };
                 const msgId = `auto-${autoMsgIndex}`;
                 agregarMensajeAlChatDisplay(msg, msgId);
