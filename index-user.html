@@ -1098,7 +1098,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.21</h1>
+                        <h1>ULTIMATE MERCENARY 0.22</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1238,11 +1238,11 @@
         </div>
         
         <!-- Modal de Prueba -->
-        <div id="test-modal" class="rules-modal">
+        <div id="test-modal" class="rules-modal" style="z-index:4000; background: rgba(0,0,0,0.92);">
             <div class="rules-content">
                 <h1 id="test-title">OBJETIVO</h1>
                 <div class="test-image-container">
-                    <img id="test-image" src="images/kaiser_intro_new.png" alt="Imagen de la prueba" style="width: 100%; max-height: 300px; object-fit: cover; margin: 20px 0; border-radius: 8px;">
+                    <img id="test-image" src="" alt="Imagen de la prueba" style="width: 100%; max-height: 300px; object-fit: cover; margin: 20px 0; border-radius: 8px; display: none;">
                 </div>
                 <div id="test-description" class="test-description">
                     <!-- La descripción se cargará dinámicamente -->
@@ -1252,7 +1252,8 @@
         </div>
         
         <div class="scanline"></div>
-        <div class="overlay"></div>
+        <!-- El overlay NO debe estar por encima del modal de objetivo -->
+        <div class="overlay" style="z-index:100;"></div>
     </div>
 
     <!-- Secciones de Conocidos y Conocimientos -->
@@ -1401,12 +1402,19 @@
         const descDiv = document.getElementById('test-description');
         if (!descDiv) return;
         document.getElementById('test-title').textContent = 'OBJETIVO';
-        // Imagen: fallback si no existe
+        // Imagen: mostrar la imagen correcta para la prueba
         const img = document.getElementById('test-image');
         if (img) {
-            const pruebaImg = `images/prueba${currentTest.replace('prueba','')}.jpg`;
-            img.style.display = '';
+            let pruebaImg = '';
+            switch(currentTest) {
+                case 'prueba0': pruebaImg = 'images/kaiser_intro_new.png'; break;
+                case 'prueba1': pruebaImg = 'images/obstacle_course_new.png'; break;
+                case 'prueba2': pruebaImg = 'images/abandoned_greenhouse.png'; break;
+                case 'prueba3': pruebaImg = 'images/city_ruins.png'; break;
+                default: pruebaImg = 'images/kaiser_intro_new.png';
+            }
             img.src = pruebaImg;
+            img.style.display = '';
         }
         descDiv.innerHTML = '<div style="color:#888;">Cargando...</div>';
         fetch(`prueba${currentTest.replace('prueba','')}.html`)
@@ -1439,12 +1447,11 @@
                 modal.style.display = 'none';
             }
         };
-        document.addEventListener('keydown', function escClose(ev) {
-            if (ev.key === 'Escape') {
+        document.onkeydown = function(e) {
+            if (e.key === 'Escape') {
                 modal.style.display = 'none';
-                document.removeEventListener('keydown', escClose);
             }
-        });
+        };
     }
     window.showTestDescription = showTestDescription;
 
@@ -1484,7 +1491,7 @@
                 time: new Date().toLocaleTimeString()
             }));
             chat.innerHTML = ejemploMensajes.map(msg =>
-                `<div class=\"chat-message\"><span class=\"username\">${msg.sender}:</span> <span class=\"content\">${msg.content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
+                `<div class=\"chat-message\"><span class="username\">${msg.sender}:</span> <span class="content">${msg.content}</span> <span style="float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
             ).join('') + '<div style="color:#888;font-size:13px;">(Mensajes de ejemplo: el chat global está vacío)</div>';
         } else {
             chat.innerHTML = mensajes.map(msg => {
@@ -1492,7 +1499,7 @@
                 const sender = msg.sender || msg.user || 'SISTEMA';
                 const content = msg.content || msg.text || '';
                 const time = msg.time || '';
-                return `<div class=\"chat-message\"><span class=\"username\">${sender}:</span> <span class=\"content\">${content}</span> <span style=\"float:right;font-size:11px;color:#888;\">${time}</span></div>`;
+                return `<div class=\"chat-message\"><span class="username\">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;\">${time}</span></div>`;
             }).join('');
         }
         chat.scrollTop = chat.scrollHeight;
@@ -1619,6 +1626,7 @@
                 return match ? parseInt(match[1].replace('+','')) : null;
             }
             function agregarMensajeAlChat(mensajeData, id) {
+                const chatContainer = document.getElementById('chat-messages');
                 const mensajeElement = document.createElement('div');
                 mensajeElement.className = `chat-message${mensajeData.destacado ? ' destacado' : ''}${mensajeData.esReto ? ' reto' : ''}`;
                 mensajeElement.style.opacity = '0';
@@ -1628,7 +1636,9 @@
                     <span style="float:right;font-size:11px;color:#888;">${mensajeData.hora || ''}</span>
                 `;
                 const pm = extraerPM(mensajeData.mensaje);
-                if (pm && !pmAceptados.includes(id)) {
+                // --- PM: solo sumar si no se ha sumado antes (persistente) ---
+                let pmSumados = JSON.parse(localStorage.getItem('pmSumados') || '{}');
+                if (pm && !pmSumados[id]) {
                     const btn = document.createElement('button');
                     btn.textContent = 'Aceptar +' + pm + ' PM';
                     btn.className = 'pm-accept-btn';
@@ -1642,16 +1652,17 @@
                     btn.onclick = function() {
                         let actual = parseInt(localStorage.getItem('playerPM') || '0');
                         localStorage.setItem('playerPM', actual + pm);
-                        pmAceptados.push(id);
-                        guardarPMAceptados();
+                        pmSumados[id] = true;
+                        localStorage.setItem('pmSumados', JSON.stringify(pmSumados));
                         btn.textContent = 'Aceptado';
                         btn.disabled = true;
                         btn.style.background = '#444';
                         btn.style.color = '#aaa';
                         if (window.updateStatusPanel) window.updateStatusPanel();
+                        if (window.savePM) window.savePM(actual + pm);
                     };
                     mensajeElement.appendChild(btn);
-                } else if (pm && pmAceptados.includes(id)) {
+                } else if (pm && pmSumados[id]) {
                     const btn = document.createElement('button');
                     btn.textContent = 'Aceptado';
                     btn.className = 'pm-accept-btn';
@@ -1748,6 +1759,13 @@
         localStorage.setItem('mensajes-jugador', JSON.stringify(mensajesJugador));
         agregarMensajeAlChat(msg, 'jugador-' + Date.now());
         input.value = '';
+        // --- Sincronizar con Firebase si está disponible ---
+        if (window.saveChat) {
+            let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+            mensajesPublicos.push({ sender: 'TÚ', content: valor, time: msg.hora });
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
+            window.saveChat(mensajesPublicos);
+        }
     }
     document.getElementById('chat-submit').onclick = enviarMensajeJugador;
     document.getElementById('chat-input').addEventListener('keydown', function(e) {
