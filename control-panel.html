@@ -191,7 +191,7 @@
         .main-area {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 2fr 1fr;
             grid-template-rows: auto auto;
             gap: 20px;
             padding: 20px;
@@ -203,17 +203,23 @@
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             border: 1px solid #444;
-            padding: 20px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 30px;
             overflow-y: auto;
+            min-height: 400px;
         }
 
-        /* Ajustar el tamaño de la sección de chat */
-        .control-section:nth-child(2) {
-            grid-column: 1 / -1;
-            max-height: 400px;
+        /* La sección de audiencia ocupa dos filas y la primera columna */
+        .control-section.audience {
+            grid-row: 1 / span 2;
+            grid-column: 1 / 2;
+            min-height: 700px;
+        }
+        /* Las otras secciones ocupan la segunda columna */
+        .control-section:not(.audience) {
+            grid-column: 2 / 3;
         }
 
         .control-section h3 {
@@ -489,7 +495,7 @@
             <!-- Área principal -->
             <div class="main-area">
                 <!-- Sección de Control de Audiencia -->
-                <div class="control-section" style="flex: 1;">
+                <div class="control-section audience">
                     <h3>CONTROL DE AUDIENCIA</h3>
                     
                     <div class="control-group">
@@ -531,7 +537,7 @@
                 </div>
                 
                 <!-- Sección de Control de Mensajes -->
-                <div class="control-section" style="flex: 1;">
+                <div class="control-section">
                     <h3>CONTROL DE MENSAJES</h3>
                     
                     <!-- Añadir el widget de chat -->
@@ -578,7 +584,7 @@
                 </div>
 
                 <!-- Sección de Conocidos y Conocimientos -->
-                <div class="control-section" style="flex: 1;">
+                <div class="control-section">
                     <h3>CONOCIDOS</h3>
                     <div id="conocidos-list" class="control-group"></div>
                     <h3>CONOCIMIENTOS</h3>
@@ -779,7 +785,7 @@
             if (window.saveCurrentTest) window.saveCurrentTest(testId);
         }
 
-        // Función para cargar y mostrar los mensajes del chat
+        // Función para cargar y mostrar los mensajes del chat con animación
         function loadChatMessages() {
             let mensajes = [];
             try {
@@ -790,14 +796,23 @@
             }
             const chat = document.getElementById('chat-messages');
             if (!chat) return;
-            
-            chat.innerHTML = mensajes.map(msg => {
-                const sender = msg.sender || msg.user || 'SISTEMA';
-                const content = msg.content || msg.text || '';
-                const time = msg.time || '';
-                return `<div class="chat-message"><span class="username">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;">${time}</span></div>`;
-            }).join('');
-            chat.scrollTop = chat.scrollHeight;
+            chat.innerHTML = '';
+            if (!mensajes || mensajes.length === 0) {
+                // Mensaje visual si está vacío
+                chat.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;">(El chat global está vacío)</div>';
+                return;
+            }
+            mensajes.forEach((msg, i) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'chat-message';
+                    div.style.opacity = '0';
+                    div.innerHTML = `<span class="username">${msg.sender || msg.user || 'SISTEMA'}:</span> <span class="content">${msg.content || msg.text || ''}</span> <span style=\"float:right;font-size:11px;color:#888;\">${msg.time || ''}</span>`;
+                    chat.appendChild(div);
+                    setTimeout(() => { div.style.opacity = '1'; }, 50);
+                    chat.scrollTop = chat.scrollHeight;
+                }, i * 100);
+            });
         }
         window.loadChatMessages = loadChatMessages;
 
@@ -1001,7 +1016,7 @@
                     mensajes.push(msg);
                     localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajes));
                     if (window.saveChat) window.saveChat(mensajes);
-                    if (window.loadChatMessages) window.loadChatMessages();
+                    loadChatMessages();
                 }, 3000);
             }
             // Iniciar solo si no hay mensajes reales

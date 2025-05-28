@@ -966,6 +966,10 @@
         #test-modal[style*="display: block"], .modal[style*="display: block"] {
             display: block !important;
         }
+
+        .pm-accept-btn {
+            transition: background 0.2s, color 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -1261,8 +1265,7 @@
         <div id="conocimientos-tarjetas" class="facciones-container"></div>
     </div>
 
-    <script src="mensajes-publico.js"></script>
-    <script src="js/stats-manager.js"></script>
+    <script src="mensajes-publico-expanded.js"></script>
     <script>
     // Exponer funciones de UI globalmente para los listeners de Firebase
     if (typeof updateStatusPanel === 'function') window.updateStatusPanel = updateStatusPanel;
@@ -1411,14 +1414,13 @@
                     if (bodyMatch) content = bodyMatch[1];
                 }
                 // Quitar la imagen del header (logo y cabecera)
-                content = content.replace(/<div class="logo-container">[\s\S]*?<\/div>/i, '');
-                // Quitar todo lo que esté por debajo de la sección de especificaciones técnicas
-                // Buscamos la sección técnica y cortamos ahí
-                const techMatch = content.match(/(<div class="technical-section[\s\S]*?<\/div>)/i);
-                if (techMatch) {
-                    // Solo dejamos hasta el final de la sección técnica
-                    content = content.split(techMatch[0])[0] + techMatch[0];
-                }
+                content = content.replace(/<div class=\"logo-container\">[\s\S]*?<\/div>/i, '');
+                // Quitar el título principal (h1 o h2 grande al principio)
+                content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '');
+                // Quitar la primera imagen (img o div con imagen al principio)
+                content = content.replace(/<img[^>]*>[\s\S]*?(<\/div>|<br>|<hr>|<p>|<h2>|<h3>|<section>|<main>|<body>|$)/i, '');
+                // Quitar el recuadro de especificaciones técnicas
+                content = content.replace(/<div class=\"technical-section[\s\S]*?<\/div>/i, '');
                 descDiv.innerHTML = content;
             })
             .catch(() => {
