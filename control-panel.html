@@ -529,11 +529,9 @@
 
     <script src="js/stats-manager.js"></script>
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
             authDomain: "ultimatemercenary-1e212.firebaseapp.com",
@@ -542,42 +540,33 @@
             messagingSenderId: "683730871364",
             appId: "1:683730871364:web:350aaf7a296ad34db28811"
         };
-
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Referencias a los datos en Firebase
+        // Referencias
         const conocidosRef = ref(database, 'conocidosSeleccionados');
         const conocimientosRef = ref(database, 'conocimientosSeleccionados');
         const mensajesRef = ref(database, 'mensajes-directos');
         const currentTestRef = ref(database, 'currentTest');
+        const nombresRef = ref(database, 'nombresConcursantes');
+        const audienceRef = ref(database, 'audience');
+        const ratingRef = ref(database, 'rating');
+        const pmRef = ref(database, 'playerPM');
+        const chatRef = ref(database, 'mensajes-publico-expanded');
 
-        // Función para guardar los conocidos seleccionados en Firebase
-        window.saveConocidosSeleccionados = function(conocidos) {
-            set(conocidosRef, conocidos);
-        };
-
-        // Función para guardar los conocimientos seleccionados en Firebase
-        window.saveConocimientosSeleccionados = function(conocimientos) {
-            set(conocimientosRef, conocimientos);
-        };
-
-        // Función para guardar los mensajes directos en Firebase
-        window.saveMensajesDirectos = function(mensajes) {
-            set(mensajesRef, mensajes);
-        };
-
-        // Función para guardar la prueba actual en Firebase
-        window.saveCurrentTest = function(test) {
-            set(currentTestRef, test);
-        };
-
-        // Función para guardar el nombre del concursante en Firebase
+        // Funciones para guardar en Firebase
         window.saveConcursanteName = function(numero, nombre) {
             const nombreRef = ref(database, `nombresConcursantes/${numero}`);
             set(nombreRef, nombre);
         };
+        window.saveAudience = function(valor) { set(audienceRef, valor); };
+        window.saveRating = function(valor) { set(ratingRef, valor); };
+        window.savePM = function(valor) { set(pmRef, valor); };
+        window.saveChat = function(arr) { set(chatRef, arr); };
+        window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
+        window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
+        window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
+        window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
     </script>
     <script>
         // Sistema de almacenamiento persistente

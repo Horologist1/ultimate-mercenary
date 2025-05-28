@@ -799,8 +799,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.characterSheet.equipment[idx].balasRestantes = value;
                     localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
                 }
+                });
             });
-        });
         // Implantes
         const implantsList = document.getElementById('implants-list');
         implantsList.innerHTML = '';

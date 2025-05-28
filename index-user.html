@@ -963,11 +963,9 @@
 <body>
     <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
             authDomain: "ultimatemercenary-1e212.firebaseapp.com",
@@ -976,70 +974,103 @@
             messagingSenderId: "683730871364",
             appId: "1:683730871364:web:350aaf7a296ad34db28811"
         };
-
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Referencias a los datos en Firebase
+        // Referencias
         const conocidosRef = ref(database, 'conocidosSeleccionados');
         const conocimientosRef = ref(database, 'conocimientosSeleccionados');
         const mensajesRef = ref(database, 'mensajes-directos');
         const currentTestRef = ref(database, 'currentTest');
+        const nombresRef = ref(database, 'nombresConcursantes');
+        const audienceRef = ref(database, 'audience');
+        const ratingRef = ref(database, 'rating');
+        const pmRef = ref(database, 'playerPM');
+        const chatRef = ref(database, 'mensajes-publico-expanded');
 
-        // Escuchar cambios en los conocidos seleccionados
+        // Listeners de sincronización
         onValue(conocidosRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
-                renderTarjetasSeleccionadas();
+                if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
-
-        // Escuchar cambios en los conocimientos seleccionados
         onValue(conocimientosRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
-                renderTarjetasSeleccionadas();
+                if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
-
-        // Escuchar cambios en los mensajes directos
         onValue(mensajesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('mensajes-directos', JSON.stringify(data));
-                loadDirectMessages();
+                if (window.loadDirectMessages) window.loadDirectMessages();
             }
         });
-
-        // Escuchar cambios en la prueba actual
         onValue(currentTestRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('currentTest', data);
-                updateObjective();
+                if (window.updateObjective) window.updateObjective();
             }
         });
-
-        // Función para guardar el nombre del concursante en Firebase
-        window.saveConcursanteName = function(numero, nombre) {
-            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
-            set(nombreRef, nombre);
-        };
-
-        // Escuchar cambios en los nombres de los concursantes
-        const nombresRef = ref(database, 'nombresConcursantes');
         onValue(nombresRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 Object.entries(data).forEach(([numero, nombre]) => {
                     localStorage.setItem(`nombreConcursante_${numero}`, nombre);
                 });
-                renderTarjetasSeleccionadas();
+                if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
+        onValue(audienceRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('spectators', data);
+                if (window.updateStatusPanel) window.updateStatusPanel();
+                if (window.updateUserList) window.updateUserList();
+            }
+        });
+        onValue(ratingRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('rating', data);
+                if (window.updateStatusPanel) window.updateStatusPanel();
+                if (window.updateUserList) window.updateUserList();
+            }
+        });
+        onValue(pmRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('playerPM', data);
+                if (window.updateStatusPanel) window.updateStatusPanel();
+                if (window.updateUserList) window.updateUserList();
+            }
+        });
+        onValue(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
+                if (window.loadChatMessages) window.loadChatMessages();
+            }
+        });
+
+        // Funciones para guardar en Firebase (si el usuario puede modificar)
+        window.saveConcursanteName = function(numero, nombre) {
+            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
+            set(nombreRef, nombre);
+        };
+        window.saveAudience = function(valor) { set(audienceRef, valor); };
+        window.saveRating = function(valor) { set(ratingRef, valor); };
+        window.savePM = function(valor) { set(pmRef, valor); };
+        window.saveChat = function(arr) { set(chatRef, arr); };
+        window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
+        window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
+        window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
+        window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
     </script>
     <div class="main-container">
         <!-- Video de fondo -->
@@ -1223,881 +1254,5 @@
 
     <script src="mensajes-publico.js"></script>
     <script src="js/stats-manager.js"></script>
-    <script>
-        // Tu configuración de Firebase
-        const firebaseConfig = {
-            // Aquí irán tus credenciales de Firebase
-            // Las encontrarás en la consola de Firebase > Configuración del proyecto
-        };
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Base de datos unificada de mensajes
-        const mensajesUnificados = {
-            nombres: [
-                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
-                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
-                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22",
-                "RazorGirl", "BlackICE", "HologramGhost", "PunisherX",
-                "RealityShow_Addict", "VoidWalker", "SilverHand_Jr", "ChromeKid",
-                "JapantownRat", "NightCityDreamer", "StimJunkie", "ArasaxaCorp",
-                "SteelSamurai", "NetRunnerWannabe", "FutureShock", "DigitalAssassin",
-                "KaiserFan01", "OCE_VIP", "BioHacker", "SyntheticLover",
-                "CyberPsycho", "MeatSpace", "DigitalNomad", "TechnoMancer",
-                "RichCorp_Kid", "WastelandPunk", "BodyModder", "MilSpecGear",
-                "RetroBlade", "SoloOperative", "Flatline_Prophet", "CHOOMBA_45",
-                "ShadowRunner", "DataPirate", "ToxicWasteland", "DeckHead",
-                "ConsoleKid", "BloodSport_Queen", "ThirstyForBlood", "MeatGrinder69",
-                "DeathDealerPRO", "ChromeAddict", "Zer0Mercy", "CyberDom",
-                "WetWare_Fetish", "SyntheticPleasure", "BladeWorship", "NeonDreamer"
-            ],
-            colores: [
-                "#ff4757", "#2ed573", "#1e90ff", "#ffa502", "#7bed9f", 
-                "#70a1ff", "#ff6b81", "#a4b0be", "#f368e0", "#ff9ff3", 
-                "#00d2d3", "#5352ed", "#6087FF", "#FEC777", "#00bfff",
-                "#FF1493", "#FF00FF", "#FF69B4", "#8B008B", "#9932CC",
-                "#00FF7F", "#00FFFF", "#00CED1", "#1E90FF", "#FF8C00"
-            ],
-            mensajes: [
-                // Mensajes de fans
-                "¡Vamos XIII, no decepciones a tus fans!",
-                "¡Estoy apostando todo por ti, no me falles!",
-                "Mira esos reflejos, ¡eres una máquina!",
-                "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
-                "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
-                "OCE debería ponerte un reto REAL, XIII",
-                "Ese cromo que llevas parece de segunda mano...",
-                "¡Eres mi favorita desde el principio!",
-                "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
-                "Por dios, alguien dé algo de equipo decente a la XIII",
-                "Sácale los ojos al siguiente que veas",
-                "Mi hija te adora, no mueras por favor",
-                "Ese último movimiento fue ÉPICO, XIII",
-                "Tu puntuación de audiencia acaba de subir un 15%",
-                "Kaiser está evaluando tus movimientos, impresiónalo",
-                "A este ritmo acabarás como carne picada",
-                "Empiezo a creer que realmente tienes posibilidades, XIII",
-                "Nadie ha pasado la siguiente prueba con vida, ¿serás la primera?",
-                "Llevo viendo este programa 5 temporadas y eres la mejor hasta ahora",
-                "¿Has considerado aliarte con el tipo del brazo biónico?",
-                
-                // Mensajes con PM
-                "¡Si eliminas a 3 concursantes en los próximos 30 minutos, te transfiero 75 PM!",
-                "¡Besa a otro concursante en los próximos 10 minutos y te doy 25 PM!",
-                "¡Haz el baile viral 'Chrome Shuffle' y te transfiero 15 PM al instante!",
-                "¡Si recitas el lema completo de OCE, te doy 20 PM ahora mismo!",
-                "¡Rompe tu propio equipo en cámara y te transfiero 40 PM por tu valentía!",
-                "¡Desafía públicamente a #01 Goliath y te doy 50 PM por tu audacia!",
-                "¡Aplica primeros auxilios a un concursante herido y te transfiero 30 PM!",
-                "¡Cuéntanos tu historia más oscura y te doy 35 PM al instante!",
-                "¡Grita 'OCE es mi dios ahora' y te transfiero 10 PM!",
-                "¡Lleva a cabo un ritual con la sangre de un enemigo caído y te doy 45 PM!",
-                
-                // Retos específicos
-                "¡Haz un striptease para la cámara, XIII! ¡Te transfiero 10 PM si lo haces!",
-                "¡Besa al próximo participante que veas y te doy 15 PM!",
-                "Reta a [PARTICIPANTE] a un duelo cuerpo a cuerpo y te transfiero 20 PM!",
-                "Haz 20 flexiones ahora mismo y te doy 5 PM por tu fuerza!",
-                "Rompe tu arma principal y te transfiero 40 PM por tu valentía!",
-                "Confiesa tu mayor miedo a la cámara y te doy 25 PM!",
-                "Háblale a la cámara sobre por qué entraste al programa y te transfiero 15 PM!",
-                "¡Intenta hackear el siguiente terminal sin protección y te doy 30 PM!",
-                "Cuéntanos tu peor secreto y te transfiero 35 PM!",
-                "Sabotea el equipo de [PARTICIPANTE] y te doy 45 PM!",
-                
-                // Mensajes de crítica
-                "Mi abuela con artritis se mueve mejor que tú en combate.",
-                "¿Llamas a eso una estrategia? Mi tostadora tiene mejor planificación.",
-                "Todos mis amigos dicen que eres la peor de la temporada. Demuéstrales que se equivocan.",
-                "¿Te entrenó un niño de 5 años? Porque tus movimientos lo sugieren.",
-                "Si tu puntería fuera un restaurante, tendría cero estrellas y una investigación sanitaria.",
-                
-                // Mensajes de apoyo
-                "¡La audiencia de Neo-Kyoto Norte te adora!",
-                "Baja el ritmo o te quemarás antes de la prueba final",
-                "Acabo de hackear las cámaras de la arena, cuidado con el sector 7",
-                "¡MÁTALOS A TODOS!",
-                "¿Por qué no intentas algo más arriesgado? Aburres...",
-                "Usa ese implante que conseguiste, ¡para eso gastaste PM!",
-                "Realmente impresionante tu técnica con esa katana",
-                "Mi IA predice un 32% de posibilidades de supervivencia",
-                "Tu puntuación en las apuestas acaba de duplicarse"
-            ],
-            participantes: [
-                "Goliath", "Silas", "Raven", "Chispa", "Marcus", "Jinx", "Lin", "Subject Omega",
-                "Echo", "Compound", "Los Gemelos", "Viper", "Phantom", "Titan", "Oracle", "Thunder Fist",
-                "Maven", "Nano", "Participante #23", "Participante #45", "Participante #17", "Participante #9"
-            ]
-        };
-
-        // Función para generar un mensaje aleatorio
-        function generarMensajeAleatorio() {
-            const usuario = mensajesUnificados.nombres[Math.floor(Math.random() * mensajesUnificados.nombres.length)];
-            const color = mensajesUnificados.colores[Math.floor(Math.random() * mensajesUnificados.colores.length)];
-            
-            // 2% de probabilidad de que sea un mensaje con PM (1 de cada 50)
-            const esMensajeConPM = Math.random() < 0.02;
-            
-            // Si es mensaje con PM, seleccionar solo de los mensajes que ofrecen PM
-            let mensaje;
-            if (esMensajeConPM) {
-                const mensajesConPM = mensajesUnificados.mensajes.filter(m => 
-                    m.includes("PM") && (
-                        m.includes("te doy") || 
-                        m.includes("te transfiero") || 
-                        m.includes("te daré") ||
-                        m.includes("te darán") ||
-                        m.includes("te dará") ||
-                        m.includes("te dar") ||
-                        m.includes("te regalo") ||
-                        m.includes("te envío") ||
-                        m.includes("te mando") ||
-                        m.includes("te paso") ||
-                        m.includes("si lo haces") ||
-                        m.includes("si lo realizas") ||
-                        m.includes("si lo completas") ||
-                        m.includes("si lo logras") ||
-                        m.includes("si lo consigues") ||
-                        m.includes("si lo intentas") ||
-                        m.includes("si lo aceptas") ||
-                        m.includes("si te atreves") ||
-                        m.includes("si te animas")
-                    )
-                );
-                mensaje = mensajesConPM[Math.floor(Math.random() * mensajesConPM.length)];
-            } else {
-                // Si no es mensaje con PM, seleccionar de los mensajes que NO ofrecen PM
-                const mensajesSinPM = mensajesUnificados.mensajes.filter(m => 
-                    !m.includes("PM") || !(
-                        m.includes("te doy") || 
-                        m.includes("te transfiero") || 
-                        m.includes("te daré") ||
-                        m.includes("te darán") ||
-                        m.includes("te dará") ||
-                        m.includes("te dar") ||
-                        m.includes("te regalo") ||
-                        m.includes("te envío") ||
-                        m.includes("te mando") ||
-                        m.includes("te paso") ||
-                        m.includes("si lo haces") ||
-                        m.includes("si lo realizas") ||
-                        m.includes("si lo completas") ||
-                        m.includes("si lo logras") ||
-                        m.includes("si lo consigues") ||
-                        m.includes("si lo intentas") ||
-                        m.includes("si lo aceptas") ||
-                        m.includes("si te atreves") ||
-                        m.includes("si te animas")
-                    )
-                );
-                mensaje = mensajesSinPM[Math.floor(Math.random() * mensajesSinPM.length)];
-            }
-            
-            // Reemplazar [PARTICIPANTE] si existe en el mensaje
-            if (mensaje.includes("[PARTICIPANTE]")) {
-                const participante = mensajesUnificados.participantes[Math.floor(Math.random() * mensajesUnificados.participantes.length)];
-                mensaje = mensaje.replace("[PARTICIPANTE]", participante);
-            }
-            
-            return {
-                usuario: usuario,
-                color: color,
-                mensaje: mensaje,
-                destacado: Math.random() < 0.2, // 20% de mensajes destacados
-                esReto: esMensajeConPM
-            };
-        }
-
-        // Función para cargar mensajes del chat
-        function loadChatMessages() {
-            const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML = ''; // Limpiar mensajes existentes
-            
-            // Solo mostrar el mensaje de bienvenida del sistema
-            const systemMessage = {
-                sender: 'SISTEMA',
-                content: 'Bienvenido a Ultimate Mercenary. Enlace establecido. Tu misión comienza ahora.'
-            };
-
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message system';
-            messageElement.innerHTML = `
-                <div class="username">${systemMessage.sender}</div>
-                <div class="content">${systemMessage.content}</div>
-            `;
-            chatMessages.appendChild(messageElement);
-
-            // Función para generar un nuevo mensaje
-            function generateNewMessage() {
-                const mensajeData = generarMensajeAleatorio();
-                
-                const messageElement = document.createElement('div');
-                messageElement.className = 'chat-message';
-                
-                if (mensajeData.destacado) {
-                    messageElement.className += ' highlight';
-                }
-
-                let tags = '';
-                // 10% de probabilidad de ser VIP
-                if (Math.random() < 0.1) {
-                    tags += '<span class="tag vip">VIP</span>';
-                }
-                // 5% de probabilidad de ser patrocinado
-                if (Math.random() < 0.05) {
-                    tags += '<span class="tag sponsored">Patrocinado</span>';
-                }
-
-                let pmButton = '';
-                // Si el mensaje contiene PM, añadir botón
-                if (mensajeData.esReto) {
-                    const pmMatch = mensajeData.mensaje.match(/(\d+)\s*PM/);
-                    if (pmMatch) {
-                        const pmAmount = pmMatch[1];
-                        pmButton = `<button class="pm-button" onclick="addPM(${pmAmount}, this)">Aceptar ${pmAmount} PM</button>`;
-                    }
-                }
-
-                messageElement.innerHTML = `
-                    <div class="username" style="color: ${mensajeData.color}">
-                        ${mensajeData.usuario}
-                        ${tags}
-                    </div>
-                    <div class="content">
-                        ${mensajeData.mensaje}
-                        ${pmButton}
-                    </div>
-                `;
-                
-                chatMessages.appendChild(messageElement);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Generar un nuevo mensaje cada 2-4 segundos
-            setInterval(generateNewMessage, Math.random() * 2000 + 2000);
-        }
-
-        // Función para añadir PM
-        function addPM(amount, button) {
-            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
-            const newPM = currentPM + amount;
-            localStorage.setItem('playerPM', newPM.toString());
-            updateStatusPanel();
-            
-            // Deshabilitar el botón y cambiar su texto
-            button.disabled = true;
-            button.textContent = '✓ Aceptado';
-            button.style.backgroundColor = '#a4b0be';
-            button.style.cursor = 'default';
-
-            // Obtener el mensaje y el usuario del reto
-            const messageElement = button.closest('.chat-message');
-            const username = messageElement.querySelector('.username').textContent.trim();
-            const content = messageElement.querySelector('.content').textContent.trim();
-
-            // Crear mensaje de confirmación del sistema
-            const confirmationMessage = {
-                sender: 'SISTEMA',
-                type: 'system',
-                content: `Has aceptado el reto de ${username}: "${content}"
-
-Recompensa: ${amount} PM
-
-Hasta que no lo realices, estos PM no están garantizados. Recuerda que fallar o falsear un reto puede incurrir en una penalización.`,
-                time: new Date().toLocaleTimeString()
-            };
-
-            // Añadir el mensaje a la bandeja de entrada
-            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-            messages.push(confirmationMessage);
-            localStorage.setItem('mensajes-directos', JSON.stringify(messages));
-
-            // Si el modal de mensajes está abierto, actualizar la vista
-            const messagesModal = document.getElementById('messages-modal');
-            if (messagesModal && messagesModal.style.display === 'block') {
-                loadDirectMessages();
-            }
-        }
-
-        // Función para cargar mensajes del modal
-        function loadMessages() {
-            const messagesList = document.getElementById('messages-list');
-            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-            messagesList.innerHTML = '';
-            
-            // Obtener solo mensajes directos
-            const directMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-            
-            // Filtrar mensajes según la pestaña activa
-            const filteredMessages = directMessages.filter(msg => {
-                if (activeTab === 'inbox') return true;
-                return msg.type === activeTab;
-            });
-            
-            if (filteredMessages.length === 0) {
-                const emptyMessage = document.createElement('div');
-                emptyMessage.className = 'message-item';
-                emptyMessage.innerHTML = `
-                    <div class="message-content" style="text-align: center; color: #666;">
-                        No hay mensajes en esta categoría
-                    </div>
-                `;
-                messagesList.appendChild(emptyMessage);
-                return;
-            }
-            
-            filteredMessages.forEach(msg => {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message-item';
-                messageElement.setAttribute('data-type', msg.type || 'system');
-                messageElement.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-sender">${msg.sender}</span>
-                        <span class="message-time">${msg.time}</span>
-                    </div>
-                    <div class="message-content">${msg.content}</div>
-                `;
-                messagesList.appendChild(messageElement);
-            });
-            
-            // Scroll al último mensaje
-            messagesList.scrollTop = messagesList.scrollHeight;
-        }
-
-        // Manejar el envío de mensajes
-        document.getElementById('chat-submit').addEventListener('click', function() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            
-            if (message) {
-                try {
-                    // Crear y añadir el mensaje directamente al chat
-                    const chatMessages = document.getElementById('chat-messages');
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'chat-message';
-                    messageElement.innerHTML = `
-                        <div class="username" style="color: #ff4757">
-                            XIII
-                            <span class="tag vip">VIP</span>
-                        </div>
-                        <div class="content">${message}</div>
-                    `;
-                    chatMessages.appendChild(messageElement);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                    input.value = '';
-                } catch (error) {
-                    console.error('Error al guardar mensaje:', error);
-                }
-            }
-        });
-
-        // También permitir enviar mensaje con Enter
-        document.getElementById('chat-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('chat-submit').click();
-            }
-        });
-
-        // Función para cerrar sesión
-        function logout() {
-            // Solo elimina claves de login (ajusta los nombres si usas otros)
-            localStorage.removeItem('user');
-            localStorage.removeItem('sessionToken');
-            sessionStorage.clear();
-
-            // Limpia cookies de sesión (opcional)
-            document.cookie.split(';').forEach(function(c) {
-                document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/');
-            });
-
-            // Redirige a login
-            window.location.replace('login.html');
-        }
-
-        // Mostrar modal de reglas al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            const rulesModal = document.getElementById('rules-modal');
-            const acceptBtn = document.getElementById('accept-btn');
-            const messageBtn = document.getElementById('message-btn');
-            const objectiveBtn = document.getElementById('objective-btn');
-            const messagesModal = document.getElementById('messages-modal');
-            
-            // Verificar si ya se aceptaron las reglas
-            if (!localStorage.getItem('rulesAccepted')) {
-                rulesModal.style.display = 'block';
-            }
-
-            // Manejar la aceptación de reglas
-            acceptBtn.addEventListener('click', function() {
-                localStorage.setItem('rulesAccepted', 'true');
-                rulesModal.style.display = 'none';
-            });
-
-            // Manejar el botón de mensajes
-            messageBtn.addEventListener('click', function() {
-                messagesModal.style.display = 'block';
-                loadMessages();
-            });
-
-            // Manejar el botón de objetivo
-            objectiveBtn.addEventListener('click', showTestDescription);
-
-            // Cargar mensajes iniciales del chat
-            loadChatMessages();
-        });
-
-        // Función para actualizar los valores del panel de estado
-        function updateStatusPanel() {
-            statsManager.updateUI();
-        }
-
-        // Función para actualizar el objetivo mostrado
-        function updateObjective() {
-            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
-            const objectiveTitle = document.getElementById('objective-title');
-            const objectiveDescription = document.getElementById('objective-description');
-            const backgroundVideo = document.getElementById('background-video');
-            
-            // Actualizar el video de fondo
-            const videoSource = backgroundVideo.querySelector('source');
-            videoSource.src = `videos/${currentTest}.mp4`;
-            backgroundVideo.load();
-            
-            switch(currentTest) {
-                case 'prueba0':
-                    objectiveTitle.textContent = 'Prueba 0: La Caída';
-                    objectiveDescription.textContent = 'Sobrevive al entorno hostil, familiarízate con el equipo básico y demuestra tu capacidad de adaptación en condiciones extremas.';
-                    break;
-                case 'prueba1':
-                    objectiveTitle.textContent = 'Prueba 1: Carrera de Obstáculos';
-                    objectiveDescription.textContent = 'Supera los desafíos físicos y mentales de la carrera industrial, demostrando tu agilidad y resistencia bajo presión.';
-                    break;
-                case 'prueba2':
-                    objectiveTitle.textContent = 'Prueba 2: La Cosecha';
-                    objectiveDescription.textContent = 'Identifica y recolecta especímenes valiosos del Jardín Vertical, demostrando precisión y conocimiento en condiciones peligrosas.';
-                    break;
-                case 'prueba3':
-                    objectiveTitle.textContent = 'Prueba 3: La Entrega';
-                    objectiveDescription.textContent = 'Transporta cargamentos valiosos a través del distrito industrial, demostrando sigilo y eficiencia en cada entrega.';
-                    break;
-                default:
-                    objectiveTitle.textContent = 'Prueba 0: La Caída';
-                    objectiveDescription.textContent = 'Sobrevive al entorno hostil, familiarízate con el equipo básico y demuestra tu capacidad de adaptación en condiciones extremas.';
-            }
-        }
-
-        // Actualizar el objetivo al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            updateObjective();
-            // Actualizar el objetivo cada 5 segundos para mantenerlo sincronizado
-            setInterval(updateObjective, 5000);
-        });
-
-        // Datos completos de las pruebas
-        const testData = {
-            'prueba0': {
-                title: 'Prueba 0: La Caída',
-                image: 'images/kaiser_intro_new.png',
-                description: `
-                    <section>
-                        <h2>NARRATIVA</h2>
-                        <p>El eco de los pasos resuena en el hangar subterráneo mientras los 100 concursantes son conducidos al interior. El aire está cargado con el olor a metal y desinfectante, mezclado con el sudor frío del miedo. Las luces neón parpadean, creando sombras danzantes sobre las paredes de acero.</p>
-                        
-                        <p>Las pantallas gigantes que dominan el hangar cobran vida, y la silueta de Kaiser aparece, su rostro oculto tras una máscara de metal pulido que refleja las luces de neón. Su voz, distorsionada por efectos digitales, resuena en el espacio:</p>
-                        
-                        <div class="cyberpunk-quote">
-                            "¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"
-                        </div>
-                        
-                        <p>Mientras Kaiser habla, los concursantes reciben su equipo básico: un mono gris con el logo de OCE, un cuchillo de combate básico, y una pistola de autodefensa "Pocket Pal Mk.II" con 6 balas. El mensaje es claro: están atrapados, pero no desarmados.</p>
-                        
-                        <p>En las esquinas del hangar, las cámaras de OCE giran silenciosamente, capturando cada reacción, cada gesto de miedo o determinación. Los drones de seguridad patrullan el perímetro, sus ojos rojos escaneando constantemente a los concursantes.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
-                        <ul>
-                            <li><strong>Dificultad Base:</strong> Media</li>
-                            <li><strong>Habilidades Principales:</strong> Supervivencia, Adaptación</li>
-                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
-                            <li><strong>Puntos de Mérito:</strong> 100 PM por completar la prueba</li>
-                        </ul>
-                    </section>
-                `
-            },
-            'prueba1': {
-                title: 'Prueba 1: Carrera de Obstáculos',
-                image: 'images/obstacle_course_new.png',
-                description: `
-                    <section>
-                        <h2>NARRATIVA</h2>
-                        <p>El distrito industrial de Neo-Kyoto se ha transformado en un circuito mortal. Las fábricas abandonadas, los contenedores oxidados y las grúas gigantes forman un laberinto vertical que desafía los límites de la resistencia humana. El aire está cargado con el olor a metal quemado y aceite industrial.</p>
-                        
-                        <p>Las pantallas gigantes que rodean el circuito cobran vida, y la silueta de Kaiser aparece, su voz resonando a través de los altavoces industriales:</p>
-                        
-                        <div class="cyberpunk-quote">
-                            "¡Bienvenidos a la primera prueba real, mis queridos mercenarios! Aquí es donde separamos el cromo del metal barato. Este circuito industrial no es solo una carrera, es una declaración. ¿Quién de ustedes tiene lo que se necesita para ascender? ¿Quién caerá en el olvido? ¡Que comience la carrera de obstáculos!"
-                        </div>
-                        
-                        <p>Los concursantes se alinean en la línea de salida, cada uno equipado con su equipo básico y cualquier mejora que hayan podido conseguir. El circuito se extiende ante ellos, una serie de desafíos que combinan agilidad, fuerza y astucia.</p>
-                        
-                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan el perímetro, asegurándose de que nadie intente tomar atajos prohibidos.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
-                        <ul>
-                            <li><strong>Dificultad Base:</strong> Alta</li>
-                            <li><strong>Habilidades Principales:</strong> Agilidad, Resistencia</li>
-                            <li><strong>Habilidades Secundarias:</strong> Fuerza, Coordinación</li>
-                            <li><strong>Puntos de Mérito:</strong> 150 PM por completar la prueba</li>
-                        </ul>
-                    </section>
-                `
-            },
-            'prueba2': {
-                title: 'Prueba 2: La Cosecha',
-                image: 'images/abandoned_greenhouse.png',
-                description: `
-                    <section>
-                        <h2>NARRATIVA</h2>
-                        <p>El Jardín Vertical de Neo-Kyoto es un monumento a la ingeniería biológica. Una torre de 200 pisos que alberga ecosistemas artificiales, cada uno más peligroso que el anterior. Las plantas modificadas genéticamente brillan con colores neón, mientras los especímenes raros se mueven entre la vegetación.</p>
-                        
-                        <p>Las pantallas holográficas que flotan alrededor del jardín cobran vida, y la silueta de Kaiser aparece, su voz resonando a través del sistema de sonido ambiental:</p>
-                        
-                        <div class="cyberpunk-quote">
-                            "¡Bienvenidos al Jardín Vertical, mis queridos recolectores! Aquí es donde la naturaleza se encuentra con la tecnología, donde cada planta es una obra de arte... y un arma potencial. Su misión es simple: recolectar los especímenes más valiosos. Pero recuerden, en este jardín, cada flor tiene su espina, cada fruto su veneno. ¡Que comience la cosecha!"
-                        </div>
-                        
-                        <p>Los concursantes se equipan con sus trajes de protección y herramientas de recolección. El jardín se extiende ante ellos, una maravilla de la ingeniería biológica que oculta tesoros y peligros en igual medida.</p>
-                        
-                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan los niveles superiores, asegurándose de que nadie intente acceder a zonas restringidas.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
-                        <ul>
-                            <li><strong>Dificultad Base:</strong> Alta</li>
-                            <li><strong>Habilidades Principales:</strong> Conocimiento, Precisión</li>
-                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
-                            <li><strong>Puntos de Mérito:</strong> 200 PM por completar la prueba</li>
-                        </ul>
-                    </section>
-                `
-            },
-            'prueba3': {
-                title: 'Prueba 3: La Entrega',
-                image: 'images/city_ruins.png',
-                description: `
-                    <section>
-                        <h2>NARRATIVA</h2>
-                        <p>El distrito industrial de Neo-Kyoto es un laberinto de fábricas abandonadas y zonas de alta seguridad. Las calles están llenas de bandas rivales, drones de seguridad y sistemas de vigilancia automatizados. El aire está cargado con el olor a metal quemado y aceite industrial.</p>
-                        
-                        <p>Las pantallas gigantes que dominan el distrito cobran vida, y la silueta de Kaiser aparece, su voz resonando a través de los altavoces industriales:</p>
-                        
-                        <div class="cyberpunk-quote">
-                            "¡Bienvenidos a la prueba final, mis queridos mensajeros! En este distrito industrial, cada calle es una batalla, cada esquina un peligro. Su misión es simple: entregar los paquetes a tiempo. Pero recuerden, en Neo-Kyoto, nada es lo que parece. ¡Que comience la entrega!"
-                        </div>
-                        
-                        <p>Los concursantes reciben sus paquetes y rutas asignadas. El distrito se extiende ante ellos, un laberinto de peligros y oportunidades. Cada entrega exitosa acerca a los concursantes a la victoria, pero cada error puede ser fatal.</p>
-                        
-                        <p>Las cámaras de OCE siguen cada movimiento, mientras los drones de seguridad patrullan las calles, asegurándose de que nadie intente tomar atajos prohibidos.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>ESPECIFICACIONES TÉCNICAS</h2>
-                        <ul>
-                            <li><strong>Dificultad Base:</strong> Muy Alta</li>
-                            <li><strong>Habilidades Principales:</strong> Sigilo, Eficiencia</li>
-                            <li><strong>Habilidades Secundarias:</strong> Percepción, Resistencia</li>
-                            <li><strong>Puntos de Mérito:</strong> 250 PM por completar la prueba</li>
-                        </ul>
-                    </section>
-                `
-            }
-        };
-
-        // Función para mostrar la descripción completa de la prueba
-        function showTestDescription() {
-            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
-            const testInfo = testData[currentTest];
-            
-            document.getElementById('test-title').textContent = testInfo.title;
-            document.getElementById('test-image').src = testInfo.image;
-            document.getElementById('test-description').innerHTML = testInfo.description;
-            document.getElementById('test-modal').style.display = 'block';
-        }
-
-        // Función para cargar mensajes directos
-        function loadDirectMessages() {
-            const messagesList = document.getElementById('messages-list');
-            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-            
-            // Filtrar mensajes según la pestaña activa
-            let filteredMessages = messages;
-            if (activeTab === 'inbox') {
-                filteredMessages = messages.filter(m => m.type === 'shop' || m.type === 'achievement' || m.type === 'warning' || m.type === 'system');
-            } else if (activeTab === 'system') {
-                filteredMessages = messages.filter(m => m.type === 'system');
-            } else if (activeTab === 'shop') {
-                filteredMessages = messages.filter(m => m.type === 'shop');
-            }
-
-            if (filteredMessages.length === 0) {
-                messagesList.innerHTML = '<div class="no-messages">No hay mensajes en esta categoría</div>';
-                return;
-            }
-
-            messagesList.innerHTML = filteredMessages.map((message, index) => {
-                const messageClass = `message-item ${message.type}`;
-                const imageHtml = message.image ? 
-                    `<div class="message-image">
-                        <img src="${message.image}" alt="Imagen del item" onerror="this.style.display='none'">
-                    </div>` : '';
-                
-                return `
-                    <div class="${messageClass}">
-                        <div class="message-header">
-                            <span class="message-sender">${message.sender}</span>
-                            <span class="message-time">${message.time}</span>
-                        </div>
-                        ${imageHtml}
-                        <div class="message-content">${message.content}</div>
-                        <div class="message-actions">
-                            ${message.type === 'challenge' ? `
-                                <button onclick="acceptChallenge('${message.sender}')" class="accept-button">Aceptar Reto</button>
-                            ` : ''}
-                            <button onclick="deleteMessage(${index})" class="delete-button">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function deleteMessage(index) {
-            if (confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
-                const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-                messages.splice(index, 1);
-                localStorage.setItem('mensajes-directos', JSON.stringify(messages));
-                loadDirectMessages();
-            }
-        }
-
-        function acceptChallenge(sender) {
-            // Crear el mensaje de confirmación del sistema
-            const confirmationMessage = {
-                sender: 'SISTEMA',
-                type: 'system',
-                content: `Has aceptado el reto de ${sender}. Hasta que no lo realices, tus PM no están garantizados. Recuerda que fallar o falsear un reto puede incurrir en una penalización.`,
-                time: new Date().toLocaleTimeString()
-            };
-
-            // Obtener mensajes existentes y añadir el nuevo
-            const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-            messages.push(confirmationMessage);
-            localStorage.setItem('mensajes-directos', JSON.stringify(messages));
-
-            // Recargar mensajes para mostrar el nuevo mensaje
-            loadDirectMessages();
-
-            // Cambiar a la pestaña de sistema para mostrar el mensaje
-            const systemTab = document.querySelector('.tab-button[data-tab="system"]');
-            if (systemTab) {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                systemTab.classList.add('active');
-                loadDirectMessages();
-            }
-        }
-
-        // Manejar cambio de pestañas
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                loadDirectMessages();
-            });
-        });
-
-        // Cargar mensajes al iniciar y cada 5 segundos
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDirectMessages();
-            setInterval(loadDirectMessages, 5000);
-        });
-
-        // Función para abrir la ventana de estadísticas
-        function openStats() {
-            const statsWindow = document.createElement('div');
-            statsWindow.className = 'modal';
-            statsWindow.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>ESTADÍSTICAS</h2>
-                        <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
-                    </div>
-                    <div class="modal-body">
-                        <iframe src="character-sheet-modal.html" style="width: 100%; height: 600px; border: none;"></iframe>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(statsWindow);
-            // Guardar referencia al iframe
-            window.fichaIframe = statsWindow.querySelector('iframe');
-        }
-
-        // Función para abrir la tienda
-        function openShop() {
-            const shopWindow = document.createElement('div');
-            shopWindow.className = 'modal';
-            shopWindow.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>TIENDA</h2>
-                        <button class="close-button" onclick="this.parentElement.parentElement.parentElement.remove()">VOLVER</button>
-                    </div>
-                    <div class="modal-body">
-                        <iframe src="tienda.html" style="width: 100%; height: 600px; border: none;"></iframe>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(shopWindow);
-            // Guardar referencia al iframe
-            window.tiendaIframe = shopWindow.querySelector('iframe');
-        }
-
-        // Listener global para reenviar mensajes de la tienda a la ficha
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'addItem' && window.fichaIframe) {
-                window.fichaIframe.contentWindow.postMessage(event.data, '*');
-            }
-        });
-
-        // Manejar el toggle de opacidad del chat
-        document.getElementById('opacity-toggle').addEventListener('click', function() {
-            const chatContainer = document.querySelector('.chat-container');
-            chatContainer.classList.toggle('transparent');
-            
-            // Guardar la preferencia en localStorage
-            const isTransparent = chatContainer.classList.contains('transparent');
-            localStorage.setItem('chatTransparent', isTransparent);
-        });
-
-        // Cargar la preferencia de opacidad al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatContainer = document.querySelector('.chat-container');
-            const isTransparent = localStorage.getItem('chatTransparent') === 'true';
-            if (isTransparent) {
-                chatContainer.classList.add('transparent');
-            }
-        });
-
-        // Datos de personajes y facciones (deben coincidir con los del panel de control)
-        const personajes = [
-            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
-            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
-            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
-            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
-            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
-            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
-            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
-            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
-            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
-            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
-            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
-            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
-            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
-            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
-            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
-            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
-        ];
-        const facciones = [
-            { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
-            { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
-            { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
-            { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
-            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
-        ];
-        function renderTarjetasSeleccionadas() {
-            // Conocidos
-            const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
-            const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
-            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
-                const numeros = {
-                    'Auri': 13,
-                    'Boris "Goliath" Volkov': 42,
-                    'Silas "Glitch" Vance': 17,
-                    'Raven (Mizuki Tanaka)': 89,
-                    'Chispa (Anya Sharma)': 31,
-                    'Marcus "Old Man" Thorne': 76,
-                    'Jinx': 23,
-                    'Lin Mayfair': 58,
-                    'Subject Omega': 91,
-                    'Ekaterina "Echo" Petrov': 37,
-                    'Dr. Felix "Compound" Reyes': 64,
-                    'Los Gemelos (Jin & Jun)': 82,
-                    'Sofía "Viper" Nakamura': 45,
-                    'Alex "Phantom" Mercer': 29,
-                    'Marcus "Titan" Graves': 71,
-                    'Faith "Oracle" Lee': 53,
-                    'Darius "Thunder Fist" Jackson': 68,
-                    'Aria "Maven" Chen': 19
-                };
-                const numero = numeros[p.nombre] ? `#${numeros[p.nombre]}` : '';
-                const valorGuardado = localStorage.getItem(`nombreConcursante_${numero}`) || '';
-                return `
-                    <div class="character-card">
-                        <div class="character-info">
-                            <h4 class="character-name">${numero} <input type='text' class='nombre-concursante-input' data-numero='${numero}' placeholder='Nombre del concursante' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Listeners para guardar el nombre al escribir
-            document.querySelectorAll('.nombre-concursante-input').forEach(input => {
-                input.addEventListener('input', function() {
-                    const num = this.getAttribute('data-numero');
-                    const nombre = this.value;
-                    localStorage.setItem(`nombreConcursante_${num}`, nombre);
-                    // Guardar en Firebase
-                    if (window.saveConcursanteName) {
-                        window.saveConcursanteName(num, nombre);
-                    }
-                });
-            });
-
-            // Conocimientos
-            const conocimientosSel = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
-            const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
-            document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => `
-                <div class="faction-card">
-                    <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
-                    <div class="faction-info">
-                        <h3>${f.nombre}</h3>
-                        <p>${f.desc}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-        document.addEventListener('DOMContentLoaded', renderTarjetasSeleccionadas);
-        window.addEventListener('storage', renderTarjetasSeleccionadas);
-
-        // Añadir lógica para guardar y cargar el nombre del concursante
-        const nombreInput = document.getElementById('nombre-concursante-input');
-        if (nombreInput) {
-          // Cargar valor guardado
-          const guardado = localStorage.getItem('nombreConcursante') || '';
-          nombreInput.value = guardado;
-          nombreInput.addEventListener('input', function() {
-            localStorage.setItem('nombreConcursante', this.value);
-          });
-        }
-    </script>
 </body>
 </html> 
