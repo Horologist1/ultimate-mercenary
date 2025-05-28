@@ -1098,7 +1098,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.22</h1>
+                        <h1>ULTIMATE MERCENARY 0.25</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1253,7 +1253,7 @@
         
         <div class="scanline"></div>
         <!-- El overlay NO debe estar por encima del modal de objetivo -->
-        <div class="overlay" style="z-index:100;"></div>
+        <div class="overlay" style="z-index:50;"></div>
     </div>
 
     <!-- Secciones de Conocidos y Conocimientos -->
@@ -1636,43 +1636,38 @@
                     <span style="float:right;font-size:11px;color:#888;">${mensajeData.hora || ''}</span>
                 `;
                 const pm = extraerPM(mensajeData.mensaje);
-                // --- PM: solo sumar si no se ha sumado antes (persistente) ---
-                let pmSumados = JSON.parse(localStorage.getItem('pmSumados') || '{}');
-                if (pm && !pmSumados[id]) {
+                // --- PM: mostrar botón de aceptar siempre, pero verificar si ya se sumaron los PM ---
+                if (pm) {
                     const btn = document.createElement('button');
-                    btn.textContent = 'Aceptar +' + pm + ' PM';
-                    btn.className = 'pm-accept-btn';
-                    btn.style.marginLeft = '10px';
-                    btn.style.fontSize = '12px';
-                    btn.style.background = '#222';
-                    btn.style.color = '#2ed573';
-                    btn.style.border = '1px solid #2ed573';
-                    btn.style.borderRadius = '4px';
-                    btn.style.cursor = 'pointer';
-                    btn.onclick = function() {
-                        let actual = parseInt(localStorage.getItem('playerPM') || '0');
-                        localStorage.setItem('playerPM', actual + pm);
-                        pmSumados[id] = true;
-                        localStorage.setItem('pmSumados', JSON.stringify(pmSumados));
+                    let pmSumados = JSON.parse(localStorage.getItem('pmSumados') || '{}');
+                    if (pmSumados[id]) {
                         btn.textContent = 'Aceptado';
                         btn.disabled = true;
                         btn.style.background = '#444';
                         btn.style.color = '#aaa';
-                        if (window.updateStatusPanel) window.updateStatusPanel();
-                        if (window.savePM) window.savePM(actual + pm);
-                    };
-                    mensajeElement.appendChild(btn);
-                } else if (pm && pmSumados[id]) {
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Aceptado';
+                    } else {
+                        btn.textContent = 'Aceptar +' + pm + ' PM';
+                        btn.style.background = '#222';
+                        btn.style.color = '#2ed573';
+                        btn.onclick = function() {
+                            let actual = parseInt(localStorage.getItem('playerPM') || '0');
+                            localStorage.setItem('playerPM', actual + pm);
+                            pmSumados[id] = true;
+                            localStorage.setItem('pmSumados', JSON.stringify(pmSumados));
+                            btn.textContent = 'Aceptado';
+                            btn.disabled = true;
+                            btn.style.background = '#444';
+                            btn.style.color = '#aaa';
+                            if (window.updateStatusPanel) window.updateStatusPanel();
+                            if (window.savePM) window.savePM(actual + pm);
+                        };
+                    }
                     btn.className = 'pm-accept-btn';
-                    btn.disabled = true;
                     btn.style.marginLeft = '10px';
                     btn.style.fontSize = '12px';
-                    btn.style.background = '#444';
-                    btn.style.color = '#aaa';
                     btn.style.border = '1px solid #2ed573';
                     btn.style.borderRadius = '4px';
+                    btn.style.cursor = 'pointer';
                     mensajeElement.appendChild(btn);
                 }
                 chatContainer.appendChild(mensajeElement);
