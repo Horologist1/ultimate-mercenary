@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.35</h1>
+                        <h1>ULTIMATE MERCENARY 0.36</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1464,21 +1464,43 @@
             // Colores de nicks
             let userColor = '#cccccc';
             let tag = '';
+            let tagLabel = '';
+            let tagStyle = '';
+            // Tags immersivos posibles
+            const tagsImmersivos = [
+                {label: 'VIP', style: 'background:#ffd700;color:#222;border:1px solid #ffd700;'},
+                {label: 'PATROCINADO', style: 'background:#ff4757;color:#fff;border:1px solid #ff4757;'},
+                {label: 'FAN', style: 'background:#70a1ff;color:#fff;border:1px solid #70a1ff;'},
+                {label: 'SPONSOR', style: 'background:#2ed573;color:#fff;border:1px solid #2ed573;'},
+                {label: 'INFLUENCER', style: 'background:#eccc68;color:#222;border:1px solid #eccc68;'},
+                {label: 'EXPERTO', style: 'background:#5352ed;color:#fff;border:1px solid #5352ed;'}
+            ];
+            // Si el mensaje ya tiene un tag (de mensajes-publico-expanded), respétalo
+            if (msgData.tagImmersivo) {
+                tagLabel = msgData.tagImmersivo;
+                const found = tagsImmersivos.find(t => t.label === tagLabel);
+                tagStyle = found ? found.style : tagsImmersivos[0].style;
+            } else if (msgData.automatico) {
+                // Selecciona un tag aleatorio para mensajes automáticos
+                const tagObj = tagsImmersivos[Math.floor(Math.random() * tagsImmersivos.length)];
+                tagLabel = tagObj.label;
+                tagStyle = tagObj.style;
+            }
+            if (tagLabel) {
+                tag = `<span class="tag" style="${tagStyle}margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">${tagLabel}</span>`;
+            }
             if (msgData.usuario === 'TÚ') {
                 userColor = '#00ccff';
-                tag = '<span class="tag" style="background:#222;color:#00ccff;border:1px solid #00ccff;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">JUGADOR</span>';
             } else if (msgData.usuario === 'Kaiser') {
                 userColor = '#ff4757';
-                tag = '<span class="tag" style="background:#222;color:#ff4757;border:1px solid #ff4757;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">KAISER</span>';
             } else if (msgData.automatico) {
                 userColor = msgData.color || '#ffd700';
-                tag = '<span class="tag" style="background:#222;color:#ffd700;border:1px solid #ffd700;margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;">AUTOMÁTICO</span>';
             } else {
                 userColor = msgData.color || '#cccccc';
             }
-            // Mensaje destacado si es PM
+            // Mensaje destacado si es PM o tiene tag especial
             const pmValue = (msgData.mensaje||'').match(/([+][0-9]+)\s*PM/) ? parseInt((msgData.mensaje.match(/([+][0-9]+)\s*PM/)||[])[1].replace('+','')) : null;
-            if (pmValue) div.classList.add('destacado');
+            if (pmValue || tagLabel) div.classList.add('destacado');
             div.className += ' chat-message';
             div.innerHTML = `
                 <span class="username" style="color:${userColor};font-weight:bold;">${msgData.usuario || 'Anónimo'}:${tag}</span>
@@ -1545,12 +1567,16 @@
             let autoMsgIndex = 0;
             autoMsgInterval = setInterval(() => {
                 const idx = autoMsgIndex % ejemplos.length;
+                // Tag immersivo aleatorio
+                const tagsImmersivos = ["VIP","PATROCINADO","FAN","SPONSOR","INFLUENCER","EXPERTO"];
+                const tagImmersivo = tagsImmersivos[Math.floor(Math.random()*tagsImmersivos.length)];
                 const msg = {
                     usuario: nombresUsuarios[idx % nombresUsuarios.length],
                     mensaje: ejemplos[idx],
                     color: coloresAuto[idx % coloresAuto.length],
                     hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                    automatico: true
+                    automatico: true,
+                    tagImmersivo
                 };
                 const msgId = `auto-${autoMsgIndex}`;
                 agregarMensajeAlChatDisplay(msg, msgId);
