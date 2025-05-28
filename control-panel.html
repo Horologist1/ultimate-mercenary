@@ -691,6 +691,7 @@
         function updateCurrentTest(testId) {
             localStorage.setItem('currentTest', testId);
             document.getElementById('objective-text').textContent = testObjectives[testId];
+            if (window.saveCurrentTest) window.saveCurrentTest(testId);
         }
 
         // Función para enviar mensaje
@@ -706,8 +707,8 @@
                     time: new Date().toLocaleTimeString()
                 });
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                if (window.saveChat) window.saveChat(messages);
                 document.getElementById('message-input').value = '';
-                // Guardar el último usuario usado
                 localStorage.setItem('lastPublicUsername', sender);
             }
         }
@@ -726,10 +727,10 @@
                     time: new Date().toLocaleTimeString()
                 });
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                if (window.saveChat) window.saveChat(messages);
                 statsManager.updatePM(pmAmount);
                 document.getElementById('pm-input').value = '';
                 document.getElementById('pm-message-input').value = '';
-                // Guardar el último usuario usado
                 localStorage.setItem('lastPMUsername', sender);
             }
         }
@@ -755,6 +756,7 @@
                 };
                 messages.push(newMessage);
                 localStorage.setItem('mensajes-directos', JSON.stringify(messages));
+                if (window.saveMensajesDirectos) window.saveMensajesDirectos(messages);
                 
                 // Limpiar el formulario
                 document.getElementById('dm-content').value = '';
@@ -772,6 +774,7 @@
             const pmAmount = document.getElementById('pm-direct-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
                 persistentStorage.updatePM(parseInt(pmAmount));
+                if (window.savePM) window.savePM(parseInt(pmAmount));
                 document.getElementById('pm-direct-input').value = '';
                 updateUserList();
             }
@@ -783,6 +786,7 @@
                 const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
                 const newPM = currentPM + parseInt(pmAmount);
                 persistentStorage.updatePM(newPM);
+                if (window.savePM) window.savePM(newPM);
                 document.getElementById('pm-add-input').value = '';
                 updateUserList();
             }
@@ -794,6 +798,7 @@
                 const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
                 const newPM = Math.max(0, currentPM - parseInt(pmAmount));
                 persistentStorage.updatePM(newPM);
+                if (window.savePM) window.savePM(newPM);
                 document.getElementById('pm-add-input').value = '';
                 updateUserList();
             }
@@ -802,6 +807,7 @@
         function updateSpectators() {
             const spectators = document.getElementById('spectators-input').value;
             persistentStorage.updateAudience(spectators);
+            if (window.saveAudience) window.saveAudience(parseInt(spectators));
             document.getElementById('spectators-input').value = '';
             updateUserList();
         }
@@ -809,6 +815,7 @@
         function updateRating() {
             const rating = document.getElementById('rating-input').value;
             persistentStorage.updateRating(rating);
+            if (window.saveRating) window.saveRating(parseFloat(rating));
             document.getElementById('rating-input').value = '';
             updateUserList();
         }
@@ -939,6 +946,18 @@
                 window.saveConcursanteName(numero, nombre);
             }
         }
+    </script>
+    <script>
+        if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
+        if (typeof renderCheckboxList === 'function') window.renderCheckboxList = renderCheckboxList;
+        if (typeof updateCurrentTest === 'function') window.updateCurrentTest = updateCurrentTest;
+        if (typeof sendMessage === 'function') window.sendMessage = sendMessage;
+        if (typeof sendPMMessage === 'function') window.sendPMMessage = sendPMMessage;
+        if (typeof sendDirectMessage === 'function') window.sendDirectMessage = sendDirectMessage;
+        if (typeof addPM === 'function') window.addPM = addPM;
+        if (typeof subtractPM === 'function') window.subtractPM = subtractPM;
+        if (typeof updateSpectators === 'function') window.updateSpectators = updateSpectators;
+        if (typeof updateRating === 'function') window.updateRating = updateRating;
     </script>
 </body>
 </html> 

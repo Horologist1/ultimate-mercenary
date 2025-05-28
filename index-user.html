@@ -1254,5 +1254,14 @@
 
     <script src="mensajes-publico.js"></script>
     <script src="js/stats-manager.js"></script>
+    <script>
+    // Exponer funciones de UI globalmente para los listeners de Firebase
+    if (typeof updateStatusPanel === 'function') window.updateStatusPanel = updateStatusPanel;
+    if (typeof updateObjective === 'function') window.updateObjective = updateObjective;
+    if (typeof loadChatMessages === 'function') window.loadChatMessages = loadChatMessages;
+    if (typeof renderTarjetasSeleccionadas === 'function') window.renderTarjetasSeleccionadas = renderTarjetasSeleccionadas;
+    if (typeof loadDirectMessages === 'function') window.loadDirectMessages = loadDirectMessages;
+    if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
+    </script>
 </body>
 </html> 
