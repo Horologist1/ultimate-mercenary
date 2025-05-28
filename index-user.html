@@ -1438,10 +1438,26 @@
 
     // Carga los mensajes públicos en el chat
     function loadChatMessages() {
-        const mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+        let mensajes = [];
+        try {
+            mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+            if (!Array.isArray(mensajes)) mensajes = [];
+        } catch (e) {
+            mensajes = [];
+        }
         const chat = document.getElementById('chat-messages');
         if (!chat) return;
-        chat.innerHTML = mensajes.map(msg => `<div class="chat-message"><span class="username">${msg.sender}:</span> <span class="content">${msg.content}</span> <span style="float:right;font-size:11px;color:#888;">${msg.time || ''}</span></div>`).join('') || '<div style="color:#888;font-size:13px;">No hay mensajes públicos.</div>';
+        if (mensajes.length === 0) {
+            chat.innerHTML = '<div style="color:#888;font-size:13px;">No hay mensajes públicos.</div>';
+        } else {
+            chat.innerHTML = mensajes.map(msg => {
+                // Compatibilidad flexible
+                const sender = msg.sender || msg.user || 'SISTEMA';
+                const content = msg.content || msg.text || '';
+                const time = msg.time || '';
+                return `<div class="chat-message"><span class="username">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;">${time}</span></div>`;
+            }).join('');
+        }
         chat.scrollTop = chat.scrollHeight;
     }
     window.loadChatMessages = loadChatMessages;
@@ -1452,6 +1468,40 @@
     renderTarjetasSeleccionadas();
     loadDirectMessages();
     loadChatMessages();
+    </script>
+    <script>
+    function showTestDescription() {
+        // Objetivos y descripciones
+        const testObjectives = {
+            'prueba0': {
+                title: 'Prueba 0: La Caída',
+                desc: 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
+                img: 'images/kaiser_intro_new.png'
+            },
+            'prueba1': {
+                title: 'Prueba 1: Carrera de Obstáculos',
+                desc: 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
+                img: 'images/prueba1.png'
+            },
+            'prueba2': {
+                title: 'Prueba 2: La Cosecha',
+                desc: 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
+                img: 'images/prueba2.png'
+            },
+            'prueba3': {
+                title: 'Prueba 3: La Entrega',
+                desc: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.',
+                img: 'images/prueba3.png'
+            }
+        };
+        const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+        const obj = testObjectives[currentTest] || testObjectives['prueba0'];
+        if (document.getElementById('test-title')) document.getElementById('test-title').textContent = obj.title;
+        if (document.getElementById('test-description')) document.getElementById('test-description').textContent = obj.desc;
+        if (document.getElementById('test-image')) document.getElementById('test-image').src = obj.img;
+        if (document.getElementById('test-modal')) document.getElementById('test-modal').style.display = 'block';
+    }
+    window.showTestDescription = showTestDescription;
     </script>
 </body>
 </html> 
