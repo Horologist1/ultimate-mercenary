@@ -903,7 +903,6 @@ NOTA INTERNA: IMPLANTACIÓN DE KILLSWITCH OBLIGATORIA
     <script>
         // Funcionalidad del modal de imágenes
         const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
         const closeBtn = document.querySelector('.modal-close');
 
         // Funcionalidad de las pestañas
@@ -921,15 +920,6 @@ NOTA INTERNA: IMPLANTACIÓN DE KILLSWITCH OBLIGATORIA
                 const contentId = this.getAttribute('data-tab');
                 document.getElementById(contentId).classList.add('active');
             });
-        });
-
-        // Añadir evento click a todas las imágenes de personajes
-        document.querySelectorAll('.character-image').forEach(img => {
-            img.onclick = function() {
-                modal.classList.add('active');
-                // Usar la imagen completa si está disponible
-                modalImg.src = this.dataset.fullImage || this.src;
-            }
         });
 
         // Cerrar modal al hacer click en la X
