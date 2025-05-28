@@ -359,6 +359,22 @@
             line-height: 1.4;
         }
 
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
         .overlay {
             position: fixed;
             top: 0;
@@ -1737,16 +1753,19 @@
         agregarMensajeAlChat(msg, 'jugador-' + Date.now());
 
         // Guardar en localStorage
-        let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-        mensajesPublicos.push({ 
-            sender: 'TÚ', 
-            content: valor, 
-            time: msg.hora 
-        });
-        localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
+        let mensajesJugador = JSON.parse(localStorage.getItem('mensajes-jugador') || '[]');
+        mensajesJugador.push(msg);
+        localStorage.setItem('mensajes-jugador', JSON.stringify(mensajesJugador));
 
         // Sincronizar con Firebase si está disponible
         if (window.saveChat) {
+            let mensajesPublicos = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+            mensajesPublicos.push({ 
+                sender: 'TÚ', 
+                content: valor, 
+                time: msg.hora 
+            });
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesPublicos));
             window.saveChat(mensajesPublicos);
         }
 
@@ -1754,7 +1773,7 @@
         input.value = '';
     }
 
-    // Configurar los event listeners
+    // Asegurar que los event listeners estén correctamente asignados
     document.addEventListener('DOMContentLoaded', function() {
         const submitBtn = document.getElementById('chat-submit');
         const input = document.getElementById('chat-input');
@@ -1772,19 +1791,13 @@
         }
     });
 
-    // Función para reiniciar el chat al cargar la página
-    function reiniciarChat() {
-        const chatContainer = document.getElementById('chat-messages');
-        if (chatContainer) {
-            chatContainer.innerHTML = '';
-        }
-        // Limpiar mensajes antiguos
+    // Limpiar mensajes antiguos al cargar
+    window.addEventListener('load', function() {
         localStorage.removeItem('mensajes-jugador');
-    }
-
-    // Llamar a reiniciarChat cuando se carga la página
-    document.addEventListener('DOMContentLoaded', reiniciarChat);
+        if (window.loadChatMessages) {
+            window.loadChatMessages();
+        }
+    });
     </script>
 </body>
-</html> 
 </html> 
