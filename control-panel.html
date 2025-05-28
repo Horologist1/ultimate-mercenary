@@ -530,7 +530,7 @@
     <script src="js/stats-manager.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
@@ -568,385 +568,84 @@
         window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
         window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
         window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
-    </script>
-    <script>
-        // Sistema de almacenamiento persistente
-        const persistentStorage = {
-            data: {
-                playerPM: 0,
-                audience: 0,
-                rating: 0
-            },
 
-            init() {
-                // Obtener valores actuales
-                const currentPM = localStorage.getItem('playerPM') || '0';
-                const currentAudience = localStorage.getItem('spectators') || '0';
-                const currentRating = localStorage.getItem('rating') || '0.0';
-
-                // Actualizar datos
-                this.data.playerPM = parseInt(currentPM);
-                this.data.audience = parseInt(currentAudience);
-                this.data.rating = parseFloat(currentRating);
-
-                // Sincronizar con statsManager si existe y tiene las funciones necesarias
-                if (window.statsManager && typeof statsManager.updateUI === 'function') {
-                    if (typeof statsManager.updateSpectators === 'function') {
-                        statsManager.updateSpectators(this.data.audience);
-                    }
-                    if (typeof statsManager.updateRating === 'function') {
-                        statsManager.updateRating(this.data.rating);
-                    }
-                    statsManager.updateUI();
-                }
-            },
-
-            updatePM(amount) {
-                this.data.playerPM = amount;
-                localStorage.setItem('playerPM', amount.toString());
-                if (window.statsManager && typeof statsManager.updateUI === 'function') {
-                    statsManager.updateUI();
-                }
-            },
-
-            updateAudience(value) {
-                const newValue = parseInt(value) || 0;
-                this.data.audience = newValue;
-                localStorage.setItem('spectators', newValue.toString());
-                if (window.statsManager && typeof statsManager.updateSpectators === 'function') {
-                    statsManager.updateSpectators(newValue);
-                    if (typeof statsManager.updateUI === 'function') {
-                        statsManager.updateUI();
-                    }
-                }
-            },
-
-            updateRating(value) {
-                const newValue = parseFloat(value) || 0;
-                this.data.rating = newValue;
-                localStorage.setItem('rating', newValue.toString());
-                if (window.statsManager && typeof statsManager.updateRating === 'function') {
-                    statsManager.updateRating(newValue);
-                    if (typeof statsManager.updateUI === 'function') {
-                        statsManager.updateUI();
-                    }
-                }
+        // Listeners para sincronización en tiempo real
+        onValue(conocidosRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
+                renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
             }
-        };
-
-        // Función para actualizar la lista de usuarios
-        function updateUserList() {
-            const userListContent = document.getElementById('user-list-content');
-            if (!userListContent) return;
-
-            // Obtener valores actuales
-            const currentPM = localStorage.getItem('playerPM') || '0';
-            const currentAudience = localStorage.getItem('spectators') || '0';
-            const currentRating = localStorage.getItem('rating') || '0.0';
-
-            // Crear elemento para el usuario auri
-            userListContent.innerHTML = `
-                <div class="user-item">
-                    <div class="user-name">auri</div>
-                    <div class="user-pm">${currentPM}</div>
-                    <div class="user-audience">${currentAudience}</div>
-                    <div class="user-rating">${parseFloat(currentRating).toFixed(1)}</div>
-                </div>
-            `;
-        }
-
-        // Inicializar inmediatamente al cargar la página
-        persistentStorage.init();
-        updateUserList();
-
-        // También inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            persistentStorage.init();
-            updateUserList();
-            
-            // Cargar valores actuales en los inputs
-            document.getElementById('spectators-input').value = persistentStorage.data.audience;
-            document.getElementById('rating-input').value = persistentStorage.data.rating;
-            
-            // Cargar la prueba actual
-            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
-            document.getElementById('current-test').value = currentTest;
-            document.getElementById('objective-text').textContent = testObjectives[currentTest];
-
-            // Cargar el último usuario usado en los campos de usuario
-            const lastPublicUsername = localStorage.getItem('lastPublicUsername') || '';
-            document.getElementById('public-username-input').value = lastPublicUsername;
-            const lastPMUsername = localStorage.getItem('lastPMUsername') || '';
-            document.getElementById('pm-username-input').value = lastPMUsername;
         });
 
-        // Objetivos de cada prueba
-        const testObjectives = {
-            'prueba0': 'Supervivencia inicial en el hangar subterráneo. Los concursantes deben adaptarse al entorno, familiarizarse con el equipo básico y demostrar su capacidad para sobrevivir en condiciones adversas.',
-            'prueba1': 'Completar la carrera de obstáculos industrial. Los concursantes deben superar una serie de desafíos físicos y mentales, demostrando su agilidad, resistencia y capacidad de adaptación.',
-            'prueba2': 'Recolectar plantas y materiales valiosos del Jardín Vertical. Los concursantes deben identificar, recolectar y preservar especímenes raros y peligrosos, demostrando su conocimiento y precisión.',
-            'prueba3': 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.'
-        };
-
-        // Función para actualizar la prueba actual
-        function updateCurrentTest(testId) {
-            localStorage.setItem('currentTest', testId);
-            document.getElementById('objective-text').textContent = testObjectives[testId];
-            if (window.saveCurrentTest) window.saveCurrentTest(testId);
-        }
-
-        // Función para enviar mensaje
-        function sendMessage() {
-            const message = document.getElementById('message-input').value;
-            const usernameInput = document.getElementById('public-username-input');
-            let sender = usernameInput.value.trim() || 'SISTEMA';
-            if (message) {
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push({
-                    sender: sender,
-                    content: message,
-                    time: new Date().toLocaleTimeString()
-                });
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                if (window.saveChat) window.saveChat(messages);
-                document.getElementById('message-input').value = '';
-                localStorage.setItem('lastPublicUsername', sender);
+        onValue(conocimientosRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
+                renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
             }
-        }
-
-        // Función para enviar mensaje con PM
-        function sendPMMessage() {
-            const pmAmount = document.getElementById('pm-input').value;
-            const message = document.getElementById('pm-message-input').value;
-            const usernameInput = document.getElementById('pm-username-input');
-            let sender = usernameInput.value.trim() || 'SISTEMA';
-            if (pmAmount && message) {
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push({
-                    sender: sender,
-                    content: `${message} ¡Te transfiero ${pmAmount} PM!`,
-                    time: new Date().toLocaleTimeString()
-                });
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                if (window.saveChat) window.saveChat(messages);
-                statsManager.updatePM(pmAmount);
-                document.getElementById('pm-input').value = '';
-                document.getElementById('pm-message-input').value = '';
-                localStorage.setItem('lastPMUsername', sender);
-            }
-        }
-
-        // Función para enviar mensaje directo
-        function sendDirectMessage() {
-            const sender = document.getElementById('dm-sender').value;
-            const type = document.getElementById('dm-type').value;
-            const content = document.getElementById('dm-content').value;
-            
-            if (!content) {
-                alert('Por favor, escribe un mensaje');
-                return;
-            }
-            
-            try {
-                const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-                const newMessage = {
-                    sender: sender,
-                    type: type,
-                    content: content,
-                    time: new Date().toLocaleTimeString()
-                };
-                messages.push(newMessage);
-                localStorage.setItem('mensajes-directos', JSON.stringify(messages));
-                if (window.saveMensajesDirectos) window.saveMensajesDirectos(messages);
-                
-                // Limpiar el formulario
-                document.getElementById('dm-content').value = '';
-                
-                // Notificar éxito
-                alert('Mensaje directo enviado correctamente');
-            } catch (error) {
-                console.error('Error al enviar mensaje directo:', error);
-                alert('Error al enviar el mensaje');
-            }
-        }
-
-        // Modificar las funciones existentes para usar el almacenamiento persistente
-        function updateDirectPM() {
-            const pmAmount = document.getElementById('pm-direct-input').value;
-            if (pmAmount && !isNaN(pmAmount)) {
-                persistentStorage.updatePM(parseInt(pmAmount));
-                if (window.savePM) window.savePM(parseInt(pmAmount));
-                document.getElementById('pm-direct-input').value = '';
-                updateUserList();
-            }
-        }
-
-        function addPM() {
-            const pmAmount = document.getElementById('pm-add-input').value;
-            if (pmAmount && !isNaN(pmAmount)) {
-                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
-                const newPM = currentPM + parseInt(pmAmount);
-                persistentStorage.updatePM(newPM);
-                if (window.savePM) window.savePM(newPM);
-                document.getElementById('pm-add-input').value = '';
-                updateUserList();
-            }
-        }
-
-        function subtractPM() {
-            const pmAmount = document.getElementById('pm-add-input').value;
-            if (pmAmount && !isNaN(pmAmount)) {
-                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
-                const newPM = Math.max(0, currentPM - parseInt(pmAmount));
-                persistentStorage.updatePM(newPM);
-                if (window.savePM) window.savePM(newPM);
-                document.getElementById('pm-add-input').value = '';
-                updateUserList();
-            }
-        }
-
-        function updateSpectators() {
-            const spectators = document.getElementById('spectators-input').value;
-            persistentStorage.updateAudience(spectators);
-            if (window.saveAudience) window.saveAudience(parseInt(spectators));
-            document.getElementById('spectators-input').value = '';
-            updateUserList();
-        }
-
-        function updateRating() {
-            const rating = document.getElementById('rating-input').value;
-            persistentStorage.updateRating(rating);
-            if (window.saveRating) window.saveRating(parseFloat(rating));
-            document.getElementById('rating-input').value = '';
-            updateUserList();
-        }
-
-        // Datos de personajes y facciones (resumidos, puedes ampliar luego)
-        const personajes = [
-            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
-            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
-            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
-            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
-            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
-            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
-            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
-            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
-            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
-            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
-            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
-            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
-            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
-            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
-            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
-            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
-        ];
-        const facciones = [
-            { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
-            { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
-            { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
-            { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
-            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
-        ];
-
-        // Renderizar checkboxes
-        function renderCheckboxList(list, containerId, cookieKey) {
-            const container = document.getElementById(containerId);
-            const selected = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
-            container.innerHTML = list.map((item, idx) => {
-                const isSelected = selected.includes(item.nombre);
-                return '<label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">' +
-                    '<input type="checkbox" value="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" ' + (isSelected ? 'checked' : '') +
-                    ' data-nombre="' + encodeURIComponent(item.nombre) + '" data-cookiekey="' + cookieKey + '">' +
-                    '<img src="' + item.img + '" alt="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">' +
-                    '<span style="font-weight:bold;color:#00ccff;">' + item.nombre + '</span>' +
-                    '<span style="font-size:12px;color:#aaa;margin-left:8px;">' + item.desc + '</span>' +
-                    '</label>';
-            }).join('');
-            // Agregar listeners después de renderizar
-            const checkboxes = container.querySelectorAll('input[type="checkbox"][data-nombre][data-cookiekey]');
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', function() {
-                    const nombre = decodeURIComponent(this.getAttribute('data-nombre'));
-                    const key = this.getAttribute('data-cookiekey');
-                    window.toggleSelection(key, nombre);
-                });
-            });
-        }
-        window.toggleSelection = function(cookieKey, nombre) {
-            let list = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
-            const idx = list.indexOf(nombre);
-            if(idx > -1) list.splice(idx,1); else list.push(nombre);
-            if(cookieKey === 'conocidosSeleccionados') setConocidosSeleccionados(list);
-            else setConocimientosSeleccionados(list);
-            // Volver a renderizar para reflejar el cambio
-            if(cookieKey === 'conocidosSeleccionados') renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
-            else renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
-            renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
         });
 
-        // Utilidades para localStorage
-        function getConocidosSeleccionados() {
-            const val = localStorage.getItem('conocidosSeleccionados');
-            return val ? JSON.parse(val) : [];
-        }
-        function getConocimientosSeleccionados() {
-            const val = localStorage.getItem('conocimientosSeleccionados');
-            return val ? JSON.parse(val) : [];
-        }
-        function setConocidosSeleccionados(arr) {
-            localStorage.setItem('conocidosSeleccionados', JSON.stringify(arr));
-        }
-        function setConocimientosSeleccionados(arr) {
-            localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
-        }
-
-        // Actualizar las funciones de guardado para usar Firebase
-        function guardarConocidosSeleccionados() {
-            const conocidos = Array.from(document.querySelectorAll('.character-card.selected')).map(card => card.dataset.nombre);
-            localStorage.setItem('conocidosSeleccionados', JSON.stringify(conocidos));
-            // Guardar en Firebase
-            if (window.saveConocidosSeleccionados) {
-                window.saveConocidosSeleccionados(conocidos);
+        onValue(mensajesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('mensajes-directos', JSON.stringify(data));
             }
-        }
+        });
 
-        function guardarConocimientosSeleccionados() {
-            const conocimientos = Array.from(document.querySelectorAll('.faction-card.selected')).map(card => card.dataset.nombre);
-            localStorage.setItem('conocimientosSeleccionados', JSON.stringify(conocimientos));
-            // Guardar en Firebase
-            if (window.saveConocimientosSeleccionados) {
-                window.saveConocimientosSeleccionados(conocimientos);
+        onValue(currentTestRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('currentTest', data);
+                document.getElementById('current-test').value = data;
+                document.getElementById('objective-text').textContent = testObjectives[data];
             }
-        }
+        });
 
-        function guardarMensajesDirectos(mensajes) {
-            localStorage.setItem('mensajes-directos', JSON.stringify(mensajes));
-            // Guardar en Firebase
-            if (window.saveMensajesDirectos) {
-                window.saveMensajesDirectos(mensajes);
+        onValue(nombresRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.entries(data).forEach(([numero, nombre]) => {
+                    localStorage.setItem(`nombreConcursante_${numero}`, nombre);
+                });
             }
-        }
+        });
 
-        function guardarCurrentTest(test) {
-            localStorage.setItem('currentTest', test);
-            // Guardar en Firebase
-            if (window.saveCurrentTest) {
-                window.saveCurrentTest(test);
+        onValue(audienceRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('spectators', data);
+                persistentStorage.data.audience = parseInt(data);
+                document.getElementById('spectators-input').value = data;
+                updateUserList();
             }
-        }
+        });
 
-        function guardarNombreConcursante(numero, nombre) {
-            localStorage.setItem(`nombreConcursante_${numero}`, nombre);
-            // Guardar en Firebase
-            if (window.saveConcursanteName) {
-                window.saveConcursanteName(numero, nombre);
+        onValue(ratingRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('rating', data);
+                persistentStorage.data.rating = parseFloat(data);
+                document.getElementById('rating-input').value = data;
+                updateUserList();
             }
-        }
+        });
+
+        onValue(pmRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('playerPM', data);
+                persistentStorage.data.playerPM = parseInt(data);
+                updateUserList();
+            }
+        });
+
+        onValue(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
+            }
+        });
     </script>
     <script>
         if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
