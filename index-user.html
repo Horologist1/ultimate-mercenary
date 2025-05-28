@@ -1410,6 +1410,15 @@
                     const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
                     if (bodyMatch) content = bodyMatch[1];
                 }
+                // Quitar la imagen del header (logo y cabecera)
+                content = content.replace(/<div class="logo-container">[\s\S]*?<\/div>/i, '');
+                // Quitar todo lo que esté por debajo de la sección de especificaciones técnicas
+                // Buscamos la sección técnica y cortamos ahí
+                const techMatch = content.match(/(<div class="technical-section[\s\S]*?<\/div>)/i);
+                if (techMatch) {
+                    // Solo dejamos hasta el final de la sección técnica
+                    content = content.split(techMatch[0])[0] + techMatch[0];
+                }
                 descDiv.innerHTML = content;
             })
             .catch(() => {
@@ -1476,6 +1485,76 @@
     renderTarjetasSeleccionadas();
     loadDirectMessages();
     loadChatMessages();
+    </script>
+    <script>
+    // Añadir mensajes de ejemplo de uno en uno cada 3 segundos si el chat está vacío
+    (function() {
+        const nombresUsuarios = [
+            "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+            "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+            "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
+        ];
+        const ejemplos = [
+            "¡Vamos XIII, no decepciones a tus fans!",
+            "¡Estoy apostando todo por ti, no me falles!",
+            "Mira esos reflejos, ¡eres una máquina!",
+            "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+            "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
+            "OCE debería ponerte un reto REAL, XIII",
+            "Ese cromo que llevas parece de segunda mano...",
+            "¡Eres mi favorita desde el principio!",
+            "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+            "Por dios, alguien dé algo de equipo decente a la XIII"
+        ];
+        let ejemploIndex = 0;
+        let autoMsgInterval = null;
+        function startAutoMessages() {
+            if (autoMsgInterval) return;
+            autoMsgInterval = setInterval(() => {
+                let mensajes = [];
+                try {
+                    mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    if (!Array.isArray(mensajes)) mensajes = [];
+                } catch (e) { mensajes = []; }
+                // Si hay mensajes reales, detener
+                if (mensajes.length > 0) {
+                    clearInterval(autoMsgInterval);
+                    autoMsgInterval = null;
+                    return;
+                }
+                // Añadir uno nuevo
+                const msg = {
+                    sender: nombresUsuarios[ejemploIndex % nombresUsuarios.length],
+                    content: ejemplos[ejemploIndex % ejemplos.length],
+                    time: new Date().toLocaleTimeString()
+                };
+                ejemploIndex++;
+                mensajes.push(msg);
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajes));
+                if (window.saveChat) window.saveChat(mensajes);
+                if (window.loadChatMessages) window.loadChatMessages();
+            }, 3000);
+        }
+        // Iniciar solo si no hay mensajes reales
+        document.addEventListener('DOMContentLoaded', function() {
+            let mensajes = [];
+            try {
+                mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                if (!Array.isArray(mensajes)) mensajes = [];
+            } catch (e) { mensajes = []; }
+            if (mensajes.length === 0) startAutoMessages();
+        });
+        // Si el usuario o el admin escribe, detener el auto-mensaje
+        window.sendChatMessage = (function(orig) {
+            return function() {
+                if (autoMsgInterval) {
+                    clearInterval(autoMsgInterval);
+                    autoMsgInterval = null;
+                }
+                return orig.apply(this, arguments);
+            };
+        })(window.sendChatMessage);
+    })();
     </script>
 </body>
 </html> 
