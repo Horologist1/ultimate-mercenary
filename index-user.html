@@ -1107,7 +1107,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.45</h1>
+                        <h1>ULTIMATE MERCENARY 0.46</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1516,7 +1516,7 @@
             
             // Resaltar "XIII" o "#13" en el contenido del mensaje
             let mensajeContent = msgData.mensaje || '';
-            mensajeContent = mensajeContent.replace(/(XIII|#13)/gi, '<span style="color:#ff00ff;font-weight:bold;">$1</span>');
+            mensajeContent = mensajeContent.replace(/(XIII|#13)/gi, '<span style="color:#ffd700;font-weight:bold;">$1</span>');
             
             div.innerHTML = `
                 <span class=\"username\" style=\"color:${userColor};font-weight:bold;\">${msgData.usuario || 'Anónimo'}:${tag}</span>
@@ -1637,7 +1637,8 @@
             window.renderGlobalChatMessages = function(messagesArray) {
                 // Solo renderizar mensajes que NO sean del jugador (ignorando mayúsculas, minúsculas y espacios)
                 messagesArray.forEach((msg, index) => {
-                    if (typeof msg.sender === 'string' && msg.sender.trim().toLowerCase() === 'xiii') return;
+                    const sender = (msg.sender || '').trim().toLowerCase();
+                    if (sender === 'tú') return;
                     const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
@@ -1678,7 +1679,8 @@
         const mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
         const filtrados = mensajes.filter(msg => {
             if (!msg.sender) return true;
-            return msg.sender.trim().toLowerCase() !== 'xiii';
+            const sender = msg.sender.trim().toLowerCase();
+            return sender !== 'tú';
         });
         window.saveChat(filtrados);
         alert('Mensajes del jugador eliminados de Firebase (puede tardar unos segundos en reflejarse).');
