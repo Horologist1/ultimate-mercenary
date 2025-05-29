@@ -439,6 +439,11 @@
                 // Actualizar UI
                 if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
                 if (typeof updateUI === 'function') updateUI();
+                
+                // Forzar actualización de la visualización del inventario
+                if (typeof updateInventoryDisplay === 'function') {
+                    updateInventoryDisplay();
+                }
             }
         });
     </script>

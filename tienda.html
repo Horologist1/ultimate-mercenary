@@ -724,26 +724,23 @@
                         };
                     }
                     
-                    // Enviar el item a la ficha
-                    if (window.parent) {
-                        window.parent.postMessage({
-                            type: 'addItem',
-                            item: fichaItem
-                        }, '*');
-                    }
-
-                    // Actualizar Firebase
-                    if (window.database) {
-                        const itemsCompradosRef = window.database.ref('itemsComprados');
-                        itemsCompradosRef.once('value', (snapshot) => {
-                            let items = snapshot.val() || [];
-                            if (!Array.isArray(items)) {
-                                items = Object.values(items);
-                            }
-                            items.push(fichaItem);
-                            itemsCompradosRef.set(items);
-                        });
-                    }
+                    // Obtener referencia a Firebase
+                    const itemsCompradosRef = window.database.ref('itemsComprados');
+                    
+                    // Obtener items actuales
+                    itemsCompradosRef.once('value').then((snapshot) => {
+                        let currentItems = [];
+                        const data = snapshot.val();
+                        if (data) {
+                            currentItems = Array.isArray(data) ? data : Object.values(data);
+                        }
+                        
+                        // Añadir nuevo item
+                        currentItems.push(fichaItem);
+                        
+                        // Guardar en Firebase
+                        itemsCompradosRef.set(currentItems);
+                    });
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
