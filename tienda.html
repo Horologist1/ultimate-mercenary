@@ -678,12 +678,6 @@
                 const success = window.comprarItem(itemId, item.price);
                 
                 if (success) {
-                    // Mostrar mensaje de éxito
-                    showPurchaseMessage(item);
-                    
-                    // Actualizar la UI
-                    updatePMDisplay();
-                    
                     // Preparar el item para la ficha
                     let fichaItem = {
                         nombre: item.name,
@@ -724,13 +718,14 @@
                         };
                     }
                     
-                    // Obtener referencia a Firebase
-                    const itemsCompradosRef = window.parent.firebase.database().ref('itemsComprados');
+                    // Obtener los items actuales y añadir el nuevo
+                    const itemsCompradosRef = window.firebaseUtils.ref(window.firebaseUtils.database, 'itemsComprados');
                     
-                    // Usar transacción para evitar sobrescrituras
-                    itemsCompradosRef.transaction((currentData) => {
+                    // Leer los datos actuales usando onValue 
+                    window.firebaseUtils.onValue(itemsCompradosRef, (snapshot) => {
                         // Si no hay datos, inicializar como array vacío
                         let items = [];
+                        const currentData = snapshot.val();
                         if (currentData) {
                             items = Array.isArray(currentData) ? currentData : Object.values(currentData);
                         }
@@ -738,146 +733,12 @@
                         // Añadir el nuevo item
                         items.push(fichaItem);
                         
-                        return items;
-                    }).then((result) => {
-                        if (result.committed) {
-                            // Notificar al character sheet modal si está abierto
-                            if (window.parent) {
-                                window.parent.postMessage({
-                                    type: 'addItem',
-                                    item: fichaItem
-                                }, '*');
-                                
-                                // Notificar también a través del iframe de estadísticas si está abierto
-                                const statsIframe = window.parent.document.querySelector('iframe[src="character-sheet-modal.html"]');
-                                if (statsIframe) {
-                                    statsIframe.contentWindow.postMessage({
-                                        type: 'addItem',
-                                        item: fichaItem
-                                    }, '*');
-                                }
-                            }
-                            
-                            // Mostrar mensaje de éxito
-                            showPurchaseMessage(item);
-                            
-                            // Actualizar la UI
-                            updatePMDisplay();
-                        } else {
-                            console.error('La transacción no se completó');
-                            alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
-                        }
-                    }).catch(error => {
-                        console.error('Error al guardar en Firebase:', error);
-                        alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
-                    });
-                }
-            } else {
-                alert('No tienes suficientes PM para realizar esta compra');
-            }
-        }
-
-        // Función para cargar la URL de imagen guardada
-        function getItemImageUrl(itemName) {
-            // Primero intentar obtener la imagen del localStorage (configurada en el admin)
-            const savedUrl = localStorage.getItem(`product_image_url_${itemName}`);
-            if (savedUrl) return savedUrl;
-            
-            // Si no hay URL configurada, usar la imagen local según el tipo de item
-            const defaultImages = {
-                'Katana Monomolecular': 'images/katana.png',
-                'Pistola Pesada': 'images/predator_pistol.png',
-                'Escopeta de Combate': 'images/street_sweeper.png',
-                'Ojo Cibernético Avanzado': 'images/cybereye.png',
-                'Reflejos Cableados': 'images/reflejos.png',
-                'Piel Subdérmica Blindada': 'images/piel_armadura.png',
-                'Procesador de Combate Táctico': 'images/procesador.png',
-                'Pulmones Filtradores Mejorados': 'images/pulmones.png',
-                'Implante de Camuflaje Óptico': 'images/camuflaje.png',
-                'Kit Médico Avanzado': 'images/kit_medico.png',
-                'Cyberdeck "Shinigami Micro"': 'images/cyberdeck.png',
-                'Micro-Dron de Reconocimiento': 'images/dron.png'
-            };
-            
-            return defaultImages[itemName] || '';
-        }
-
-        // Función para renderizar los items de la tienda
-        function renderShopItems() {
-            const sectionsContainer = document.getElementById('shop-sections');
-            const tabsContainer = document.querySelector('.shop-tabs');
-            const sections = {
-                'shop-armas': 'Armas',
-                'shop-municion': 'Munición',
-                'shop-armaduras': 'Armaduras',
-                'shop-cyberware': 'Cyberware',
-                'shop-equipo': 'Equipo',
-                'shop-servicios': 'Servicios'
-            };
-
-            // Renderizar pestañas
-            tabsContainer.innerHTML = Object.entries(sections).map(([sectionId, sectionName], index) => `
-                <div class="shop-tab ${index === 0 ? 'active' : ''}" data-section="${sectionId}">
-                    ${sectionName}
-                </div>
-            `).join('');
-
-            // Renderizar secciones
-            sectionsContainer.innerHTML = Object.entries(sections).map(([sectionId, sectionName], index) => {
-                const sectionItems = shopItems.filter(item => item.section === sectionId);
-                if (sectionItems.length === 0) return '';
-
-                return `
-                    <div class="shop-section ${index === 0 ? 'active' : ''}" id="${sectionId}">
-                        <div class="items-grid">
-                            ${sectionItems.map(item => {
-                                const imageUrl = getItemImageUrl(item.name);
-                                return `
-                                    <div class="item-card">
-                                        <div class="item-image ${imageUrl ? '' : 'placeholder'}">
-                                            ${imageUrl ? 
-                                                `<img src="${imageUrl}" alt="${item.name}" onerror="this.parentElement.classList.add('placeholder'); this.parentElement.innerHTML = '<span>Error al cargar la imagen</span>';">` :
-                                                `<span>Sin imagen</span>`
-                                            }
-                                        </div>
-                                        <h3>${item.name}</h3>
-                                        <p>${item.description}</p>
-                                        ${(item.section === 'shop-armas' && item.damage) ? `<p><strong>Daño:</strong> ${item.damage}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.details) ? `<p><strong>Notas:</strong> ${item.details}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.notas) ? `<p><strong>Notas:</strong> ${item.notas}</p>` : ''}
-                                        <p class="price">${item.price} PM</p>
-                                        <button class="buy-button" data-item-id="${item.id}" onclick="buyItem('${item.id}')">
-                                            Comprar
-                                        </button>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Añadir eventos a las pestañas
-            document.querySelectorAll('.shop-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remover clase active de todas las pestañas y secciones
-                    document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
-                    
-                    // Añadir clase active a la pestaña clickeada y su sección correspondiente
-                    tab.classList.add('active');
-                    const sectionId = tab.dataset.section;
-                    document.getElementById(sectionId).classList.add('active');
-                });
-            });
-        }
-
-        // Inicializar la tienda
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSavedItems();
-            renderShopItems();
-            updatePMDisplay();
-        });
-    </script>
-</body>
-</html> 
+                        // Guardar el array actualizado
+                        return window.firebaseUtils.set(itemsCompradosRef, items);
+                    }).then(() => {
+                        // Notificar al character sheet modal si está abierto
+                        if (window.parent) {
+                            window.parent.postMessage({
+                                type: 'addItem',
+                                item: fichaItem
+                           
