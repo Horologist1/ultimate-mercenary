@@ -1059,8 +1059,12 @@
         onValue(pmRef, (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
-                localStorage.setItem('playerPM', data);
-                if (window.updateStatusPanel) window.updateStatusPanel();
+                const currentLocalPM = parseInt(localStorage.getItem('playerPM') || '0');
+                // Solo actualizar si el valor de Firebase es mayor (para evitar sobrescribir gastos)
+                if (data > currentLocalPM) {
+                    localStorage.setItem('playerPM', data);
+                    if (window.updateStatusPanel) window.updateStatusPanel();
+                }
             }
         });
         onValue(chatRef, (snapshot) => {
@@ -1702,8 +1706,14 @@
         let currentPM = parseInt(localStorage.getItem('playerPM') || '0');
         currentPM = Math.max(0, currentPM - cantidad); // Evitar PM negativos
         localStorage.setItem('playerPM', currentPM);
-        if (window.savePM) window.savePM(currentPM);
-        if (window.updateStatusPanel) window.updateStatusPanel();
+        // Forzar la actualización en Firebase
+        if (window.savePM) {
+            window.savePM(currentPM);
+            // Esperar un momento para asegurar que Firebase se actualiza
+            setTimeout(() => {
+                if (window.updateStatusPanel) window.updateStatusPanel();
+            }, 100);
+        }
     };
 
     // Función para comprar items (llamada desde el iframe de la tienda)
