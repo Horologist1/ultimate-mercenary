@@ -1324,6 +1324,77 @@
                 document.body.style.overflow = '';
             }
         });
+
+        // Sistema de inventario
+        let inventory = [];
+
+        // Escuchar mensajes del padre
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'updateInventory') {
+                inventory = event.data.items;
+                updateInventoryDisplay();
+            }
+        });
+
+        // Solicitar inventario al cargar
+        if (window.parent) {
+            window.parent.postMessage({ type: 'getInventory' }, '*');
+        }
+
+        function updateInventoryDisplay() {
+            // Actualizar sección de armas
+            const armasContainer = document.getElementById('armas-container');
+            if (armasContainer) {
+                const armas = inventory.filter(item => item.tipo === 'arma');
+                armasContainer.innerHTML = armas.map(arma => `
+                    <div class="item-card">
+                        <h4>${arma.nombre}</h4>
+                        <p>${arma.descripcion || ''}</p>
+                        <p><strong>Daño:</strong> ${arma.dano || ''}</p>
+                        <p><strong>Notas:</strong> ${arma.notas || ''}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Actualizar sección de armaduras
+            const armadurasContainer = document.getElementById('armaduras-container');
+            if (armadurasContainer) {
+                const armaduras = inventory.filter(item => item.tipo === 'armadura');
+                armadurasContainer.innerHTML = armaduras.map(armadura => `
+                    <div class="item-card">
+                        <h4>${armadura.nombre}</h4>
+                        <p>${armadura.notas || ''}</p>
+                        <p><strong>Protección:</strong> ${armadura.proteccion || ''}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Actualizar sección de equipo
+            const equipoContainer = document.getElementById('equipo-container');
+            if (equipoContainer) {
+                const equipos = inventory.filter(item => item.tipo === 'equipo');
+                equipoContainer.innerHTML = equipos.map(equipo => `
+                    <div class="item-card">
+                        <h4>${equipo.nombre}</h4>
+                        <p>${equipo.descripcion || ''}</p>
+                        <p><strong>Detalles:</strong> ${equipo.detalles || ''}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Actualizar sección de cyberware
+            const cyberwareContainer = document.getElementById('cyberware-container');
+            if (cyberwareContainer) {
+                const cyberwares = inventory.filter(item => item.tipo === 'cyberware');
+                cyberwareContainer.innerHTML = cyberwares.map(cyberware => `
+                    <div class="item-card">
+                        <h4>${cyberware.nombre}</h4>
+                        <p>${cyberware.descripcion || ''}</p>
+                        <p><strong>Efectos:</strong> ${cyberware.efectos || ''}</p>
+                    </div>
+                `).join('');
+            }
+        }
     </script>
 </body>
 </html> 

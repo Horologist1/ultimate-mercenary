@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.6 - Concursante</title>
+    <title>Ultimate Mercenary 0.61 - Concursante</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1129,7 +1129,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.6</h1>
+                        <h1>ULTIMATE MERCENARY 0.61</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1283,6 +1283,15 @@
         `;
         document.body.appendChild(statsWindow);
         window.fichaIframe = statsWindow.querySelector('iframe');
+        
+        // Esperar a que el iframe cargue
+        window.fichaIframe.onload = function() {
+            // Enviar el inventario actual
+            window.fichaIframe.contentWindow.postMessage({
+                type: 'updateInventory',
+                items: window.inventory.getItems()
+            }, '*');
+        };
     }
     window.openStats = openStats;
     </script>
@@ -1800,6 +1809,46 @@
         }
     };
 
+    // Sistema de inventario
+    window.inventory = {
+        items: [],
+
+        init() {
+            // Cargar items guardados
+            const saved = localStorage.getItem('inventory');
+            if (saved) {
+                this.items = JSON.parse(saved);
+            }
+        },
+
+        addItem(item) {
+            this.items.push(item);
+            this.save();
+            this.notifyFicha();
+        },
+
+        getItems() {
+            return this.items;
+        },
+
+        save() {
+            localStorage.setItem('inventory', JSON.stringify(this.items));
+        },
+
+        notifyFicha() {
+            if (window.fichaIframe && window.fichaIframe.contentWindow) {
+                window.fichaIframe.contentWindow.postMessage({
+                    type: 'updateInventory',
+                    items: this.items
+                }, '*');
+            }
+        }
+    };
+
+    // Inicializar sistemas
+    window.pmTransactions.init();
+    window.inventory.init();
+
     // Escuchar mensajes de los iframes
     window.addEventListener('message', function(event) {
         if (event.data && event.data.type === 'getPM') {
@@ -1809,24 +1858,24 @@
                 total: window.pmTransactions.getTotal()
             }, '*');
         } else if (event.data && event.data.type === 'addItem') {
-            // Añadir item a la ficha
+            // Añadir item al inventario
             const item = event.data.item;
-            if (item && window.fichaIframe && window.fichaIframe.contentWindow) {
-                window.fichaIframe.contentWindow.postMessage({
-                    type: 'addItem',
-                    item: item
-                }, '*');
+            if (item) {
+                window.inventory.addItem(item);
             }
         } else if (event.data && event.data.type === 'setPM') {
             // Establecer PM desde el panel de control
             if (window.pmTransactions) {
                 window.pmTransactions.setTotal(event.data.total);
             }
+        } else if (event.data && event.data.type === 'getInventory') {
+            // Responder con el inventario actual
+            event.source.postMessage({
+                type: 'updateInventory',
+                items: window.inventory.getItems()
+            }, '*');
         }
     });
-
-    // Inicializar el sistema de transacciones
-    window.pmTransactions.init();
 
     // Funciones globales para manejar PM
     window.sumarPM = function(cantidad, razon) {
@@ -1853,7 +1902,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.6';
+        const SYSTEM_VERSION = '0.61';
     </script>
 
 </body>
