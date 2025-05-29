@@ -590,88 +590,79 @@
         // Función para comprar un item
         function buyItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
-            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+            const currentPM = window.pmTransactions.getTotal();
 
             if (currentPM >= item.price) {
-                // Actualizar PM
-                const newPM = currentPM - item.price;
-                localStorage.setItem('playerPM', newPM);
-                updatePMDisplay();
-
-                // Mostrar mensaje de compra
-                showPurchaseMessage(item);
-
-                // Añadir mensaje al buzón (localStorage)
-                const directMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-                const imageUrl = getItemImageUrl(item.name);
-                const purchaseMessage = {
-                    sender: 'TIENDA',
-                    type: 'shop',
-                    content: `Has adquirido: ${item.name}\n\nDetalles:\n${item.description}\n${item.details ? `\nEspecificaciones: ${item.details}` : ''}\n\nPrecio: ${item.price} PM`,
-                    image: imageUrl || null,
-                    time: new Date().toLocaleTimeString()
-                };
-                directMessages.push(purchaseMessage);
-                localStorage.setItem('mensajes-directos', JSON.stringify(directMessages));
-
-                // --- INTEGRACIÓN FICHA ---
-                // Enviar a la ficha a través de postMessage al padre
-                let tipo = '';
-                let fichaItem = {};
-                if (item.section === 'shop-armas') {
-                    tipo = 'arma';
-                    fichaItem = {
-                        tipo,
+                // Intentar comprar usando el sistema de transacciones
+                const success = window.comprarItem(item.price, itemId, `Compra de ${item.name}`);
+                
+                if (success) {
+                    // Mostrar mensaje de éxito
+                    showPurchaseMessage(item);
+                    
+                    // Actualizar la UI
+                    updatePMDisplay();
+                    updateBuyButtons();
+                    
+                    // --- INTEGRACIÓN FICHA ---
+                    const fichaItem = {
                         nombre: item.name,
-                        dano: item.damage || item.details || '',
-                        notas: item.details || '',
-                        descripcion: item.description || ''
+                        descripcion: item.description,
+                        detalles: item.details,
+                        tipo: item.section
                     };
-                } else if (item.section === 'shop-armaduras') {
-                    tipo = 'armadura';
-                    fichaItem = {
-                        tipo,
-                        nombre: item.name,
-                        proteccion: item.details || '',
-                        notas: item.description || ''
-                    };
-                } else if (item.section === 'shop-cyberware') {
-                    tipo = 'implant';
-                    fichaItem = {
-                        tipo,
-                        nombre: item.name,
-                        efectos: item.details || ''
-                    };
-                } else if (item.section === 'shop-equipo') {
-                    tipo = 'equipo';
-                    fichaItem = {
-                        tipo,
-                        nombre: item.name,
-                        descripcion: item.details || ''
-                    };
-                } else if (item.section === 'shop-municion') {
-                    tipo = 'equipo';
-                    fichaItem = {
-                        tipo,
-                        nombre: item.name,
-                        descripcion: `${item['Compatible con'] ? 'Compatible: ' + item['Compatible con'] + '. ' : ''}${item['Cantidad'] ? 'Cantidad: ' + item['Cantidad'] + '. ' : ''}${item.details || ''}`
-                    };
+                    
+                    if (item.section === 'shop-armas') {
+                        tipo = 'arma';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            dano: item.damage || item.details || '',
+                            notas: item.details || '',
+                            descripcion: item.description || ''
+                        };
+                    } else if (item.section === 'shop-armaduras') {
+                        tipo = 'armadura';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            proteccion: item.details || '',
+                            notas: item.description || ''
+                        };
+                    } else if (item.section === 'shop-cyberware') {
+                        tipo = 'implant';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            efectos: item.details || ''
+                        };
+                    } else if (item.section === 'shop-equipo') {
+                        tipo = 'equipo';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            descripcion: item.details || ''
+                        };
+                    } else if (item.section === 'shop-municion') {
+                        tipo = 'equipo';
+                        fichaItem = {
+                            tipo,
+                            nombre: item.name,
+                            descripcion: `${item['Compatible con'] ? 'Compatible: ' + item['Compatible con'] + '. ' : ''}${item['Cantidad'] ? 'Cantidad: ' + item['Cantidad'] + '. ' : ''}${item.details || ''}`
+                        };
+                    }
+                    if (tipo) {
+                        // Guardar en la cola de pendientes
+                        const pending = JSON.parse(localStorage.getItem('pendingItems') || '[]');
+                        pending.push(fichaItem);
+                        localStorage.setItem('pendingItems', JSON.stringify(pending));
+                        // Intentar enviar por postMessage (por si la ficha está abierta)
+                        window.parent.postMessage({
+                            type: 'addItem',
+                            item: fichaItem
+                        }, '*');
+                    }
                 }
-                if (tipo) {
-                    // Guardar en la cola de pendientes
-                    const pending = JSON.parse(localStorage.getItem('pendingItems') || '[]');
-                    pending.push(fichaItem);
-                    localStorage.setItem('pendingItems', JSON.stringify(pending));
-                    // Intentar enviar por postMessage (por si la ficha está abierta)
-                    window.parent.postMessage({
-                        type: 'addItem',
-                        item: fichaItem
-                    }, '*');
-                }
-                // --- FIN INTEGRACIÓN FICHA ---
-
-                // Actualizar botones
-                updateBuyButtons();
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
             }
@@ -679,13 +670,13 @@
 
         // Función para actualizar la visualización de PM
         function updatePMDisplay() {
-            const currentPM = localStorage.getItem('playerPM') || '0';
+            const currentPM = window.pmTransactions.getTotal();
             document.getElementById('current-pm').textContent = currentPM;
         }
 
         // Función para actualizar el estado de los botones de compra
         function updateBuyButtons() {
-            const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+            const currentPM = window.pmTransactions.getTotal();
             const buttons = document.querySelectorAll('.buy-button');
             buttons.forEach(button => {
                 const itemId = button.dataset.itemId;

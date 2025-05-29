@@ -893,34 +893,44 @@
         function updateDirectPM() {
             const pmAmount = document.getElementById('pm-direct-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
-                persistentStorage.updatePM(parseInt(pmAmount));
-                if (window.savePM) window.savePM(parseInt(pmAmount));
-                document.getElementById('pm-direct-input').value = '';
-                updateUserList();
+                const currentTotal = window.pmTransactions.getTotal();
+                const newTotal = parseInt(pmAmount);
+                const difference = newTotal - currentTotal;
+                
+                if (difference !== 0) {
+                    const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
+                    if (description !== null) {
+                        window.pmTransactions.add(Math.abs(difference), difference > 0 ? 'gain' : 'spend', description);
+                        document.getElementById('pm-direct-input').value = '';
+                        updateUserList();
+                    }
+                }
             }
         }
 
         function addPM() {
             const pmAmount = document.getElementById('pm-add-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
-                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
-                const newPM = currentPM + parseInt(pmAmount);
-                persistentStorage.updatePM(newPM);
-                if (window.savePM) window.savePM(newPM);
-                document.getElementById('pm-add-input').value = '';
-                updateUserList();
+                const amount = parseInt(pmAmount);
+                const description = prompt('Descripción de la transacción:', 'Ajuste manual de PM');
+                if (description !== null) {
+                    window.pmTransactions.add(amount, 'gain', description);
+                    document.getElementById('pm-add-input').value = '';
+                    updateUserList();
+                }
             }
         }
 
         function subtractPM() {
             const pmAmount = document.getElementById('pm-add-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
-                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
-                const newPM = Math.max(0, currentPM - parseInt(pmAmount));
-                persistentStorage.updatePM(newPM);
-                if (window.savePM) window.savePM(newPM);
-                document.getElementById('pm-add-input').value = '';
-                updateUserList();
+                const amount = parseInt(pmAmount);
+                const description = prompt('Descripción de la transacción:', 'Ajuste manual de PM');
+                if (description !== null) {
+                    window.pmTransactions.add(amount, 'spend', description);
+                    document.getElementById('pm-add-input').value = '';
+                    updateUserList();
+                }
             }
         }
 
