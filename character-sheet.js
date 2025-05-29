@@ -171,6 +171,48 @@
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+        authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+        projectId: "ultimatemercenary-1e212",
+        storageBucket: "ultimatemercenary-1e212.appspot.com",
+        messagingSenderId: "683730871364",
+        appId: "1:683730871364:web:350aaf7a296ad34db28811",
+        databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+    };
+
+    // Inicializar Firebase si no está ya inicializado
+    if (!window.firebaseApp) {
+        window.firebaseApp = firebase.initializeApp(firebaseConfig);
+        window.database = firebase.database();
+    }
+
+    // Referencia a itemsComprados en Firebase
+    const itemsCompradosRef = window.database.ref('itemsComprados');
+
+    // Función para sincronizar el inventario con Firebase
+    function syncInventoryToFirebase() {
+        const allItems = [...window.characterSheet.equipment, ...window.characterSheet.implants];
+        itemsCompradosRef.set(allItems);
+    }
+
+    // Listener para cambios en Firebase
+    itemsCompradosRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Separar items por tipo
+            window.characterSheet.equipment = data.filter(item => 
+                item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
+            );
+            window.characterSheet.implants = data.filter(item => 
+                item.tipo === 'implant' || item.tipo === 'implante'
+            );
+            // Actualizar UI
+            updateEquipmentUI();
+        }
+    });
+
     // Tab switching functionality
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -198,6 +240,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 notas: '6 balas, básica',
                 descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
             });
+            updateEquipmentUI();
+            syncInventoryToFirebase(); // Sincronizar después de añadir
         }
     }
 
@@ -576,16 +620,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- NUEVO: Eliminar ítems de equipo/implantes ---
-    function removeEquipmentItem(index) {
+    window.removeEquipmentItem = function(index) {
         window.characterSheet.equipment.splice(index, 1);
-        localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
         updateEquipmentUI();
-    }
+        syncInventoryToFirebase(); // Sincronizar después de eliminar
+    };
     function removeImplant(index) {
         window.characterSheet.implants.splice(index, 1);
-        localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
         updateEquipmentUI();
-        updateUI();
+        syncInventoryToFirebase(); // Sincronizar después de eliminar
     }
 
     // --- NUEVO: Efectos de implantes ---
@@ -826,6 +869,9 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             implantsList.appendChild(div);
         });
+        
+        // Sincronizar con Firebase después de actualizar la UI
+        syncInventoryToFirebase();
     }
 
     // --- MODIFICADO: Aplicar efectos de implantes a la ficha ---
