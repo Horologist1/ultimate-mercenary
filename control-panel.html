@@ -893,27 +893,31 @@
         function updateDirectPM() {
             const pmAmount = document.getElementById('pm-direct-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
+                const currentTotal = window.pmTransactions.getTotal();
                 const newTotal = parseInt(pmAmount);
-                const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
-                if (description !== null) {
-                    // Actualizar en Firebase
-                    const pmRef = window.database.ref('playerPM');
-                    pmRef.set(newTotal.toString());
-                    
-                    // Actualizar transacciones
-                    const transactions = window.pmTransactions.getAll();
-                    transactions.push({
-                        amount: newTotal,
-                        type: 'gain',
-                        description: description,
-                        timestamp: new Date().toISOString()
-                    });
-                    const pmTransactionsRef = window.database.ref('pmTransactions');
-                    pmTransactionsRef.set(transactions);
-                    
-                    // Actualizar UI
-                    document.getElementById('pm-direct-input').value = '';
-                    updateUserList();
+                const difference = newTotal - currentTotal;
+                
+                if (difference !== 0) {
+                    const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
+                    if (description !== null) {
+                        // Crear una transacción que refleje el cambio total
+                        window.pmTransactions.add(Math.abs(difference), difference > 0 ? 'gain' : 'spend', description);
+                        
+                        // Actualizar Firebase directamente
+                        const pmRef = window.database.ref('playerPM');
+                        pmRef.set(newTotal.toString());
+                        
+                        document.getElementById('pm-direct-input').value = '';
+                        updateUserList();
+                        
+                        // Notificar a la tienda si está abierta
+                        if (window.parent) {
+                            window.parent.postMessage({
+                                type: 'updatePM',
+                                value: newTotal
+                            }, '*');
+                        }
+                    }
                 }
             }
         }

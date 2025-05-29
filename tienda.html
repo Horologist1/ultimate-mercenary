@@ -250,26 +250,6 @@
             localStorage.setItem('playerPM', data.toString());
             updatePMDisplay();
             updateBuyButtons();
-            
-            // Notificar al padre si está embebido
-            if (window.parent) {
-                window.parent.postMessage({
-                    type: 'updatePM',
-                    value: data.toString()
-                }, '*');
-            }
-        }
-    });
-
-    // Listener para transacciones de PM
-    const pmTransactionsRef = window.database.ref('pmTransactions');
-    pmTransactionsRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            localStorage.setItem('pmTransactions', JSON.stringify(data));
-            if (window.pmTransactions) {
-                window.pmTransactions.updateUI();
-            }
         }
     });
 
@@ -744,10 +724,6 @@
                     const itemsComprados = JSON.parse(localStorage.getItem('itemsComprados') || '[]');
                     itemsComprados.push(fichaItem);
                     itemsCompradosRef.set(itemsComprados);
-
-                    // Actualizar PM en Firebase
-                    const newPM = currentPM - item.price;
-                    pmRef.set(newPM.toString());
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
@@ -758,23 +734,14 @@
         function updatePMDisplay() {
             const pmElement = document.getElementById('current-pm');
             if (pmElement) {
-                pmElement.textContent = localStorage.getItem('playerPM') || '0';
+                const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+                pmElement.textContent = total;
             }
         }
 
-        // Escuchar mensajes de actualización de PM
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'updatePM') {
-                pmRef.set(event.data.value.toString());
-            }
-        });
-
-        // Inicializar la visualización de PM
-        updatePMDisplay();
-
         // Función para actualizar el estado de los botones de compra
         function updateBuyButtons() {
-            const currentPM = window.pmTransactions.getTotal();
+            const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
             const buttons = document.querySelectorAll('.buy-button');
             buttons.forEach(button => {
                 const itemId = button.dataset.itemId;

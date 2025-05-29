@@ -1002,7 +1002,6 @@
         const pmTransactionsRef = ref(database, 'pmTransactions');
         const chatRef = ref(database, 'mensajes-publico-expanded');
         const itemsCompradosRef = ref(database, 'itemsComprados');
-        const pmAcceptedRef = ref(database, 'pmAccepted');
 
         // Listeners de sincronización
         onValue(conocidosRef, (snapshot) => {
@@ -1079,11 +1078,19 @@
         });
         onValue(chatRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
-                if (window.agregarMensajeAlChatDisplay) {
-                    window.agregarMensajeAlChatDisplay(data);
-                }
+            // Ensure data is an array, or provide an empty array if null/undefined
+            // Firebase Realtime Database often returns objects for lists unless pushed with numeric keys.
+            // If 'data' is an object of messages, convert to array.
+            const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
+
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesArray));
+            if (window.renderGlobalChatMessages) {
+                console.log("[Firebase Chat Listener] Calling renderGlobalChatMessages.");
+                window.renderGlobalChatMessages(messagesArray);
+            } else {
+                // This might happen if Firebase loads and fires this event before the main DOM is fully parsed.
+                // The initChatSystem on DOMContentLoaded should handle initial rendering from localStorage anyway.
+                console.warn("[Firebase Chat Listener] renderGlobalChatMessages function not found at the moment of Firebase data arrival. Chat will render on DOMContentLoaded or next update.");
             }
         });
 
@@ -1091,13 +1098,6 @@
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('itemsComprados', JSON.stringify(data));
-            }
-        });
-
-        onValue(pmAcceptedRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                localStorage.setItem('pmAccepted', JSON.stringify(data));
             }
         });
 
@@ -1491,71 +1491,90 @@
             const chatMessagesContainer = document.getElementById('chat-messages');
             if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
         }
-        function agregarMensajeAlChatDisplay(mensajes) {
+        function agregarMensajeAlChatDisplay(msgData, msgId) {
             const chatMessagesContainer = document.getElementById('chat-messages');
             if (!chatMessagesContainer) return;
+            const div = document.createElement('div');
+            // Colores de nicks
+            let userColor = '#cccccc';
+            let tag = '';
+            let tagLabel = '';
+            let tagStyle = '';
+            // Tags immersivos posibles
+            const tagsImmersivos = [
+                {label: 'VIP', style: 'background:#ffd700;color:#222;border:1px solid #ffd700;'},
+                {label: 'PATROCINADO', style: 'background:#ff4757;color:#fff;border:1px solid #ff4757;'},
+                {label: 'FAN', style: 'background:#70a1ff;color:#fff;border:1px solid #70a1ff;'},
+                {label: 'SPONSOR', style: 'background:#2ed573;color:#fff;border:1px solid #2ed573;'},
+                {label: 'INFLUENCER', style: 'background:#eccc68;color:#222;border:1px solid #eccc68;'},
+                {label: 'EXPERTO', style: 'background:#5352ed;color:#fff;border:1px solid #5352ed;'}
+            ];
+            if (msgData.tagImmersivo) {
+                tagLabel = msgData.tagImmersivo;
+                const found = tagsImmersivos.find(t => t.label === tagLabel);
+                tagStyle = found ? found.style : tagsImmersivos[0].style;
+            } else if (msgData.automatico && msgData.showTag) {
+                // Solo si showTag está en true
+                const tagObj = tagsImmersivos[Math.floor(Math.random() * tagsImmersivos.length)];
+                tagLabel = tagObj.label;
+                tagStyle = tagObj.style;
+            }
+            if (tagLabel) {
+                tag = `<span class=\"tag\" style=\"${tagStyle}margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;\">${tagLabel}</span>`;
+            }
+            if (msgData.usuario === 'XIII') {
+                userColor = '#00ccff';
+            } else if (msgData.usuario === 'Kaiser') {
+                userColor = '#ff4757';
+            } else if (msgData.automatico) {
+                userColor = msgData.color || '#ffd700';
+            } else {
+                userColor = msgData.color || '#cccccc';
+            }
+            // Mensaje destacado si es PM o tiene tag especial
+            const pmValue = (msgData.mensaje||'').match(/([+][0-9]+)\s*PM/) ? parseInt((msgData.mensaje.match(/([+][0-9]+)\s*PM/)||[])[1].replace('+','')) : null;
+            if (pmValue || tagLabel) div.classList.add('destacado');
+            div.className += ' chat-message';
             
-            chatMessagesContainer.innerHTML = '';
-            mensajes.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = 'chat-message';
-                div.style.opacity = '0';
-                
-                const sender = msg.sender || 'SISTEMA';
-                const content = msg.content || '';
-                const time = msg.time || new Date().toLocaleTimeString();
-                
-                div.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-sender">${sender}</span>
-                        <span class="message-time">${time}</span>
-                    </div>
-                    <div class="message-content">${content}</div>
-                `;
-                
-                // Extraer PM del mensaje si existe
-                const pmMatch = content.match(/¡Te transfiero (\d+) PM!/);
-                const pmValue = pmMatch ? parseInt(pmMatch[1]) : null;
-                
-                if (pmValue) {
-                    const btn = document.createElement('button');
-                    btn.textContent = `Aceptar +${pmValue} PM`;
-                    btn.className = 'pm-accept-btn';
-                    Object.assign(btn.style, {
-                        marginLeft: '10px', fontSize: '12px', background: '#222', color: '#2ed573',
-                        border: '1px solid #2ed573', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.3s ease'
-                    });
-                    
-                    // Obtener estado de aceptado desde Firebase
-                    const msgId = msg.timestamp || time;
-                    const pmAccepted = JSON.parse(localStorage.getItem('pmAccepted') || '{}');
-                    
-                    if (pmAccepted[msgId]) {
+            // Resaltar "XIII" o "#13" en el contenido del mensaje
+            let mensajeContent = msgData.mensaje || '';
+            mensajeContent = mensajeContent.replace(/(XIII|#13)/gi, '<span style="color:#ffd700;font-weight:bold;">$1</span>');
+            
+            div.innerHTML = `
+                <span class=\"username\" style=\"color:${userColor};font-weight:bold;\">${msgData.usuario || 'Anónimo'}:${tag}</span>
+                <span class=\"content\">${mensajeContent}</span>
+                <span style=\"float:right;font-size:11px;color:#888;\">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+            `;
+            if (pmValue) {
+                const btn = document.createElement('button');
+                btn.textContent = `Aceptar +${pmValue} PM`;
+                btn.className = 'pm-accept-btn';
+                Object.assign(btn.style, {
+                    marginLeft: '10px', fontSize: '12px', background: '#222', color: '#2ed573',
+                    border: '1px solid #2ed573', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.3s ease'
+                });
+                let pmButtonStates = JSON.parse(sessionStorage.getItem('pmSumadosParaBotones') || '{}');
+                if (pmButtonStates[msgId]) {
+                    btn.textContent = 'Aceptado';
+                    btn.disabled = true;
+                    Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
+                } else {
+                    btn.onclick = function() {
+                        let currentTotalPM = parseInt(localStorage.getItem('playerPM') || '0');
+                        localStorage.setItem('playerPM', currentTotalPM + pmValue);
+                        pmButtonStates[msgId] = true;
+                        sessionStorage.setItem('pmSumadosParaBotones', JSON.stringify(pmButtonStates));
                         btn.textContent = 'Aceptado';
                         btn.disabled = true;
                         Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
-                    } else {
-                        btn.onclick = function() {
-                            let currentTotalPM = parseInt(localStorage.getItem('playerPM') || '0');
-                            localStorage.setItem('playerPM', currentTotalPM + pmValue);
-                            
-                            // Actualizar estado en Firebase
-                            pmAccepted[msgId] = true;
-                            set(pmAcceptedRef, pmAccepted);
-                            
-                            btn.textContent = 'Aceptado';
-                            btn.disabled = true;
-                            Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
-                            
-                            if (window.updateStatusPanel) window.updateStatusPanel();
-                            if (window.savePM) window.savePM(currentTotalPM + pmValue);
-                        };
-                    }
-                    div.appendChild(btn);
+                        if (window.updateStatusPanel) window.updateStatusPanel();
+                        if (window.savePM) window.savePM(currentTotalPM + pmValue);
+                    };
                 }
-                chatMessagesContainer.appendChild(div);
-                setTimeout(() => div.style.opacity = '1', 50);
-            });
+                div.appendChild(btn);
+            }
+            chatMessagesContainer.appendChild(div);
+            setTimeout(() => div.style.opacity = '1', 50);
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
         }
         window.agregarMensajeAlChatDisplay = agregarMensajeAlChatDisplay;
@@ -1789,6 +1808,11 @@
     window.sumarPM = sumarPM;
     window.comprarItem = comprarItem;
     window.pmTransactions = pmTransactions;
+    </script>
+
+    <!-- Versión del sistema -->
+    <script>
+        const SYSTEM_VERSION = '0.55';
     </script>
 
 </body>
