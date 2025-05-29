@@ -678,12 +678,6 @@
                 const success = window.comprarItem(itemId, item.price);
                 
                 if (success) {
-                    // Mostrar mensaje de éxito
-                    showPurchaseMessage(item);
-                    
-                    // Actualizar la UI
-                    updatePMDisplay();
-                    
                     // Preparar el item para la ficha
                     let fichaItem = {
                         nombre: item.name,
