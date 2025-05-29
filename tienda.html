@@ -209,6 +209,15 @@
     </style>
 </head>
 <body>
+    <script>
+    // Permite a la tienda usar el sistema de transacciones del padre si está embebida
+    if (!window.pmTransactions && window.parent && window.parent.pmTransactions) {
+        window.pmTransactions = window.parent.pmTransactions;
+        window.comprarItem = window.parent.comprarItem;
+        window.sumarPM = window.parent.sumarPM;
+        window.restarPM = window.parent.restarPM;
+    }
+    </script>
     <div class="container">
         <header>
             <div class="logo-container">
