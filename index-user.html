@@ -974,10 +974,9 @@
 </head>
 <body>
     <!-- Firebase App (the core Firebase SDK) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
             authDomain: "ultimatemercenary-1e212.firebaseapp.com",
@@ -987,52 +986,56 @@
             appId: "1:683730871364:web:350aaf7a296ad34db28811",
             databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
         };
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        
+        // Inicializar Firebase (versión 8)
+        if (!window.firebaseApp) {
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            window.database = firebase.database();
+        }
 
         // Referencias
-        const conocidosRef = ref(database, 'conocidosSeleccionados');
-        const conocimientosRef = ref(database, 'conocimientosSeleccionados');
-        const mensajesRef = ref(database, 'mensajes-directos');
-        const currentTestRef = ref(database, 'currentTest');
-        const nombresRef = ref(database, 'nombresConcursantes');
-        const audienceRef = ref(database, 'audience');
-        const ratingRef = ref(database, 'rating');
-        const pmRef = ref(database, 'playerPM');
-        const pmTransactionsRef = ref(database, 'pmTransactions');
-        const chatRef = ref(database, 'mensajes-publico-expanded');
-        const itemsCompradosRef = ref(database, 'itemsComprados');
+        const conocidosRef = window.database.ref('conocidosSeleccionados');
+        const conocimientosRef = window.database.ref('conocimientosSeleccionados');
+        const mensajesRef = window.database.ref('mensajes-directos');
+        const currentTestRef = window.database.ref('currentTest');
+        const nombresRef = window.database.ref('nombresConcursantes');
+        const audienceRef = window.database.ref('audience');
+        const ratingRef = window.database.ref('rating');
+        const pmRef = window.database.ref('playerPM');
+        const pmTransactionsRef = window.database.ref('pmTransactions');
+        const chatRef = window.database.ref('mensajes-publico-expanded');
+        const itemsCompradosRef = window.database.ref('itemsComprados');
 
         // Listeners de sincronización
-        onValue(conocidosRef, (snapshot) => {
+        conocidosRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
                 if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
-        onValue(conocimientosRef, (snapshot) => {
+        conocimientosRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
                 if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
-        onValue(mensajesRef, (snapshot) => {
+        mensajesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('mensajes-directos', JSON.stringify(data));
                 if (window.loadDirectMessages) window.loadDirectMessages();
             }
         });
-        onValue(currentTestRef, (snapshot) => {
+        currentTestRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('currentTest', data);
                 if (window.updateObjective) window.updateObjective();
             }
         });
-        onValue(nombresRef, (snapshot) => {
+        nombresRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 Object.entries(data).forEach(([numero, nombre]) => {
@@ -1041,7 +1044,7 @@
                 if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
-        onValue(audienceRef, (snapshot) => {
+        audienceRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 localStorage.setItem('spectators', data);
@@ -1049,7 +1052,7 @@
                 if (window.updateUserList) window.updateUserList();
             }
         });
-        onValue(ratingRef, (snapshot) => {
+        ratingRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 localStorage.setItem('rating', data);
@@ -1057,17 +1060,17 @@
                 if (window.updateUserList) window.updateUserList();
             }
         });
-        onValue(pmRef, (snapshot) => {
+        pmRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 // Solo actualizar si no hay transacciones locales
-                if (window.pmTransactions.getAll().length === 0) {
+                if (window.pmTransactions && window.pmTransactions.transactions && window.pmTransactions.transactions.length === 0) {
                     // Si es la primera vez, crear una transacción inicial
-                    window.pmTransactions.add(data, 'gain', 'PM inicial');
+                    window.pmTransactions.addTransaction(data, 'PM inicial');
                 }
             }
         });
-        onValue(pmTransactionsRef, (snapshot) => {
+        pmTransactionsRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('pmTransactions', JSON.stringify(data));
@@ -1076,7 +1079,7 @@
                 }
             }
         });
-        onValue(chatRef, (snapshot) => {
+        chatRef.on('value', (snapshot) => {
             const data = snapshot.val();
             // Ensure data is an array, or provide an empty array if null/undefined
             // Firebase Realtime Database often returns objects for lists unless pushed with numeric keys.
@@ -1094,7 +1097,7 @@
             }
         });
 
-        onValue(itemsCompradosRef, (snapshot) => {
+        itemsCompradosRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('itemsComprados', JSON.stringify(data));
@@ -1103,18 +1106,18 @@
 
         // Funciones para guardar en Firebase (si el usuario puede modificar)
         window.saveConcursanteName = function(numero, nombre) {
-            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
-            set(nombreRef, nombre);
+            const nombreRef = window.database.ref(`nombresConcursantes/${numero}`);
+            nombreRef.set(nombre);
         };
-        window.saveAudience = function(valor) { set(audienceRef, valor); };
-        window.saveRating = function(valor) { set(ratingRef, valor); };
-        window.savePM = function(valor) { set(pmRef, valor); };
-        window.saveChat = function(arr) { set(chatRef, arr); };
-        window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
-        window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
-        window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
-        window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
-        window.saveItemsComprados = function(arr) { set(itemsCompradosRef, arr); };
+        window.saveAudience = function(valor) { audienceRef.set(valor); };
+        window.saveRating = function(valor) { ratingRef.set(valor); };
+        window.savePM = function(valor) { pmRef.set(valor); };
+        window.saveChat = function(arr) { chatRef.set(arr); };
+        window.saveConocidosSeleccionados = function(arr) { conocidosRef.set(arr); };
+        window.saveConocimientosSeleccionados = function(arr) { conocimientosRef.set(arr); };
+        window.saveMensajesDirectos = function(arr) { mensajesRef.set(arr); };
+        window.saveCurrentTest = function(valor) { currentTestRef.set(valor); };
+        window.saveItemsComprados = function(arr) { itemsCompradosRef.set(arr); };
     </script>
     <div class="main-container">
         <!-- Video de fondo -->
