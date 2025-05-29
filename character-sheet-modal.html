@@ -398,95 +398,6 @@
             display: block;
             margin: 0 auto;
         }
-
-        /* Estilos para items del inventario */
-        .item-card {
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 1px solid #444;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-
-        .item-card h4 {
-            color: #00ccff;
-            margin: 0 0 5px 0;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-        }
-
-        .item-description {
-            color: #aaa;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .item-stat {
-            color: #ff4757;
-            font-weight: bold;
-            font-size: 12px;
-            margin: 2px 0;
-        }
-
-        .item-effects {
-            color: #2ecc71;
-            font-size: 12px;
-            margin: 2px 0;
-        }
-
-        .remove-item {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: #ff4757;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 2px 5px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .remove-item:hover {
-            background-color: #ff6b81;
-        }
-
-        .no-items {
-            color: #666;
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* Debug panel */
-        .debug-panel {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.9);
-            border: 1px solid #ff4757;
-            border-radius: 4px;
-            padding: 10px;
-            font-size: 10px;
-            color: #ff4757;
-            z-index: 10000;
-            max-width: 300px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .debug-panel h4 {
-            margin: 0 0 5px 0;
-            color: #00ccff;
-        }
-
-        .debug-item {
-            margin: 2px 0;
-            padding: 2px;
-            background-color: rgba(255, 71, 87, 0.1);
-            border-radius: 2px;
-        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
@@ -514,12 +425,6 @@
     </script>
 </head>
 <body>
-    <!-- Debug panel para ver qué datos se están recibiendo -->
-    <div class="debug-panel" id="debug-panel">
-        <h4>🔍 Debug Firebase</h4>
-        <div id="debug-content">Inicializando...</div>
-    </div>
-
     <div class="character-sheet">
         <div class="sheet-header">
             <h1>FICHA DE PERSONAJE</h1>
@@ -944,66 +849,29 @@
     
     <script src="character-sheet.js"></script>
     <script>
-        // Variable global para el inventario
-        let inventory = [];
-
-        // Función de debug para mostrar qué datos se están recibiendo
-        function updateDebugPanel(data) {
-            const debugContent = document.getElementById('debug-content');
-            if (debugContent) {
-                const items = Array.isArray(data) ? data : (data && typeof data === 'object' ? Object.values(data) : []);
-                debugContent.innerHTML = `
-                    <div>Items recibidos: ${items.length}</div>
-                    ${items.map((item, i) => `
-                        <div class="debug-item">
-                            ${i+1}. ${item.nombre || 'Sin nombre'} 
-                            (${item.tipo || 'Sin tipo'})
-                        </div>
-                    `).join('')}
-                `;
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Inicializando character sheet con debug mejorado...');
-            
             // Cargar inventario inicial desde localStorage
             inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
             updateInventoryDisplay();
-            updateDebugPanel(inventory);
             
-            // Función de sincronización Firebase mejorada con debug
+            // Forzar sincronización con Firebase
             function initFirebaseListener() {
                 if (window.onValueFirebase && window.itemsCompradosRef) {
-                    console.log('✅ Inicializando listener Firebase...');
-                    
                     window.onValueFirebase(window.itemsCompradosRef, (snapshot) => {
-                        console.log('🔄 Datos recibidos de Firebase:', snapshot.val());
-                        
                         const data = snapshot.val();
                         let items = [];
-                        
-                        if (Array.isArray(data)) {
-                            items = data;
-                        } else if (data && typeof data === 'object') {
-                            items = Object.values(data);
-                        } else {
-                            items = [];
-                        }
-                        
-                        console.log('📦 Items procesados:', items);
+                        if (Array.isArray(data)) items = data;
+                        else if (data && typeof data === 'object') items = Object.values(data);
+                        else items = [];
                         
                         // Actualizar el inventario global y localStorage
                         inventory = items;
                         localStorage.setItem('inventory', JSON.stringify(items));
                         
-                        // Actualizar debug panel
                         updateDebugPanel(items);
                         
                         // Actualizar UI inmediatamente
                         updateInventoryDisplay();
-                        
-                        console.log('✅ Inventario actualizado:', inventory);
                         
                         // Forzar actualización del character sheet
                         if (window.characterSheet) {
@@ -1014,7 +882,7 @@
                         }
                     });
                 } else {
-                    console.log('⏳ Firebase no disponible, reintentando en 100ms...');
+                    // Si Firebase no está disponible aún, intentar de nuevo en 100ms
                     setTimeout(initFirebaseListener, 100);
                 }
             }
@@ -1490,18 +1358,17 @@
         // Sistema de inventario
         let inventory = [];
 
-        // Escuchar mensajes del padre (para compatibilidad)
+        // Escuchar mensajes del padre
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'updateInventory') {
                 inventory = event.data.items || [];
                 updateInventoryDisplay();
-                updateDebugPanel(inventory);
             } else if (event.data && event.data.type === 'addItem') {
+                // Agregar un nuevo item al inventario
                 const item = event.data.item;
                 if (item) {
                     inventory.push(item);
                     updateInventoryDisplay();
-                    updateDebugPanel(inventory);
                 }
             }
         });
@@ -1511,10 +1378,7 @@
             window.parent.postMessage({ type: 'getInventory' }, '*');
         }
 
-        // Función mejorada para actualizar inventario con mejor debug
         function updateInventoryDisplay() {
-            console.log('🔄 Actualizando display del inventario con:', inventory);
-            
             // Limpiar contenedores primero
             const containers = ['weapons-list', 'armor-list', 'misc-list', 'implants-list'];
             containers.forEach(id => {
@@ -1524,13 +1388,10 @@
 
             // Agrupar items por tipo
             const groupedItems = inventory.reduce((acc, item) => {
-                const tipo = item.tipo || 'desconocido';
-                acc[tipo] = acc[tipo] || [];
-                acc[tipo].push(item);
+                acc[item.tipo] = acc[item.tipo] || [];
+                acc[item.tipo].push(item);
                 return acc;
             }, {});
-
-            console.log('📊 Items agrupados por tipo:', groupedItems);
 
             // Actualizar cada sección
             updateSection('arma', 'weapons-list', 'Arma');
@@ -1540,14 +1401,9 @@
 
             function updateSection(type, containerId, title) {
                 const container = document.getElementById(containerId);
-                if (!container) {
-                    console.warn(`⚠️ Contenedor ${containerId} no encontrado`);
-                    return;
-                }
+                if (!container) return;
                 
                 const items = groupedItems[type] || [];
-                console.log(`📝 Actualizando sección ${type}:`, items);
-                
                 if (items.length === 0) {
                     container.innerHTML = `<p class="no-items">No hay ${title.toLowerCase()}s en el inventario</p>`;
                     return;
@@ -1555,14 +1411,12 @@
 
                 container.innerHTML = items.map((item, index) => `
                     <div class="item-card" data-item-index="${index}">
-                        <h4>${item.nombre || 'Objeto sin nombre'}</h4>
+                        <h4>${item.nombre}</h4>
                         ${item.descripcion ? `<p class="item-description">${item.descripcion}</p>` : ''}
                         ${item.dano ? `<p class="item-stat">Daño: ${item.dano}</p>` : ''}
                         ${item.proteccion ? `<p class="item-stat">Protección: ${item.proteccion}</p>` : ''}
                         ${item.efectos ? `<p class="item-effects">${item.efectos}</p>` : ''}
-                        ${item.detalles ? `<p class="item-effects">${item.detalles}</p>` : ''}
-                        ${item.notas ? `<p class="item-description">${item.notas}</p>` : ''}
-                        <button class="remove-item" onclick="removeItem(${index}, '${type}')">
+                        <button class="remove-item" onclick="removeItem(${index})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -1570,43 +1424,31 @@
             }
         }
         
-        // Función mejorada para eliminar un item
-        window.removeItem = function(index, type) {
+        // Función para eliminar un item
+        window.removeItem = function(index) {
             if (confirm('¿Estás seguro de que quieres eliminar este item?')) {
-                console.log(`🗑️ Eliminando item ${index} de tipo ${type}`);
+                // Eliminar del inventario local
+                inventory.splice(index, 1);
                 
-                // Encontrar el item correcto en el inventario global
-                const groupedItems = inventory.reduce((acc, item) => {
-                    const itemType = item.tipo || 'desconocido';
-                    acc[itemType] = acc[itemType] || [];
-                    acc[itemType].push(item);
-                    return acc;
-                }, {});
+                // Actualizar Firebase
+                if (window.firebase && window.firebase.database) {
+                    const itemsCompradosRef = window.firebase.database().ref('itemsComprados');
+                    itemsCompradosRef.set(inventory).then(() => {
+                        console.log('Item eliminado de Firebase');
+                    }).catch((error) => {
+                        console.error('Error al eliminar de Firebase:', error);
+                    });
+                }
                 
-                const itemsOfType = groupedItems[type] || [];
-                if (itemsOfType[index]) {
-                    const itemToRemove = itemsOfType[index];
-                    const globalIndex = inventory.indexOf(itemToRemove);
-                    
-                    if (globalIndex !== -1) {
-                        inventory.splice(globalIndex, 1);
-                        
-                        // Actualizar Firebase
-                        if (window.firebaseDatabase && window.itemsCompradosRef) {
-                            const { getDatabase, ref, set } = window.firebaseDatabase;
-                            set(window.itemsCompradosRef, inventory).then(() => {
-                                console.log('✅ Item eliminado de Firebase');
-                            }).catch((error) => {
-                                console.error('❌ Error al eliminar de Firebase:', error);
-                            });
-                        }
-                        
-                        // Actualizar la visualización
-                        updateInventoryDisplay();
-                        updateDebugPanel(inventory);
-                        
-                        console.log('✅ Item eliminado correctamente');
-                    }
+                // Actualizar la visualización
+                updateInventoryDisplay();
+                
+                // Notificar al padre
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'inventoryUpdated',
+                        items: inventory
+                    }, '*');
                 }
             }
         };
