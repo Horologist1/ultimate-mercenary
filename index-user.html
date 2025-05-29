@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.59 - Concursante</title>
+    <title>Ultimate Mercenary 0.6 - Concursante</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1129,7 +1129,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.59</h1>
+                        <h1>ULTIMATE MERCENARY 0.6</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1761,6 +1761,11 @@
             return this.total;
         },
 
+        setTotal(newTotal) {
+            const difference = newTotal - this.total;
+            return this.addTransaction(difference, 'Ajuste manual de PM');
+        },
+
         getTotal() {
             return this.total;
         },
@@ -1812,6 +1817,11 @@
                     item: item
                 }, '*');
             }
+        } else if (event.data && event.data.type === 'setPM') {
+            // Establecer PM desde el panel de control
+            if (window.pmTransactions) {
+                window.pmTransactions.setTotal(event.data.total);
+            }
         }
     });
 
@@ -1827,6 +1837,10 @@
         return window.pmTransactions.addTransaction(-cantidad, razon);
     };
 
+    window.establecerPM = function(total) {
+        return window.pmTransactions.setTotal(total);
+    };
+
     window.comprarItem = function(itemId, precio) {
         const total = window.pmTransactions.getTotal();
         if (total >= precio) {
@@ -1839,7 +1853,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.59';
+        const SYSTEM_VERSION = '0.6';
     </script>
 
 </body>

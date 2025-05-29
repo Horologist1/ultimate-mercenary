@@ -712,7 +712,15 @@
                             tipo: 'equipo',
                             nombre: item.name,
                             descripcion: item.description || '',
-                            detalles: item.details || ''
+                            detalles: item.details || '',
+                            categoria: 'equipo'
+                        };
+                    } else if (item.section === 'shop-cyberware') {
+                        fichaItem = {
+                            tipo: 'cyberware',
+                            nombre: item.name,
+                            descripcion: item.description || '',
+                            efectos: item.details || ''
                         };
                     }
                     
