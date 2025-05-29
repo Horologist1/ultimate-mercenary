@@ -739,7 +739,15 @@
                         currentItems.push(fichaItem);
                         
                         // Guardar en Firebase
-                        itemsCompradosRef.set(currentItems);
+                        itemsCompradosRef.set(currentItems).then(() => {
+                            // Notificar al character sheet modal si está abierto
+                            if (window.parent) {
+                                window.parent.postMessage({
+                                    type: 'addItem',
+                                    item: fichaItem
+                                }, '*');
+                            }
+                        });
                     });
                 }
             } else {

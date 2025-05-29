@@ -444,6 +444,14 @@
                 if (typeof updateInventoryDisplay === 'function') {
                     updateInventoryDisplay();
                 }
+
+                // Notificar al padre que el inventario ha sido actualizado
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'inventoryUpdated',
+                        items: items
+                    }, '*');
+                }
             }
         });
     </script>
