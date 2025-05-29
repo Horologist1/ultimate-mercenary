@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.69</title>
+    <title>Ultimate Mercenary 0.7</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -975,20 +975,30 @@
 <body>
     <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
             authDomain: "ultimatemercenary-1e212.firebaseapp.com",
             projectId: "ultimatemercenary-1e212",
-            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
+            storageBucket: "ultimatemercenary-1e212.appspot.com",
             messagingSenderId: "683730871364",
             appId: "1:683730871364:web:350aaf7a296ad34db28811",
             databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
         };
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+
+        // Exponer las funciones necesarias globalmente
+        window.firebaseUtils = {
+            database,
+            ref: ref,
+            set: set,
+            get: get,
+            update: update,
+            onValue: onValue
+        };
 
         // Referencias
         const conocidosRef = ref(database, 'conocidosSeleccionados');
@@ -1129,7 +1139,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.68</h1>
+                        <h1>ULTIMATE MERCENARY 0.7</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
