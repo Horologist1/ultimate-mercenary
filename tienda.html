@@ -210,19 +210,53 @@
 </head>
 <body>
     <script>
-    // Permite a la tienda usar el sistema de transacciones y Firebase del padre si está embebida
-    let puenteActivo = false;
+    // Sistema para la comunicación con la ventana padre
+    let shopInitialized = false;
+    let retryCount = 0;
+    const maxRetries = 10;
+
+    // Esperar mensajes del padre
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'initializeShop') {
+            console.log('[DEBUG] Recibida inicialización de tienda:', event.data);
+            
+            // Asegurarse de que tenemos acceso a las funciones necesarias
+            if (!window.pmTransactions) {
+                window.pmTransactions = window.parent.pmTransactions;
+                window.comprarItem = window.parent.comprarItem;
+                window.sumarPM = window.parent.sumarPM;
+                window.restarPM = window.parent.restarPM;
+            }
+
+            if (!window.firebaseUtils) {
+                window.firebaseUtils = window.parent.firebaseUtils;
+            }
+
+            shopInitialized = true;
+            updatePMDisplay();
+        }
+    });
+
+    // Función para verificar la inicialización
+    function waitForInitialization(callback) {
+        if (shopInitialized) {
+            callback();
+            return;
+        }
+
+        if (retryCount >= maxRetries) {
+            console.error('No se pudo inicializar la tienda después de varios intentos');
+            return;
+        }
+
+        retryCount++;
+        console.log(`[DEBUG] Esperando inicialización (${retryCount}/${maxRetries})`);
+        setTimeout(() => waitForInitialization(callback), 1000);
+    }
+
+    // Solicitar inicialización al cargar
     if (window.parent) {
-        if (window.parent.pmTransactions) {
-            window.pmTransactions = window.parent.pmTransactions;
-            window.comprarItem = window.parent.comprarItem;
-            window.sumarPM = window.parent.sumarPM;
-            window.restarPM = window.parent.restarPM;
-        }
-        if (window.parent.firebaseUtils) {
-            window.firebaseUtils = window.parent.firebaseUtils;
-        }
-        puenteActivo = true;
+        window.parent.postMessage({ type: 'requestInit' }, '*');
     }
 
     // Función para actualizar la visualización de PM
@@ -754,24 +788,52 @@
                         alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
                         return;
                     }
-                    
-                    // Obtener los items actuales y añadir el nuevo
-                    const itemsCompradosRef = window.firebaseUtils.ref(window.firebaseUtils.database, 'itemsComprados');
-                    
-                    // Leer los datos actuales usando onValue 
-                    window.firebaseUtils.onValue(itemsCompradosRef, (snapshot) => {
-                        // Si no hay datos, inicializar como array vacío
-                        let items = [];
-                        const currentData = snapshot.val();
-                        if (currentData) {
-                            items = Array.isArray(currentData) ? currentData : Object.values(currentData);
+
+                    // Funcion para guardar el item
+                    async function saveItem() {
+                        try {
+                            // Obtener referencia de Firebase
+                            const itemsCompradosRef = window.firebaseUtils.ref(window.firebaseUtils.database, 'itemsComprados');
+                            
+                            // Obtener los items actuales
+                            const snapshot = await window.firebaseUtils.get(itemsCompradosRef);
+                            let items = [];
+                            
+                            if (snapshot.exists()) {
+                                const currentData = snapshot.val();
+                                items = Array.isArray(currentData) ? currentData : Object.values(currentData);
+                            }
+                            
+                            // Añadir el nuevo item
+                            items.push(fichaItem);
+                            
+                            // Guardar en Firebase
+                            await window.firebaseUtils.set(itemsCompradosRef, items);
+                            
+                            // Mostrar mensaje de éxito
+                            showPurchaseMessage({
+                                name: fichaItem.nombre,
+                                id: itemId
+                            });
+                            
+                            // Notificar a la ventana padre
+                            if (window.parent) {
+                                window.parent.postMessage({
+                                    type: 'itemPurchased',
+                                    item: fichaItem
+                                }, '*');
+                            }
+                            
+                            return true;
+                        } catch (error) {
+                            console.error('Error al guardar item:', error);
+                            alert('Ocurrió un error al guardar el item. Por favor, inténtalo de nuevo.');
+                            return false;
                         }
-                        
-                        // Añadir el nuevo item
-                        items.push(fichaItem);
-                        
-                        // Guardar el array actualizado
-                        return window.firebaseUtils.set(itemsCompradosRef, items);
+                    }
+                    
+                    // Intentar guardar el item
+                    saveItem();
                     }).then(() => {
                         // Notificar al character sheet modal si está abierto
                         if (window.parent) {
