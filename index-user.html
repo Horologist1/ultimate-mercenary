@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.72</title>
+    <title>Ultimate Mercenary 0.71</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -976,7 +976,7 @@
     <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
@@ -1071,9 +1071,9 @@
             const data = snapshot.val();
             if (data !== null) {
                 // Solo actualizar si no hay transacciones locales
-                if (window.pmTransactions && window.pmTransactions.transactions.length === 0) {
+                if (window.pmTransactions.getAll().length === 0) {
                     // Si es la primera vez, crear una transacción inicial
-                    window.pmTransactions.addTransaction(parseInt(data), 'PM inicial');
+                    window.pmTransactions.add(data, 'gain', 'PM inicial');
                 }
             }
         });
@@ -1139,7 +1139,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.72</h1>
+                        <h1>ULTIMATE MERCENARY 0.71</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1324,60 +1324,7 @@
             </div>
         `;
         document.body.appendChild(shopWindow);
-        
-        // Obtener referencia al iframe
         window.tiendaIframe = shopWindow.querySelector('iframe');
-        
-        // Función para intentar pasar las utilidades al iframe
-        function initializeIframe() {
-            if (window.tiendaIframe.contentWindow) {
-                try {
-                    // Pasar las funciones y objetos necesarios
-                    window.tiendaIframe.contentWindow.pmTransactions = window.pmTransactions;
-                    window.tiendaIframe.contentWindow.comprarItem = window.comprarItem;
-                    window.tiendaIframe.contentWindow.sumarPM = window.sumarPM;
-                    window.tiendaIframe.contentWindow.restarPM = window.restarPM;
-                    window.tiendaIframe.contentWindow.firebaseUtils = window.firebaseUtils;
-                    window.tiendaIframe.contentWindow.itemsComprados = window.itemsComprados || [];
-                    
-                    // Notificar al iframe que todo está listo
-                    window.tiendaIframe.contentWindow.postMessage({
-                        type: 'initializeShop',
-                        data: {
-                            pm: window.pmTransactions.getTotal(),
-                            firebase: !!window.firebaseUtils,
-                            itemsComprados: window.itemsComprados || []
-                        }
-                    }, '*');
-                    
-                    return true;
-                } catch (e) {
-                    console.error('Error al inicializar iframe:', e);
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        // Esperar a que el iframe cargue y reintentar si es necesario
-        let retryCount = 0;
-        const maxRetries = 5;
-        
-        window.tiendaIframe.onload = function() {
-            const tryInit = () => {
-                if (initializeIframe()) {
-                    console.log('[DEBUG] Tienda inicializada correctamente');
-                } else if (retryCount < maxRetries) {
-                    retryCount++;
-                    console.log(`[DEBUG] Reintentando inicialización de tienda (${retryCount}/${maxRetries})`);
-                    setTimeout(tryInit, 1000);
-                } else {
-                    console.error('[DEBUG] No se pudo inicializar la tienda después de varios intentos');
-                }
-            };
-            
-            tryInit();
-        };
     }
     window.openShop = openShop;
 
@@ -1515,42 +1462,475 @@
                 time: new Date().toLocaleTimeString()
             }));
             chat.innerHTML = ejemploMensajes.map(msg =>
-                `<div class=\"chat-message\"><span class="username">${msg.sender}</span>: <span class="content">${msg.content}</span> <span class="time">${msg.time}</span></div>`
-            ).join('');
-            chat.scrollTop = chat.scrollHeight;
+                `<div class=\"chat-message\"><span class="username\">${msg.sender}:</span> <span class="content">${msg.content}</span> <span style="float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
+            ).join('') + '<div style="color:#888;font-size:13px;">(Mensajes de ejemplo: el chat global está vacío)</div>';
         } else {
-            // Cargar mensajes reales desde localStorage
-            chat.innerHTML = mensajes.map(msg =>
-                `<div class=\"chat-message\"><span class="username">${msg.sender}</span>: <span class="content">${msg.content}</span> <span class="time">${msg.time}</span></div>`
-            ).join('');
-            chat.scrollTop = chat.scrollHeight;
+            chat.innerHTML = mensajes.map(msg => {
+                // Compatibilidad flexible
+                const sender = msg.sender || msg.user || 'SISTEMA';
+                const content = msg.content || msg.text || '';
+                const time = msg.time || '';
+                return `<div class=\"chat-message\"><span class="username\">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;\">${time}</span></div>`;
+            }).join('');
+        }
+        chat.scrollTop = chat.scrollHeight;
+    };
+    </script>
+    <script>
+    // Llama a las funciones al cargar la página para inicializar la UI
+    updateStatusPanel();
+    updateObjective();
+    renderTarjetasSeleccionadas();
+    loadDirectMessages();
+    </script>
+
+    <!-- NEW CONSOLIDATED CHAT SYSTEM SCRIPT -->
+    <script>
+        // --- CHAT ROBUSTO Y GLOBAL ---
+        let autoMsgInterval;
+        function limpiarMensajesJugadorDOM() {
+            // Elimina del DOM todos los mensajes del jugador
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            if (!chatMessagesContainer) return;
+            const mensajes = chatMessagesContainer.querySelectorAll('.chat-message');
+            mensajes.forEach(msg => {
+                const username = msg.querySelector('.username');
+                if (username && username.textContent.trim().startsWith('XIII')) {
+                    chatMessagesContainer.removeChild(msg);
+                }
+            });
+        }
+        function limpiarChatJugador() {
+            // Borra solo los mensajes del jugador de localStorage y del DOM
+            localStorage.removeItem('mensajes-jugador-sesion');
+            limpiarMensajesJugadorDOM();
+        }
+        function limpiarChatDOMCompleto() {
+            // Limpia todo el chat del DOM
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
+        }
+        function agregarMensajeAlChatDisplay(msgData, msgId) {
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            if (!chatMessagesContainer) return;
+            const div = document.createElement('div');
+            // Colores de nicks
+            let userColor = '#cccccc';
+            let tag = '';
+            let tagLabel = '';
+            let tagStyle = '';
+            // Tags immersivos posibles
+            const tagsImmersivos = [
+                {label: 'VIP', style: 'background:#ffd700;color:#222;border:1px solid #ffd700;'},
+                {label: 'PATROCINADO', style: 'background:#ff4757;color:#fff;border:1px solid #ff4757;'},
+                {label: 'FAN', style: 'background:#70a1ff;color:#fff;border:1px solid #70a1ff;'},
+                {label: 'SPONSOR', style: 'background:#2ed573;color:#fff;border:1px solid #2ed573;'},
+                {label: 'INFLUENCER', style: 'background:#eccc68;color:#222;border:1px solid #eccc68;'},
+                {label: 'EXPERTO', style: 'background:#5352ed;color:#fff;border:1px solid #5352ed;'}
+            ];
+            if (msgData.tagImmersivo) {
+                tagLabel = msgData.tagImmersivo;
+                const found = tagsImmersivos.find(t => t.label === tagLabel);
+                tagStyle = found ? found.style : tagsImmersivos[0].style;
+            } else if (msgData.automatico && msgData.showTag) {
+                // Solo si showTag está en true
+                const tagObj = tagsImmersivos[Math.floor(Math.random() * tagsImmersivos.length)];
+                tagLabel = tagObj.label;
+                tagStyle = tagObj.style;
+            }
+            if (tagLabel) {
+                tag = `<span class=\"tag\" style=\"${tagStyle}margin-left:7px;font-size:10px;padding:2px 6px;border-radius:3px;\">${tagLabel}</span>`;
+            }
+            if (msgData.usuario === 'XIII') {
+                userColor = '#00ccff';
+            } else if (msgData.usuario === 'Kaiser') {
+                userColor = '#ff4757';
+            } else if (msgData.automatico) {
+                userColor = msgData.color || '#ffd700';
+            } else {
+                userColor = msgData.color || '#cccccc';
+            }
+            // Mensaje destacado si es PM o tiene tag especial
+            const pmValue = (msgData.mensaje||'').match(/([+][0-9]+)\s*PM/) ? parseInt((msgData.mensaje.match(/([+][0-9]+)\s*PM/)||[])[1].replace('+','')) : null;
+            if (pmValue || tagLabel) div.classList.add('destacado');
+            div.className += ' chat-message';
+            
+            // Resaltar "XIII" o "#13" en el contenido del mensaje
+            let mensajeContent = msgData.mensaje || '';
+            mensajeContent = mensajeContent.replace(/(XIII|#13)/gi, '<span style="color:#ffd700;font-weight:bold;">$1</span>');
+            
+            div.innerHTML = `
+                <span class=\"username\" style=\"color:${userColor};font-weight:bold;\">${msgData.usuario || 'Anónimo'}:${tag}</span>
+                <span class=\"content\">${mensajeContent}</span>
+                <span style=\"float:right;font-size:11px;color:#888;\">${msgData.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+            `;
+            if (pmValue) {
+                const btn = document.createElement('button');
+                btn.textContent = `Aceptar +${pmValue} PM`;
+                btn.className = 'pm-accept-btn';
+                Object.assign(btn.style, {
+                    marginLeft: '10px', fontSize: '12px', background: '#222', color: '#2ed573',
+                    border: '1px solid #2ed573', borderRadius: '4px', cursor: 'pointer', transition: 'all 0.3s ease'
+                });
+                let pmButtonStates = JSON.parse(sessionStorage.getItem('pmSumadosParaBotones') || '{}');
+                if (pmButtonStates[msgId]) {
+                    btn.textContent = 'Aceptado';
+                    btn.disabled = true;
+                    Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
+                } else {
+                    btn.onclick = function() {
+                        window.sumarPM(pmValue, `PM de chat: ${msgData.mensaje}`);
+                        pmButtonStates[msgId] = true;
+                        sessionStorage.setItem('pmSumadosParaBotones', JSON.stringify(pmButtonStates));
+                        btn.textContent = 'Aceptado';
+                        btn.disabled = true;
+                        Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
+                    };
+                }
+                div.appendChild(btn);
+            }
+            chatMessagesContainer.appendChild(div);
+            setTimeout(() => div.style.opacity = '1', 50);
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+        window.agregarMensajeAlChatDisplay = agregarMensajeAlChatDisplay;
+        function startAutoMessages() {
+            if (autoMsgInterval) clearInterval(autoMsgInterval);
+            const nombresUsuarios = [
+                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
+            ];
+            const coloresAuto = [
+                '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
+            ];
+            const ejemplos = [
+                "¡Vamos XIII, no decepciones a tus fans!",
+                "¡Estoy apostando todo por ti, no me falles!",
+                "Mira esos reflejos, ¡eres una máquina!",
+                "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+                "Acabo de apostar 5000 créditos a que sobrevives esta prueba",
+                "OCE debería ponerte un reto REAL, XIII",
+                "Ese cromo que llevas parece de segunda mano...",
+                "¡Eres mi favorita desde el principio!",
+                "Solo las débiles usan tanto equipo. Demuestra tu valor real.",
+                "Por dios, alguien dé algo de equipo decente a la XIII",
+                "¡Actúa como si tuvieras múltiples personalidades por 12 horas! ¡+70 PM!",
+                "¡Marca territorios con sangre como un animal y defiéndelos a muerte! ¡+80 PM!"
+            ];
+            let autoMsgIndex = 0;
+            autoMsgInterval = setInterval(() => {
+                const idx = autoMsgIndex % ejemplos.length;
+                // Tag immersivo solo en 1 de cada 5
+                const showTag = (autoMsgIndex % 5 === 0);
+                let tagImmersivo = undefined;
+                if (showTag) {
+                    const tagsImmersivos = ["VIP","PATROCINADO","FAN","SPONSOR","INFLUENCER","EXPERTO"];
+                    tagImmersivo = tagsImmersivos[Math.floor(Math.random()*tagsImmersivos.length)];
+                }
+                const msg = {
+                    usuario: nombresUsuarios[idx % nombresUsuarios.length],
+                    mensaje: ejemplos[idx],
+                    color: coloresAuto[idx % coloresAuto.length],
+                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    automatico: true,
+                    showTag,
+                    tagImmersivo
+                };
+                const msgId = `auto-${autoMsgIndex}`;
+                agregarMensajeAlChatDisplay(msg, msgId);
+                autoMsgIndex++;
+            }, 3500);
+        }
+        function initChatSystem() {
+            // Al cargar la página, limpiar mensajes del jugador
+            limpiarChatJugador();
+            // Iniciar mensajes automáticos
+            startAutoMessages();
+            // NO renderizar mensajes del jugador guardados en la sesión anterior
+            const chatInput = document.getElementById('chat-input');
+            const chatSubmitBtn = document.getElementById('chat-submit');
+            window.enviarMensajeJugador = function() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                const playerMsg = {
+                    usuario: 'XIII',
+                    mensaje: text,
+                    color: '#00ccff',
+                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                };
+                const uniqueMsgId = `player-${Date.now()}`;
+                // Añadir al DOM
+                agregarMensajeAlChatDisplay(playerMsg, uniqueMsgId);
+                chatInput.value = '';
+                // NO guardar en localStorage ni en Firebase
+            };
+            chatSubmitBtn.onclick = window.enviarMensajeJugador;
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.enviarMensajeJugador();
+                }
+            });
+            window.renderGlobalChatMessages = function(messagesArray) {
+                // Solo renderizar mensajes que NO sean del jugador (ignorando mayúsculas, minúsculas y espacios)
+                messagesArray.forEach((msg, index) => {
+                    const sender = (msg.sender || '').trim().toLowerCase();
+                    if (sender === 'tú') return;
+                    const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
+                    agregarMensajeAlChatDisplay({
+                        usuario: msg.sender,
+                        mensaje: msg.content,
+                        hora: msg.time,
+                        color: msg.sender === 'Kaiser' ? '#ff4757' : '#cccccc',
+                        esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
+                    }, msgId);
+                });
+            };
+            // Limpieza total al hacer logout
+            window.logout = function() {
+                limpiarChatJugador();
+                localStorage.removeItem('user');
+                localStorage.removeItem('sessionToken');
+                sessionStorage.clear();
+                document.cookie.split(';').forEach(function(c) {
+                    document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/');
+                });
+                window.location.replace('login.html');
+            };
+            window.addEventListener('beforeunload', limpiarChatJugador);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            limpiarChatDOMCompleto(); // Limpia todo el chat antes de inicializar
+            initChatSystem();
+        });
+        window.addEventListener('beforeunload', limpiarChatJugador);
+    </script>
+
+    <!-- Función para borrar mensajes del jugador en Firebase (llámala desde la consola: borrarMensajesJugadorFirebase();) -->
+    <script>
+    window.borrarMensajesJugadorFirebase = function() {
+        if (!window.firebase || !window.saveChat) {
+            alert('Firebase no está disponible.');
+            return;
+        }
+        const mensajes = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+        const filtrados = mensajes.filter(msg => {
+            if (!msg.sender) return true;
+            const sender = msg.sender.trim().toLowerCase();
+            return sender !== 'tú';
+        });
+        window.saveChat(filtrados);
+        alert('Mensajes del jugador eliminados de Firebase (puede tardar unos segundos en reflejarse).');
+    };
+    </script>
+
+    <script>
+    // Sistema de transacciones PM
+    window.pmTransactions = {
+        transactions: [],
+        total: 0,
+
+        init() {
+            // Cargar transacciones guardadas
+            const saved = localStorage.getItem('pmTransactions');
+            if (saved) {
+                this.transactions = JSON.parse(saved);
+                this.total = this.transactions.reduce((sum, t) => sum + t.amount, 0);
+            }
+            
+            // Sincronizar con Firebase
+            if (window.database) {
+                const pmRef = window.database.ref('playerPM');
+                pmRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data !== null) {
+                        this.total = parseInt(data);
+                        localStorage.setItem('playerPM', this.total.toString());
+                        this.updateUI();
+                    }
+                });
+            }
+            
+            this.updateUI();
+        },
+
+        addTransaction(amount, reason) {
+            const transaction = {
+                amount,
+                reason,
+                timestamp: Date.now()
+            };
+            this.transactions.push(transaction);
+            this.total += amount;
+            
+            // Guardar en localStorage
+            localStorage.setItem('pmTransactions', JSON.stringify(this.transactions));
+            localStorage.setItem('playerPM', this.total.toString());
+            
+            // Guardar en Firebase
+            if (window.database) {
+                window.database.ref('playerPM').set(this.total);
+            }
+            
+            // Notificar a todos los iframes
+            this.notifyIframes();
+            
+            this.updateUI();
+            return this.total;
+        },
+
+        setTotal(newTotal) {
+            const difference = newTotal - this.total;
+            return this.addTransaction(difference, 'Ajuste manual de PM');
+        },
+
+        getTotal() {
+            return this.total;
+        },
+
+        updateUI() {
+            // Actualizar todos los elementos con data-pm-display
+            document.querySelectorAll('[data-pm-display]').forEach(el => {
+                el.textContent = this.total;
+            });
+            
+            // Actualizar el elemento PM en el panel lateral
+            const pmElement = document.getElementById('pm-value');
+            if (pmElement) {
+                pmElement.textContent = this.total;
+            }
+            
+            // Notificar a todos los iframes
+            this.notifyIframes();
+        },
+
+        notifyIframes() {
+            // Notificar a todos los iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'updatePM',
+                        total: this.total
+                    }, '*');
+                }
+            });
         }
     };
 
-    // Listener para mensajes del iframe de la tienda
-    window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'requestInit') {
-            // El iframe está solicitando inicialización
-            if (window.tiendaIframe && window.tiendaIframe.contentWindow === event.source) {
-                initializeIframe();
+    // Sistema de inventario
+    window.inventory = {
+        items: [],
+
+        init() {
+            // Cargar items guardados
+            const saved = localStorage.getItem('itemsComprados');
+            if (saved) {
+                this.items = JSON.parse(saved);
             }
-        } else if (event.data && event.data.type === 'itemPurchased') {
-            // Se compró un item, actualizar el inventario local
-            const item = event.data.item;
-            if (!window.itemsComprados) {
-                window.itemsComprados = [];
-            }
-            window.itemsComprados.push(item);
             
-            // Si el character sheet está abierto, actualizarlo
-            if (window.fichaIframe) {
+            // Sincronizar con Firebase
+            if (window.database) {
+                const itemsCompradosRef = window.database.ref('itemsComprados');
+                itemsCompradosRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        this.items = Array.isArray(data) ? data : Object.values(data);
+                        localStorage.setItem('itemsComprados', JSON.stringify(this.items));
+                        this.notifyFicha();
+                    }
+                });
+            }
+        },
+
+        addItem(item) {
+            this.items.push(item);
+            this.save();
+            this.notifyFicha();
+        },
+
+        getItems() {
+            return this.items;
+        },
+
+        save() {
+            localStorage.setItem('itemsComprados', JSON.stringify(this.items));
+            if (window.database) {
+                const itemsCompradosRef = window.database.ref('itemsComprados');
+                itemsCompradosRef.set(this.items);
+            }
+        },
+
+        notifyFicha() {
+            if (window.fichaIframe && window.fichaIframe.contentWindow) {
                 window.fichaIframe.contentWindow.postMessage({
                     type: 'updateInventory',
-                    items: window.itemsComprados
+                    items: this.items
                 }, '*');
             }
         }
+    };
+
+    // Inicializar sistemas
+    window.pmTransactions.init();
+    window.inventory.init();
+
+    // Escuchar mensajes de los iframes
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'getPM') {
+            // Responder con el total actual
+            event.source.postMessage({
+                type: 'updatePM',
+                total: window.pmTransactions.getTotal()
+            }, '*');
+        } else if (event.data && event.data.type === 'addItem') {
+            // Añadir item al inventario
+            const item = event.data.item;
+            if (item) {
+                window.inventory.addItem(item);
+            }
+        } else if (event.data && event.data.type === 'setPM') {
+            // Establecer PM desde el panel de control
+            if (window.pmTransactions) {
+                window.pmTransactions.setTotal(event.data.total);
+            }
+        } else if (event.data && event.data.type === 'getInventory') {
+            // Responder con el inventario actual
+            event.source.postMessage({
+                type: 'updateInventory',
+                items: window.inventory.getItems()
+            }, '*');
+        }
     });
+
+    // Funciones globales para manejar PM
+    window.sumarPM = function(cantidad, razon) {
+        return window.pmTransactions.addTransaction(cantidad, razon);
+    };
+
+    window.restarPM = function(cantidad, razon) {
+        return window.pmTransactions.addTransaction(-cantidad, razon);
+    };
+
+    window.establecerPM = function(total) {
+        return window.pmTransactions.setTotal(total);
+    };
+
+    window.comprarItem = function(itemId, precio) {
+        const total = window.pmTransactions.getTotal();
+        if (total >= precio) {
+            window.restarPM(precio, `Compra de item ${itemId}`);
+            return true;
+        }
+        return false;
+    };
     </script>
+
+    <!-- Versión del sistema -->
+    <script>
+        const SYSTEM_VERSION = '0.64';
+    </script>
+
 </body>
-</html>
+</html> 
