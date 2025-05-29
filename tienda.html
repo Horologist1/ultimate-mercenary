@@ -684,12 +684,12 @@
                     // Actualizar la UI
                     updatePMDisplay();
                     
-                    // --- INTEGRACIÓN FICHA ---
+                    // Preparar el item para la ficha
                     let fichaItem = {
                         nombre: item.name,
                         descripcion: item.description,
                         detalles: item.details,
-                        tipo: item.section
+                        tipo: item.section.replace('shop-', '')
                     };
                     
                     if (item.section === 'shop-armas') {
