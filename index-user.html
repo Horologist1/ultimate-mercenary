@@ -1071,9 +1071,9 @@
             const data = snapshot.val();
             if (data !== null) {
                 // Solo actualizar si no hay transacciones locales
-                if (window.pmTransactions.getAll().length === 0) {
+                if (window.pmTransactions && window.pmTransactions.transactions.length === 0) {
                     // Si es la primera vez, crear una transacción inicial
-                    window.pmTransactions.add(data, 'gain', 'PM inicial');
+                    window.pmTransactions.addTransaction(parseInt(data), 'PM inicial');
                 }
             }
         });

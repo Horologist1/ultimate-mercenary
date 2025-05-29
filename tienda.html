@@ -210,15 +210,18 @@
 </head>
 <body>
     <script>
-    // Permite a la tienda usar el sistema de transacciones del padre si está embebida
+    // Permite a la tienda usar el sistema de transacciones y Firebase del padre si está embebida
     let puenteActivo = false;
-    if (!window.pmTransactions && window.parent && window.parent.pmTransactions) {
-        window.pmTransactions = window.parent.pmTransactions;
-        window.comprarItem = window.parent.comprarItem;
-        window.sumarPM = window.parent.sumarPM;
-        window.restarPM = window.parent.restarPM;
-        puenteActivo = true;
-    } else if (window.pmTransactions && window.comprarItem) {
+    if (window.parent) {
+        if (window.parent.pmTransactions) {
+            window.pmTransactions = window.parent.pmTransactions;
+            window.comprarItem = window.parent.comprarItem;
+            window.sumarPM = window.parent.sumarPM;
+            window.restarPM = window.parent.restarPM;
+        }
+        if (window.parent.firebaseUtils) {
+            window.firebaseUtils = window.parent.firebaseUtils;
+        }
         puenteActivo = true;
     }
 
@@ -288,6 +291,33 @@
             }
         });
     }
+
+    // Función para inicializar la conexión con el padre
+    function initializeParentConnection(retries = 5) {
+        if (retries <= 0) {
+            console.error('No se pudo establecer conexión con la ventana padre');
+            return;
+        }
+
+        if (window.parent && window.parent.firebaseUtils && window.parent.pmTransactions) {
+            window.firebaseUtils = window.parent.firebaseUtils;
+            window.pmTransactions = window.parent.pmTransactions;
+            window.comprarItem = window.parent.comprarItem;
+            window.sumarPM = window.parent.sumarPM;
+            window.restarPM = window.parent.restarPM;
+            console.log('Conexión con la ventana padre establecida');
+        } else {
+            setTimeout(() => initializeParentConnection(retries - 1), 1000);
+        }
+    }
+
+    // Iniciar el proceso de conexión cuando el documento esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeParentConnection();
+        loadSavedItems();
+        renderShopItems();
+        updatePMDisplay();
+    });
     </script>
     <div class="container">
         <header>
@@ -716,6 +746,13 @@
                             descripcion: item.description || '',
                             efectos: item.details || ''
                         };
+                    }
+                    
+                    // Verificar que firebaseUtils esté disponible
+                    if (!window.firebaseUtils) {
+                        console.error('Firebase no está disponible');
+                        alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
+                        return;
                     }
                     
                     // Obtener los items actuales y añadir el nuevo
