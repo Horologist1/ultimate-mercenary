@@ -211,12 +211,39 @@
 <body>
     <script>
     // Permite a la tienda usar el sistema de transacciones del padre si está embebida
+    let puenteActivo = false;
     if (!window.pmTransactions && window.parent && window.parent.pmTransactions) {
         window.pmTransactions = window.parent.pmTransactions;
         window.comprarItem = window.parent.comprarItem;
         window.sumarPM = window.parent.sumarPM;
         window.restarPM = window.parent.restarPM;
+        puenteActivo = true;
+    } else if (window.pmTransactions && window.comprarItem) {
+        puenteActivo = true;
     }
+    // Debug visual
+    window.addEventListener('DOMContentLoaded', function() {
+        const shopContainer = document.querySelector('.shop-container');
+        if (!puenteActivo) {
+            const msg = document.createElement('div');
+            msg.style.background = '#ff4757';
+            msg.style.color = '#fff';
+            msg.style.padding = '18px';
+            msg.style.margin = '20px 0';
+            msg.style.borderRadius = '8px';
+            msg.style.fontWeight = 'bold';
+            msg.style.fontSize = '18px';
+            msg.innerHTML = '⚠️ Error: La tienda no tiene acceso al sistema de transacciones del juego.<br>El botón de comprar no funcionará.<br>Revisa la integración del iframe/modal.';
+            if (shopContainer) shopContainer.prepend(msg);
+            // Deshabilitar todos los botones de compra
+            setTimeout(() => {
+                document.querySelectorAll('.buy-button').forEach(btn => btn.disabled = true);
+            }, 1000);
+            console.error('[TIENDA] No se detectó el puente de transacciones.');
+        } else {
+            console.log('[TIENDA] Puente de transacciones activo.');
+        }
+    });
     </script>
     <div class="container">
         <header>
