@@ -1733,6 +1733,10 @@
             if (window.savePM) {
                 const newTotal = this.getTotal();
                 window.savePM(newTotal.toString());
+                // También guardar las transacciones en Firebase
+                if (window.savePMTransactions) {
+                    window.savePMTransactions(transactions);
+                }
             }
             
             // Actualizar UI
@@ -1752,15 +1756,75 @@
         // Actualizar la UI
         updateUI: function() {
             const total = this.getTotal();
+            // Actualizar localStorage
+            localStorage.setItem('playerPM', total.toString());
+            
+            // Actualizar UI en index-user
             if (window.updateStatusPanel) {
                 window.updateStatusPanel();
             }
+            
+            // Actualizar UI en la tienda si está abierta
+            if (window.tiendaIframe && window.tiendaIframe.contentWindow) {
+                try {
+                    window.tiendaIframe.contentWindow.updatePMDisplay();
+                } catch (e) {
+                    console.log('Tienda no disponible para actualizar PM');
+                }
+            }
+            
             // Actualizar cualquier otro elemento que muestre PM
             const pmElements = document.querySelectorAll('[data-pm-display]');
             pmElements.forEach(el => {
                 el.textContent = total;
             });
+        },
+
+        // Sincronizar con Firebase
+        syncWithFirebase: function() {
+            if (window.savePM) {
+                const total = this.getTotal();
+                window.savePM(total.toString());
+                if (window.savePMTransactions) {
+                    window.savePMTransactions(this.getAll());
+                }
+            }
         }
+    };
+
+    // Exponer funciones globales para la tienda
+    window.sumarPM = function(cantidad, descripcion) {
+        return window.pmTransactions.add(cantidad, 'gain', descripcion || 'Ganancia de PM');
+    };
+
+    window.restarPM = function(cantidad, descripcion) {
+        return window.pmTransactions.add(cantidad, 'spend', descripcion || 'Gasto de PM');
+    };
+
+    window.comprarItem = function(precio, itemId, descripcion) {
+        const total = window.pmTransactions.getTotal();
+        if (total >= precio) {
+            // Restar PM
+            const transaction = window.restarPM(precio, descripcion || `Compra de item ${itemId}`);
+            
+            // Guardar el item comprado
+            let itemsComprados = JSON.parse(localStorage.getItem('itemsComprados') || '[]');
+            itemsComprados.push({
+                id: itemId,
+                precio: precio,
+                fecha: new Date().toISOString(),
+                transactionId: transaction.timestamp
+            });
+            localStorage.setItem('itemsComprados', JSON.stringify(itemsComprados));
+            
+            // Guardar en Firebase
+            if (window.saveItemsComprados) {
+                window.saveItemsComprados(itemsComprados);
+            }
+            
+            return true;
+        }
+        return false;
     };
     </script>
 
