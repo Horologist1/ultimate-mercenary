@@ -255,8 +255,8 @@
         window.parent.postMessage({ type: 'getPM' }, '*');
     }
 
-    // Actualizar PM cada 2 segundos para mantener sincronización
-    setInterval(updatePMDisplay, 2000);
+    // Actualizar PM cada segundo para mantener sincronización
+    setInterval(updatePMDisplay, 1000);
 
     // Inicializar Firebase solo si no estamos en un iframe
     if (!window.parent || window.parent === window) {
@@ -670,11 +670,12 @@
         // Función para comprar un item
         function buyItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
-            const currentPM = window.pmTransactions.getTotal();
+            if (!item) return;
 
+            const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
             if (currentPM >= item.price) {
                 // Intentar comprar usando el sistema de transacciones
-                const success = window.comprarItem(item.price, itemId, `Compra de ${item.name}`);
+                const success = window.comprarItem(itemId, item.price);
                 
                 if (success) {
                     // Mostrar mensaje de éxito
@@ -722,11 +723,6 @@
                             item: fichaItem
                         }, '*');
                     }
-                    
-                    // Guardar en Firebase
-                    const itemsComprados = JSON.parse(localStorage.getItem('itemsComprados') || '[]');
-                    itemsComprados.push(fichaItem);
-                    itemsCompradosRef.set(itemsComprados);
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
