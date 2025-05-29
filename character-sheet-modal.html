@@ -412,34 +412,10 @@
             appId: "1:683730871364:web:350aaf7a296ad34db28811",
             databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
         };
+        
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const itemsCompradosRef = ref(database, 'itemsComprados');
-
-        // Listener para itemsComprados
-        onValue(itemsCompradosRef, (snapshot) => {
-            const data = snapshot.val();
-            let items = [];
-            if (Array.isArray(data)) items = data;
-            else if (data && typeof data === 'object') items = Object.values(data);
-            else items = [];
-            
-            // Actualizar el inventario global y localStorage
-            inventory = items;
-            localStorage.setItem('inventory', JSON.stringify(items));
-            
-            // Actualizar UI inmediatamente
-            updateInventoryDisplay();
-            
-            // Forzar actualización del character sheet
-            if (window.characterSheet) {
-                window.characterSheet.equipment = items.filter(item => 
-                    item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
-                );
-                window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
-                updateEquipmentUI();
-            }
-        });
     </script>
 </head>
 <body>
@@ -895,7 +871,6 @@
                         item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
                     );
                     window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
-                    updateEquipmentUI();
                 }
             });
             

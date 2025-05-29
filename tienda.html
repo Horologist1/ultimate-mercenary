@@ -725,7 +725,7 @@
                     }
                     
                     // Obtener referencia a Firebase
-                    const itemsCompradosRef = window.database.ref('itemsComprados');
+                    const itemsCompradosRef = window.parent.database.ref('itemsComprados');
                     
                     // Usar transacción para evitar sobrescrituras
                     itemsCompradosRef.transaction((currentData) => {
