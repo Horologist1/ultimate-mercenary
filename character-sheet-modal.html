@@ -416,6 +416,12 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const itemsCompradosRef = ref(database, 'itemsComprados');
+        
+        // Hacer disponibles globalmente para el resto del código
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
+        window.itemsCompradosRef = itemsCompradosRef;
+        window.onValueFirebase = onValue;
     </script>
 </head>
 <body>
@@ -839,9 +845,7 @@
         <img class="modal-content" id="modalImage" style="max-width:90vw;max-height:80vh;box-shadow:0 0 40px #00ffff,0 0 80px #ff00cc; border-radius:12px; border:3px solid #00ffff; background:#111;">
     </div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Firebase se inicializa con ES6 modules en el head -->
     
     <script src="character-sheet.js"></script>
     <script>
@@ -851,28 +855,38 @@
             updateInventoryDisplay();
             
             // Forzar sincronización con Firebase
-            onValue(itemsCompradosRef, (snapshot) => {
-                const data = snapshot.val();
-                let items = [];
-                if (Array.isArray(data)) items = data;
-                else if (data && typeof data === 'object') items = Object.values(data);
-                else items = [];
-                
-                // Actualizar el inventario global y localStorage
-                inventory = items;
-                localStorage.setItem('inventory', JSON.stringify(items));
-                
-                // Actualizar UI inmediatamente
-                updateInventoryDisplay();
-                
-                // Forzar actualización del character sheet
-                if (window.characterSheet) {
-                    window.characterSheet.equipment = items.filter(item => 
-                        item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
-                    );
-                    window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
+            function initFirebaseListener() {
+                if (window.onValueFirebase && window.itemsCompradosRef) {
+                    window.onValueFirebase(window.itemsCompradosRef, (snapshot) => {
+                        const data = snapshot.val();
+                        let items = [];
+                        if (Array.isArray(data)) items = data;
+                        else if (data && typeof data === 'object') items = Object.values(data);
+                        else items = [];
+                        
+                        // Actualizar el inventario global y localStorage
+                        inventory = items;
+                        localStorage.setItem('inventory', JSON.stringify(items));
+                        
+                        // Actualizar UI inmediatamente
+                        updateInventoryDisplay();
+                        
+                        // Forzar actualización del character sheet
+                        if (window.characterSheet) {
+                            window.characterSheet.equipment = items.filter(item => 
+                                item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
+                            );
+                            window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
+                        }
+                    });
+                } else {
+                    // Si Firebase no está disponible aún, intentar de nuevo en 100ms
+                    setTimeout(initFirebaseListener, 100);
                 }
-            });
+            }
+            
+            // Inicializar Firebase listener
+            initFirebaseListener();
             
             // Tab switching functionality
             document.querySelectorAll('.tab').forEach(tab => {
@@ -1364,7 +1378,7 @@
 
         function updateInventoryDisplay() {
             // Limpiar contenedores primero
-            const containers = ['weapons-list', 'armor-list', 'equipment-list', 'implants-list'];
+            const containers = ['weapons-list', 'armor-list', 'misc-list', 'implants-list'];
             containers.forEach(id => {
                 const container = document.getElementById(id);
                 if (container) container.innerHTML = '';
@@ -1380,7 +1394,7 @@
             // Actualizar cada sección
             updateSection('arma', 'weapons-list', 'Arma');
             updateSection('armadura', 'armor-list', 'Armadura');
-            updateSection('equipo', 'equipment-list', 'Equipo');
+            updateSection('equipo', 'misc-list', 'Equipo');
             updateSection('implant', 'implants-list', 'Implante');
 
             function updateSection(type, containerId, title) {
