@@ -400,8 +400,8 @@
         }
     </style>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
@@ -416,9 +416,6 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const itemsCompradosRef = ref(database, 'itemsComprados');
-
-        // Hacer disponibles las funciones necesarias
-        window.firebaseUtils = { onValue, itemsCompradosRef };
     </script>
 </head>
 <body>
@@ -849,31 +846,32 @@
     <script src="character-sheet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const { onValue, itemsCompradosRef } = window.firebaseUtils;
+            // Cargar inventario inicial desde localStorage
+            inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            updateInventoryDisplay();
             
+            // Forzar sincronización con Firebase
             onValue(itemsCompradosRef, (snapshot) => {
                 const data = snapshot.val();
                 let items = [];
                 if (Array.isArray(data)) items = data;
                 else if (data && typeof data === 'object') items = Object.values(data);
+                else items = [];
                 
+                // Actualizar el inventario global y localStorage
                 inventory = items;
                 localStorage.setItem('inventory', JSON.stringify(items));
                 
-                // Update the character sheet
+                // Actualizar UI inmediatamente
+                updateInventoryDisplay();
+                
+                // Forzar actualización del character sheet
                 if (window.characterSheet) {
                     window.characterSheet.equipment = items.filter(item => 
-                        ['arma', 'armadura', 'equipo'].includes(item.tipo)
+                        item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
                     );
                     window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
-                    
-                    // Save character sheet state
-                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
                 }
-
-                // Update UI
-                updateInventoryDisplay();
-                if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
             });
             
             // Tab switching functionality
