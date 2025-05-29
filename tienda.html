@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda - Ultimate Mercenary</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         .shop-container {
             max-width: 1200px;
@@ -210,89 +208,86 @@
         }
     </style>
 </head>
-
 <body>
     <script>
-        // Permite a la tienda usar el sistema de transacciones del padre si está embebida
-        let puenteActivo = false;
-        if (!window.pmTransactions && window.parent && window.parent.pmTransactions) {
-            window.pmTransactions = window.parent.pmTransactions;
-            window.comprarItem = window.parent.comprarItem;
-            window.sumarPM = window.parent.sumarPM;
-            window.restarPM = window.parent.restarPM;
-            puenteActivo = true;
-        } else if (window.pmTransactions && window.comprarItem) {
-            puenteActivo = true;
-        }
+    // Permite a la tienda usar el sistema de transacciones del padre si está embebida
+    let puenteActivo = false;
+    if (!window.pmTransactions && window.parent && window.parent.pmTransactions) {
+        window.pmTransactions = window.parent.pmTransactions;
+        window.comprarItem = window.parent.comprarItem;
+        window.sumarPM = window.parent.sumarPM;
+        window.restarPM = window.parent.restarPM;
+        puenteActivo = true;
+    } else if (window.pmTransactions && window.comprarItem) {
+        puenteActivo = true;
+    }
 
-        // Función para actualizar la visualización de PM
-        function updatePMDisplay() {
-            const pmElement = document.getElementById('current-pm');
-            if (pmElement) {
-                const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
-                pmElement.textContent = total;
-
-                // Actualizar estado de botones de compra
-                document.querySelectorAll('.buy-button').forEach(button => {
-                    const item = button.closest('.item-card');
-                    if (item) {
-                        const priceElement = item.querySelector('.price');
-                        if (priceElement) {
-                            const price = parseInt(priceElement.textContent);
-                            button.disabled = total < price;
-                        }
+    // Función para actualizar la visualización de PM
+    function updatePMDisplay() {
+        const pmElement = document.getElementById('current-pm');
+        if (pmElement) {
+            const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+            pmElement.textContent = total;
+            
+            // Actualizar estado de botones de compra
+            document.querySelectorAll('.buy-button').forEach(button => {
+                const item = button.closest('.item-card');
+                if (item) {
+                    const priceElement = item.querySelector('.price');
+                    if (priceElement) {
+                        const price = parseInt(priceElement.textContent);
+                        button.disabled = total < price;
                     }
-                });
-            }
-        }
-
-        // Escuchar mensajes del padre
-        window.addEventListener('message', function (event) {
-            if (event.data && event.data.type === 'updatePM') {
-                updatePMDisplay();
-            }
-        });
-
-        // Solicitar actualización inicial de PM
-        if (window.parent) {
-            window.parent.postMessage({
-                type: 'getPM'
-            }, '*');
-        }
-
-        // Actualizar PM cada segundo para mantener sincronización
-        setInterval(updatePMDisplay, 1000);
-
-        // Inicializar Firebase solo si no estamos en un iframe
-        if (!window.parent || window.parent === window) {
-            const firebaseConfig = {
-                apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
-                authDomain: "ultimatemercenary-1e212.firebaseapp.com",
-                projectId: "ultimatemercenary-1e212",
-                storageBucket: "ultimatemercenary-1e212.appspot.com",
-                messagingSenderId: "683730871364",
-                appId: "1:683730871364:web:350aaf7a296ad34db28811",
-                databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
-            };
-
-            if (!window.firebaseApp) {
-                window.firebaseApp = firebase.initializeApp(firebaseConfig);
-                window.database = firebase.database();
-            }
-
-            // Referencias a Firebase
-            const pmRef = window.database.ref('playerPM');
-            const itemsCompradosRef = window.database.ref('itemsComprados');
-
-            // Listener para cambios en PM
-            pmRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data !== null) {
-                    localStorage.setItem('playerPM', data.toString());
-                    updatePMDisplay();
                 }
             });
         }
+    }
+
+    // Escuchar mensajes del padre
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'updatePM') {
+            updatePMDisplay();
+        }
+    });
+
+    // Solicitar actualización inicial de PM
+    if (window.parent) {
+        window.parent.postMessage({ type: 'getPM' }, '*');
+    }
+
+    // Actualizar PM cada segundo para mantener sincronización
+    setInterval(updatePMDisplay, 1000);
+
+    // Inicializar Firebase solo si no estamos en un iframe
+    if (!window.parent || window.parent === window) {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.appspot.com",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811",
+            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+        };
+
+        if (!window.firebaseApp) {
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            window.database = firebase.database();
+        }
+
+        // Referencias a Firebase
+        const pmRef = window.database.ref('playerPM');
+        const itemsCompradosRef = window.database.ref('itemsComprados');
+
+        // Listener para cambios en PM
+        pmRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('playerPM', data.toString());
+                updatePMDisplay();
+            }
+        });
+    }
     </script>
     <div class="container">
         <header>
@@ -334,7 +329,8 @@
     <script>
         // Items predefinidos de la tienda
         const defaultShopItems = {
-            'shop-armas': [{
+            'shop-armas': [
+                {
                     'Artículo': 'Pistola de Autodefensa "Pocket Pal Mk.II"',
                     'Descripción': 'Arma básica de autodefensa entregada a todos los concursantes',
                     'Daño': '1d10',
@@ -412,7 +408,8 @@
                     'Coste': 600
                 }
             ],
-            'shop-municion': [{
+            'shop-municion': [
+                {
                     'Artículo': 'Cargador Pistola Ligera',
                     'Compatible con': 'Pistolas 9mm',
                     'Cantidad': '12 balas',
@@ -449,7 +446,8 @@
                     'Coste': '50% extra'
                 }
             ],
-            'shop-cyberware': [{
+            'shop-cyberware': [
+                {
                     'Artículo': 'Ojo Cibernético Avanzado',
                     'Descripción': 'HawkEye-3',
                     'Efectos': '+15 Percepción Visual, Térmica, EMF, Smartlink',
@@ -486,7 +484,8 @@
                     'Coste': 700
                 }
             ],
-            'shop-servicios': [{
+            'shop-servicios': [
+                {
                     'Servicio': 'Información Vaga sobre la Próxima Prueba',
                     'Descripción': 'Detalles generales, sin especificaciones',
                     'Coste': 150
@@ -512,7 +511,8 @@
                     'Coste': 1000
                 }
             ],
-            'shop-armaduras': [{
+            'shop-armaduras': [
+                {
                     'Artículo': 'Ropa Reforzada',
                     'Descripción': 'Aspecto de ropa normal pero con protección',
                     'Armadura (K/E)': '2/2',
@@ -548,7 +548,8 @@
                     'Coste': 100
                 }
             ],
-            'shop-equipo': [{
+            'shop-equipo': [
+                {
                     'Artículo': 'Kit Médico Básico',
                     'Descripción': '1x Trauma-Patch Plus',
                     'Efectos': 'Cura 1d10 PV',
@@ -619,11 +620,11 @@
 
         // Cargar items desde localStorage o usar los predefinidos
         let shopItems = [];
-
+        
         // Función para cargar items guardados
         function loadSavedItems() {
             let savedItems = JSON.parse(localStorage.getItem('shopItems') || '{}');
-
+            
             // Si no hay items guardados, usar los predefinidos
             if (Object.keys(savedItems).length === 0) {
                 savedItems = defaultShopItems;
@@ -631,14 +632,13 @@
             }
 
             // Convertir el objeto de items en un array plano
-            shopItems = Object.entries(savedItems).flatMap(([section, items]) =>
+            shopItems = Object.entries(savedItems).flatMap(([section, items]) => 
                 items.map((item, index) => ({
                     id: `${section}-${index}`,
                     name: item.Artículo || item.Servicio || '',
                     description: item.Descripción || '',
                     price: parseInt(item.Coste) || 0,
-                    details: item.Efectos || item.Notas || item.Daño || item['Armadura (K/E)'] || item.Cobertura ||
-                        '',
+                    details: item.Efectos || item.Notas || item.Daño || item['Armadura (K/E)'] || item.Cobertura || '',
                     section: section,
                     damage: item.Daño || ''
                 }))
@@ -668,15 +668,22 @@
         }
 
         // Función para comprar un item
-        window.buyItem = function (itemId) {
+        function buyItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
             if (!item) return;
 
             const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
             if (currentPM >= item.price) {
+                // Intentar comprar usando el sistema de transacciones
                 const success = window.comprarItem(itemId, item.price);
-
+                
                 if (success) {
+                    // Mostrar mensaje de éxito
+                    showPurchaseMessage(item);
+                    
+                    // Actualizar la UI
+                    updatePMDisplay();
+                    
                     // Preparar el item para la ficha
                     let fichaItem = {
                         nombre: item.name,
@@ -684,7 +691,7 @@
                         detalles: item.details,
                         tipo: item.section.replace('shop-', '')
                     };
-
+                    
                     if (item.section === 'shop-armas') {
                         fichaItem = {
                             tipo: 'arma',
@@ -716,10 +723,10 @@
                             efectos: item.details || ''
                         };
                     }
-
-                    // Obtener referencia a Firebase (usando el del padre)
+                    
+                    // Obtener referencia a Firebase
                     const itemsCompradosRef = window.parent.database.ref('itemsComprados');
-
+                    
                     // Usar transacción para evitar sobrescrituras
                     itemsCompradosRef.transaction((currentData) => {
                         // Si no hay datos, inicializar como array vacío
@@ -727,10 +734,10 @@
                         if (currentData) {
                             items = Array.isArray(currentData) ? currentData : Object.values(currentData);
                         }
-
+                        
                         // Añadir el nuevo item
                         items.push(fichaItem);
-
+                        
                         return items;
                     }).then((result) => {
                         if (result.committed) {
@@ -740,7 +747,7 @@
                                     type: 'addItem',
                                     item: fichaItem
                                 }, '*');
-
+                                
                                 // Notificar también a través del iframe de estadísticas si está abierto
                                 const statsIframe = window.parent.document.querySelector('iframe[src="character-sheet-modal.html"]');
                                 if (statsIframe) {
@@ -750,13 +757,12 @@
                                     }, '*');
                                 }
                             }
-
+                            
                             // Mostrar mensaje de éxito
                             showPurchaseMessage(item);
-
+                            
                             // Actualizar la UI
                             updatePMDisplay();
-
                         } else {
                             console.error('La transacción no se completó');
                             alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
@@ -776,7 +782,7 @@
             // Primero intentar obtener la imagen del localStorage (configurada en el admin)
             const savedUrl = localStorage.getItem(`product_image_url_${itemName}`);
             if (savedUrl) return savedUrl;
-
+            
             // Si no hay URL configurada, usar la imagen local según el tipo de item
             const defaultImages = {
                 'Katana Monomolecular': 'images/katana.png',
@@ -792,7 +798,7 @@
                 'Cyberdeck "Shinigami Micro"': 'images/cyberdeck.png',
                 'Micro-Dron de Reconocimiento': 'images/dron.png'
             };
-
+            
             return defaultImages[itemName] || '';
         }
 
@@ -825,30 +831,27 @@
                     <div class="shop-section ${index === 0 ? 'active' : ''}" id="${sectionId}">
                         <div class="items-grid">
                             ${sectionItems.map(item => {
-                                    const imageUrl = getItemImageUrl(item.name);
-                                    return `
+                                const imageUrl = getItemImageUrl(item.name);
+                                return `
                                     <div class="item-card">
                                         <div class="item-image ${imageUrl ? '' : 'placeholder'}">
-                                            ${imageUrl ?
-                                                    `<img src="${imageUrl}" alt="${item.name}" onerror="this.parentElement.classList.add('placeholder'); this.parentElement.innerHTML = '<span>Error al cargar la imagen</span>';">` :
-                                                    `<span>Sin imagen</span>`
-                                                }
+                                            ${imageUrl ? 
+                                                `<img src="${imageUrl}" alt="${item.name}" onerror="this.parentElement.classList.add('placeholder'); this.parentElement.innerHTML = '<span>Error al cargar la imagen</span>';">` :
+                                                `<span>Sin imagen</span>`
+                                            }
                                         </div>
                                         <h3>${item.name}</h3>
                                         <p>${item.description}</p>
-                                        ${(item.section === 'shop-armas' && item.damage) ?
-                                                `<p><strong>Daño:</strong> ${item.damage}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.details) ?
-                                                `<p><strong>Notas:</strong> ${item.details}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.notas) ?
-                                                `<p><strong>Notas:</strong> ${item.notas}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.damage) ? `<p><strong>Daño:</strong> ${item.damage}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.details) ? `<p><strong>Notas:</strong> ${item.details}</p>` : ''}
+                                        ${(item.section === 'shop-armas' && item.notas) ? `<p><strong>Notas:</strong> ${item.notas}</p>` : ''}
                                         <p class="price">${item.price} PM</p>
                                         <button class="buy-button" data-item-id="${item.id}" onclick="buyItem('${item.id}')">
                                             Comprar
                                         </button>
                                     </div>
                                 `;
-                                }).join('')}
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -860,7 +863,21 @@
                     // Remover clase active de todas las pestañas y secciones
                     document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
-
+                    
                     // Añadir clase active a la pestaña clickeada y su sección correspondiente
                     tab.classList.add('active');
-                    
+                    const sectionId = tab.dataset.section;
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+        }
+
+        // Inicializar la tienda
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedItems();
+            renderShopItems();
+            updatePMDisplay();
+        });
+    </script>
+</body>
+</html> 
