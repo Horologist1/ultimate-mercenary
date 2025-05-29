@@ -1408,13 +1408,18 @@
                 }
 
                 container.innerHTML = items.map((item, index) => `
-                    <div class="item-card" data-item-index="${index}">
-                        <h4>${item.nombre}</h4>
-                        ${item.descripcion ? `<p class="item-description">${item.descripcion}</p>` : ''}
-                        ${item.dano ? `<p class="item-stat">Daño: ${item.dano}</p>` : ''}
-                        ${item.proteccion ? `<p class="item-stat">Protección: ${item.proteccion}</p>` : ''}
-                        ${item.efectos ? `<p class="item-effects">${item.efectos}</p>` : ''}
-                        <button class="remove-item" onclick="removeItem(${index})">
+                    <div class="item-card" data-item-index="${index}" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #444;">
+                        <div style="flex: 1; min-width: 0;">
+                            <h4 style="margin: 0 0 5px 0; color: #ff4757;">${item.nombre}</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.9em;">
+                                ${item.descripcion ? `<span style="color: #aaa;">${item.descripcion}</span>` : ''}
+                                ${item.dano ? `<span style="color: #00ccff;">Daño: ${item.dano}</span>` : ''}
+                                ${item.proteccion ? `<span style="color: #00ccff;">Protección: ${item.proteccion}</span>` : ''}
+                                ${item.efectos ? `<span style="color: #00ccff;">${item.efectos}</span>` : ''}
+                                ${item.notas ? `<span style="color: #aaa;">${item.notas}</span>` : ''}
+                            </div>
+                        </div>
+                        <button class="remove-item" onclick="removeItem(${index})" style="background: none; border: none; color: #ff4757; cursor: pointer; padding: 5px;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
