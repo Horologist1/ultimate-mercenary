@@ -1384,14 +1384,17 @@
             if (armasContainer) {
                 const armas = inventory.filter(item => item.tipo === 'arma');
                 if (armas.length > 0) {
-                    armasContainer.innerHTML = armas.map(arma => `
-                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px;">
-                            <h4 style="color: #00ccff; margin: 0 0 5px 0;">${arma.nombre}</h4>
+                    armasContainer.innerHTML = armas.map((arma, index) => {
+                        const itemIndex = inventory.findIndex(item => item === arma);
+                        return `
+                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px; position: relative;">
+                            <button onclick="removeItem(${itemIndex})" style="position: absolute; top: 5px; right: 5px; background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Eliminar</button>
+                            <h4 style="color: #00ccff; margin: 0 0 5px 0; padding-right: 60px;">${arma.nombre}</h4>
                             ${arma.descripcion ? `<p style="margin: 5px 0; color: #ccc;">${arma.descripcion}</p>` : ''}
                             ${arma.dano ? `<p style="margin: 5px 0;"><strong>Daño:</strong> ${arma.dano}</p>` : ''}
                             ${arma.notas ? `<p style="margin: 5px 0;"><strong>Notas:</strong> ${arma.notas}</p>` : ''}
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     armasContainer.innerHTML = '<p>Sin armas equipadas</p>';
                 }
@@ -1402,13 +1405,16 @@
             if (armadurasContainer) {
                 const armaduras = inventory.filter(item => item.tipo === 'armadura');
                 if (armaduras.length > 0) {
-                    armadurasContainer.innerHTML = armaduras.map(armadura => `
-                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px;">
-                            <h4 style="color: #00ccff; margin: 0 0 5px 0;">${armadura.nombre}</h4>
+                    armadurasContainer.innerHTML = armaduras.map((armadura, index) => {
+                        const itemIndex = inventory.findIndex(item => item === armadura);
+                        return `
+                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px; position: relative;">
+                            <button onclick="removeItem(${itemIndex})" style="position: absolute; top: 5px; right: 5px; background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Eliminar</button>
+                            <h4 style="color: #00ccff; margin: 0 0 5px 0; padding-right: 60px;">${armadura.nombre}</h4>
                             ${armadura.notas || armadura.descripcion ? `<p style="margin: 5px 0; color: #ccc;">${armadura.notas || armadura.descripcion}</p>` : ''}
                             ${armadura.proteccion ? `<p style="margin: 5px 0;"><strong>Protección:</strong> ${armadura.proteccion}</p>` : ''}
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     armadurasContainer.innerHTML = '<p>Sin armadura equipada</p>';
                 }
@@ -1419,13 +1425,16 @@
             if (equipoContainer) {
                 const equipos = inventory.filter(item => item.tipo === 'equipo');
                 if (equipos.length > 0) {
-                    equipoContainer.innerHTML = equipos.map(equipo => `
-                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px;">
-                            <h4 style="color: #00ccff; margin: 0 0 5px 0;">${equipo.nombre}</h4>
+                    equipoContainer.innerHTML = equipos.map((equipo, index) => {
+                        const itemIndex = inventory.findIndex(item => item === equipo);
+                        return `
+                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px; position: relative;">
+                            <button onclick="removeItem(${itemIndex})" style="position: absolute; top: 5px; right: 5px; background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Eliminar</button>
+                            <h4 style="color: #00ccff; margin: 0 0 5px 0; padding-right: 60px;">${equipo.nombre}</h4>
                             ${equipo.descripcion ? `<p style="margin: 5px 0; color: #ccc;">${equipo.descripcion}</p>` : ''}
                             ${equipo.detalles ? `<p style="margin: 5px 0;"><strong>Detalles:</strong> ${equipo.detalles}</p>` : ''}
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     equipoContainer.innerHTML = '<p>Sin equipo adicional</p>';
                 }
@@ -1436,18 +1445,50 @@
             if (implantsContainer) {
                 const implants = inventory.filter(item => item.tipo === 'implant' || item.tipo === 'implante' || item.tipo === 'cyberware');
                 if (implants.length > 0) {
-                    implantsContainer.innerHTML = implants.map(implant => `
-                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px;">
-                            <h4 style="color: #00ccff; margin: 0 0 5px 0;">${implant.nombre}</h4>
+                    implantsContainer.innerHTML = implants.map((implant, index) => {
+                        const itemIndex = inventory.findIndex(item => item === implant);
+                        return `
+                        <div class="item-card" style="margin: 10px 0; padding: 10px; border: 1px solid #00ccff; border-radius: 5px; position: relative;">
+                            <button onclick="removeItem(${itemIndex})" style="position: absolute; top: 5px; right: 5px; background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Eliminar</button>
+                            <h4 style="color: #00ccff; margin: 0 0 5px 0; padding-right: 60px;">${implant.nombre}</h4>
                             ${implant.descripcion ? `<p style="margin: 5px 0; color: #ccc;">${implant.descripcion}</p>` : ''}
                             ${implant.efectos || implant.detalles ? `<p style="margin: 5px 0;"><strong>Efectos:</strong> ${implant.efectos || implant.detalles}</p>` : ''}
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     implantsContainer.innerHTML = '<p>Sin implantes instalados</p>';
                 }
             }
         }
+        
+        // Función para eliminar un item
+        window.removeItem = function(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar este item?')) {
+                // Eliminar del inventario local
+                inventory.splice(index, 1);
+                
+                // Actualizar Firebase
+                if (window.firebase && window.firebase.database) {
+                    const itemsCompradosRef = window.firebase.database().ref('itemsComprados');
+                    itemsCompradosRef.set(inventory).then(() => {
+                        console.log('Item eliminado de Firebase');
+                    }).catch((error) => {
+                        console.error('Error al eliminar de Firebase:', error);
+                    });
+                }
+                
+                // Actualizar la visualización
+                updateInventoryDisplay();
+                
+                // Notificar al padre
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'inventoryUpdated',
+                        items: inventory
+                    }, '*');
+                }
+            }
+        };
     </script>
 </body>
 </html> 

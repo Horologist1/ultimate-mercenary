@@ -192,10 +192,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const itemsCompradosRef = window.database.ref('itemsComprados');
 
     // Función para sincronizar el inventario con Firebase
+    // COMENTADO: Esta función causa conflictos con la tienda
+    /*
     function syncInventoryToFirebase() {
         const allItems = [...window.characterSheet.equipment, ...window.characterSheet.implants];
         itemsCompradosRef.set(allItems);
     }
+    */
 
     // Listener para cambios en Firebase
     itemsCompradosRef.on('value', (snapshot) => {
@@ -251,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
             });
             updateEquipmentUI();
-            syncInventoryToFirebase(); // Sincronizar después de añadir
+            // syncInventoryToFirebase(); // Sincronizar después de añadir - COMENTADO
         }
     }
 
@@ -633,12 +636,12 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeEquipmentItem = function(index) {
         window.characterSheet.equipment.splice(index, 1);
         updateEquipmentUI();
-        syncInventoryToFirebase(); // Sincronizar después de eliminar
+        // syncInventoryToFirebase(); // Sincronizar después de eliminar - COMENTADO
     };
     function removeImplant(index) {
         window.characterSheet.implants.splice(index, 1);
         updateEquipmentUI();
-        syncInventoryToFirebase(); // Sincronizar después de eliminar
+        // syncInventoryToFirebase(); // Sincronizar después de eliminar - COMENTADO
     }
 
     // --- NUEVO: Efectos de implantes ---
@@ -881,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Sincronizar con Firebase después de actualizar la UI
-        syncInventoryToFirebase();
+        // syncInventoryToFirebase(); // Sincronizar después de actualizar la UI - COMENTADO
     }
 
     // --- MODIFICADO: Aplicar efectos de implantes a la ficha ---

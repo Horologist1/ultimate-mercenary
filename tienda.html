@@ -727,19 +727,20 @@
                     // Obtener referencia a Firebase
                     const itemsCompradosRef = window.database.ref('itemsComprados');
                     
-                    // Obtener items actuales
-                    itemsCompradosRef.once('value').then((snapshot) => {
-                        let currentItems = [];
-                        const data = snapshot.val();
-                        if (data) {
-                            currentItems = Array.isArray(data) ? data : Object.values(data);
+                    // Usar transacción para evitar sobrescrituras
+                    itemsCompradosRef.transaction((currentData) => {
+                        // Si no hay datos, inicializar como array vacío
+                        let items = [];
+                        if (currentData) {
+                            items = Array.isArray(currentData) ? currentData : Object.values(currentData);
                         }
                         
-                        // Añadir nuevo item
-                        currentItems.push(fichaItem);
+                        // Añadir el nuevo item
+                        items.push(fichaItem);
                         
-                        // Guardar en Firebase
-                        itemsCompradosRef.set(currentItems).then(() => {
+                        return items;
+                    }).then((result) => {
+                        if (result.committed) {
                             // Notificar al character sheet modal si está abierto
                             if (window.parent) {
                                 window.parent.postMessage({
@@ -762,10 +763,13 @@
                             
                             // Actualizar la UI
                             updatePMDisplay();
-                        }).catch(error => {
-                            console.error('Error al guardar en Firebase:', error);
+                        } else {
+                            console.error('La transacción no se completó');
                             alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
-                        });
+                        }
+                    }).catch(error => {
+                        console.error('Error al guardar en Firebase:', error);
+                        alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
                     });
                 }
             } else {
