@@ -1,3 +1,71 @@
+// Exponer la función globalmente desde el inicio
+window.clearPurchasedItems = function() {
+    if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
+        // Limpiar del character sheet
+        if (window.characterSheet) {
+            window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
+                item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
+            );
+            window.characterSheet.implants = [];
+        }
+        
+        // Limpiar de localStorage
+        localStorage.removeItem('itemsComprados');
+        if (window.characterSheet) {
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+        }
+        
+        // Limpiar de Firebase
+        if (window.database) {
+            window.database.ref('itemsComprados').remove().then(() => {
+                console.log('Items comprados eliminados de Firebase');
+                alert('Items comprados eliminados correctamente');
+            }).catch(error => {
+                console.error('Error al limpiar Firebase:', error);
+                alert('Error al limpiar Firebase: ' + error.message);
+            });
+        }
+        
+        // Actualizar UI
+        if (typeof updateEquipmentUI === 'function') {
+            updateEquipmentUI();
+        }
+        if (typeof updateUI === 'function') {
+            updateUI();
+        }
+    }
+};
+
+// Función para reinicio completo 
+window.fullReset = function() {
+    if (confirm('¿Estás seguro de que quieres reiniciar TODO? Se perderán todos los datos.')) {
+        // Limpiar localStorage completamente
+        localStorage.removeItem('characterSheet');
+        localStorage.removeItem('itemsComprados');
+        localStorage.removeItem('inventory');
+        
+        // Limpiar Firebase
+        if (window.database) {
+            window.database.ref('itemsComprados').remove();
+        }
+        
+        // Reiniciar characterSheet
+        if (window.characterSheet) {
+            window.characterSheet = new CharacterSheet();
+        }
+        
+        // Actualizar UI
+        if (typeof updateEquipmentUI === 'function') {
+            updateEquipmentUI();
+        }
+        if (typeof updateUI === 'function') {
+            updateUI();
+        }
+        
+        alert('Ficha completamente reiniciada');
+    }
+};
+
     class CharacterSheet {
         constructor() {
             this.aptitudes = {
@@ -613,6 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Limpiar localStorage
             localStorage.removeItem('characterSheet');
             localStorage.removeItem('itemsComprados');
+            localStorage.removeItem('inventory');
             
             // Limpiar Firebase
             if (window.database) {
@@ -626,12 +695,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reiniciar el objeto characterSheet
             window.characterSheet = new CharacterSheet();
             
+            // Limpiar arrays de equipo e implantes
+            window.characterSheet.equipment = [];
+            window.characterSheet.implants = [];
+            
+            // Añadir solo el arma inicial
+            window.characterSheet.equipment.push({
+                tipo: 'arma',
+                nombre: 'Pistola de Autodefensa "Pocket Pal Mk.II"',
+                dano: '1d10',
+                notas: '6 balas, básica',
+                descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
+            });
+            
             // Limpiar habilidades personalizadas del DOM
             const customSkillsContainer = document.getElementById('custom-skills-container');
-            customSkillsContainer.innerHTML = '';
+            if (customSkillsContainer) {
+                customSkillsContainer.innerHTML = '';
+            }
             
             // Actualizar la interfaz
             updateUI();
+            updateEquipmentUI();
             
             // Mostrar mensaje de confirmación
             this.textContent = '¡REINICIADO!';
@@ -973,40 +1058,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeCustomSkill = removeCustomSkill;
     window.removeEquipmentItem = removeEquipmentItem;
     window.removeImplant = removeImplant;
-
-    // Función global para limpiar items comprados (útil para debugging)
-    window.clearPurchasedItems = function() {
-        if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
-            // Limpiar del character sheet
-            window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
-                item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
-            );
-            window.characterSheet.implants = [];
-            
-            // Limpiar de localStorage
-            localStorage.removeItem('itemsComprados');
-            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
-            
-            // Limpiar de Firebase
-            if (window.database) {
-                window.database.ref('itemsComprados').remove().then(() => {
-                    console.log('Items comprados eliminados de Firebase');
-                    alert('Items comprados eliminados correctamente');
-                }).catch(error => {
-                    console.error('Error al limpiar Firebase:', error);
-                    alert('Error al limpiar Firebase: ' + error.message);
-                });
-            }
-            
-            // Actualizar UI
-            if (typeof updateEquipmentUI === 'function') {
-                updateEquipmentUI();
-            }
-            if (typeof updateUI === 'function') {
-                updateUI();
-            }
-        }
-    };
 
     // Listener para mensajes del padre
     window.addEventListener('message', function(event) {

@@ -226,9 +226,6 @@
         }
 
         .save-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
             padding: 10px 20px;
             background-color: #00ccff;
             color: #000;
@@ -238,12 +235,8 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            z-index: 99999;
-            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            pointer-events: auto !important;
+            margin: 5px;
+            display: inline-block;
         }
 
         .save-button:hover {
@@ -253,9 +246,6 @@
         }
 
         .reset-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
             padding: 10px 20px;
             background-color: rgba(255, 165, 0, 0.8);
             color: #000;
@@ -264,13 +254,23 @@
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            z-index: 99999;
             transition: all 0.3s ease;
+            margin: 5px;
+            display: inline-block;
         }
 
         .reset-button:hover {
             background-color: rgba(255, 165, 0, 1);
             box-shadow: 0 0 15px rgba(255, 165, 0, 0.7);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
         }
 
         .field-input {
@@ -398,6 +398,68 @@
             display: block;
             margin: 0 auto;
         }
+
+        .gear-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .gear-item .remove-skill {
+            background-color: #ff4757 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 8px 12px !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            margin-left: auto !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .gear-item .remove-skill:hover {
+            background-color: #ff6b81 !important;
+            transform: scale(1.1) !important;
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .item-card h4 {
+            color: #00ccff;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .remove-item {
+            background-color: #ff4757 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 8px 12px !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            margin-left: auto !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .remove-item:hover {
+            background-color: #ff6b81 !important;
+            transform: scale(1.1) !important;
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
@@ -423,6 +485,55 @@
         window.itemsCompradosRef = itemsCompradosRef;
         window.onValueFirebase = onValue;
     </script>
+    
+    <script>
+        // Función global para limpiar items comprados (disponible inmediatamente)
+        window.clearPurchasedItems = function() {
+            if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
+                // Limpiar del character sheet
+                if (window.characterSheet) {
+                    window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
+                        item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
+                    );
+                    window.characterSheet.implants = [];
+                }
+                
+                // Limpiar de localStorage
+                localStorage.removeItem('itemsComprados');
+                localStorage.removeItem('inventory');
+                if (window.characterSheet) {
+                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                }
+                
+                // Limpiar de Firebase
+                if (window.firebaseDatabase) {
+                    const itemsRef = window.firebaseDatabase.ref('itemsComprados');
+                    itemsRef.remove().then(() => {
+                        console.log('Items comprados eliminados de Firebase');
+                        alert('Items comprados eliminados correctamente');
+                        
+                        // Forzar actualización de UI
+                        if (typeof updateEquipmentUI === 'function') {
+                            updateEquipmentUI();
+                        }
+                        if (typeof updateUI === 'function') {
+                            updateUI();
+                        }
+                        
+                        // Recargar la página para asegurar que todo se actualice
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }).catch(error => {
+                        console.error('Error al limpiar Firebase:', error);
+                        alert('Error al limpiar Firebase: ' + error.message);
+                    });
+                } else {
+                    alert('Firebase no disponible, solo se limpiaron los datos locales');
+                }
+            }
+        };
+    </script>
 </head>
 <body>
     <div class="character-sheet">
@@ -431,11 +542,13 @@
             <h2>Concursante #13</h2>
         </div>
 
-        <button id="saveButton" class="save-button">GUARDAR FICHA</button>
+        <div class="button-container">
+            <button id="saveButton" class="save-button">GUARDAR FICHA</button>
 
-        <button id="clearItemsButton" class="reset-button" style="background-color: #ff9500; margin: 10px 0;">LIMPIAR ITEMS COMPRADOS</button>
+            <button id="clearItemsButton" class="reset-button" style="background-color: #ff9500; margin: 10px 0;">LIMPIAR ITEMS COMPRADOS</button>
 
-        <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
+            <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
+        </div>
 
         <div class="tabs">
             <div class="tab active" data-tab="basics">Básicos</div>
