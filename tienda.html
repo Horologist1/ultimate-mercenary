@@ -221,6 +221,46 @@
     } else if (window.pmTransactions && window.comprarItem) {
         puenteActivo = true;
     }
+
+    // Inicializar Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+        authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+        projectId: "ultimatemercenary-1e212",
+        storageBucket: "ultimatemercenary-1e212.appspot.com",
+        messagingSenderId: "683730871364",
+        appId: "1:683730871364:web:350aaf7a296ad34db28811",
+        databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+    };
+
+    // Inicializar Firebase si no está ya inicializado
+    if (!window.firebaseApp) {
+        window.firebaseApp = firebase.initializeApp(firebaseConfig);
+        window.database = firebase.database();
+    }
+
+    // Referencias a Firebase
+    const pmRef = window.database.ref('playerPM');
+    const itemsCompradosRef = window.database.ref('itemsComprados');
+
+    // Listener para cambios en PM
+    pmRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data !== null) {
+            localStorage.setItem('playerPM', data.toString());
+            updatePMDisplay();
+            updateBuyButtons();
+        }
+    });
+
+    // Listener para items comprados
+    itemsCompradosRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            localStorage.setItem('itemsComprados', JSON.stringify(data));
+        }
+    });
+
     // Debug visual
     window.addEventListener('DOMContentLoaded', function() {
         const shopContainer = document.querySelector('.shop-container');
@@ -641,7 +681,7 @@
                     updateBuyButtons();
                     
                     // --- INTEGRACIÓN FICHA ---
-                    const fichaItem = {
+                    let fichaItem = {
                         nombre: item.name,
                         descripcion: item.description,
                         detalles: item.details,
@@ -649,55 +689,41 @@
                     };
                     
                     if (item.section === 'shop-armas') {
-                        tipo = 'arma';
                         fichaItem = {
-                            tipo,
+                            tipo: 'arma',
                             nombre: item.name,
                             dano: item.damage || item.details || '',
                             notas: item.details || '',
                             descripcion: item.description || ''
                         };
                     } else if (item.section === 'shop-armaduras') {
-                        tipo = 'armadura';
                         fichaItem = {
-                            tipo,
+                            tipo: 'armadura',
                             nombre: item.name,
                             proteccion: item.details || '',
                             notas: item.description || ''
                         };
-                    } else if (item.section === 'shop-cyberware') {
-                        tipo = 'implant';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            efectos: item.details || ''
-                        };
                     } else if (item.section === 'shop-equipo') {
-                        tipo = 'equipo';
                         fichaItem = {
-                            tipo,
+                            tipo: 'equipo',
                             nombre: item.name,
-                            descripcion: item.details || ''
-                        };
-                    } else if (item.section === 'shop-municion') {
-                        tipo = 'equipo';
-                        fichaItem = {
-                            tipo,
-                            nombre: item.name,
-                            descripcion: `${item['Compatible con'] ? 'Compatible: ' + item['Compatible con'] + '. ' : ''}${item['Cantidad'] ? 'Cantidad: ' + item['Cantidad'] + '. ' : ''}${item.details || ''}`
+                            descripcion: item.description || '',
+                            detalles: item.details || ''
                         };
                     }
-                    if (tipo) {
-                        // Guardar en la cola de pendientes
-                        const pending = JSON.parse(localStorage.getItem('pendingItems') || '[]');
-                        pending.push(fichaItem);
-                        localStorage.setItem('pendingItems', JSON.stringify(pending));
-                        // Intentar enviar por postMessage (por si la ficha está abierta)
+                    
+                    // Enviar el item a la ficha
+                    if (window.parent) {
                         window.parent.postMessage({
                             type: 'addItem',
                             item: fichaItem
                         }, '*');
                     }
+                    
+                    // Guardar en Firebase
+                    const itemsComprados = JSON.parse(localStorage.getItem('itemsComprados') || '[]');
+                    itemsComprados.push(fichaItem);
+                    itemsCompradosRef.set(itemsComprados);
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
@@ -706,9 +732,21 @@
 
         // Función para actualizar la visualización de PM
         function updatePMDisplay() {
-            const currentPM = window.pmTransactions.getTotal();
-            document.getElementById('current-pm').textContent = currentPM;
+            const pmElement = document.getElementById('current-pm');
+            if (pmElement) {
+                pmElement.textContent = localStorage.getItem('playerPM') || '0';
+            }
         }
+
+        // Escuchar mensajes de actualización de PM
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'updatePM') {
+                pmRef.set(event.data.value.toString());
+            }
+        });
+
+        // Inicializar la visualización de PM
+        updatePMDisplay();
 
         // Función para actualizar el estado de los botones de compra
         function updateBuyButtons() {
