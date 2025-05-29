@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.71</title>
+    <title>Ultimate Mercenary 0.72</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1106,14 +1106,9 @@
 
         onValue(itemsCompradosRef, (snapshot) => {
             const data = snapshot.val();
-            const items = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-            
-            // Actualizar inventario local
-            inventory = items;
-            localStorage.setItem('inventory', JSON.stringify(items));
-            
-            // Actualizar UI
-            updateInventoryDisplay();
+            if (data) {
+                localStorage.setItem('itemsComprados', JSON.stringify(data));
+            }
         });
 
         // Funciones para guardar en Firebase (si el usuario puede modificar)
@@ -1144,7 +1139,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.71</h1>
+                        <h1>ULTIMATE MERCENARY 0.72</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1830,9 +1825,22 @@
 
         init() {
             // Cargar items guardados
-            const saved = localStorage.getItem('inventory');
+            const saved = localStorage.getItem('itemsComprados');
             if (saved) {
                 this.items = JSON.parse(saved);
+            }
+            
+            // Sincronizar con Firebase
+            if (window.database) {
+                const itemsCompradosRef = window.database.ref('itemsComprados');
+                itemsCompradosRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        this.items = Array.isArray(data) ? data : Object.values(data);
+                        localStorage.setItem('itemsComprados', JSON.stringify(this.items));
+                        this.notifyFicha();
+                    }
+                });
             }
         },
 
@@ -1847,7 +1855,11 @@
         },
 
         save() {
-            localStorage.setItem('inventory', JSON.stringify(this.items));
+            localStorage.setItem('itemsComprados', JSON.stringify(this.items));
+            if (window.database) {
+                const itemsCompradosRef = window.database.ref('itemsComprados');
+                itemsCompradosRef.set(this.items);
+            }
         },
 
         notifyFicha() {
@@ -1918,48 +1930,6 @@
     <!-- Versión del sistema -->
     <script>
         const SYSTEM_VERSION = '0.64';
-    </script>
-
-    <!-- Listener para mensajes directos -->
-    <script>
-    window.addEventListener('message', (event) => {
-        if (event.data.type === 'itemComprado') {
-            // Forzar actualización inmediata
-            const modal = document.querySelector('.modal iframe');
-            if (modal) {
-                modal.contentWindow.postMessage({
-                    type: 'itemComprado',
-                    item: event.data.item
-                }, '*');
-            }
-        }
-    });
-    </script>
-
-    <script>
-    function updateInventoryDisplay() {
-        // Agrupar items por tipo
-        const itemsPorTipo = {
-            arma: inventory.filter(i => i.tipo === 'arma'),
-            armadura: inventory.filter(i => i.tipo === 'armadura'),
-            equipo: inventory.filter(i => i.tipo === 'equipo'),
-            implant: inventory.filter(i => i.tipo === 'implant')
-        };
-
-        // Actualizar cada sección
-        Object.entries(itemsPorTipo).forEach(([tipo, items]) => {
-            const container = document.getElementById(`${tipo}-list`);
-            if (!container) return;
-
-            container.innerHTML = items.map(item => `
-                <div class="item-card">
-                    <h4>${item.nombre}</h4>
-                    ${item.descripcion ? `<p>${item.descripcion}</p>` : ''}
-                    <small>Comprado: ${new Date(item.compradoEn).toLocaleString()}</small>
-                </div>
-            `).join('') || '<p>No hay items</p>';
-        });
-    }
     </script>
 
 </body>

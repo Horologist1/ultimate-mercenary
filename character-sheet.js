@@ -192,13 +192,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const itemsCompradosRef = window.database.ref('itemsComprados');
 
     // Función para sincronizar el inventario con Firebase
-    // COMENTADO: Esta función causa conflictos con la tienda
-    /*
     function syncInventoryToFirebase() {
-        const allItems = [...window.characterSheet.equipment, ...window.characterSheet.implants];
-        itemsCompradosRef.set(allItems);
+        // Solo sincronizar si el objeto characterSheet está disponible
+        if (!window.characterSheet) return;
+        
+        // Usar transaction para evitar conflictos
+        itemsCompradosRef.transaction((currentData) => {
+            // Si no hay datos, usar los datos locales
+            if (!currentData) {
+                const allItems = [
+                    ...(window.characterSheet.equipment || []),
+                    ...(window.characterSheet.implants || [])
+                ];
+                return allItems;
+            }
+
+            // Convertir datos existentes a array
+            let existingItems = Array.isArray(currentData) ? currentData : Object.values(currentData);
+
+            // Combinar elementos existentes con los locales, eliminando duplicados por nombre
+            const localItems = [
+                ...(window.characterSheet.equipment || []),
+                ...(window.characterSheet.implants || [])
+            ];
+
+            // Usar un Map para mantener el elemento más reciente
+            const itemMap = new Map();
+            [...existingItems, ...localItems].forEach(item => {
+                itemMap.set(item.nombre, item);
+            });
+
+            return Array.from(itemMap.values());
+        }).then((result) => {
+            if (result.committed) {
+                console.log('Inventario sincronizado con Firebase');
+            }
+        }).catch(error => {
+            console.error('Error al sincronizar con Firebase:', error);
+        });
     }
-    */
 
     // Listener para cambios en Firebase
     itemsCompradosRef.on('value', (snapshot) => {
@@ -636,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeEquipmentItem = function(index) {
         window.characterSheet.equipment.splice(index, 1);
         updateEquipmentUI();
-        // syncInventoryToFirebase(); // Sincronizar después de eliminar - COMENTADO
+        syncInventoryToFirebase(); // Sincronizar tras eliminar
     };
     function removeImplant(index) {
         window.characterSheet.implants.splice(index, 1);

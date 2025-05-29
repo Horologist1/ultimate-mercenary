@@ -859,14 +859,21 @@
                 
                 inventory = items;
                 localStorage.setItem('inventory', JSON.stringify(items));
-                updateInventoryDisplay();
                 
+                // Update the character sheet
                 if (window.characterSheet) {
                     window.characterSheet.equipment = items.filter(item => 
                         ['arma', 'armadura', 'equipo'].includes(item.tipo)
                     );
                     window.characterSheet.implants = items.filter(item => item.tipo === 'implant');
+                    
+                    // Save character sheet state
+                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
                 }
+
+                // Update UI
+                updateInventoryDisplay();
+                if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
             });
             
             // Tab switching functionality
