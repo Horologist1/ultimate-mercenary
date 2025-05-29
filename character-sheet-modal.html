@@ -437,14 +437,15 @@
                 localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
                 
                 // Actualizar UI
-                if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
+                if (typeof updateEquipmentUI === 'function') {
+                    updateEquipmentUI();
+                    // Forzar actualización de la visualización del inventario
+                    if (typeof updateInventoryDisplay === 'function') {
+                        updateInventoryDisplay();
+                    }
+                }
                 if (typeof updateUI === 'function') updateUI();
                 
-                // Forzar actualización de la visualización del inventario
-                if (typeof updateInventoryDisplay === 'function') {
-                    updateInventoryDisplay();
-                }
-
                 // Notificar al padre que el inventario ha sido actualizado
                 if (window.parent) {
                     window.parent.postMessage({
