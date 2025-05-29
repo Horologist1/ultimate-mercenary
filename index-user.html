@@ -1729,11 +1729,13 @@
             transactions.push(newTransaction);
             localStorage.setItem('pmTransactions', JSON.stringify(transactions));
             
+            // Calcular y guardar el nuevo total
+            const newTotal = this.getTotal();
+            localStorage.setItem('playerPM', newTotal.toString());
+            
             // Guardar en Firebase
             if (window.savePM) {
-                const newTotal = this.getTotal();
                 window.savePM(newTotal.toString());
-                // También guardar las transacciones en Firebase
                 if (window.savePMTransactions) {
                     window.savePMTransactions(transactions);
                 }
@@ -1756,8 +1758,6 @@
         // Actualizar la UI
         updateUI: function() {
             const total = this.getTotal();
-            // Actualizar localStorage
-            localStorage.setItem('playerPM', total.toString());
             
             // Actualizar UI en index-user
             if (window.updateStatusPanel) {
@@ -1767,9 +1767,13 @@
             // Actualizar UI en la tienda si está abierta
             if (window.tiendaIframe && window.tiendaIframe.contentWindow) {
                 try {
-                    window.tiendaIframe.contentWindow.updatePMDisplay();
+                    // Forzar actualización en la tienda
+                    window.tiendaIframe.contentWindow.postMessage({
+                        type: 'updatePM',
+                        value: total
+                    }, '*');
                 } catch (e) {
-                    console.log('Tienda no disponible para actualizar PM');
+                    console.log('Error actualizando PM en tienda:', e);
                 }
             }
             
@@ -1826,6 +1830,17 @@
         }
         return false;
     };
+
+    // Escuchar mensajes de la tienda
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'getPM') {
+            const total = window.pmTransactions.getTotal();
+            event.source.postMessage({
+                type: 'updatePM',
+                value: total
+            }, '*');
+        }
+    });
     </script>
 
     <!-- Versión del sistema -->
