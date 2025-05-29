@@ -204,8 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
     itemsCompradosRef.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
+            console.log('Firebase data received:', data);
+            
             // Separar items por tipo
             const firebaseItems = Array.isArray(data) ? data : Object.values(data);
+            console.log('Firebase items processed:', firebaseItems);
+            
             const newEquipment = firebaseItems.filter(item => 
                 item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
             );
@@ -217,25 +221,34 @@ document.addEventListener('DOMContentLoaded', function() {
             window.characterSheet.equipment = window.characterSheet.equipment || [];
             window.characterSheet.implants = window.characterSheet.implants || [];
             
-            // Solo añadir items que no existan ya (comparar por nombre para evitar duplicados)
-            const existingEquipmentNames = window.characterSheet.equipment.map(e => e.nombre);
-            const existingImplantNames = window.characterSheet.implants.map(i => i.nombre);
+            // Crear una clave única para cada item (nombre + tipo + descripción)
+            const createItemKey = (item) => `${item.nombre}-${item.tipo}-${item.descripcion || ''}`;
+            
+            // Solo añadir items que no existan ya (comparar por clave única)
+            const existingEquipmentKeys = window.characterSheet.equipment.map(createItemKey);
+            const existingImplantKeys = window.characterSheet.implants.map(createItemKey);
             
             let itemsAdded = false;
             
             newEquipment.forEach(item => {
-                if (!existingEquipmentNames.includes(item.nombre)) {
+                const itemKey = createItemKey(item);
+                if (!existingEquipmentKeys.includes(itemKey)) {
                     window.characterSheet.equipment.push(item);
                     console.log('Nuevo item de equipo añadido desde Firebase:', item.nombre);
                     itemsAdded = true;
+                } else {
+                    console.log('Item de equipo ya existe, saltando:', item.nombre);
                 }
             });
             
             newImplants.forEach(item => {
-                if (!existingImplantNames.includes(item.nombre)) {
+                const itemKey = createItemKey(item);
+                if (!existingImplantKeys.includes(itemKey)) {
                     window.characterSheet.implants.push(item);
                     console.log('Nuevo implante añadido desde Firebase:', item.nombre);
                     itemsAdded = true;
+                } else {
+                    console.log('Implante ya existe, saltando:', item.nombre);
                 }
             });
             
@@ -599,6 +612,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (confirm('¿Estás seguro de que quieres reiniciar la ficha? Se perderán todos los datos actuales.')) {
             // Limpiar localStorage
             localStorage.removeItem('characterSheet');
+            localStorage.removeItem('itemsComprados');
+            
+            // Limpiar Firebase
+            if (window.database) {
+                window.database.ref('itemsComprados').remove().then(() => {
+                    console.log('Items comprados eliminados de Firebase');
+                }).catch(error => {
+                    console.error('Error al limpiar Firebase:', error);
+                });
+            }
             
             // Reiniciar el objeto characterSheet
             window.characterSheet = new CharacterSheet();
@@ -616,6 +639,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = 'REINICIAR FICHA';
             }, 2000);
         }
+    });
+
+    // Clear items button functionality
+    const clearItemsButton = document.getElementById('clearItemsButton');
+    clearItemsButton.addEventListener('click', function() {
+        window.clearPurchasedItems();
     });
 
     // Función para añadir habilidad personalizada
@@ -944,6 +973,40 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeCustomSkill = removeCustomSkill;
     window.removeEquipmentItem = removeEquipmentItem;
     window.removeImplant = removeImplant;
+
+    // Función global para limpiar items comprados (útil para debugging)
+    window.clearPurchasedItems = function() {
+        if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
+            // Limpiar del character sheet
+            window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
+                item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
+            );
+            window.characterSheet.implants = [];
+            
+            // Limpiar de localStorage
+            localStorage.removeItem('itemsComprados');
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+            
+            // Limpiar de Firebase
+            if (window.database) {
+                window.database.ref('itemsComprados').remove().then(() => {
+                    console.log('Items comprados eliminados de Firebase');
+                    alert('Items comprados eliminados correctamente');
+                }).catch(error => {
+                    console.error('Error al limpiar Firebase:', error);
+                    alert('Error al limpiar Firebase: ' + error.message);
+                });
+            }
+            
+            // Actualizar UI
+            if (typeof updateEquipmentUI === 'function') {
+                updateEquipmentUI();
+            }
+            if (typeof updateUI === 'function') {
+                updateUI();
+            }
+        }
+    };
 
     // Listener para mensajes del padre
     window.addEventListener('message', function(event) {
