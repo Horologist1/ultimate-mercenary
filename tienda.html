@@ -717,7 +717,7 @@
                         };
                     } else if (item.section === 'shop-cyberware') {
                         fichaItem = {
-                            tipo: 'cyberware',
+                            tipo: 'implant',
                             nombre: item.name,
                             descripcion: item.description || '',
                             efectos: item.details || ''
@@ -730,6 +730,19 @@
                             type: 'addItem',
                             item: fichaItem
                         }, '*');
+                    }
+
+                    // Actualizar Firebase
+                    if (window.database) {
+                        const itemsCompradosRef = window.database.ref('itemsComprados');
+                        itemsCompradosRef.once('value', (snapshot) => {
+                            let items = snapshot.val() || [];
+                            if (!Array.isArray(items)) {
+                                items = Object.values(items);
+                            }
+                            items.push(fichaItem);
+                            itemsCompradosRef.set(items);
+                        });
                     }
                 }
             } else {

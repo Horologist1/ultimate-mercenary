@@ -423,19 +423,20 @@
             if (Array.isArray(data)) items = data;
             else if (data && typeof data === 'object') items = Object.values(data);
             else items = [];
+            
             // Reconstruir inventario
             if (window.characterSheet) {
-                window.characterSheet.equipment = [];
-                window.characterSheet.implants = [];
-                items.forEach(item => {
-                    if (item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo') {
-                        window.characterSheet.equipment.push(item);
-                    } else if (item.tipo === 'implant' || item.tipo === 'implante') {
-                        window.characterSheet.implants.push(item);
-                    }
-                });
+                window.characterSheet.equipment = items.filter(item => 
+                    item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
+                );
+                window.characterSheet.implants = items.filter(item => 
+                    item.tipo === 'implant' || item.tipo === 'implante'
+                );
+                
                 // Guardar en localStorage para compatibilidad
                 localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                
+                // Actualizar UI
                 if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
                 if (typeof updateUI === 'function') updateUI();
             }
