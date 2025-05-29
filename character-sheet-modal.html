@@ -426,6 +426,7 @@
             
             // Reconstruir inventario
             if (window.characterSheet) {
+                // Filtrar y asignar items por tipo
                 window.characterSheet.equipment = items.filter(item => 
                     item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
                 );
@@ -439,12 +440,15 @@
                 // Actualizar UI
                 if (typeof updateEquipmentUI === 'function') {
                     updateEquipmentUI();
-                    // Forzar actualización de la visualización del inventario
-                    if (typeof updateInventoryDisplay === 'function') {
-                        updateInventoryDisplay();
-                    }
                 }
-                if (typeof updateUI === 'function') updateUI();
+                if (typeof updateUI === 'function') {
+                    updateUI();
+                }
+                
+                // Forzar actualización de la visualización del inventario
+                if (typeof updateInventoryDisplay === 'function') {
+                    updateInventoryDisplay();
+                }
                 
                 // Notificar al padre que el inventario ha sido actualizado
                 if (window.parent) {

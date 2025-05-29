@@ -202,14 +202,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = snapshot.val();
         if (data) {
             // Separar items por tipo
-            window.characterSheet.equipment = data.filter(item => 
+            const items = Array.isArray(data) ? data : Object.values(data);
+            window.characterSheet.equipment = items.filter(item => 
                 item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
             );
-            window.characterSheet.implants = data.filter(item => 
+            window.characterSheet.implants = items.filter(item => 
                 item.tipo === 'implant' || item.tipo === 'implante'
             );
+            
+            // Guardar en localStorage para compatibilidad
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+            
             // Actualizar UI
-            updateEquipmentUI();
+            if (typeof updateEquipmentUI === 'function') {
+                updateEquipmentUI();
+            }
+            if (typeof updateUI === 'function') {
+                updateUI();
+            }
         }
     });
 
@@ -903,23 +913,30 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeEquipmentItem = removeEquipmentItem;
     window.removeImplant = removeImplant;
 
-    // Al final del DOMContentLoaded, antes de cerrar la función
+    // Listener para mensajes del padre
     window.addEventListener('message', function(event) {
-        console.log('Mensaje recibido en ficha:', event.data);
         if (event.data && event.data.type === 'addItem' && event.data.item) {
             const item = event.data.item;
             if (item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo') {
                 window.characterSheet.equipment = window.characterSheet.equipment || [];
                 window.characterSheet.equipment.push(item);
-                console.log('Añadido a equipment:', item, window.characterSheet.equipment);
+                console.log('Añadido a equipment:', item);
             } else if (item.tipo === 'implant' || item.tipo === 'implante') {
                 window.characterSheet.implants = window.characterSheet.implants || [];
                 window.characterSheet.implants.push(item);
-                console.log('Añadido a implants:', item, window.characterSheet.implants);
+                console.log('Añadido a implants:', item);
             }
+            
+            // Guardar en localStorage
             localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
-            updateEquipmentUI();
-            updateUI();
+            
+            // Actualizar UI
+            if (typeof updateEquipmentUI === 'function') {
+                updateEquipmentUI();
+            }
+            if (typeof updateUI === 'function') {
+                updateUI();
+            }
         }
     });
 
