@@ -205,23 +205,52 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = snapshot.val();
         if (data) {
             // Separar items por tipo
-            const items = Array.isArray(data) ? data : Object.values(data);
-            window.characterSheet.equipment = items.filter(item => 
+            const firebaseItems = Array.isArray(data) ? data : Object.values(data);
+            const newEquipment = firebaseItems.filter(item => 
                 item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
             );
-            window.characterSheet.implants = items.filter(item => 
+            const newImplants = firebaseItems.filter(item => 
                 item.tipo === 'implant' || item.tipo === 'implante'
             );
             
-            // Guardar en localStorage para compatibilidad
-            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+            // Inicializar arrays si no existen
+            window.characterSheet.equipment = window.characterSheet.equipment || [];
+            window.characterSheet.implants = window.characterSheet.implants || [];
             
-            // Actualizar UI
-            if (typeof updateEquipmentUI === 'function') {
-                updateEquipmentUI();
-            }
-            if (typeof updateUI === 'function') {
-                updateUI();
+            // Solo añadir items que no existan ya (comparar por nombre para evitar duplicados)
+            const existingEquipmentNames = window.characterSheet.equipment.map(e => e.nombre);
+            const existingImplantNames = window.characterSheet.implants.map(i => i.nombre);
+            
+            let itemsAdded = false;
+            
+            newEquipment.forEach(item => {
+                if (!existingEquipmentNames.includes(item.nombre)) {
+                    window.characterSheet.equipment.push(item);
+                    console.log('Nuevo item de equipo añadido desde Firebase:', item.nombre);
+                    itemsAdded = true;
+                }
+            });
+            
+            newImplants.forEach(item => {
+                if (!existingImplantNames.includes(item.nombre)) {
+                    window.characterSheet.implants.push(item);
+                    console.log('Nuevo implante añadido desde Firebase:', item.nombre);
+                    itemsAdded = true;
+                }
+            });
+            
+            // Solo actualizar UI y guardar si se añadieron items nuevos
+            if (itemsAdded) {
+                // Guardar en localStorage para compatibilidad
+                localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                
+                // Actualizar UI
+                if (typeof updateEquipmentUI === 'function') {
+                    updateEquipmentUI();
+                }
+                if (typeof updateUI === 'function') {
+                    updateUI();
+                }
             }
         }
     });

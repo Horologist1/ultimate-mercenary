@@ -675,7 +675,14 @@
             const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
             if (currentPM >= item.price) {
                 // Intentar comprar usando el sistema de transacciones
-                const success = window.comprarItem(itemId, item.price);
+                // Buscar la función comprarItem en el parent o en window global
+                const comprarItemFn = window.parent.comprarItem || window.comprarItem;
+                if (!comprarItemFn) {
+                    alert('Error: Sistema de compras no disponible');
+                    return;
+                }
+                
+                const success = comprarItemFn(itemId, item.price);
                 
                 if (success) {
                     // Preparar el item para la ficha
@@ -706,8 +713,7 @@
                             tipo: 'equipo',
                             nombre: item.name,
                             descripcion: item.description || '',
-                            detalles: item.details || '',
-                            categoria: 'equipo'
+                            detalles: item.details || ''
                         };
                     } else if (item.section === 'shop-cyberware') {
                         fichaItem = {
@@ -718,8 +724,14 @@
                         };
                     }
                     
-                    // Obtener referencia a Firebase
-                    const itemsCompradosRef = window.parent.database.ref('itemsComprados');
+                    // Obtener referencia a Firebase (priorizar parent)
+                    const database = window.parent.database || window.database;
+                    if (!database) {
+                        alert('Error: Base de datos no disponible');
+                        return;
+                    }
+                    
+                    const itemsCompradosRef = database.ref('itemsComprados');
                     
                     // Usar transacción para evitar sobrescrituras
                     itemsCompradosRef.transaction((currentData) => {
@@ -729,12 +741,14 @@
                             items = Array.isArray(currentData) ? currentData : Object.values(currentData);
                         }
                         
-                        // Añadir el nuevo item
+                        // Añadir SOLO el nuevo item comprado
                         items.push(fichaItem);
                         
                         return items;
                     }).then((result) => {
                         if (result.committed) {
+                            console.log('Item añadido correctamente a Firebase:', fichaItem.nombre);
+                            
                             // Notificar al character sheet modal si está abierto
                             if (window.parent) {
                                 window.parent.postMessage({
@@ -751,12 +765,6 @@
                                     }, '*');
                                 }
                             }
-                            
-                            // Mostrar mensaje de éxito
-                            showPurchaseMessage(item);
-                            
-                            // Actualizar la UI
-                            updatePMDisplay();
                         } else {
                             console.error('La transacción no se completó');
                             alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
@@ -765,6 +773,14 @@
                         console.error('Error al guardar en Firebase:', error);
                         alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
                     });
+                    
+                    // Mostrar mensaje de éxito (solo una vez)
+                    showPurchaseMessage(item);
+                    
+                    // Actualizar la UI (solo una vez)
+                    updatePMDisplay();
+                } else {
+                    alert('Error en la transacción. Por favor, inténtalo de nuevo.');
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
