@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.56 - Concursante</title>
+    <title>Ultimate Mercenary 0.57 - Concursante</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1129,7 +1129,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.56</h1>
+                        <h1>ULTIMATE MERCENARY 0.57</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1712,140 +1712,107 @@
     <script>
     // Sistema de transacciones PM
     window.pmTransactions = {
-        // Obtener todas las transacciones
-        getAll: function() {
-            return JSON.parse(localStorage.getItem('pmTransactions') || '[]');
-        },
-        
-        // Añadir una transacción
-        add: function(amount, type, description) {
-            const transactions = this.getAll();
-            const newTransaction = {
-                amount: amount,
-                type: type, // 'gain' o 'spend'
-                description: description,
-                timestamp: new Date().toISOString()
-            };
-            transactions.push(newTransaction);
-            localStorage.setItem('pmTransactions', JSON.stringify(transactions));
-            
-            // Calcular y guardar el nuevo total
-            const newTotal = this.getTotal();
-            localStorage.setItem('playerPM', newTotal.toString());
-            
-            // Guardar en Firebase
-            if (window.savePM) {
-                window.savePM(newTotal.toString());
-                if (window.savePMTransactions) {
-                    window.savePMTransactions(transactions);
-                }
+        transactions: [],
+        total: 0,
+
+        init() {
+            // Cargar transacciones guardadas
+            const saved = localStorage.getItem('pmTransactions');
+            if (saved) {
+                this.transactions = JSON.parse(saved);
+                this.total = this.transactions.reduce((sum, t) => sum + t.amount, 0);
             }
-            
-            // Actualizar UI
             this.updateUI();
-            
-            // Devolver la transacción creada
-            return newTransaction;
-        },
-        
-        // Calcular el total actual
-        getTotal: function() {
-            return this.getAll().reduce((total, tx) => {
-                return total + (tx.type === 'gain' ? tx.amount : -tx.amount);
-            }, 0);
-        },
-        
-        // Actualizar la UI
-        updateUI: function() {
-            const total = this.getTotal();
-            
-            // Actualizar UI en index-user
-            if (window.updateStatusPanel) {
-                window.updateStatusPanel();
-            }
-            
-            // Actualizar UI en la tienda si está abierta
-            if (window.tiendaIframe && window.tiendaIframe.contentWindow) {
-                try {
-                    // Forzar actualización en la tienda
-                    window.tiendaIframe.contentWindow.postMessage({
-                        type: 'updatePM',
-                        value: total
-                    }, '*');
-                } catch (e) {
-                    console.log('Error actualizando PM en tienda:', e);
-                }
-            }
-            
-            // Actualizar cualquier otro elemento que muestre PM
-            const pmElements = document.querySelectorAll('[data-pm-display]');
-            pmElements.forEach(el => {
-                el.textContent = total;
-            });
         },
 
-        // Sincronizar con Firebase
-        syncWithFirebase: function() {
-            if (window.savePM) {
-                const total = this.getTotal();
-                window.savePM(total.toString());
-                if (window.savePMTransactions) {
-                    window.savePMTransactions(this.getAll());
-                }
+        addTransaction(amount, reason) {
+            const transaction = {
+                amount,
+                reason,
+                timestamp: Date.now()
+            };
+            this.transactions.push(transaction);
+            this.total += amount;
+            
+            // Guardar en localStorage
+            localStorage.setItem('pmTransactions', JSON.stringify(this.transactions));
+            
+            // Guardar en Firebase
+            if (window.database) {
+                window.database.ref('playerPM').set(this.total);
             }
+            
+            // Notificar a todos los iframes
+            this.notifyIframes();
+            
+            this.updateUI();
+            return this.total;
+        },
+
+        getTotal() {
+            return this.total;
+        },
+
+        updateUI() {
+            // Actualizar todos los elementos con data-pm-display
+            document.querySelectorAll('[data-pm-display]').forEach(el => {
+                el.textContent = this.total;
+            });
+            
+            // Notificar a todos los iframes
+            this.notifyIframes();
+        },
+
+        notifyIframes() {
+            // Notificar a todos los iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'updatePM',
+                        total: this.total
+                    }, '*');
+                }
+            });
         }
     };
 
-    // Exponer funciones globales para la tienda
-    window.sumarPM = function(cantidad, descripcion) {
-        return window.pmTransactions.add(cantidad, 'gain', descripcion || 'Ganancia de PM');
+    // Escuchar mensajes de los iframes
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'getPM') {
+            // Responder con el total actual
+            event.source.postMessage({
+                type: 'updatePM',
+                total: window.pmTransactions.getTotal()
+            }, '*');
+        }
+    });
+
+    // Inicializar el sistema de transacciones
+    window.pmTransactions.init();
+
+    // Funciones globales para manejar PM
+    window.sumarPM = function(cantidad, razon) {
+        return window.pmTransactions.addTransaction(cantidad, razon);
     };
 
-    window.restarPM = function(cantidad, descripcion) {
-        return window.pmTransactions.add(cantidad, 'spend', descripcion || 'Gasto de PM');
+    window.restarPM = function(cantidad, razon) {
+        return window.pmTransactions.addTransaction(-cantidad, razon);
     };
 
-    window.comprarItem = function(precio, itemId, descripcion) {
+    window.comprarItem = function(itemId, precio) {
         const total = window.pmTransactions.getTotal();
         if (total >= precio) {
-            // Restar PM
-            const transaction = window.restarPM(precio, descripcion || `Compra de item ${itemId}`);
-            
-            // Guardar el item comprado
-            let itemsComprados = JSON.parse(localStorage.getItem('itemsComprados') || '[]');
-            itemsComprados.push({
-                id: itemId,
-                precio: precio,
-                fecha: new Date().toISOString(),
-                transactionId: transaction.timestamp
-            });
-            localStorage.setItem('itemsComprados', JSON.stringify(itemsComprados));
-            
-            // Guardar en Firebase
-            if (window.saveItemsComprados) {
-                window.saveItemsComprados(itemsComprados);
-            }
-            
+            window.restarPM(precio, `Compra de item ${itemId}`);
             return true;
         }
         return false;
     };
-
-    // Escuchar mensajes de la tienda
-    window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'getPM') {
-            const total = window.pmTransactions.getTotal();
-            event.source.postMessage({
-                type: 'updatePM',
-                value: total
-            }, '*');
-        }
-    });
     </script>
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.56';
+        const SYSTEM_VERSION = '0.57';
     </script>
 
 </body>

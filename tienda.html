@@ -222,68 +222,72 @@
         puenteActivo = true;
     }
 
-    // Inicializar Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
-        authDomain: "ultimatemercenary-1e212.firebaseapp.com",
-        projectId: "ultimatemercenary-1e212",
-        storageBucket: "ultimatemercenary-1e212.appspot.com",
-        messagingSenderId: "683730871364",
-        appId: "1:683730871364:web:350aaf7a296ad34db28811",
-        databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
-    };
-
-    // Inicializar Firebase si no está ya inicializado
-    if (!window.firebaseApp) {
-        window.firebaseApp = firebase.initializeApp(firebaseConfig);
-        window.database = firebase.database();
+    // Función para actualizar la visualización de PM
+    function updatePMDisplay() {
+        const pmElement = document.getElementById('current-pm');
+        if (pmElement) {
+            const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+            pmElement.textContent = total;
+            
+            // Actualizar estado de botones de compra
+            document.querySelectorAll('.buy-button').forEach(button => {
+                const item = button.closest('.item-card');
+                if (item) {
+                    const priceElement = item.querySelector('.price');
+                    if (priceElement) {
+                        const price = parseInt(priceElement.textContent);
+                        button.disabled = total < price;
+                    }
+                }
+            });
+        }
     }
 
-    // Referencias a Firebase
-    const pmRef = window.database.ref('playerPM');
-    const itemsCompradosRef = window.database.ref('itemsComprados');
-
-    // Listener para cambios en PM
-    pmRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data !== null) {
-            localStorage.setItem('playerPM', data.toString());
+    // Escuchar mensajes del padre
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'updatePM') {
             updatePMDisplay();
-            updateBuyButtons();
         }
     });
 
-    // Listener para items comprados
-    itemsCompradosRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            localStorage.setItem('itemsComprados', JSON.stringify(data));
-        }
-    });
+    // Solicitar actualización inicial de PM
+    if (window.parent) {
+        window.parent.postMessage({ type: 'getPM' }, '*');
+    }
 
-    // Debug visual
-    window.addEventListener('DOMContentLoaded', function() {
-        const shopContainer = document.querySelector('.shop-container');
-        if (!puenteActivo) {
-            const msg = document.createElement('div');
-            msg.style.background = '#ff4757';
-            msg.style.color = '#fff';
-            msg.style.padding = '18px';
-            msg.style.margin = '20px 0';
-            msg.style.borderRadius = '8px';
-            msg.style.fontWeight = 'bold';
-            msg.style.fontSize = '18px';
-            msg.innerHTML = '⚠️ Error: La tienda no tiene acceso al sistema de transacciones del juego.<br>El botón de comprar no funcionará.<br>Revisa la integración del iframe/modal.';
-            if (shopContainer) shopContainer.prepend(msg);
-            // Deshabilitar todos los botones de compra
-            setTimeout(() => {
-                document.querySelectorAll('.buy-button').forEach(btn => btn.disabled = true);
-            }, 1000);
-            console.error('[TIENDA] No se detectó el puente de transacciones.');
-        } else {
-            console.log('[TIENDA] Puente de transacciones activo.');
+    // Actualizar PM cada 2 segundos para mantener sincronización
+    setInterval(updatePMDisplay, 2000);
+
+    // Inicializar Firebase solo si no estamos en un iframe
+    if (!window.parent || window.parent === window) {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.appspot.com",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811",
+            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+        };
+
+        if (!window.firebaseApp) {
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            window.database = firebase.database();
         }
-    });
+
+        // Referencias a Firebase
+        const pmRef = window.database.ref('playerPM');
+        const itemsCompradosRef = window.database.ref('itemsComprados');
+
+        // Listener para cambios en PM
+        pmRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null) {
+                localStorage.setItem('playerPM', data.toString());
+                updatePMDisplay();
+            }
+        });
+    }
     </script>
     <div class="container">
         <header>
@@ -678,7 +682,6 @@
                     
                     // Actualizar la UI
                     updatePMDisplay();
-                    updateBuyButtons();
                     
                     // --- INTEGRACIÓN FICHA ---
                     let fichaItem = {
@@ -728,26 +731,6 @@
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
             }
-        }
-
-        // Función para actualizar la visualización de PM
-        function updatePMDisplay() {
-            const pmElement = document.getElementById('current-pm');
-            if (pmElement) {
-                const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
-                pmElement.textContent = total;
-            }
-        }
-
-        // Función para actualizar el estado de los botones de compra
-        function updateBuyButtons() {
-            const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
-            const buttons = document.querySelectorAll('.buy-button');
-            buttons.forEach(button => {
-                const itemId = button.dataset.itemId;
-                const item = shopItems.find(i => i.id === itemId);
-                button.disabled = currentPM < item.price;
-            });
         }
 
         // Función para cargar la URL de imagen guardada
@@ -850,7 +833,6 @@
             loadSavedItems();
             renderShopItems();
             updatePMDisplay();
-            updateBuyButtons();
         });
     </script>
 </body>
