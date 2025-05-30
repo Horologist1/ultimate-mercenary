@@ -72,17 +72,27 @@ window.addItemToInventory = function(item) {
         origen: item.origen || 'manual'
     };
     
+    // Verificar duplicados basándose en nombre y timestamp (evitar duplicados inmediatos)
+    const tiempoActual = Date.now();
+    const existeReciente = window.inventory.find(existingItem => {
+        const mismoNombre = existingItem.nombre === normalizedItem.nombre;
+        const tiempoItem = new Date(existingItem.fechaCompra).getTime();
+        const diferenciaSegundos = (tiempoActual - tiempoItem) / 1000;
+        return mismoNombre && diferenciaSegundos < 5; // 5 segundos de ventana anti-duplicado
+    });
+    
+    if (existeReciente) {
+        console.warn('🚫 Item duplicado detectado, ignorando:', normalizedItem.nombre);
+        return existeReciente;
+    }
+    
     // Añadir al array local
     window.inventory.push(normalizedItem);
     console.log('✅ Item añadido al inventario local:', normalizedItem.nombre);
     
-    // Actualizar Firebase
-    if (window.database) {
-        window.database.ref('itemsComprados').set(window.inventory).then(() => {
-            console.log('✅ Inventario actualizado en Firebase');
-        }).catch(error => {
-            console.error('❌ Error actualizando Firebase:', error);
-        });
+    // Actualizar Firebase usando la función helper
+    if (window.database && window.updateFirebaseInventory) {
+        window.updateFirebaseInventory();
     }
     
     // Notificar a modales
@@ -91,17 +101,19 @@ window.addItemToInventory = function(item) {
     return normalizedItem;
 };
 
-// Función para limpiar inventario
+// Función para limpiar todo el inventario
 window.clearInventory = function() {
-    if (confirm('¿Limpiar todo el inventario?')) {
+    if (confirm('¿Estás seguro de que quieres limpiar TODO el inventario? Esta acción no se puede deshacer.')) {
         window.inventory = [];
+        console.log('🧹 Inventario limpiado localmente');
         
-        if (window.database) {
-            window.database.ref('itemsComprados').set(null);
+        // Actualizar Firebase usando la función helper
+        if (window.database && window.updateFirebaseInventory) {
+            window.updateFirebaseInventory();
         }
         
+        // Notificar a modales
         notifyModals();
-        console.log('🧹 Inventario limpiado');
     }
 };
 
@@ -121,13 +133,9 @@ window.removeItemFromInventoryById = function(itemId) {
     const removedItem = window.inventory.splice(itemIndex, 1)[0];
     console.log('🗑️ Item eliminado:', removedItem);
     
-    // Actualizar Firebase
-    if (window.database) {
-        window.database.ref('itemsComprados').set(window.inventory).then(() => {
-            console.log('✅ Inventario actualizado en Firebase tras eliminación');
-        }).catch(error => {
-            console.error('❌ Error actualizando Firebase:', error);
-        });
+    // Actualizar Firebase usando la función helper
+    if (window.database && window.updateFirebaseInventory) {
+        window.updateFirebaseInventory();
     }
     
     // Notificar a modales
@@ -188,21 +196,49 @@ function initializeInventorySystem() {
     
     window.firebaseInitialized = true;
     
-    // Listener de Firebase - SIMPLE Y DIRECTO
+    // Listener de Firebase - SIMPLE Y DIRECTO con prevención de loops
+    let isUpdatingFromFirebase = false;
     const itemsRef = window.database.ref('itemsComprados');
     itemsRef.on('value', (snapshot) => {
+        if (isUpdatingFromFirebase) {
+            console.log('🔄 Ignorando update de Firebase (loop prevention)');
+            return;
+        }
+        
         const data = snapshot.val();
         console.log('📡 Datos de Firebase recibidos:', data);
         
         if (data && Array.isArray(data)) {
-            window.inventory = data;
-            console.log('📦 Inventario actualizado:', window.inventory.length, 'items');
-            notifyModals();
+            // Verificar si realmente hay cambios
+            const currentItemsStr = JSON.stringify(window.inventory);
+            const newItemsStr = JSON.stringify(data);
+            
+            if (currentItemsStr !== newItemsStr) {
+                window.inventory = data;
+                console.log('📦 Inventario actualizado:', window.inventory.length, 'items');
+                notifyModals();
+            } else {
+                console.log('📦 Sin cambios en el inventario, omitiendo actualización');
+            }
         } else if (!data) {
-            window.inventory = [];
-            notifyModals();
+            if (window.inventory.length > 0) {
+                window.inventory = [];
+                notifyModals();
+            }
         }
     });
+    
+    // Función helper para actualizar Firebase sin triggear el listener
+    window.updateFirebaseInventory = function() {
+        isUpdatingFromFirebase = true;
+        window.database.ref('itemsComprados').set(window.inventory).then(() => {
+            console.log('✅ Inventario actualizado en Firebase');
+            setTimeout(() => { isUpdatingFromFirebase = false; }, 100);
+        }).catch(error => {
+            console.error('❌ Error actualizando Firebase:', error);
+            isUpdatingFromFirebase = false;
+        });
+    };
     
     // Listener para la ficha de personaje
     const characterSheetRef = window.database.ref('characterSheet');
@@ -386,7 +422,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.76'
+            version: '0.77'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {

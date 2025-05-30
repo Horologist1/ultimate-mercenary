@@ -477,52 +477,274 @@
         }
 
         .add-item-form {
-            background: rgba(0,0,0,0.3) !important;
-            border: 1px solid #444 !important;
-            border-radius: 4px !important;
-            margin-top: 10px !important;
-            padding: 10px !important;
+            background: linear-gradient(135deg, rgba(0, 20, 40, 0.8) 0%, rgba(0, 10, 20, 0.8) 100%) !important;
+            border: 1px solid #00ccff !important;
+            border-radius: 8px !important;
+            margin-top: 15px !important;
+            padding: 15px !important;
+            box-shadow: 0 4px 8px rgba(0, 204, 255, 0.1) !important;
         }
 
         .add-item-form h4 {
             color: #00ccff !important;
-            margin: 0 0 10px 0 !important;
+            margin: 0 0 15px 0 !important;
             font-family: 'Orbitron', sans-serif !important;
+            font-size: 16px !important;
+            text-align: center !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            font-family: 'Orbitron', sans-serif !important;
+        }
+
+        .remove-item-improved {
+            background: #ff4757 !important;
+            color: white !important;
+            border: none !important;
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            flex-shrink: 0 !important;
+            margin-left: 10px !important;
+        }
+
+        .remove-item-improved:hover {
+            background: #ff6b81 !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 0 8px rgba(255, 71, 87, 0.5) !important;
+        }
+
+        .item-description {
+            padding: 12px 15px !important;
+            color: #ccc !important;
+            font-size: 14px !important;
+            line-height: 1.4 !important;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.5) !important;
+        }
+
+        .item-stats-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            gap: 8px !important;
+            padding: 12px 15px !important;
+        }
+
+        .item-stat {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+        }
+
+        .item-stat.full-width {
+            grid-column: 1 / -1 !important;
+        }
+
+        .stat-label {
+            color: #888 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            font-weight: bold !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .stat-value {
+            color: #fff !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+        }
+
+        .item-meta {
+            padding: 8px 15px !important;
+            background: rgba(0, 0, 0, 0.2) !important;
+            border-top: 1px solid rgba(68, 68, 68, 0.5) !important;
+            color: #666 !important;
+            font-size: 11px !important;
+            text-align: right !important;
         }
 
         .add-item-form input,
         .add-item-form textarea {
-            background: #333 !important;
+            background: rgba(30, 30, 30, 0.8) !important;
+            border: 1px solid #444 !important;
+            border-radius: 4px !important;
             color: #fff !important;
-            border: 1px solid #555 !important;
-            padding: 5px !important;
-            border-radius: 3px !important;
-            font-family: 'Roboto', sans-serif !important;
+            padding: 8px 12px !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         .add-item-form input:focus,
         .add-item-form textarea:focus {
-            outline: none !important;
             border-color: #00ccff !important;
-            box-shadow: 0 0 3px rgba(0, 204, 255, 0.3) !important;
+            outline: none !important;
+            box-shadow: 0 0 5px rgba(0, 204, 255, 0.3) !important;
+            background: rgba(40, 40, 40, 0.9) !important;
+        }
+
+        .add-item-form input::placeholder,
+        .add-item-form textarea::placeholder {
+            color: #888 !important;
         }
 
         .add-item-form button {
-            background: #00ccff !important;
+            background: linear-gradient(135deg, #00ccff 0%, #0099cc 100%) !important;
             color: #000 !important;
             border: none !important;
-            padding: 8px 15px !important;
-            border-radius: 4px !important;
+            padding: 10px 20px !important;
+            border-radius: 6px !important;
             cursor: pointer !important;
             font-family: 'Orbitron', sans-serif !important;
             font-weight: bold !important;
+            font-size: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
             transition: all 0.3s ease !important;
+            width: 100% !important;
+            margin-top: 10px !important;
         }
 
         .add-item-form button:hover {
-            background: #ff4757 !important;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%) !important;
             color: #fff !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(255, 71, 87, 0.3) !important;
+        }
+
+        /* === ESTILOS MEJORADOS PARA ITEMS === */
+        .item-card-improved {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%) !important;
+            border: 1px solid #444 !important;
+            border-radius: 8px !important;
+            margin-bottom: 15px !important;
+            padding: 0 !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s ease !important;
+            overflow: hidden !important;
+        }
+
+        .item-card-improved:hover {
+            border-color: #00ccff !important;
+            box-shadow: 0 6px 12px rgba(0, 204, 255, 0.2) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .item-header {
+            display: flex !important;
+            align-items: center !important;
+            padding: 12px 15px !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+            border-bottom: 1px solid #444 !important;
+        }
+
+        .item-icon {
+            font-size: 20px !important;
+            margin-right: 12px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .item-title {
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+
+        .item-title h4 {
+            color: #00ccff !important;
+            margin: 0 0 2px 0 !important;
+            font-family: 'Orbitron', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+        }
+
+        .item-type {
+            color: #888 !important;
+            font-size: 10px !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            font-family: 'Orbitron', sans-serif !important;
+        }
+
+        .remove-item-improved {
+            background: #ff4757 !important;
+            color: white !important;
+            border: none !important;
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            flex-shrink: 0 !important;
+            margin-left: 10px !important;
+        }
+
+        .remove-item-improved:hover {
+            background: #ff6b81 !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 0 8px rgba(255, 71, 87, 0.5) !important;
+        }
+
+        .item-description {
+            padding: 12px 15px !important;
+            color: #ccc !important;
+            font-size: 14px !important;
+            line-height: 1.4 !important;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.5) !important;
+        }
+
+        .item-stats-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            gap: 8px !important;
+            padding: 12px 15px !important;
+        }
+
+        .item-stat {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+        }
+
+        .item-stat.full-width {
+            grid-column: 1 / -1 !important;
+        }
+
+        .stat-label {
+            color: #888 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            font-weight: bold !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .stat-value {
+            color: #fff !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+        }
+
+        .item-meta {
+            padding: 8px 15px !important;
+            background: rgba(0, 0, 0, 0.2) !important;
+            border-top: 1px solid rgba(68, 68, 68, 0.5) !important;
+            color: #666 !important;
+            font-size: 11px !important;
+            text-align: right !important;
         }
     </style>
     
@@ -1624,56 +1846,76 @@
                 implant: inventory.filter(item => item.tipo === 'implant' || item.tipo === 'cyberware')
             };
 
-            // Función helper para crear HTML de items con detalles
+            // Función helper para crear HTML de items con detalles mejorada
             function createItemHTML(items, tipo) {
                 if (items.length === 0) {
-                    return `<p style="color: #666;">No hay ${tipo}s</p>`;
+                    return `<p style="color: #666; text-align: center; padding: 20px; font-style: italic;">No hay ${tipo}s equipadas</p>`;
                 }
                 
                 return items.map((item, index) => {
                     let detallesHTML = '';
+                    let iconoTipo = '📦'; // Icono por defecto
                     
-                    // Detalles específicos según el tipo
+                    // Iconos y detalles específicos según el tipo
                     if (item.tipo === 'arma' || item.tipo === 'armas') {
+                        iconoTipo = '⚔️';
                         detallesHTML = `
-                            ${item.dano ? `<div class="item-stat"><strong>Daño:</strong> ${item.dano}</div>` : ''}
-                            ${item.ap ? `<div class="item-stat"><strong>PA:</strong> ${item.ap}</div>` : ''}
-                            ${item.alcance ? `<div class="item-stat"><strong>Alcance:</strong> ${item.alcance}</div>` : ''}
-                            ${item.municion ? `<div class="item-stat"><strong>Munición:</strong> ${item.municion}</div>` : ''}
+                            ${item.dano ? `<div class="item-stat"><span class="stat-label">Daño:</span> <span class="stat-value">${item.dano}</span></div>` : ''}
+                            ${item.ap ? `<div class="item-stat"><span class="stat-label">PA:</span> <span class="stat-value">${item.ap}</span></div>` : ''}
+                            ${item.alcance ? `<div class="item-stat"><span class="stat-label">Alcance:</span> <span class="stat-value">${item.alcance}</span></div>` : ''}
+                            ${item.municion ? `<div class="item-stat"><span class="stat-label">Munición:</span> <span class="stat-value">${item.municion}</span></div>` : ''}
                         `;
                     } else if (item.tipo === 'armadura' || item.tipo === 'armaduras') {
+                        iconoTipo = '🛡️';
                         detallesHTML = `
-                            ${item.proteccion ? `<div class="item-stat"><strong>Protección:</strong> ${item.proteccion}</div>` : ''}
-                            ${item.peso ? `<div class="item-stat"><strong>Peso:</strong> ${item.peso}</div>` : ''}
+                            ${item.proteccion ? `<div class="item-stat"><span class="stat-label">Protección:</span> <span class="stat-value">${item.proteccion}</span></div>` : ''}
+                            ${item.cobertura ? `<div class="item-stat"><span class="stat-label">Cobertura:</span> <span class="stat-value">${item.cobertura}</span></div>` : ''}
                         `;
                     } else if (item.tipo === 'implant' || item.tipo === 'cyberware') {
+                        iconoTipo = '🔧';
                         detallesHTML = `
-                            ${item.efectos ? `<div class="item-stat"><strong>Efectos:</strong> ${item.efectos}</div>` : ''}
+                            ${item.efectos ? `<div class="item-stat"><span class="stat-label">Efectos:</span> <span class="stat-value">${item.efectos}</span></div>` : ''}
+                        `;
+                    } else if (item.tipo === 'equipo') {
+                        iconoTipo = '🎒';
+                        detallesHTML = `
+                            ${item.efectos ? `<div class="item-stat"><span class="stat-label">Efectos:</span> <span class="stat-value">${item.efectos}</span></div>` : ''}
+                        `;
+                    } else if (item.tipo === 'municion') {
+                        iconoTipo = '🎯';
+                        detallesHTML = `
+                            ${item.compatible ? `<div class="item-stat"><span class="stat-label">Compatible:</span> <span class="stat-value">${item.compatible}</span></div>` : ''}
+                            ${item.cantidad ? `<div class="item-stat"><span class="stat-label">Cantidad:</span> <span class="stat-value">${item.cantidad}</span></div>` : ''}
                         `;
                     }
                     
                     // Información común para todos los tipos
                     const infoComun = `
-                        ${item.coste ? `<div class="item-stat"><strong>Coste:</strong> ${item.coste} PM</div>` : ''}
-                        ${item.notas ? `<div class="item-stat"><strong>Notas:</strong> ${item.notas}</div>` : ''}
+                        ${item.coste ? `<div class="item-stat"><span class="stat-label">Coste:</span> <span class="stat-value">${item.coste} PM</span></div>` : ''}
+                        ${item.notas ? `<div class="item-stat full-width"><span class="stat-label">Notas:</span> <span class="stat-value">${item.notas}</span></div>` : ''}
                     `;
                     
-                    // Usar ID único en lugar de índice
+                    // Usar ID único
                     const itemId = item.id || `item-${Date.now()}-${Math.random()}`;
                     
                     return `
-                        <div class="item-card" style="margin-bottom: 15px; padding: 12px; background: rgba(30, 30, 30, 0.8); border: 1px solid #444; border-radius: 4px;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <h4 style="color: #00ccff; margin: 0; font-family: 'Orbitron', sans-serif;">${item.nombre}</h4>
-                                <button class="remove-item" onclick="removeItemById('${itemId}')" style="background-color: #ff4757; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; line-height: 1;" title="Eliminar item">
+                        <div class="item-card-improved">
+                            <div class="item-header">
+                                <div class="item-icon">${iconoTipo}</div>
+                                <div class="item-title">
+                                    <h4>${item.nombre}</h4>
+                                    <span class="item-type">${item.tipo.toUpperCase()}</span>
+                                </div>
+                                <button class="remove-item-improved" onclick="removeItemById('${itemId}')" title="Eliminar item">
                                     ✕
                                 </button>
                             </div>
-                            ${item.descripcion ? `<p style="color: #ccc; margin: 0 0 8px 0; font-size: 14px;">${item.descripcion}</p>` : ''}
-                            <div class="item-details" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 5px; font-size: 12px;">
+                            ${item.descripcion ? `<div class="item-description">${item.descripcion}</div>` : ''}
+                            <div class="item-stats-grid">
                                 ${detallesHTML}
                                 ${infoComun}
                             </div>
+                            ${item.fechaCompra ? `<div class="item-meta">Adquirido: ${new Date(item.fechaCompra).toLocaleDateString()}</div>` : ''}
                         </div>
                     `;
                 }).join('');
@@ -1805,7 +2047,7 @@
                 
                 // Timestamp de guardado
                 lastSaved: new Date().toISOString(),
-                version: '0.76'
+                version: '0.77'
             };
             
             console.log('📋 Datos recopilados:', characterData);
