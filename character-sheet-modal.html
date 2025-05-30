@@ -807,6 +807,25 @@
                     </select>
                 </div>
                 
+                <!-- Botones de Administración -->
+                <div class="points-counter" style="margin-bottom: 20px; background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; border-radius: 4px; padding: 15px;">
+                    <h3 style="color: #ff4757; margin-bottom: 10px;">🔧 Administración del Inventario</h3>
+                    <p style="font-size: 11px; color: #aaa; margin-bottom: 10px;">
+                        Funciones para limpiar duplicados y gestionar items problemáticos del inventario.
+                    </p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="quickCleanDuplicates()" style="background: #ffa502; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
+                            🧹 LIMPIAR DUPLICADOS
+                        </button>
+                        <button onclick="showInventoryStats()" style="background: #70a1ff; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
+                            📊 ESTADÍSTICAS
+                        </button>
+                        <button onclick="showAdminMenu()" style="background: #ff4757; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
+                            ⚠️ ADMIN COMPLETO
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="grid">
                     <div class="item">
                         <h3>COG</h3>
@@ -2801,6 +2820,89 @@
         console.log('🔧 Funciones de prueba disponibles: testImprovedItemSystem() y clearTestItems()');
         
         // =================== FIN FUNCIÓN DE PRUEBA ===================
+        
+        // ================= FUNCIONES DE ADMINISTRACIÓN =================
+        
+        // Función para limpiar duplicados rápidamente (interfaz)
+        window.quickCleanDuplicates = function() {
+            if (window.parent && window.parent.cleanFirebaseDuplicates) {
+                window.parent.cleanFirebaseDuplicates().then(result => {
+                    alert('Resultado: ' + result);
+                }).catch(error => {
+                    alert('Error: ' + error);
+                });
+            } else {
+                alert('Función no disponible. Usa la consola: cleanFirebaseDuplicates()');
+            }
+        };
+        
+        // Función para mostrar estadísticas (interfaz)
+        window.showInventoryStats = function() {
+            if (window.parent && window.parent.showInventoryStats) {
+                window.parent.showInventoryStats().then(stats => {
+                    if (stats) {
+                        const message = `📊 Estadísticas del Inventario:
+Total: ${stats.total}
+Armas: ${stats.armas}
+Armaduras: ${stats.armaduras}
+Equipo: ${stats.equipo}
+Cyberware: ${stats.cyberware}
+Munición: ${stats.municion}
+Sin ID: ${stats.sinID}
+Duplicados: ${stats.duplicados}`;
+                        alert(message);
+                    }
+                });
+            } else {
+                alert('Función no disponible. Usa la consola: showInventoryStats()');
+            }
+        };
+        
+        // Función para mostrar menú de administración completo
+        window.showAdminMenu = function() {
+            const choice = prompt(`🔧 ADMINISTRACIÓN AVANZADA
+
+Elige una opción:
+1 - Limpiar solo duplicados (recomendado)
+2 - Ver lista completa de items
+3 - Eliminar TODO el inventario (PELIGROSO)
+4 - Cancelar
+
+Introduce el número (1-4):`);
+            
+            if (!choice || choice === '4') {
+                return;
+            }
+            
+            switch(choice) {
+                case '1':
+                    quickCleanDuplicates();
+                    break;
+                case '2':
+                    if (window.parent && window.parent.listAllItems) {
+                        window.parent.listAllItems();
+                        alert('Lista completa en la consola (F12)');
+                    } else {
+                        alert('Función no disponible. Usa la consola: listAllItems()');
+                    }
+                    break;
+                case '3':
+                    if (confirm('⚠️ PELIGRO: Esto eliminará TODOS los items.\n¿Estás COMPLETAMENTE seguro?')) {
+                        if (window.parent && window.parent.clearFirebaseInventory) {
+                            window.parent.clearFirebaseInventory().then(result => {
+                                alert('Resultado: ' + result);
+                            });
+                        } else {
+                            alert('Función no disponible. Usa la consola: clearFirebaseInventory()');
+                        }
+                    }
+                    break;
+                default:
+                    alert('Opción no válida');
+            }
+        };
+        
+        // ================ FIN FUNCIONES DE ADMINISTRACIÓN ===============
     </script>
 </body>
 </html> 

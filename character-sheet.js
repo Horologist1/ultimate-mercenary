@@ -477,4 +477,224 @@ function updateCharacterSheetInFirebase(data) {
             console.error('❌ Error guardando ficha en Firebase:', error);
         });
     }
-} 
+}
+
+// =================== FUNCIONES ADMINISTRATIVAS DE FIREBASE ===================
+
+// Función para limpiar completamente el inventario de Firebase
+window.clearFirebaseInventory = function() {
+    if (!confirm('⚠️ ATENCIÓN: Esto eliminará TODOS los items del inventario en Firebase.\n¿Estás completamente seguro?')) {
+        return 'Operación cancelada';
+    }
+    
+    if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán TODOS los items.\n¿Continuar?')) {
+        return 'Operación cancelada';
+    }
+    
+    console.log('🧹 Limpiando inventario de Firebase...');
+    
+    if (window.database) {
+        return window.database.ref('itemsComprados').set(null).then(() => {
+            window.inventory = [];
+            notifyModals();
+            console.log('✅ Inventario de Firebase completamente limpio');
+            return 'Inventario de Firebase limpiado completamente';
+        }).catch(error => {
+            console.error('❌ Error limpiando Firebase:', error);
+            return 'Error al limpiar Firebase';
+        });
+    }
+    
+    return 'Firebase no disponible';
+};
+
+// Función para eliminar duplicados de Firebase manteniendo solo una copia de cada item
+window.cleanFirebaseDuplicates = function() {
+    console.log('🔍 Analizando duplicados en Firebase...');
+    
+    if (!window.database) {
+        return 'Firebase no disponible';
+    }
+    
+    return window.database.ref('itemsComprados').once('value').then(snapshot => {
+        const data = snapshot.val();
+        
+        if (!data || !Array.isArray(data)) {
+            console.log('📦 No hay items en Firebase para limpiar');
+            return 'No hay items para limpiar';
+        }
+        
+        const originalLength = data.length;
+        const seen = new Map();
+        const cleanedItems = [];
+        
+        data.forEach((item, index) => {
+            if (!item || !item.nombre) {
+                console.log(`🗑️ Eliminando item inválido en índice ${index}`);
+                return; // Skip invalid items
+            }
+            
+            // Crear clave única basada en propiedades principales
+            const key = `${item.nombre}-${item.tipo}-${item.dano || ''}-${item.proteccion || ''}`;
+            
+            if (seen.has(key)) {
+                console.log('🗑️ Duplicado encontrado:', item.nombre);
+                return; // Skip duplicate
+            }
+            
+            // Asegurar que el item tiene ID único
+            if (!item.id) {
+                item.id = `fixed-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                console.log('🔧 ID asignado a:', item.nombre);
+            }
+            
+            // Asegurar que tiene fecha de compra
+            if (!item.fechaCompra) {
+                item.fechaCompra = new Date().toISOString();
+            }
+            
+            seen.set(key, true);
+            cleanedItems.push(item);
+        });
+        
+        const removedCount = originalLength - cleanedItems.length;
+        
+        if (removedCount > 0) {
+            console.log(`🧹 Eliminando ${removedCount} duplicados de Firebase...`);
+            
+            return window.database.ref('itemsComprados').set(cleanedItems).then(() => {
+                window.inventory = cleanedItems;
+                notifyModals();
+                const message = `✅ ${removedCount} duplicados eliminados de Firebase`;
+                console.log(message);
+                return message;
+            });
+        } else {
+            console.log('✅ No se encontraron duplicados en Firebase');
+            return 'No se encontraron duplicados';
+        }
+    }).catch(error => {
+        console.error('❌ Error limpiando duplicados:', error);
+        return 'Error al limpiar duplicados';
+    });
+};
+
+// Función para mostrar estadísticas del inventario
+window.showInventoryStats = function() {
+    if (!window.database) {
+        console.log('Firebase no disponible');
+        return;
+    }
+    
+    return window.database.ref('itemsComprados').once('value').then(snapshot => {
+        const data = snapshot.val();
+        
+        if (!data || !Array.isArray(data)) {
+            console.log('📊 Inventario vacío');
+            return;
+        }
+        
+        const stats = {
+            total: data.length,
+            armas: 0,
+            armaduras: 0,
+            equipo: 0,
+            cyberware: 0,
+            municion: 0,
+            sinID: 0,
+            duplicados: 0
+        };
+        
+        const seen = new Map();
+        
+        data.forEach(item => {
+            if (!item || !item.nombre) return;
+            
+            // Contar por tipo
+            const tipo = item.tipo || 'desconocido';
+            if (stats[tipo] !== undefined) {
+                stats[tipo]++;
+            }
+            
+            // Contar items sin ID
+            if (!item.id) {
+                stats.sinID++;
+            }
+            
+            // Detectar duplicados
+            const key = `${item.nombre}-${item.tipo}`;
+            if (seen.has(key)) {
+                stats.duplicados++;
+            } else {
+                seen.set(key, true);
+            }
+        });
+        
+        console.log('📊 Estadísticas del Inventario:');
+        console.log(`   Total de items: ${stats.total}`);
+        console.log(`   Armas: ${stats.armas}`);
+        console.log(`   Armaduras: ${stats.armaduras}`);
+        console.log(`   Equipo: ${stats.equipo}`);
+        console.log(`   Cyberware: ${stats.cyberware}`);
+        console.log(`   Munición: ${stats.municion}`);
+        console.log(`   Sin ID: ${stats.sinID}`);
+        console.log(`   Duplicados: ${stats.duplicados}`);
+        
+        return stats;
+    });
+};
+
+// Función para listar todos los items con detalles
+window.listAllItems = function() {
+    if (!window.database) {
+        console.log('Firebase no disponible');
+        return;
+    }
+    
+    return window.database.ref('itemsComprados').once('value').then(snapshot => {
+        const data = snapshot.val();
+        
+        if (!data || !Array.isArray(data)) {
+            console.log('📦 No hay items en Firebase');
+            return;
+        }
+        
+        console.log('📋 Lista completa de items:');
+        data.forEach((item, index) => {
+            if (!item) {
+                console.log(`${index}: [ITEM NULO]`);
+                return;
+            }
+            
+            const id = item.id || 'SIN ID';
+            const name = item.nombre || 'SIN NOMBRE';
+            const type = item.tipo || 'SIN TIPO';
+            
+            console.log(`${index}: [${id}] ${name} (${type})`);
+        });
+        
+        return data;
+    });
+};
+
+console.log('🔧 Funciones administrativas disponibles:');
+console.log('   clearFirebaseInventory() - Limpia todo el inventario');
+console.log('   cleanFirebaseDuplicates() - Elimina solo duplicados');
+console.log('   showInventoryStats() - Muestra estadísticas');
+console.log('   listAllItems() - Lista todos los items');
+
+// Función para limpiar todo el inventario
+window.clearInventory = function() {
+    if (confirm('¿Estás seguro de que quieres limpiar TODO el inventario? Esta acción no se puede deshacer.')) {
+        window.inventory = [];
+        console.log('🧹 Inventario limpiado localmente');
+        
+        // Actualizar Firebase usando la función helper
+        if (window.database && window.updateFirebaseInventory) {
+            window.updateFirebaseInventory();
+        }
+        
+        // Notificar a modales
+        notifyModals();
+    }
+}; 
