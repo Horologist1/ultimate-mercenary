@@ -170,4 +170,24 @@ class CharacterSheet {
 // Inicializar character sheet
 window.characterSheet = new CharacterSheet();
 
+// Función de test para verificar comunicación con la tienda
+window.testInventorySystem = function() {
+    console.log('🧪 Probando sistema de inventario...');
+    
+    // Test 1: Añadir item de prueba
+    const testItem = {
+        nombre: "Item de Prueba",
+        tipo: "equipo", 
+        descripcion: "Este es un item de prueba"
+    };
+    
+    const result = window.addItemToInventory(testItem);
+    console.log('✅ Item de prueba añadido:', result);
+    
+    // Test 2: Verificar estado
+    const debug = window.debugInventorySystem();
+    
+    return debug;
+};
+
 console.log('🎮 Sistema básico cargado. Usa debugInventorySystem() para diagnosticar.'); 
