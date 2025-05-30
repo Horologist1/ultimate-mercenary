@@ -1,37 +1,55 @@
 // Exponer la función globalmente desde el inicio
 window.clearPurchasedItems = function() {
     if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
+        console.log('🧹 Iniciando limpieza de items comprados (character-sheet.js)...');
+        
+        // Activar flag para ignorar Firebase temporalmente
+        window.justCleared = true;
+        
         // Limpiar del character sheet
         if (window.characterSheet) {
             window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
                 item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
             );
             window.characterSheet.implants = [];
+            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
         }
         
         // Limpiar de localStorage
         localStorage.removeItem('itemsComprados');
-        if (window.characterSheet) {
-            localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
-        }
+        localStorage.removeItem('inventory');
         
         // Limpiar de Firebase
         if (window.database) {
             window.database.ref('itemsComprados').remove().then(() => {
-                console.log('Items comprados eliminados de Firebase');
-                alert('Items comprados eliminados correctamente');
+                console.log('✅ Items comprados eliminados de Firebase');
+                
+                // Actualizar UI
+                if (typeof updateEquipmentUI === 'function') {
+                    updateEquipmentUI();
+                }
+                if (typeof updateUI === 'function') {
+                    updateUI();
+                }
+                
+                // Reactivar listener después de 3 segundos
+                setTimeout(() => {
+                    window.justCleared = false;
+                    console.log('🔄 Listener de Firebase reactivado');
+                }, 3000);
+                
+                alert('✅ Items comprados eliminados correctamente');
             }).catch(error => {
-                console.error('Error al limpiar Firebase:', error);
-                alert('Error al limpiar Firebase: ' + error.message);
+                console.error('❌ Error al limpiar Firebase:', error);
+                window.justCleared = false; // Reactivar incluso si hay error
+                alert('⚠️ Error al limpiar Firebase: ' + error.message);
             });
-        }
-        
-        // Actualizar UI
-        if (typeof updateEquipmentUI === 'function') {
-            updateEquipmentUI();
-        }
-        if (typeof updateUI === 'function') {
-            updateUI();
+        } else {
+            // Si no hay Firebase, solo reactivar el flag después de un tiempo
+            setTimeout(() => {
+                window.justCleared = false;
+            }, 3000);
+            alert('Firebase no disponible, solo se limpiaron los datos locales');
         }
     }
 };
@@ -259,24 +277,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Referencia a itemsComprados en Firebase
     const itemsCompradosRef = window.database.ref('itemsComprados');
 
-    // Función para sincronizar el inventario con Firebase
-    // COMENTADO: Esta función causa conflictos con la tienda
-    /*
-    function syncInventoryToFirebase() {
-        const allItems = [...window.characterSheet.equipment, ...window.characterSheet.implants];
-        itemsCompradosRef.set(allItems);
-    }
-    */
-
-    // Listener para cambios en Firebase
+    // Variable para controlar si acabamos de limpiar
+    window.justCleared = false;
+    
+    // LISTENER MAESTRO ÚNICO para itemsComprados
+    // Este es el único listener activo, maneja todo el inventario
     itemsCompradosRef.on('value', (snapshot) => {
         const data = snapshot.val();
+        
+        // Si acabamos de limpiar, ignorar los siguientes cambios por un tiempo
+        if (window.justCleared) {
+            console.log('🚫 Ignorando cambios de Firebase debido a limpieza reciente');
+            return;
+        }
+        
+        console.log('📦 [MASTER LISTENER] Datos recibidos de Firebase:', data);
+        
         if (data) {
-            console.log('Firebase data received:', data);
-            
             // Separar items por tipo
             const firebaseItems = Array.isArray(data) ? data : Object.values(data);
-            console.log('Firebase items processed:', firebaseItems);
+            console.log('📦 Items procesados:', firebaseItems.length);
+            
+            // Si Firebase está vacío, no añadir nada
+            if (firebaseItems.length === 0) {
+                console.log('📦 Firebase vacío, no añadiendo items');
+                return;
+            }
             
             const newEquipment = firebaseItems.filter(item => 
                 item.tipo === 'arma' || item.tipo === 'armadura' || item.tipo === 'equipo'
@@ -302,10 +328,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const itemKey = createItemKey(item);
                 if (!existingEquipmentKeys.includes(itemKey)) {
                     window.characterSheet.equipment.push(item);
-                    console.log('Nuevo item de equipo añadido desde Firebase:', item.nombre);
+                    console.log('✅ Nuevo item de equipo añadido:', item.nombre);
                     itemsAdded = true;
                 } else {
-                    console.log('Item de equipo ya existe, saltando:', item.nombre);
+                    console.log('⏭️ Item de equipo ya existe:', item.nombre);
                 }
             });
             
@@ -313,17 +339,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 const itemKey = createItemKey(item);
                 if (!existingImplantKeys.includes(itemKey)) {
                     window.characterSheet.implants.push(item);
-                    console.log('Nuevo implante añadido desde Firebase:', item.nombre);
+                    console.log('✅ Nuevo implante añadido:', item.nombre);
                     itemsAdded = true;
                 } else {
-                    console.log('Implante ya existe, saltando:', item.nombre);
+                    console.log('⏭️ Implante ya existe:', item.nombre);
                 }
             });
             
-            // Solo actualizar UI y guardar si se añadieron items nuevos
+            // Solo actualizar si se añadieron items nuevos
             if (itemsAdded) {
-                // Guardar en localStorage para compatibilidad
+                // Guardar en localStorage
                 localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                localStorage.setItem('inventory', JSON.stringify(firebaseItems));
+                
+                // Actualizar UI del character sheet
+                if (typeof updateEquipmentUI === 'function') {
+                    updateEquipmentUI();
+                }
+                if (typeof updateUI === 'function') {
+                    updateUI();
+                }
+                
+                // Actualizar UI del modal si está abierto
+                updateModalInventory(firebaseItems);
+                
+                console.log('🔄 UI actualizada - Items nuevos añadidos');
+            }
+        } else {
+            // Si Firebase está vacío (null), limpiar también localmente
+            console.log('🧹 Firebase vacío, limpiando items localmente');
+            if (window.characterSheet) {
+                window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
+                    item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
+                );
+                window.characterSheet.implants = [];
                 
                 // Actualizar UI
                 if (typeof updateEquipmentUI === 'function') {
@@ -332,6 +381,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (typeof updateUI === 'function') {
                     updateUI();
                 }
+                
+                // Limpiar modal también
+                updateModalInventory([]);
             }
         }
     });
@@ -364,7 +416,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
             });
             updateEquipmentUI();
-            // syncInventoryToFirebase(); // Sincronizar después de añadir - COMENTADO
         }
     }
 
@@ -779,12 +830,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeEquipmentItem = function(index) {
         window.characterSheet.equipment.splice(index, 1);
         updateEquipmentUI();
-        // syncInventoryToFirebase(); // Sincronizar después de eliminar - COMENTADO
     };
     function removeImplant(index) {
         window.characterSheet.implants.splice(index, 1);
         updateEquipmentUI();
-        // syncInventoryToFirebase(); // Sincronizar después de eliminar - COMENTADO
     }
 
     // --- NUEVO: Efectos de implantes ---
@@ -1025,9 +1074,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             implantsList.appendChild(div);
         });
-        
-        // Sincronizar con Firebase después de actualizar la UI
-        // syncInventoryToFirebase(); // Sincronizar después de actualizar la UI - COMENTADO
     }
 
     // --- MODIFICADO: Aplicar efectos de implantes a la ficha ---
@@ -1096,4 +1142,88 @@ document.addEventListener('DOMContentLoaded', function() {
             updateUI();
         });
     }
+
+    // Función para actualizar el inventario del modal
+    function updateModalInventory(items) {
+        // Buscar el iframe del modal de estadísticas
+        const statsIframe = document.querySelector('iframe[src="character-sheet-modal.html"]');
+        if (statsIframe && statsIframe.contentWindow) {
+            try {
+                // Enviar items al modal
+                statsIframe.contentWindow.postMessage({
+                    type: 'updateInventory',
+                    items: items
+                }, '*');
+                console.log('📤 Inventario enviado al modal');
+            } catch (error) {
+                console.log('⚠️ No se pudo enviar al modal (puede no estar cargado)');
+            }
+        }
+        
+        // También actualizar la variable global inventory si existe
+        if (typeof window.inventory !== 'undefined') {
+            window.inventory = items;
+        }
+    }
+
+    // Función para eliminar items desde el modal
+    window.removeItemFromInventory = function(index) {
+        console.log('🗑️ Solicitud de eliminación de item:', index);
+        
+        // Obtener todos los items actuales
+        const allItems = [
+            ...(window.characterSheet.equipment || []),
+            ...(window.characterSheet.implants || [])
+        ];
+        
+        if (index >= 0 && index < allItems.length) {
+            const itemToRemove = allItems[index];
+            console.log('🗑️ Eliminando item:', itemToRemove.nombre);
+            
+            // Determinar si es equipment o implant y eliminarlo del array correcto
+            if (itemToRemove.tipo === 'arma' || itemToRemove.tipo === 'armadura' || itemToRemove.tipo === 'equipo') {
+                const equipIndex = window.characterSheet.equipment.findIndex(item => 
+                    item.nombre === itemToRemove.nombre && item.tipo === itemToRemove.tipo
+                );
+                if (equipIndex !== -1) {
+                    window.characterSheet.equipment.splice(equipIndex, 1);
+                }
+            } else if (itemToRemove.tipo === 'implant' || itemToRemove.tipo === 'implante') {
+                const implantIndex = window.characterSheet.implants.findIndex(item => 
+                    item.nombre === itemToRemove.nombre && item.tipo === itemToRemove.tipo
+                );
+                if (implantIndex !== -1) {
+                    window.characterSheet.implants.splice(implantIndex, 1);
+                }
+            }
+            
+            // Actualizar Firebase con la nueva lista
+            const updatedItems = [
+                ...(window.characterSheet.equipment || []),
+                ...(window.characterSheet.implants || [])
+            ];
+            
+            if (window.database) {
+                const itemsCompradosRef = window.database.ref('itemsComprados');
+                itemsCompradosRef.set(updatedItems).then(() => {
+                    console.log('✅ Firebase actualizado después de eliminación');
+                    
+                    // Actualizar localStorage
+                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
+                    
+                    // Actualizar UI
+                    if (typeof updateEquipmentUI === 'function') {
+                        updateEquipmentUI();
+                    }
+                    if (typeof updateUI === 'function') {
+                        updateUI();
+                    }
+                }).catch(error => {
+                    console.error('❌ Error al actualizar Firebase:', error);
+                });
+            }
+        } else {
+            console.error('❌ Índice de item inválido:', index);
+        }
+    };
 });
