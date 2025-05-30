@@ -512,6 +512,8 @@
             transition: all 0.2s ease !important;
             flex-shrink: 0 !important;
             margin-left: 10px !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
 
         .remove-item-improved:hover {
@@ -691,6 +693,8 @@
             transition: all 0.2s ease !important;
             flex-shrink: 0 !important;
             margin-left: 10px !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
 
         .remove-item-improved:hover {
@@ -2721,6 +2725,60 @@
             
             console.log('🤖 Implante añadido:', implant);
         };
+
+        // ====================== FUNCIÓN DE PRUEBA ======================
+        
+        // Función para probar el sistema de items mejorado
+        window.testImprovedItemSystem = function() {
+            console.log('🧪 Probando sistema de items mejorado...');
+            
+            // Añadir algunos items de prueba
+            const testItems = [
+                {
+                    nombre: 'Katana de Prueba',
+                    tipo: 'arma',
+                    descripcion: 'Arma de prueba para verificar el sistema',
+                    dano: '2d10+5',
+                    ap: '-3',
+                    notas: 'Monomolecular',
+                    coste: 500
+                },
+                {
+                    nombre: 'Armadura de Prueba',
+                    tipo: 'armadura',
+                    descripcion: 'Armadura de prueba',
+                    proteccion: '10/15',
+                    cobertura: 'Cuerpo completo',
+                    coste: 300
+                }
+            ];
+            
+            testItems.forEach(item => {
+                // Simular añadir item al inventario
+                inventory.push({
+                    ...item,
+                    id: `test-${Date.now()}-${Math.random()}`,
+                    fechaCompra: new Date().toISOString(),
+                    origen: 'prueba'
+                });
+            });
+            
+            console.log('📦 Items de prueba añadidos:', inventory.length);
+            updateInventoryDisplay();
+            
+            return 'Sistema probado - revisa la ficha de personaje';
+        };
+        
+        // Función para limpiar items de prueba
+        window.clearTestItems = function() {
+            inventory = inventory.filter(item => item.origen !== 'prueba');
+            updateInventoryDisplay();
+            console.log('🧹 Items de prueba eliminados');
+        };
+        
+        console.log('🔧 Funciones de prueba disponibles: testImprovedItemSystem() y clearTestItems()');
+        
+        // =================== FIN FUNCIÓN DE PRUEBA ===================
     </script>
 </body>
 </html> 
