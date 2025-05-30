@@ -1789,47 +1789,10 @@
         }
     };
 
-    // Sistema de inventario
-    window.inventory = {
-        items: [],
-
-        init() {
-            // Cargar items guardados
-            const saved = localStorage.getItem('inventory');
-            if (saved) {
-                this.items = JSON.parse(saved);
-            }
-        },
-
-        addItem(item) {
-            this.items.push(item);
-            this.save();
-            this.notifyFicha();
-        },
-
-        getItems() {
-            return this.items;
-        },
-
-        save() {
-            localStorage.setItem('inventory', JSON.stringify(this.items));
-        },
-
-        notifyFicha() {
-            if (window.fichaIframe && window.fichaIframe.contentWindow) {
-                window.fichaIframe.contentWindow.postMessage({
-                    type: 'updateInventory',
-                    items: this.items
-                }, '*');
-            }
-        }
-    };
-
-    // Inicializar sistemas
+    // Inicializar solo el sistema PM
     window.pmTransactions.init();
-    window.inventory.init();
 
-    // Escuchar mensajes de los iframes
+    // Escuchar mensajes de los iframes (solo PM)
     window.addEventListener('message', function(event) {
         if (event.data && event.data.type === 'getPM') {
             // Responder con el total actual
@@ -1837,23 +1800,11 @@
                 type: 'updatePM',
                 total: window.pmTransactions.getTotal()
             }, '*');
-        } else if (event.data && event.data.type === 'addItem') {
-            // Añadir item al inventario
-            const item = event.data.item;
-            if (item) {
-                window.inventory.addItem(item);
-            }
         } else if (event.data && event.data.type === 'setPM') {
             // Establecer PM desde el panel de control
             if (window.pmTransactions) {
                 window.pmTransactions.setTotal(event.data.total);
             }
-        } else if (event.data && event.data.type === 'getInventory') {
-            // Responder con el inventario actual
-            event.source.postMessage({
-                type: 'updateInventory',
-                items: window.inventory.getItems()
-            }, '*');
         }
     });
 

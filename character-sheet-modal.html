@@ -461,151 +461,24 @@
             transform: scale(1.1) !important;
         }
     </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
-            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
-            projectId: "ultimatemercenary-1e212",
-            storageBucket: "ultimatemercenary-1e212.appspot.com",
-            messagingSenderId: "683730871364",
-            appId: "1:683730871364:web:350aaf7a296ad34db28811",
-            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const itemsCompradosRef = ref(database, 'itemsComprados');
-        
-        // Hacer disponibles globalmente para el resto del código
-        window.firebaseApp = app;
-        window.firebaseDatabase = database;
-        window.itemsCompradosRef = itemsCompradosRef;
-        window.onValueFirebase = onValue;
-    </script>
     
     <script>
-        // Función global para limpiar items comprados (disponible inmediatamente)
+        // SISTEMA SIMPLIFICADO: Solo delegación al listener maestro de character-sheet.js
+        // Eliminar funciones duplicadas - usar las del padre
+        
         window.clearPurchasedItems = function() {
-            if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
-                console.log('🧹 Iniciando limpieza de items comprados...');
-                
-                // 1. Desactivar temporalmente todos los listeners de Firebase
-                const listenersToDisable = [];
-                
-                // Desactivar listener del index-user.html
-                if (window.parent && window.parent.database) {
-                    const parentItemsRef = window.parent.database.ref('itemsComprados');
-                    parentItemsRef.off();
-                    listenersToDisable.push(() => {
-                        parentItemsRef.on('value', (snapshot) => {
-                            const data = snapshot.val();
-                            if (data) {
-                                localStorage.setItem('itemsComprados', JSON.stringify(data));
-                            }
-                        });
-                    });
-                }
-                
-                // 2. Limpiar datos locales inmediatamente
-                if (window.characterSheet) {
-                    window.characterSheet.equipment = window.characterSheet.equipment.filter(item => 
-                        item.nombre === 'Pistola de Autodefensa "Pocket Pal Mk.II"'
-                    );
-                    window.characterSheet.implants = [];
-                    localStorage.setItem('characterSheet', window.characterSheet.exportToJSON());
-                }
-                
-                // Limpiar todos los almacenamientos relacionados
-                localStorage.removeItem('itemsComprados');
-                localStorage.removeItem('inventory');
-                inventory = [];
-                
-                // 3. Limpiar Firebase usando ambas referencias disponibles
-                const clearFirebase = async () => {
-                    const promises = [];
-                    
-                    // Limpiar usando Firebase v9+ (character-sheet-modal.html)
-                    if (window.firebaseDatabase) {
-                        try {
-                            // Usar la nueva sintaxis de Firebase v9+
-                            const { getDatabase, ref, remove } = await import('https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js');
-                            const itemsRef = ref(window.firebaseDatabase, 'itemsComprados');
-                            promises.push(remove(itemsRef));
-                        } catch (error) {
-                            console.error('Error con Firebase v9+:', error);
-                        }
-                    }
-                    
-                    // Limpiar usando Firebase v8 (index-user.html)
-                    if (window.parent && window.parent.database) {
-                        const itemsRef = window.parent.database.ref('itemsComprados');
-                        promises.push(itemsRef.remove());
-                    }
-                    
-                    // Ejecutar todas las limpiezas en paralelo
-                    try {
-                        await Promise.all(promises);
-                        console.log('✅ Firebase limpiado correctamente');
-                        
-                        // 4. Esperar un momento antes de reactivar listeners
-                        setTimeout(() => {
-                            // Reactivar listeners
-                            listenersToDisable.forEach(reactivate => reactivate());
-                            
-                            // Forzar actualización de UI
-                            if (typeof updateEquipmentUI === 'function') {
-                                updateEquipmentUI();
-                            }
-                            if (typeof updateUI === 'function') {
-                                updateUI();
-                            }
-                            updateInventoryDisplay();
-                            
-                            alert('✅ Items comprados eliminados correctamente');
-                            console.log('🔄 Listeners reactivados');
-                        }, 2000); // Esperar 2 segundos
-                        
-                    } catch (error) {
-                        console.error('❌ Error al limpiar Firebase:', error);
-                        // Reactivar listeners incluso si hay error
-                        listenersToDisable.forEach(reactivate => reactivate());
-                        alert('⚠️ Error al limpiar Firebase: ' + error.message);
-                    }
-                };
-                
-                clearFirebase();
+            if (window.parent && window.parent.clearPurchasedItems) {
+                window.parent.clearPurchasedItems();
+            } else {
+                alert('Función no disponible desde el modal');
             }
         };
         
-        // Función adicional para eliminar COMPLETAMENTE Firebase (más agresiva)
         window.nuclearClearItems = function() {
-            if (confirm('🚨 LIMPIEZA NUCLEAR: ¿Estás COMPLETAMENTE seguro? Esto eliminará TODO.')) {
-                // Eliminar TODO el nodo de Firebase
-                const clearAll = async () => {
-                    try {
-                        if (window.parent && window.parent.database) {
-                            await window.parent.database.ref('itemsComprados').set(null);
-                        }
-                        if (window.firebaseDatabase) {
-                            const { getDatabase, ref, set } = await import('https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js');
-                            const itemsRef = ref(window.firebaseDatabase, 'itemsComprados');
-                            await set(itemsRef, null);
-                        }
-                        
-                        // Limpiar todo localmente
-                        localStorage.clear();
-                        
-                        alert('🧨 Limpieza nuclear completada. Recargando página...');
-                        window.location.reload();
-                    } catch (error) {
-                        console.error('Error en limpieza nuclear:', error);
-                        alert('Error: ' + error.message);
-                    }
-                };
-                clearAll();
+            if (window.parent && window.parent.fullReset) {
+                window.parent.fullReset();
+            } else {
+                alert('Función no disponible desde el modal');
             }
         };
     </script>
@@ -1516,23 +1389,21 @@
             }
         });
 
-        // Sistema de inventario - RECIBE datos del listener maestro (character-sheet.js)
+        // SISTEMA UNIFICADO: Solo recibe datos del listener maestro
+        // NO maneja Firebase directamente
+        
         let inventory = [];
 
-        // Escuchar mensajes del padre (character-sheet.js)
+        // Escuchar mensajes del padre (character-sheet.js) - ÚNICO CANAL DE DATOS
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'updateInventory') {
                 inventory = event.data.items || [];
                 console.log('📥 Inventario recibido del listener maestro:', inventory.length, 'items');
                 updateInventoryDisplay();
-            } else if (event.data && event.data.type === 'addItem') {
-                // Agregar un nuevo item al inventario
-                const item = event.data.item;
-                if (item) {
-                    inventory.push(item);
-                    console.log('📥 Item individual añadido:', item.nombre);
-                    updateInventoryDisplay();
-                }
+            } else if (event.data && event.data.type === 'clearInventory') {
+                console.log('🧹 Limpiando inventario del modal...');
+                inventory = [];
+                updateInventoryDisplay();
             }
         });
 
@@ -1550,7 +1421,7 @@
         }
 
         // Solicitar inventario al cargar
-        setTimeout(requestInitialInventory, 500); // Dar tiempo a que se cargue el padre
+        setTimeout(requestInitialInventory, 500);
 
         function updateInventoryDisplay() {
             // Limpiar contenedores primero
