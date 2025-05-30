@@ -706,7 +706,8 @@
                             tipo: 'armadura',
                             nombre: item.name,
                             proteccion: item.details || '',
-                            notas: item.description || ''
+                            notas: item.description || '',
+                            descripcion: item.description || ''
                         };
                     } else if (item.section === 'shop-equipo') {
                         fichaItem = {
@@ -721,6 +722,14 @@
                             nombre: item.name,
                             descripcion: item.description || '',
                             efectos: item.details || ''
+                        };
+                    } else {
+                        // Tipo por defecto
+                        fichaItem = {
+                            tipo: 'equipo',
+                            nombre: item.name,
+                            descripcion: item.description || '',
+                            detalles: item.details || ''
                         };
                     }
                     

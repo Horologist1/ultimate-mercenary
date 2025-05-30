@@ -14,11 +14,10 @@
 //
 // FUNCIONES PÚBLICAS:
 // - clearPurchasedItems(): Limpiar items comprados
-// - fullReset(): Reset completo del sistema
 // - debugInventorySystem(): Diagnosticar estado
 // =======================================================================
 
-// Exponer la función globalmente desde el inicio
+// Función simple para limpiar items comprados
 window.clearPurchasedItems = function() {
     if (confirm('¿Estás seguro de que quieres limpiar todos los items comprados? Esta acción no se puede deshacer.')) {
         console.log('🧹 Limpiando items comprados...');
@@ -41,12 +40,11 @@ window.clearPurchasedItems = function() {
         // Limpiar localStorage
         localStorage.removeItem('itemsComprados');
         localStorage.removeItem('inventory');
-        localStorage.removeItem('pendingItems');
         
         // Limpiar Firebase
         if (window.database) {
             window.database.ref('itemsComprados').set(null).then(() => {
-                console.log('✅ Firebase limpiado');
+                console.log('✅ Items eliminados correctamente');
                 
                 // Actualizar UI
                 if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
@@ -55,7 +53,7 @@ window.clearPurchasedItems = function() {
                 // Notificar a todos los modales
                 notifyAllModals('clearInventory');
                 
-                // Reactivar listener después de 3 segundos
+                // Reactivar listener después de 2 segundos
                 setTimeout(() => {
                     window.justCleared = false;
                     if (window.database) {
@@ -63,67 +61,13 @@ window.clearPurchasedItems = function() {
                         window.itemsListener = itemsCompradosRef.on('value', window.itemsListenerFunction);
                         console.log('🔄 Sistema reactivado');
                     }
-                }, 3000);
+                }, 2000);
                 
                 alert('✅ Items eliminados correctamente');
             }).catch(error => {
                 console.error('❌ Error:', error);
                 window.justCleared = false;
                 alert('Error: ' + error.message);
-            });
-        }
-    }
-};
-
-// Función de reset completo
-window.fullReset = function() {
-    if (confirm('¿Estás seguro de que quieres reiniciar TODO? Se perderán todos los datos.')) {
-        console.log('🚨 Reset completo...');
-        
-        // Desactivar listeners
-        window.justCleared = true;
-        if (window.itemsListener) window.itemsListener.off();
-        
-        // Limpiar todo localStorage relacionado
-        ['characterSheet', 'itemsComprados', 'inventory', 'pendingItems', 'playerPM', 'pmTransactions']
-            .forEach(key => localStorage.removeItem(key));
-        
-        // Limpiar Firebase
-        if (window.database) {
-            Promise.all([
-                window.database.ref('itemsComprados').set(null),
-                window.database.ref('playerPM').set(0)
-            ]).then(() => {
-                console.log('✅ Firebase limpiado');
-                
-                // Reiniciar character sheet
-                window.characterSheet = new CharacterSheet();
-                window.characterSheet.equipment = [{
-                    tipo: 'arma',
-                    nombre: 'Pistola de Autodefensa "Pocket Pal Mk.II"',
-                    dano: '1d10',
-                    notas: '6 balas, básica',
-                    descripcion: 'Arma básica de autodefensa entregada a todos los concursantes'
-                }];
-                window.characterSheet.implants = [];
-                
-                // Actualizar UI
-                if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
-                if (typeof updateUI === 'function') updateUI();
-                
-                // Notificar modales
-                notifyAllModals('clearInventory');
-                
-                // Reactivar después de 3 segundos
-                setTimeout(() => {
-                    window.justCleared = false;
-                    if (window.database) {
-                        const itemsCompradosRef = window.database.ref('itemsComprados');
-                        window.itemsListener = itemsCompradosRef.on('value', window.itemsListenerFunction);
-                    }
-                }, 3000);
-                
-                alert('🧨 Reset completo exitoso');
             });
         }
     }
@@ -783,39 +727,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Reset button functionality
+    // Reset button functionality - Resetea solo la ficha, no los items
     const resetButton = document.getElementById('resetButton');
-    resetButton.addEventListener('click', function() {
-        // Usar la función fullReset mejorada
-        window.fullReset();
-        
-        // Mostrar mensaje de confirmación en el botón
-        this.textContent = '¡REINICIADO!';
-        setTimeout(() => {
-            this.textContent = 'REINICIAR FICHA';
-        }, 2000);
-    });
-
-    // Clear items button functionality
-    const clearItemsButton = document.getElementById('clearItemsButton');
-    clearItemsButton.addEventListener('click', function() {
-        window.clearPurchasedItems();
-    });
-
-    // Nuclear reset button functionality (si existe)
-    const nuclearResetButton = document.getElementById('nuclearResetButton');
-    if (nuclearResetButton) {
-        nuclearResetButton.addEventListener('click', function() {
-            if (confirm('🚨 RESET NUCLEAR: ¿Estás COMPLETAMENTE seguro? Esto eliminará ABSOLUTAMENTE TODO.')) {
-                // Usar la función fullReset más agresiva
-                window.fullReset();
+    if (resetButton) {
+        resetButton.addEventListener('click', function() {
+            if (confirm('¿Quieres reiniciar la ficha de personaje? Los items comprados se mantendrán.')) {
+                // Reiniciar solo la ficha, no los items
+                const currentEquipment = window.characterSheet.equipment || [];
+                const currentImplants = window.characterSheet.implants || [];
+                
+                window.characterSheet = new CharacterSheet();
+                
+                // Mantener los items actuales
+                window.characterSheet.equipment = currentEquipment;
+                window.characterSheet.implants = currentImplants;
+                
+                // Actualizar UI
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof updateEquipmentUI === 'function') updateEquipmentUI();
                 
                 // Mostrar mensaje de confirmación
-                this.textContent = '🧨 NUCLEAR COMPLETADO';
+                this.textContent = '¡REINICIADO!';
                 setTimeout(() => {
-                    this.textContent = '🚨 RESET NUCLEAR';
-                }, 3000);
+                    this.textContent = 'REINICIAR FICHA';
+                }, 2000);
             }
+        });
+    }
+
+    // Clear items button functionality (si existe)
+    const clearItemsButton = document.getElementById('clearItemsButton');
+    if (clearItemsButton) {
+        clearItemsButton.addEventListener('click', function() {
+            window.clearPurchasedItems();
         });
     }
 
@@ -1231,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Función de debug simplificada
+    // Función de debug mejorada
     window.debugInventorySystem = function() {
         const equipCount = window.characterSheet?.equipment?.length || 0;
         const implantCount = window.characterSheet?.implants?.length || 0;
@@ -1242,9 +1186,34 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔥 Firebase:', window.database ? '✅ conectado' : '❌ desconectado');
         console.log('👂 Listener:', window.itemsListener ? '✅ activo' : '❌ inactivo');
         console.log('🚫 Clearing:', window.justCleared ? '⚠️ ACTIVO' : '✅ normal');
+        
+        // Mostrar items individuales
+        if (window.characterSheet?.equipment?.length > 0) {
+            console.log('🎯 Equipment:', window.characterSheet.equipment.map(item => `${item.nombre} (${item.tipo})`));
+        }
+        if (window.characterSheet?.implants?.length > 0) {
+            console.log('🤖 Implants:', window.characterSheet.implants.map(item => `${item.nombre} (${item.tipo})`));
+        }
+        
+        // Test de comunicación con Firebase
+        if (window.database) {
+            console.log('🧪 Testing Firebase connection...');
+            window.database.ref('itemsComprados').once('value').then(snapshot => {
+                const data = snapshot.val();
+                console.log('📡 Firebase data:', data ? `${Array.isArray(data) ? data.length : Object.keys(data).length} items` : 'empty');
+            }).catch(error => {
+                console.error('❌ Firebase error:', error);
+            });
+        }
+        
         console.groupEnd();
         
-        return { totalItems, hasFirebase: !!window.database, hasListener: !!window.itemsListener };
+        return { 
+            totalItems, 
+            hasFirebase: !!window.database, 
+            hasListener: !!window.itemsListener,
+            isClearing: !!window.justCleared
+        };
     };
 
     console.log('🎮 Sistema unificado de inventario cargado. Usa debugInventorySystem() para diagnosticar.');

@@ -463,24 +463,8 @@
     </style>
     
     <script>
-        // SISTEMA SIMPLIFICADO: Solo delegación al listener maestro de character-sheet.js
-        // Eliminar funciones duplicadas - usar las del padre
-        
-        window.clearPurchasedItems = function() {
-            if (window.parent && window.parent.clearPurchasedItems) {
-                window.parent.clearPurchasedItems();
-            } else {
-                alert('Función no disponible desde el modal');
-            }
-        };
-        
-        window.nuclearClearItems = function() {
-            if (window.parent && window.parent.fullReset) {
-                window.parent.fullReset();
-            } else {
-                alert('Función no disponible desde el modal');
-            }
-        };
+        // SISTEMA SIMPLIFICADO: Solo recibe datos del listener maestro de character-sheet.js
+        // El modal NO maneja Firebase directamente, solo recibe datos via postMessage
     </script>
 </head>
 <body>
@@ -492,11 +476,6 @@
 
         <div class="button-container">
             <button id="saveButton" class="save-button">GUARDAR FICHA</button>
-
-            <button id="clearItemsButton" class="reset-button" style="background-color: #ff9500; margin: 10px 0;">LIMPIAR ITEMS COMPRADOS</button>
-
-            <button id="nuclearClearButton" class="reset-button" style="background-color: #ff4757; margin: 10px 0;">🚨 LIMPIEZA NUCLEAR</button>
-
             <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
         </div>
 
@@ -1313,14 +1292,6 @@
                     localStorage.setItem(`nombreConcursante_${num}`, this.value);
                 });
             });
-            
-            // Event listener para el botón de limpieza nuclear
-            const nuclearClearButton = document.getElementById('nuclearClearButton');
-            if (nuclearClearButton) {
-                nuclearClearButton.addEventListener('click', function() {
-                    window.nuclearClearItems();
-                });
-            }
             
             // Conocimientos
             const conocimientosSel = getConocimientosSeleccionados();
