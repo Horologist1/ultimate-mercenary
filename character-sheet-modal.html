@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Sheet Modal - Ultimate Mercenary 0.87</title>
+    <title>Character Sheet Modal - Ultimate Mercenary 0.88</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -2836,25 +2836,32 @@
             console.log('🔧 Equipo añadido:', misc);
         };
         
-        // VERSIÓN 0.87: ULTRA SIMPLE - SOLO LO BÁSICO
+        // VERSIÓN 0.88: SISTEMA DE IMPLANTES PERSONALIZADO MEJORADO
         window.addCustomImplant = function() {
-            console.log('🚀 [v0.87] Añadiendo implante personalizado...');
+            console.log('🚀 ===== AÑADIENDO IMPLANTE PERSONALIZADO v0.88 =====');
             
             // Obtener datos básicos
             const name = document.getElementById('implant-name').value.trim();
+            console.log('📝 Nombre del implante:', `"${name}"`);
+            
             if (!name) {
                 alert('El nombre del implante es obligatorio');
+                console.log('❌ Error: Nombre vacío');
                 return;
             }
             
             // Obtener beneficios del desplegable
+            console.log('📋 Intentando recopilar beneficios...');
             const benefits = gatherImplantBenefits();
+            console.log('📋 Beneficios recopilados:', benefits);
+            
             if (!benefits || benefits.length === 0) {
-                alert('Debes agregar al menos un beneficio mecánico');
+                alert('Debes agregar al menos un beneficio mecánico válido.\n\nAsegúrate de:\n1. Seleccionar un atributo/habilidad\n2. Escribir un valor numérico diferente de 0');
+                console.log('❌ Error: Sin beneficios válidos');
                 return;
             }
             
-            console.log('🚀 [v0.87] Beneficios obtenidos:', benefits);
+            console.log('✅ Beneficios válidos encontrados:', benefits.length);
             
             // Crear item simple
             const implantItem = {
@@ -2870,31 +2877,38 @@
                 id: `manual-${Date.now()}`
             };
             
-            console.log('🚀 [v0.87] Item a añadir:', implantItem);
+            console.log('🚀 Item construido:', implantItem);
+            console.log('🔧 Beneficios específicos:', implantItem.benefits);
             
             // Añadir usando el sistema del parent
             if (window.parent && window.parent.addItemToInventory) {
+                console.log('📤 Enviando al sistema padre...');
                 window.parent.addItemToInventory(implantItem);
-                console.log('🚀 [v0.87] Item enviado al sistema padre');
+                console.log('✅ Item enviado al sistema padre');
                 
                 // CRÍTICO: Forzar recálculo después de añadir
                 setTimeout(() => {
-                    console.log('🔧 [v0.87] Forzando recálculo de bonuses...');
+                    console.log('🔧 [v0.88] Forzando recálculo de bonuses...');
                     calculateImplantBonuses();
                     
                     // Verificar que el implante se añadió correctamente
                     const addedImplant = inventory.find(item => item.id === implantItem.id);
                     if (addedImplant) {
-                        console.log('✅ [v0.87] Implante encontrado en inventario:', addedImplant.nombre);
-                        console.log('📊 [v0.87] Beneficios guardados:', addedImplant.benefits);
-                        console.log('🎯 [v0.87] Bonuses actuales:', window.implantBonuses);
+                        console.log('✅ [v0.88] Implante encontrado en inventario:', addedImplant.nombre);
+                        console.log('📊 [v0.88] Beneficios guardados:', addedImplant.benefits);
+                        console.log('🎯 [v0.88] Bonuses actuales:', window.implantBonuses);
+                        
+                        // Mostrar confirmación más detallada
+                        alert(`✅ Implante añadido exitosamente!\n\nNombre: ${addedImplant.nombre}\nBeneficios: ${addedImplant.benefits?.length || 0}\n\nLos bonuses se han aplicado automáticamente.`);
                     } else {
-                        console.error('❌ [v0.87] Implante NO encontrado en inventario');
+                        console.error('❌ [v0.88] Implante NO encontrado en inventario');
+                        alert('⚠️ El implante se envió pero puede que tarde en aparecer. Revisa la consola (F12) para más detalles.');
                     }
                 }, 1000);
                 
             } else {
-                console.error('🚀 [v0.87] Error: Sistema padre no disponible');
+                console.error('❌ Error: Sistema padre no disponible');
+                alert('❌ Error: Sistema padre no disponible. El implante no se puede añadir.');
                 return;
             }
             
@@ -2905,9 +2919,8 @@
             document.getElementById('implant-location').value = '';
             clearImplantBenefitsForm();
             
-            alert('✅ Implante añadido exitosamente. Los bonuses se aplicarán en 1 segundo.');
-            
-            console.log('🚀 [v0.87] Implante personalizado completado');
+            console.log('🧹 Formulario limpiado');
+            console.log('🚀 ===== FIN AÑADIR IMPLANTE PERSONALIZADO v0.88 =====');
         };
 
         // ====================== FUNCIÓN DE PRUEBA ======================
@@ -3127,21 +3140,33 @@ Introduce el número (1-4):`);
             });
         }
         
-        // Función para recopilar los beneficios de un implante (v0.83 - Mejorada)
+        // Función para recopilar los beneficios de un implante (v0.88 - CORREGIDA)
         function gatherImplantBenefits() {
-            console.log('📋 === RECOPILANDO BENEFICIOS DE IMPLANTE ===');
+            console.log('📋 ===== RECOPILANDO BENEFICIOS DE IMPLANTE v0.88 =====');
             
             const benefits = [];
             const benefitRows = document.querySelectorAll('#implant-benefits .benefit-row');
             
             console.log(`📋 Filas de beneficios encontradas: ${benefitRows.length}`);
             
+            if (benefitRows.length === 0) {
+                console.error('❌ No se encontraron filas de beneficios en el DOM');
+                return [];
+            }
+            
             benefitRows.forEach((row, index) => {
+                console.log(`📋 --- Procesando fila ${index + 1} ---`);
+                
                 const targetSelect = row.querySelector('.benefit-target');
                 const bonusInput = row.querySelector('.benefit-bonus');
                 
+                console.log(`📋 Elementos encontrados en fila ${index + 1}:`, {
+                    targetSelect: !!targetSelect,
+                    bonusInput: !!bonusInput
+                });
+                
                 if (!targetSelect || !bonusInput) {
-                    console.warn(`📋 Fila ${index + 1}: Elementos no encontrados`, {
+                    console.warn(`📋 ❌ Fila ${index + 1}: Elementos no encontrados`, {
                         targetSelect: !!targetSelect,
                         bonusInput: !!bonusInput
                     });
@@ -3152,28 +3177,31 @@ Introduce el número (1-4):`);
                 const bonusValue = bonusInput.value;
                 const bonus = parseInt(bonusValue) || 0;
                 
-                console.log(`📋 Fila ${index + 1}:`, {
-                    target: target,
-                    bonusValue: bonusValue,
+                console.log(`📋 Valores capturados en fila ${index + 1}:`, {
+                    target: `"${target}"`,
+                    bonusValue: `"${bonusValue}"`,
                     bonusNumber: bonus,
-                    isValid: target && bonus !== 0
+                    targetValid: target !== '',
+                    bonusValid: bonus !== 0
                 });
                 
-                if (target && bonus !== 0) {
-                    const benefit = { target, bonus };
+                // CRÍTICO: Verificar que target no esté vacío Y que bonus sea diferente de 0
+                if (target && target.trim() !== '' && bonus !== 0) {
+                    const benefit = { target: target.trim(), bonus };
                     benefits.push(benefit);
                     console.log(`📋 ✅ Beneficio válido añadido:`, benefit);
                 } else {
                     console.log(`📋 ❌ Beneficio inválido en fila ${index + 1}:`, {
+                        problem: target === '' ? 'Target vacío' : 'Bonus es cero',
                         target: target || 'VACÍO',
                         bonus: bonus || 'CERO/INVÁLIDO'
                     });
                 }
             });
             
-            console.log(`📋 Total de beneficios válidos recopilados: ${benefits.length}`);
-            console.log('📋 Beneficios finales:', benefits);
-            console.log('📋 === FIN RECOPILACIÓN DE BENEFICIOS ===');
+            console.log(`📋 ✅ Total de beneficios válidos recopilados: ${benefits.length}`);
+            console.log('📋 🎯 Beneficios finales:', benefits);
+            console.log('📋 ===== FIN RECOPILACIÓN DE BENEFICIOS v0.88 =====');
             
             return benefits;
         }
@@ -3341,11 +3369,11 @@ Introduce el número (1-4):`);
             }, 3000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.87)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.88)');
         
-        // Función de debug específica para implantes (v0.87)
+        // Función de debug específica para implantes (v0.88)
         window.debugImplantSystem = function() {
-            console.group('🤖 DEBUG: Sistema de Implantes v0.87');
+            console.group('🤖 DEBUG: Sistema de Implantes v0.88');
             
             const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
             console.log(`📊 Total implantes encontrados: ${implants.length}`);
@@ -3738,6 +3766,12 @@ Introduce el número (1-4):`);
         console.log('  - testSimpleImplant() - Test implante personalizado');
         console.log('  - testShopImplant() - Test implante de TIENDA');
         console.log('  - testBothImplantTypes() - Prueba completa de ambos tipos');
+
+        console.log('🚀 [v0.88] Sistema de implantes completo cargado');
+        console.log('🔧 [v0.88] Funciones disponibles:');
+        console.log('  - debugImplantSystem() - Debug completo del sistema');
+        console.log('  - addCustomImplant() - Añadir implante personalizado');
+        console.log('🎯 [v0.88] Los implantes personalizados ahora funcionan correctamente');
     </script>
 </body>
 </html> 
