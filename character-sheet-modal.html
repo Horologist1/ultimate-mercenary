@@ -2823,12 +2823,12 @@
             console.log('🔧 Equipo añadido:', misc);
         };
         
-        // Función para añadir implante personalizado (v0.83 - Corregida)
+        // Función para añadir implante personalizado (v0.84 - REESCRITA COMPLETAMENTE)
+        // Siguiendo exactamente el mismo proceso que los implantes de la tienda
         window.addCustomImplant = function() {
-            console.log('🤖 === INICIANDO ADICIÓN DE IMPLANTE PERSONALIZADO v0.83 ===');
+            console.log('🚀 === IMPLANTE PERSONALIZADO v0.84 - NUEVO SISTEMA ===');
             
             const name = document.getElementById('implant-name').value.trim();
-            // const cost = document.getElementById('implant-cost').value.trim(); // Campo comentado
             const effects = document.getElementById('implant-effects').value.trim();
             const location = document.getElementById('implant-location').value.trim();
             const description = document.getElementById('implant-description').value.trim();
@@ -2838,98 +2838,114 @@
                 return;
             }
             
-            console.log('🤖 Datos del formulario:');
+            console.log('🚀 Datos del formulario:');
             console.log('  Nombre:', name);
             console.log('  Efectos:', effects);
             console.log('  Ubicación:', location);
             console.log('  Descripción:', description);
             
-            const benefits = gatherImplantBenefits();
-            console.log('🤖 Beneficios recopilados:', benefits);
+            // PASO 1: Recopilar beneficios usando la misma función mejorada
+            const customBenefits = gatherImplantBenefits();
+            console.log('🚀 Beneficios personalizados recopilados:', customBenefits);
             
-            // Verificar que los beneficios tienen el formato correcto
-            if (benefits && benefits.length > 0) {
-                benefits.forEach((benefit, index) => {
-                    console.log(`  Beneficio ${index + 1}:`, benefit);
-                    if (!benefit.target || typeof benefit.bonus !== 'number') {
-                        console.warn(`  ⚠️ Beneficio ${index + 1} tiene formato incorrecto:`, benefit);
-                    }
-                });
-            } else {
-                console.log('  ⚠️ No se encontraron beneficios para este implante');
-            }
-            
-            const implant = {
+            // PASO 2: Crear el item siguiendo EXACTAMENTE el formato de la tienda
+            const fichaItem = {
                 nombre: name,
-                tipo: 'cyberware',
-                descripcion: description,
-                // coste: cost, // Campo no utilizado
-                efectos: effects,
-                ubicacion: location,
+                tipo: 'cyberware',  // MISMO tipo que usa la tienda
+                descripcion: description || '',
+                detalles: description || '',
+                coste: 0, // MISMO campo que usa la tienda
+                efectos: effects || '',
+                ubicacion: location || '',
                 notas: 'Añadido manualmente',
-                origen: 'manual',
-                benefits: benefits,
-                // Metadatos adicionales para debugging
-                _debug: {
-                    version: '0.83',
-                    createdAt: new Date().toISOString(),
-                    benefitsCount: benefits ? benefits.length : 0
-                }
+                // CAMPO CLAVE: benefits - exactamente como la tienda
+                benefits: customBenefits && customBenefits.length > 0 ? customBenefits : undefined,
+                // MISMO origen que otros items
+                fechaCompra: new Date().toISOString(),
+                origen: 'manual'
             };
             
-            console.log('🤖 Implante completo a añadir:', implant);
+            console.log('🚀 Item final (formato de tienda):', fichaItem);
+            console.log('🚀 Benefits que se van a aplicar:', fichaItem.benefits);
             
-            if (window.parent && window.parent.addItemToInventory) {
-                console.log('🤖 Enviando implante al sistema padre...');
-                window.parent.addItemToInventory(implant);
-                console.log('🤖 Implante enviado al padre:', implant);
+            // PASO 3: Verificar que tenemos benefits válidos
+            if (!fichaItem.benefits || fichaItem.benefits.length === 0) {
+                console.warn('⚠️ ADVERTENCIA: No se encontraron beneficios válidos');
+                const confirm = window.confirm('No se detectaron beneficios mecánicos válidos. ¿Continuar de todos modos?');
+                if (!confirm) return;
             } else {
-                console.log('🤖 Sistema padre no disponible, añadiendo localmente...');
-                inventory.push({
-                    ...implant,
-                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    fechaCompra: new Date().toISOString()
+                console.log('✅ Beneficios válidos encontrados:', fichaItem.benefits.length);
+                fichaItem.benefits.forEach((benefit, i) => {
+                    console.log(`   ${i+1}. ${benefit.target} = +${benefit.bonus}`);
                 });
-                updateInventoryDisplay();
-                console.log('🤖 Implante añadido localmente:', implant);
             }
             
-            // Limpiar formulario
+            // PASO 4: Usar EXACTAMENTE el mismo sistema que la tienda
+            if (window.parent && window.parent.addItemToInventory) {
+                console.log('🚀 Usando addItemToInventory del padre (igual que tienda)...');
+                window.parent.addItemToInventory(fichaItem);
+                console.log('🚀 Item enviado al sistema padre');
+            } else {
+                console.log('🚀 Sistema padre no disponible, añadiendo localmente...');
+                inventory.push({
+                    ...fichaItem,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                });
+                updateInventoryDisplay();
+                console.log('🚀 Item añadido localmente');
+            }
+            
+            // PASO 5: Limpiar formulario
             document.getElementById('implant-name').value = '';
-            // document.getElementById('implant-cost').value = ''; // Campo comentado
             document.getElementById('implant-effects').value = '';
             document.getElementById('implant-location').value = '';
             document.getElementById('implant-description').value = '';
             clearImplantBenefitsForm();
             
-            // Actualizar visualización con delays más agresivos
+            // PASO 6: Forzar actualización usando el MISMO sistema que character-sheet.js 
             updateInventoryDisplay();
             
-            // Múltiples intentos de recálculo para asegurar aplicación
+            // PASO 7: Recálculo automático (igual que en tienda + character-sheet.js)
             setTimeout(() => {
-                console.log('🤖 Primer recálculo de bonuses...');
-                calculateImplantBonuses();
+                console.log('🚀 Activando recálculo automático...');
+                
+                // Si estamos en el modal, también acceder al modal para el recálculo
+                const modal = document.querySelector('iframe[src*="character-sheet-modal"]');
+                if (modal && modal.contentWindow && modal.contentWindow.calculateImplantBonuses) {
+                    modal.contentWindow.calculateImplantBonuses();
+                    console.log('🚀 Recálculo ejecutado desde iframe');
+                }
+                
+                // Recálculo local
+                if (typeof calculateImplantBonuses === 'function') {
+                    calculateImplantBonuses();
+                    console.log('🚀 Recálculo local ejecutado');
+                }
+                
+                // Actualizar totales
+                if (typeof updateAllSkillTotals === 'function') updateAllSkillTotals();
+                if (typeof updateAllAttributeTotals === 'function') updateAllAttributeTotals();
+                
+                console.log('🚀 Estado final de bonuses:', window.implantBonuses);
             }, 100);
             
+            // PASO 8: Verificación adicional a los 2 segundos
             setTimeout(() => {
-                console.log('🤖 Segundo recálculo de bonuses...');
-                calculateImplantBonuses();
-                updateAllSkillTotals();
-                updateAllAttributeTotals();
-            }, 500);
-            
-            setTimeout(() => {
-                console.log('🤖 Tercer recálculo de bonuses (final)...');
-                calculateImplantBonuses();
-                updateAllSkillTotals();
-                updateAllAttributeTotals();
-                
-                // Debug final
+                console.log('🚀 Verificación final del implante...');
                 const debug = debugImplantSystem();
-                console.log('🤖 Estado final del sistema después de añadir implante:', debug);
-            }, 1000);
+                console.log('🚀 Debug completo:', debug);
+                
+                // Verificar si el implante aparece en la lista
+                const foundImplant = inventory.find(item => item.nombre === name && item.origen === 'manual');
+                if (foundImplant) {
+                    console.log('✅ Implante encontrado en inventario:', foundImplant);
+                    console.log('✅ Benefits del implante:', foundImplant.benefits);
+                } else {
+                    console.error('❌ Implante NO encontrado en inventario');
+                }
+            }, 2000);
             
-            console.log('🤖 === FINALIZADA ADICIÓN DE IMPLANTE PERSONALIZADO ===');
+            console.log('🚀 === FIN ADICIÓN IMPLANTE PERSONALIZADO v0.84 ===');
         };
 
         // ====================== FUNCIÓN DE PRUEBA ======================
@@ -3336,11 +3352,11 @@ Introduce el número (1-4):`);
             }, 3000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.83)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.84)');
         
-        // Función de debug específica para implantes (v0.83)
+        // Función de debug específica para implantes (v0.84)
         window.debugImplantSystem = function() {
-            console.group('🤖 DEBUG: Sistema de Implantes v0.83');
+            console.group('🤖 DEBUG: Sistema de Implantes v0.84');
             
             const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
             console.log(`📊 Total implantes encontrados: ${implants.length}`);
@@ -3396,11 +3412,11 @@ Introduce el número (1-4):`);
         
         console.log('🤖 Función de debug disponible: debugImplantSystem()');
         
-        // Función de prueba rápida para implantes personalizados (v0.83)
+        // Función de prueba rápida para implantes personalizados (v0.84)
         window.testCustomImplant = function() {
             console.log('🧪 Probando implante personalizado...');
             const testImplant = {
-                nombre: 'Implante de Prueba v0.83',
+                nombre: 'Implante de Prueba v0.84',
                 tipo: 'cyberware',
                 descripcion: 'Prueba de sistema',
                 origen: 'test',
@@ -3426,6 +3442,63 @@ Introduce el número (1-4):`);
         };
         
         console.log('🧪 Función de prueba: testCustomImplant()');
+        
+        // Función de verificación de flujo v0.84
+        window.compareImplantFlows = function() {
+            console.group('🔍 COMPARACIÓN DE FLUJOS v0.84');
+            console.log('Comparando flujo de implantes de tienda vs personalizados...');
+            
+            const shopImplants = inventory.filter(item => item.origen === 'tienda' && item.tipo === 'cyberware');
+            const customImplants = inventory.filter(item => item.origen === 'manual' && item.tipo === 'cyberware');
+            
+            console.log(`📊 Implantes de tienda: ${shopImplants.length}`);
+            console.log(`📊 Implantes personalizados: ${customImplants.length}`);
+            
+            if (shopImplants.length > 0) {
+                console.group('🏪 Estructura de implante de tienda:');
+                const shopExample = shopImplants[0];
+                console.log('Nombre:', shopExample.nombre);
+                console.log('Tipo:', shopExample.tipo);
+                console.log('Benefits:', shopExample.benefits);
+                console.log('Estructura completa:', shopExample);
+                console.groupEnd();
+            }
+            
+            if (customImplants.length > 0) {
+                console.group('🔧 Estructura de implante personalizado:');
+                const customExample = customImplants[0];
+                console.log('Nombre:', customExample.nombre);
+                console.log('Tipo:', customExample.tipo);
+                console.log('Benefits:', customExample.benefits);
+                console.log('Estructura completa:', customExample);
+                console.groupEnd();
+            }
+            
+            // Comparar campos críticos
+            const criticalFields = ['nombre', 'tipo', 'benefits', 'origen', 'fechaCompra'];
+            
+            if (shopImplants.length > 0 && customImplants.length > 0) {
+                console.group('⚖️ Comparación de campos críticos:');
+                criticalFields.forEach(field => {
+                    const shopHas = shopImplants[0].hasOwnProperty(field);
+                    const customHas = customImplants[0].hasOwnProperty(field);
+                    const match = shopHas === customHas;
+                    console.log(`${match ? '✅' : '❌'} ${field}: Tienda=${shopHas}, Personal=${customHas}`);
+                });
+                console.groupEnd();
+            }
+            
+            console.groupEnd();
+            
+            return {
+                shopCount: shopImplants.length,
+                customCount: customImplants.length,
+                shopImplants,
+                customImplants
+            };
+        };
+        
+        console.log('🔍 Función de comparación: compareImplantFlows()');
         
         // ================= FIN SISTEMA DE BENEFICIOS DE IMPLANTES =================
 
