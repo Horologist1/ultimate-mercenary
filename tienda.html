@@ -334,77 +334,106 @@
                     'Artículo': 'Pistola de Autodefensa "Pocket Pal Mk.II"',
                     'Descripción': 'Arma básica de autodefensa entregada a todos los concursantes',
                     'Daño': '1d10',
-                    'Notas': '6 balas, básica',
+                    'AP': '0',
+                    'Alcance': '10m',
+                    'Munición': '6 balas',
+                    'Notas': 'Básica, fiable',
                     'Coste': 0
                 },
                 {
                     'Artículo': 'Cuchillo de Combate',
                     'Descripción': 'K-BAR 2100 Neo-Ceramic',
                     'Daño': '1d10+2',
-                    'Notas': 'Básico pero fiable',
+                    'AP': '0',
+                    'Alcance': 'Cuerpo a cuerpo',
+                    'Notas': 'Básico pero fiable, silencioso',
                     'Coste': 20
                 },
                 {
                     'Artículo': 'Porra Retráctil',
                     'Descripción': 'Titanio, extensible',
                     'Daño': '1d10+1',
-                    'Notas': 'Aturdimiento',
+                    'AP': '0',
+                    'Alcance': 'Cuerpo a cuerpo',
+                    'Notas': 'Aturdimiento, no letal',
                     'Coste': 40
                 },
                 {
                     'Artículo': 'Katana Monomolecular',
-                    'Descripción': '"Filo Espectral"',
+                    'Descripción': '"Filo Espectral" - Hoja monomolecular de última generación',
                     'Daño': '2d10+2',
-                    'Notas': 'AP -2, Exclusivo',
+                    'AP': '-2',
+                    'Alcance': 'Cuerpo a cuerpo',
+                    'Notas': 'Corta armadura, silenciosa, exclusiva',
                     'Coste': 350
                 },
                 {
                     'Artículo': 'Nudillos Cibernéticos',
-                    'Descripción': '"Machacador" (Implante)',
+                    'Descripción': '"Machacador" (Implante de combate)',
                     'Daño': '1d10+3',
-                    'Notas': '+10 a golpes',
+                    'AP': '0',
+                    'Alcance': 'Cuerpo a cuerpo',
+                    'Notas': '+10 a golpes, oculto, implante',
                     'Coste': 150
                 },
                 {
                     'Artículo': 'Pistola Ligera Estándar',
-                    'Descripción': 'Ronin Arms Type-12, 9mm',
+                    'Descripción': 'Ronin Arms Type-12, 9mm parabellum',
                     'Daño': '2d10',
-                    'Notas': 'Fiable, común',
+                    'AP': '0',
+                    'Alcance': '30m',
+                    'Munición': '12 balas',
+                    'Notas': 'Fiable, común, fácil mantenimiento',
                     'Coste': 75
                 },
                 {
                     'Artículo': 'Pistola Pesada',
-                    'Descripción': 'Ares "Predator V", .45',
+                    'Descripción': 'Ares "Predator V", .45 ACP',
                     'Daño': '2d10+2',
-                    'Notas': 'AP -1',
+                    'AP': '-1',
+                    'Alcance': '35m',
+                    'Munición': '10 balas',
+                    'Notas': 'Alto poder de parada, intimidante',
                     'Coste': 150
                 },
                 {
                     'Artículo': 'Pistola de Dardos',
-                    'Descripción': 'Tranquilizantes (3 dardos)',
+                    'Descripción': 'Tranquilizantes y venenos (3 dardos)',
                     'Daño': 'Especial',
-                    'Notas': 'Aturdimiento/Veneno',
+                    'AP': '0',
+                    'Alcance': '20m',
+                    'Munición': '3 dardos',
+                    'Notas': 'Aturdimiento/Veneno, silenciosa',
                     'Coste': 120
                 },
                 {
                     'Artículo': 'Subfusil Ligero',
                     'Descripción': 'Federated Arms Striker, 9mm',
                     'Daño': '2d10',
-                    'Notas': 'Ráfaga',
+                    'AP': '0',
+                    'Alcance': '50m',
+                    'Munición': '30 balas',
+                    'Notas': 'Ráfaga, automático, compacto',
                     'Coste': 350
                 },
                 {
                     'Artículo': 'Escopeta de Combate',
                     'Descripción': 'Ronin "Street Sweeper", Cal. 12',
                     'Daño': '3d10',
-                    'Notas': 'Dispersión',
+                    'AP': '0',
+                    'Alcance': '20m',
+                    'Munición': '8 cartuchos',
+                    'Notas': 'Dispersión, devastadora a corta distancia',
                     'Coste': 400
                 },
                 {
                     'Artículo': 'Rifle de Asalto',
-                    'Descripción': 'Militech "Ronin" M-77',
+                    'Descripción': 'Militech "Ronin" M-77, 5.56mm',
                     'Daño': '2d10+4',
-                    'Notas': 'AP -2, Acceso Mayor',
+                    'AP': '-2',
+                    'Alcance': '150m',
+                    'Munición': '20 balas',
+                    'Notas': 'Militar, ráfaga, acceso restringido',
                     'Coste': 600
                 }
             ],
@@ -449,38 +478,44 @@
             'shop-cyberware': [
                 {
                     'Artículo': 'Ojo Cibernético Avanzado',
-                    'Descripción': 'HawkEye-3',
-                    'Efectos': '+15 Percepción Visual, Térmica, EMF, Smartlink',
+                    'Descripción': 'HawkEye-3 - Sistema óptico militar de última generación',
+                    'Efectos': '+15 Percepción Visual, Visión Térmica, EMF, Smartlink integrado',
+                    'Ubicación': 'Ojo',
                     'Coste': 500
                 },
                 {
                     'Artículo': 'Reflejos Cableados',
-                    'Descripción': 'Lynx V.1',
-                    'Efectos': '+5 Iniciativa, +10 Atletismo y Esquiva',
+                    'Descripción': 'Lynx V.1 - Sistema nervioso mejorado',
+                    'Efectos': '+5 Iniciativa, +10 Atletismo y Esquiva, tiempo de reacción sobrehumano',
+                    'Ubicación': 'Sistema nervioso',
                     'Coste': 450
                 },
                 {
                     'Artículo': 'Piel Subdérmica Blindada',
-                    'Descripción': 'Armadura integrada',
-                    'Efectos': 'Armadura +2/+2 natural',
+                    'Descripción': 'Armadura integrada subcutánea',
+                    'Efectos': 'Armadura +2/+2 natural, resistencia a cortes y balas',
+                    'Ubicación': 'Piel/Torso',
                     'Coste': 600
                 },
                 {
                     'Artículo': 'Procesador de Combate Táctico',
-                    'Descripción': 'Ayuda en Puntería/Esquiva',
-                    'Efectos': '+5 a una habilidad de combate',
+                    'Descripción': 'IA de combate integrada en el cerebro',
+                    'Efectos': '+5 a una habilidad de combate elegida, análisis táctico en tiempo real',
+                    'Ubicación': 'Cerebro',
                     'Coste': 550
                 },
                 {
                     'Artículo': 'Pulmones Filtradores Mejorados',
-                    'Descripción': 'Sistema respiratorio avanzado',
-                    'Efectos': 'Resistencia a toxinas, respirar bajo agua poco tiempo',
+                    'Descripción': 'Sistema respiratorio avanzado con filtros',
+                    'Efectos': 'Resistencia a toxinas, respirar bajo agua 10 minutos, +10 vs gases',
+                    'Ubicación': 'Pulmones',
                     'Coste': 400
                 },
                 {
                     'Artículo': 'Implante de Camuflaje Óptico',
-                    'Descripción': 'Básico, corta duración',
-                    'Efectos': 'Invisibilidad parcial (1 minuto), recarga lenta',
+                    'Descripción': 'Sistema de invisibilidad básico',
+                    'Efectos': 'Invisibilidad parcial (1 minuto), +20 Infiltración cuando activo',
+                    'Ubicación': 'Piel/Sistema',
                     'Coste': 700
                 }
             ],
@@ -667,6 +702,34 @@
             }
         }
 
+        // Función para obtener beneficios mecánicos predefinidos de implantes
+        function getBenefitsForImplant(implantName) {
+            const implantBenefits = {
+                'Ojo Cibernético Avanzado': [
+                    { target: 'skill_Percepción', bonus: 15 },
+                    { target: 'skill_Armas de Fuego', bonus: 10 }
+                ],
+                'Reflejos Cableados': [
+                    { target: 'skill_Atletismo', bonus: 10 },
+                    { target: 'skill_Esquivar', bonus: 10 }
+                ],
+                'Piel Subdérmica Blindada': [
+                    { target: 'attr_som', bonus: 2 }
+                ],
+                'Procesador de Combate Táctico': [
+                    { target: 'skill_Armas de Fuego', bonus: 5 }
+                ],
+                'Pulmones Filtradores Mejorados': [
+                    { target: 'attr_som', bonus: 5 }
+                ],
+                'Implante de Camuflaje Óptico': [
+                    { target: 'skill_Infiltración', bonus: 15 }
+                ]
+            };
+            
+            return implantBenefits[implantName] || [];
+        }
+
         // Función SIMPLIFICADA para comprar un item
         function buyItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
@@ -704,10 +767,13 @@
                         cobertura: item.coverage || item['Cobertura'] || '',
                         // Campos específicos para cyberware y equipo
                         efectos: item.effects || item['Efectos'] || '',
+                        ubicacion: item['Ubicación'] || '',
                         // Campos adicionales
                         compatible: item['Compatible con'] || '',
                         cantidad: item['Cantidad'] || '',
                         servicio: item['Servicio'] || '',
+                        // Beneficios mecánicos para implantes
+                        benefits: item.section === 'shop-cyberware' ? getBenefitsForImplant(item.name) : undefined,
                         // Metadatos
                         fechaCompra: new Date().toISOString(),
                         origen: 'tienda'
@@ -815,10 +881,35 @@
                                             }
                                         </div>
                                         <h3>${item.name}</h3>
-                                        <p>${item.description}</p>
-                                        ${(item.section === 'shop-armas' && item.damage) ? `<p><strong>Daño:</strong> ${item.damage}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.details) ? `<p><strong>Notas:</strong> ${item.details}</p>` : ''}
-                                        ${(item.section === 'shop-armas' && item.notas) ? `<p><strong>Notas:</strong> ${item.notas}</p>` : ''}
+                                        <p style="margin-bottom: 10px;">${item.description}</p>
+                                        
+                                        ${item.section === 'shop-armas' ? `
+                                            ${item['Daño'] ? `<p><strong>Daño:</strong> ${item['Daño']}</p>` : ''}
+                                            ${item['AP'] ? `<p><strong>AP:</strong> ${item['AP']}</p>` : ''}
+                                            ${item['Alcance'] ? `<p><strong>Alcance:</strong> ${item['Alcance']}</p>` : ''}
+                                            ${item['Munición'] ? `<p><strong>Munición:</strong> ${item['Munición']}</p>` : ''}
+                                            ${item['Notas'] ? `<p><strong>Notas:</strong> ${item['Notas']}</p>` : ''}
+                                        ` : ''}
+                                        
+                                        ${item.section === 'shop-armaduras' ? `
+                                            ${item['Armadura (K/E)'] ? `<p><strong>Protección:</strong> ${item['Armadura (K/E)']}</p>` : ''}
+                                            ${item['Cobertura'] ? `<p><strong>Cobertura:</strong> ${item['Cobertura']}</p>` : ''}
+                                        ` : ''}
+                                        
+                                        ${item.section === 'shop-cyberware' ? `
+                                            ${item['Efectos'] ? `<p><strong>Efectos:</strong> ${item['Efectos']}</p>` : ''}
+                                            ${item['Ubicación'] ? `<p><strong>Ubicación:</strong> ${item['Ubicación']}</p>` : ''}
+                                        ` : ''}
+                                        
+                                        ${item.section === 'shop-equipo' ? `
+                                            ${item['Efectos'] ? `<p><strong>Efectos:</strong> ${item['Efectos']}</p>` : ''}
+                                        ` : ''}
+                                        
+                                        ${item.section === 'shop-municion' ? `
+                                            ${item['Compatible con'] ? `<p><strong>Compatible:</strong> ${item['Compatible con']}</p>` : ''}
+                                            ${item['Cantidad'] ? `<p><strong>Cantidad:</strong> ${item['Cantidad']}</p>` : ''}
+                                        ` : ''}
+                                        
                                         <p class="price">${item.price} PM</p>
                                         <button class="buy-button" data-item-id="${item.id}" onclick="buyItem('${item.id}')">
                                             Comprar

@@ -807,25 +807,6 @@
                     </select>
                 </div>
                 
-                <!-- Botones de Administración -->
-                <div class="points-counter" style="margin-bottom: 20px; background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; border-radius: 4px; padding: 15px;">
-                    <h3 style="color: #ff4757; margin-bottom: 10px;">🔧 Administración del Inventario</h3>
-                    <p style="font-size: 11px; color: #aaa; margin-bottom: 10px;">
-                        Funciones para limpiar duplicados y gestionar items problemáticos del inventario.
-                    </p>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button onclick="quickCleanDuplicates()" style="background: #ffa502; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
-                            🧹 LIMPIAR DUPLICADOS
-                        </button>
-                        <button onclick="showInventoryStats()" style="background: #70a1ff; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
-                            📊 ESTADÍSTICAS
-                        </button>
-                        <button onclick="showAdminMenu()" style="background: #ff4757; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; flex: 1; min-width: 120px;">
-                            ⚠️ ADMIN COMPLETO
-                        </button>
-                    </div>
-                </div>
-                
                 <div class="grid">
                     <div class="item">
                         <h3>COG</h3>
@@ -1182,6 +1163,25 @@
                             </div>
                             <textarea id="misc-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
                             <button onclick="addCustomMisc()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Equipo</button>
+                        </div>
+                        
+                        <!-- Administración del Inventario -->
+                        <div style="margin-top: 30px; text-align: center; background: rgba(255, 71, 87, 0.1); border: 2px solid #ff4757; border-radius: 8px; padding: 20px;">
+                            <h3 style="color: #ff4757; margin: 0 0 15px 0; font-family: 'Orbitron', sans-serif; font-size: 18px;">🔧 ADMINISTRACIÓN DEL INVENTARIO</h3>
+                            <p style="font-size: 12px; color: #aaa; margin-bottom: 20px; line-height: 1.4;">
+                                Herramientas avanzadas para gestión de inventario. Utiliza con precaución.
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px;">
+                                <button onclick="quickCleanDuplicates()" style="background: linear-gradient(45deg, #ffa502, #ff9f00); color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'Orbitron', sans-serif; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 165, 2, 0.3); transition: all 0.3s ease;">
+                                    🧹 LIMPIAR DUPLICADOS
+                                </button>
+                                <button onclick="showInventoryStats()" style="background: linear-gradient(45deg, #70a1ff, #5352ed); color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'Orbitron', sans-serif; font-weight: bold; box-shadow: 0 4px 15px rgba(112, 161, 255, 0.3); transition: all 0.3s ease;">
+                                    📊 ESTADÍSTICAS
+                                </button>
+                                <button onclick="showAdminMenu()" style="background: linear-gradient(45deg, #ff4757, #ff3838); color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'Orbitron', sans-serif; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); transition: all 0.3s ease;">
+                                    ⚠️ ADMIN COMPLETO
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2510,7 +2510,18 @@
                 total = skillValue + attributeValue;
             }
             
-            totalElement.textContent = total;
+            // Añadir bonuses de implantes
+            const implantBonus = (window.implantBonuses && window.implantBonuses.skills && window.implantBonuses.skills[skillName]) || 0;
+            total += implantBonus;
+            
+            // Mostrar el total con color verde si hay bonuses de implantes
+            if (implantBonus > 0) {
+                totalElement.style.color = '#2ed573';
+                totalElement.textContent = `${total} (+${implantBonus})`;
+            } else {
+                totalElement.style.color = '';
+                totalElement.textContent = total;
+            }
         }
         
         // Función para actualizar todos los totales de habilidades
@@ -3184,7 +3195,7 @@ Introduce el número (1-4):`);
             }, 2000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.79)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.8)');
         
         // ================= FIN SISTEMA DE BENEFICIOS DE IMPLANTES =================
     </script>

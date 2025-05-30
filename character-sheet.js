@@ -470,7 +470,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.79'
+            version: '0.8'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {
