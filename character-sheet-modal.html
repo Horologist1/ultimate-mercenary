@@ -895,6 +895,42 @@
             // El inventario se maneja desde character-sheet.js
             // para evitar conflictos entre múltiples listeners
             
+            // Conectar botón de guardar ficha
+            const saveButton = document.getElementById('saveButton');
+            if (saveButton) {
+                saveButton.addEventListener('click', function() {
+                    console.log('💾 Botón guardar presionado');
+                    gatherCharacterData();
+                    
+                    // Mostrar confirmación visual
+                    this.textContent = '¡GUARDADO!';
+                    this.style.backgroundColor = '#2ed573';
+                    setTimeout(() => {
+                        this.textContent = 'GUARDAR FICHA';
+                        this.style.backgroundColor = '';
+                    }, 2000);
+                });
+            }
+            
+            // Conectar botón de reiniciar
+            const resetButton = document.getElementById('resetButton');
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    if (confirm('¿Estás seguro de que quieres reiniciar toda la ficha? Esta acción no se puede deshacer.')) {
+                        // Resetear todos los campos a valores por defecto
+                        resetCharacterSheet();
+                        
+                        // Mostrar confirmación visual
+                        this.textContent = '¡REINICIADO!';
+                        this.style.backgroundColor = '#ff4757';
+                        setTimeout(() => {
+                            this.textContent = 'REINICIAR FICHA';
+                            this.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                });
+            }
+            
             // Tab switching functionality
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function() {
@@ -919,6 +955,12 @@
             
             // Actualizar inventario al cargar
             updateInventoryDisplay();
+            
+            // Solicitar datos de ficha al cargar
+            setTimeout(() => {
+                requestInitialCharacterData();
+                requestInitialInventory();
+            }, 1000);
         });
 
         // Actualizar tarjetas si cambia el almacenamiento desde otro tab/ventana
@@ -1375,6 +1417,14 @@
                 console.log('🧹 Limpiando inventario del modal...');
                 inventory = [];
                 updateInventoryDisplay();
+            } else if (event.data && event.data.type === 'gatherCharacterData') {
+                // El padre solicita que recopilemos todos los datos de la ficha
+                console.log('📋 Recopilando datos de ficha...');
+                gatherCharacterData();
+            } else if (event.data && event.data.type === 'loadCharacterData') {
+                // El padre nos envía datos para cargar en la ficha
+                console.log('📂 Cargando datos de ficha:', event.data.data);
+                loadCharacterData(event.data.data);
             }
         });
 
@@ -1489,6 +1539,291 @@
                 console.log('🗑️ Item eliminado del inventario local');
             }
         };
+
+        // =================== SISTEMA DE GUARDADO DE FICHA COMPLETA ===================
+        
+        // Función para recopilar todos los datos de la ficha
+        function gatherCharacterData() {
+            console.log('📋 Recopilando datos de la ficha...');
+            
+            const characterData = {
+                // Atributos básicos
+                attributes: {
+                    cog: getInputValue('cog', 10),
+                    int: getInputValue('int', 10),
+                    ref: getInputValue('ref', 10),
+                    sav: getInputValue('sav', 10),
+                    som: getInputValue('som', 10),
+                    wil: getInputValue('wil', 10)
+                },
+                
+                // Estadísticas derivadas
+                derivedStats: {
+                    dur: getInputValue('dur', 30),
+                    woundThreshold: getElementText('wound-threshold', '6'),
+                    deathRating: getElementText('death-rating', '45'),
+                    initiative: getElementText('initiative', '7'),
+                    movement: getElementText('movement', '4')
+                },
+                
+                // Habilidades activas
+                skills: gatherSkillsData(),
+                
+                // Habilidades personalizadas
+                customSkills: gatherCustomSkills(),
+                
+                // Plantilla seleccionada
+                template: getSelectValue('aptitude-template', 'actioneer'),
+                
+                // Campos de especialización
+                fields: gatherFieldsData(),
+                
+                // Timestamp de guardado
+                lastSaved: new Date().toISOString(),
+                version: '0.73'
+            };
+            
+            console.log('📋 Datos recopilados:', characterData);
+            
+            // Enviar datos al padre
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'characterDataGathered',
+                    data: characterData
+                }, '*');
+            }
+            
+            return characterData;
+        }
+        
+        // Función para cargar datos en la ficha
+        function loadCharacterData(data) {
+            if (!data) {
+                console.log('📂 No hay datos para cargar');
+                return;
+            }
+            
+            console.log('📂 Cargando datos en la ficha:', data);
+            
+            try {
+                // Cargar atributos
+                if (data.attributes) {
+                    setInputValue('cog', data.attributes.cog || 10);
+                    setInputValue('int', data.attributes.int || 10);
+                    setInputValue('ref', data.attributes.ref || 10);
+                    setInputValue('sav', data.attributes.sav || 10);
+                    setInputValue('som', data.attributes.som || 10);
+                    setInputValue('wil', data.attributes.wil || 10);
+                }
+                
+                // Cargar estadísticas derivadas
+                if (data.derivedStats) {
+                    setInputValue('dur', data.derivedStats.dur || 30);
+                }
+                
+                // Cargar habilidades
+                if (data.skills) {
+                    loadSkillsData(data.skills);
+                }
+                
+                // Cargar habilidades personalizadas
+                if (data.customSkills) {
+                    loadCustomSkills(data.customSkills);
+                }
+                
+                // Cargar plantilla
+                if (data.template) {
+                    setSelectValue('aptitude-template', data.template);
+                }
+                
+                // Cargar campos de especialización
+                if (data.fields) {
+                    loadFieldsData(data.fields);
+                }
+                
+                // Recalcular estadísticas derivadas
+                if (typeof updateDerivedStats === 'function') {
+                    updateDerivedStats();
+                }
+                
+                console.log('✅ Datos cargados correctamente');
+                
+            } catch (error) {
+                console.error('❌ Error al cargar datos de ficha:', error);
+            }
+        }
+        
+        // Funciones auxiliares para manejo de elementos
+        function getInputValue(id, defaultValue) {
+            const element = document.getElementById(id);
+            return element ? (parseInt(element.value) || defaultValue) : defaultValue;
+        }
+        
+        function setInputValue(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+                // Disparar evento para actualizar cálculos
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+        
+        function getElementText(id, defaultValue) {
+            const element = document.getElementById(id);
+            return element ? element.textContent : defaultValue;
+        }
+        
+        function getSelectValue(id, defaultValue) {
+            const element = document.getElementById(id);
+            return element ? element.value : defaultValue;
+        }
+        
+        function setSelectValue(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+        
+        // Función para recopilar habilidades
+        function gatherSkillsData() {
+            const skills = {};
+            const skillInputs = document.querySelectorAll('.skill-value');
+            
+            skillInputs.forEach(input => {
+                const skillName = input.getAttribute('data-skill');
+                if (skillName) {
+                    skills[skillName] = parseInt(input.value) || 0;
+                }
+            });
+            
+            return skills;
+        }
+        
+        // Función para cargar habilidades
+        function loadSkillsData(skills) {
+            Object.entries(skills).forEach(([skillName, value]) => {
+                const input = document.querySelector(`.skill-value[data-skill="${skillName}"]`);
+                if (input) {
+                    input.value = value;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        }
+        
+        // Función para recopilar habilidades personalizadas
+        function gatherCustomSkills() {
+            const customSkills = [];
+            const customSkillContainers = document.querySelectorAll('#custom-skills-container .custom-skill-item');
+            
+            customSkillContainers.forEach(container => {
+                const nameInput = container.querySelector('input[type="text"]');
+                const valueInput = container.querySelector('input[type="number"]');
+                
+                if (nameInput && valueInput && nameInput.value.trim()) {
+                    customSkills.push({
+                        name: nameInput.value.trim(),
+                        value: parseInt(valueInput.value) || 0
+                    });
+                }
+            });
+            
+            return customSkills;
+        }
+        
+        // Función para cargar habilidades personalizadas
+        function loadCustomSkills(customSkills) {
+            // Limpiar habilidades personalizadas existentes
+            const container = document.getElementById('custom-skills-container');
+            if (container) {
+                container.innerHTML = '';
+                
+                // Añadir cada habilidad personalizada
+                customSkills.forEach(skill => {
+                    if (typeof addCustomSkill === 'function') {
+                        addCustomSkill(skill.name, skill.value);
+                    }
+                });
+            }
+        }
+        
+        // Función para recopilar campos de especialización
+        function gatherFieldsData() {
+            const fields = {};
+            const fieldInputs = document.querySelectorAll('.field-input');
+            
+            fieldInputs.forEach(input => {
+                const fieldName = input.getAttribute('data-field');
+                if (fieldName && input.value.trim()) {
+                    fields[fieldName] = input.value.trim();
+                }
+            });
+            
+            return fields;
+        }
+        
+        // Función para cargar campos de especialización
+        function loadFieldsData(fields) {
+            Object.entries(fields).forEach(([fieldName, value]) => {
+                const input = document.querySelector(`.field-input[data-field="${fieldName}"]`);
+                if (input) {
+                    input.value = value;
+                }
+            });
+        }
+        
+        // Solicitar datos iniciales al cargar
+        function requestInitialCharacterData() {
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'requestCharacterData'
+                }, '*');
+            }
+        }
+        
+        // Función para resetear la ficha completa
+        function resetCharacterSheet() {
+            console.log('🔄 Reseteando ficha de personaje...');
+            
+            // Resetear atributos a 10
+            ['cog', 'int', 'ref', 'sav', 'som', 'wil'].forEach(attr => {
+                setInputValue(attr, 10);
+            });
+            
+            // Resetear DUR a 30
+            setInputValue('dur', 30);
+            
+            // Resetear plantilla
+            setSelectValue('aptitude-template', 'actioneer');
+            
+            // Resetear todas las habilidades a 0
+            document.querySelectorAll('.skill-value').forEach(input => {
+                input.value = 0;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            
+            // Limpiar habilidades personalizadas
+            const customSkillsContainer = document.getElementById('custom-skills-container');
+            if (customSkillsContainer) {
+                customSkillsContainer.innerHTML = '';
+            }
+            
+            // Limpiar campos de especialización
+            document.querySelectorAll('.field-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // Recalcular estadísticas derivadas
+            if (typeof updateDerivedStats === 'function') {
+                updateDerivedStats();
+            }
+            
+            // Guardar el reset
+            gatherCharacterData();
+            
+            console.log('✅ Ficha reseteada correctamente');
+        }
     </script>
 </body>
 </html> 
