@@ -3298,32 +3298,63 @@ Introduce el número (1-4):`);
         
         console.log('🔧 Sistema de beneficios de implantes inicializado (v0.85)');
         
-        // FUNCIÓN DEBUG v0.86 (DISPONIBLE GLOBALMENTE)
+        // Función de debug específica para implantes (v0.85)
         window.debugImplantSystem = function() {
-            console.group('🤖 [v0.86] DEBUG: Sistema de Implantes');
+            console.group('🤖 DEBUG: Sistema de Implantes v0.85');
             
             const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
-            console.log(`📊 Total implantes: ${implants.length}`);
+            console.log(`📊 Total implantes encontrados: ${implants.length}`);
             
-            implants.forEach((implant, i) => {
-                console.log(`${i+1}. ${implant.nombre} (${implant.origen})`);
-                console.log(`   Benefits:`, implant.benefits);
+            implants.forEach((implant, index) => {
+                console.group(`🔧 Implante ${index + 1}: ${implant.nombre}`);
+                console.log('Tipo:', implant.tipo);
+                console.log('Origen:', implant.origen);
+                console.log('Beneficios explícitos:', implant.benefits);
+                console.log('Estructura completa del implante:', implant);
+                
+                const autoBenefits = getBenefitsForImplantByName(implant.nombre);
+                console.log('Beneficios automáticos:', autoBenefits);
+                
+                const finalBenefits = implant.benefits && implant.benefits.length > 0 ? 
+                    implant.benefits : autoBenefits;
+                console.log('Beneficios finales a aplicar:', finalBenefits);
+                
+                // Verificar cada beneficio individualmente
+                if (finalBenefits && finalBenefits.length > 0) {
+                    finalBenefits.forEach((benefit, bIndex) => {
+                        console.log(`  Beneficio ${bIndex + 1}:`, benefit);
+                        console.log(`    Target: "${benefit.target}" | Bonus: ${benefit.bonus}`);
+                        const [type, name] = benefit.target.split('_');
+                        console.log(`    Tipo: "${type}" | Nombre: "${name}"`);
+                    });
+                } else {
+                    console.log('  ⚠️ No hay beneficios para este implante');
+                }
+                
+                console.groupEnd();
             });
             
-            console.log('🔧 Bonuses actuales:', window.implantBonuses);
+            console.log('🔧 Bonuses globales actuales:', window.implantBonuses);
             console.groupEnd();
             
             // Forzar recálculo
-            if (typeof calculateImplantBonuses === 'function') {
-                calculateImplantBonuses();
-            }
+            calculateImplantBonuses();
             
             return {
                 totalImplants: implants.length,
-                implants: implants,
-                bonuses: window.implantBonuses
+                currentBonuses: window.implantBonuses,
+                implantDetails: implants.map(i => ({
+                    name: i.nombre,
+                    type: i.tipo,
+                    origin: i.origen,
+                    explicitBenefits: i.benefits,
+                    autoBenefits: getBenefitsForImplantByName(i.nombre),
+                    fullStructure: i
+                }))
             };
         };
+        
+        console.log('🤖 Función de debug disponible: debugImplantSystem()');
         
         // Función de prueba rápida para implantes personalizados (v0.84)
         window.testCustomImplant = function() {
@@ -3455,123 +3486,6 @@ Introduce el número (1-4):`);
         }
         
         // Función para actualizar todos los totales de habilidades
-        console.log('🚀 [v0.86] === SISTEMA DE IMPLANTES ULTRA ROBUSTO ===');
-        
-        // FUNCIÓN ACTUALIZAR TOTALES v0.86
-        function updateAllAttributeTotals() {
-            console.log('📊 [v0.86] Actualizando totales de atributos...');
-            
-            const attributes = ['cog', 'int', 'ref', 'sav', 'som', 'wil'];
-            
-            attributes.forEach(attr => {
-                const baseInput = document.getElementById(attr);
-                const totalElement = document.getElementById(`${attr}-total`);
-                const bonusElement = document.getElementById(`${attr}-bonus`);
-                
-                if (baseInput && totalElement) {
-                    const baseValue = parseInt(baseInput.value) || 10;
-                    const implantBonus = (window.implantBonuses && window.implantBonuses.attributes && window.implantBonuses.attributes[attr]) || 0;
-                    const totalValue = baseValue + implantBonus;
-                    
-                    totalElement.textContent = totalValue;
-                    
-                    if (bonusElement) {
-                        if (implantBonus > 0) {
-                            bonusElement.textContent = ` (+${implantBonus})`;
-                            bonusElement.style.display = 'inline';
-                            bonusElement.style.color = '#2ecc71';
-                        } else {
-                            bonusElement.textContent = '';
-                            bonusElement.style.display = 'none';
-                        }
-                    }
-                    
-                    console.log(`📊 [v0.86] ${attr}: ${baseValue} + ${implantBonus} = ${totalValue}`);
-                }
-            });
-        }
-        
-        // HACER DISPONIBLE GLOBALMENTE
-        window.updateAllAttributeTotals = updateAllAttributeTotals;
-        
-        // FUNCIÓN CALCULAR BONUSES v0.86 (SIMPLIFICADA)
-        function calculateImplantBonuses() {
-            console.log('🔧 [v0.86] Calculando bonuses de implantes...');
-            
-            // Resetear bonuses
-            window.implantBonuses = { attributes: {}, skills: {} };
-            
-            // Procesar cada item del inventario
-            inventory.forEach(item => {
-                if ((item.tipo === 'cyberware' || item.tipo === 'implant') && item.benefits) {
-                    console.log(`🔧 [v0.86] Procesando: ${item.nombre}`);
-                    
-                    item.benefits.forEach(benefit => {
-                        const [type, name] = benefit.target.split('_');
-                        const bonus = parseInt(benefit.bonus) || 0;
-                        
-                        if (type === 'attr') {
-                            window.implantBonuses.attributes[name] = (window.implantBonuses.attributes[name] || 0) + bonus;
-                            console.log(`🔧 [v0.86] Atributo ${name}: +${bonus}`);
-                        } else if (type === 'skill') {
-                            window.implantBonuses.skills[name] = (window.implantBonuses.skills[name] || 0) + bonus;
-                            console.log(`🔧 [v0.86] Skill ${name}: +${bonus}`);
-                        }
-                    });
-                }
-            });
-            
-            console.log('🔧 [v0.86] Bonuses calculados:', window.implantBonuses);
-            
-            // Actualizar UI
-            updateAllAttributeTotals();
-            if (typeof updateAllSkillTotals === 'function') {
-                updateAllSkillTotals();
-            }
-        }
-        
-        // HACER DISPONIBLE GLOBALMENTE
-        window.calculateImplantBonuses = calculateImplantBonuses;
-        
-        // FUNCIÓN TEST v0.86
-        window.testImplantSystem = function() {
-            console.log('🧪 [v0.86] Probando sistema...');
-            
-            const testImplant = {
-                nombre: 'Test Implant v0.86',
-                tipo: 'cyberware',
-                benefits: [
-                    { target: 'attr_som', bonus: 5 },
-                    { target: 'skill_Percepción', bonus: 10 }
-                ],
-                origen: 'test',
-                id: 'test-' + Date.now()
-            };
-            
-            inventory.push(testImplant);
-            updateInventoryDisplay();
-            
-            setTimeout(() => {
-                calculateImplantBonuses();
-                console.log('🧪 [v0.86] Test completado - revisa los valores de SOM en la ficha');
-            }, 500);
-            
-            return testImplant;
-        };
-        
-        // INICIALIZACIÓN v0.86
-        window.implantBonuses = { attributes: {}, skills: {} };
-        
-        // INICIALIZAR CUANDO EL DOM ESTÉ LISTO
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                if (typeof calculateImplantBonuses === 'function') {
-                    calculateImplantBonuses();
-                }
-            }, 3000);
-        });
-        
-        console.log('🚀 [v0.86] Sistema v0.86 cargado - Funciones: debugImplantSystem(), testImplantSystem()');
     </script>
 </body>
 </html> 
