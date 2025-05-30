@@ -226,8 +226,11 @@
     function updatePMDisplay() {
         const pmElement = document.getElementById('current-pm');
         if (pmElement) {
-            const total = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+            // Buscar el sistema de PM en parent primero, luego en window
+            const pmSystem = window.parent.pmTransactions || window.pmTransactions;
+            const total = pmSystem ? pmSystem.getTotal() : 0;
             pmElement.textContent = total;
+            console.log('💰 Actualizando display PM a:', total);
             
             // Actualizar estado de botones de compra
             document.querySelectorAll('.buy-button').forEach(button => {
@@ -735,18 +738,28 @@
             const item = shopItems.find(i => i.id === itemId);
             if (!item) return;
 
-            console.log('🛒 Intentando comprar:', item.name);
+            console.log('🛒 Intentando comprar:', item.name, 'por', item.price, 'PM');
 
-            const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+            // Obtener PM actual desde el parent
+            const pmSystem = window.parent.pmTransactions || window.pmTransactions;
+            const currentPM = pmSystem ? pmSystem.getTotal() : 0;
+            
+            console.log('💰 PM actual:', currentPM, 'PM necesario:', item.price);
+            
             if (currentPM >= item.price) {
-                // Restar PM
+                // Restar PM usando el sistema del parent
                 const comprarItemFn = window.parent.comprarItem || window.comprarItem;
+                console.log('🔧 Función comprarItem disponible:', !!comprarItemFn);
+                
                 if (!comprarItemFn) {
                     alert('Error: Sistema de compras no disponible');
+                    console.error('❌ No se encontró la función comprarItem en window.parent o window');
                     return;
                 }
                 
+                console.log('💳 Ejecutando compra...');
                 const success = comprarItemFn(itemId, item.price);
+                console.log('💳 Resultado de la compra:', success);
                 
                 if (success) {
                     // Preparar el item con todos los datos disponibles
@@ -809,13 +822,47 @@
                     // Mostrar mensaje de éxito
                     showPurchaseMessage(item);
                     updatePMDisplay();
+                    
+                    // Verificar PM después de la compra
+                    const newPM = pmSystem ? pmSystem.getTotal() : 0;
+                    console.log('💰 PM después de la compra:', newPM);
                 } else {
-                    alert('Error en la transacción');
+                    alert('Error en la transacción - PM insuficientes o error del sistema');
                 }
             } else {
-                alert('No tienes suficientes PM para realizar esta compra');
+                alert(`No tienes suficientes PM para realizar esta compra. Tienes: ${currentPM} PM, necesitas: ${item.price} PM`);
             }
         }
+
+        // Función de debugging para verificar el estado del sistema
+        window.debugShopSystem = function() {
+            console.group('🏪 DEBUG: Sistema de Tienda');
+            console.log('🔗 Window parent:', !!window.parent);
+            console.log('💰 PM System en parent:', !!window.parent.pmTransactions);
+            console.log('💰 PM System local:', !!window.pmTransactions);
+            
+            const pmSystem = window.parent.pmTransactions || window.pmTransactions;
+            if (pmSystem) {
+                console.log('💰 PM actual:', pmSystem.getTotal());
+            } else {
+                console.log('❌ No se encontró sistema de PM');
+            }
+            
+            console.log('🔧 Función comprarItem en parent:', !!window.parent.comprarItem);
+            console.log('🔧 Función addItemToInventory en parent:', !!window.parent.addItemToInventory);
+            console.log('🔥 Database en parent:', !!window.parent.database);
+            console.groupEnd();
+            
+            return {
+                hasParent: !!window.parent,
+                parentPMSystem: !!window.parent.pmTransactions,
+                localPMSystem: !!window.pmTransactions,
+                currentPM: pmSystem ? pmSystem.getTotal() : 0,
+                comprarItemAvailable: !!window.parent.comprarItem,
+                addItemToInventoryAvailable: !!window.parent.addItemToInventory,
+                databaseAvailable: !!window.parent.database
+            };
+        };
 
         // Función para cargar la URL de imagen guardada
         function getItemImageUrl(itemName) {
