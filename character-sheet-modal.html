@@ -460,6 +460,65 @@
             background-color: #ff6b81 !important;
             transform: scale(1.1) !important;
         }
+
+        .item-stat {
+            color: #aaa;
+            font-size: 12px;
+            margin: 2px 0;
+        }
+
+        .item-stat strong {
+            color: #00ccff;
+        }
+
+        .add-item-form {
+            background: rgba(0,0,0,0.3) !important;
+            border: 1px solid #444 !important;
+            border-radius: 4px !important;
+            margin-top: 10px !important;
+            padding: 10px !important;
+        }
+
+        .add-item-form h4 {
+            color: #00ccff !important;
+            margin: 0 0 10px 0 !important;
+            font-family: 'Orbitron', sans-serif !important;
+        }
+
+        .add-item-form input,
+        .add-item-form textarea {
+            background: #333 !important;
+            color: #fff !important;
+            border: 1px solid #555 !important;
+            padding: 5px !important;
+            border-radius: 3px !important;
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        .add-item-form input:focus,
+        .add-item-form textarea:focus {
+            outline: none !important;
+            border-color: #00ccff !important;
+            box-shadow: 0 0 3px rgba(0, 204, 255, 0.3) !important;
+        }
+
+        .add-item-form button {
+            background: #00ccff !important;
+            color: #000 !important;
+            border: none !important;
+            padding: 8px 15px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            font-family: 'Orbitron', sans-serif !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .add-item-form button:hover {
+            background: #ff4757 !important;
+            color: #fff !important;
+            transform: translateY(-1px) !important;
+        }
     </style>
     
     <script>
@@ -829,21 +888,51 @@
                         <div id="weapons-list">
                             <p>Sin armas equipadas</p>
                         </div>
-                        <button class="button add-item" data-type="weapon">+ Añadir Arma</button>
+                        <div class="add-item-form" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 4px;">
+                            <h4 style="color: #00ccff; margin: 0 0 10px 0;">Añadir Arma</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="weapon-name" placeholder="Nombre del arma" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="weapon-damage" placeholder="Daño (ej: 2d10+2)" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="weapon-ap" placeholder="PA (ej: -2)" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="weapon-range" placeholder="Alcance" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                            </div>
+                            <textarea id="weapon-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
+                            <button onclick="addCustomWeapon()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Arma</button>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>Armadura</h3>
                         <div id="armor-list">
                             <p>Sin armadura equipada</p>
                         </div>
-                        <button class="button add-item" data-type="armor">+ Añadir Armadura</button>
+                        <div class="add-item-form" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 4px;">
+                            <h4 style="color: #00ccff; margin: 0 0 10px 0;">Añadir Armadura</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="armor-name" placeholder="Nombre de la armadura" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="armor-protection" placeholder="Protección (ej: 10/15)" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="armor-weight" placeholder="Peso" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="armor-effects" placeholder="Efectos especiales" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                            </div>
+                            <textarea id="armor-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
+                            <button onclick="addCustomArmor()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Armadura</button>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>Equipo Misceláneo</h3>
                         <div id="misc-list">
                             <p>Sin equipo adicional</p>
                         </div>
-                        <button class="button add-item" data-type="misc">+ Añadir Equipo</button>
+                        <div class="add-item-form" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 4px;">
+                            <h4 style="color: #00ccff; margin: 0 0 10px 0;">Añadir Equipo</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="misc-name" placeholder="Nombre del equipo" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="misc-weight" placeholder="Peso" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="misc-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="misc-effects" placeholder="Efectos/Uso" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                            </div>
+                            <textarea id="misc-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
+                            <button onclick="addCustomMisc()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Equipo</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -858,7 +947,17 @@
                         <div id="implants-list">
                             <p>Sin implantes instalados</p>
                         </div>
-                        <button class="button add-item" data-type="implant">+ Añadir Implante</button>
+                        <div class="add-item-form" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 4px;">
+                            <h4 style="color: #00ccff; margin: 0 0 10px 0;">Añadir Implante</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="implant-name" placeholder="Nombre del implante" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="implant-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="implant-effects" placeholder="Efectos mecánicos" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <input type="text" id="implant-location" placeholder="Ubicación" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                            </div>
+                            <textarea id="implant-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
+                            <button onclick="addCustomImplant()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Implante</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1520,21 +1619,56 @@
                 implant: inventory.filter(item => item.tipo === 'implant' || item.tipo === 'cyberware')
             };
 
-            // Función helper para crear HTML de items
+            // Función helper para crear HTML de items con detalles
             function createItemHTML(items, tipo) {
                 if (items.length === 0) {
                     return `<p style="color: #666;">No hay ${tipo}s</p>`;
                 }
                 
-                return items.map((item, index) => `
-                    <div class="item-card">
-                        <h4>${item.nombre}</h4>
-                        <p>${item.descripcion || item.detalles || 'Sin descripción'}</p>
-                        <button class="remove-item" onclick="removeItem(${index})" style="background-color: #ff4757; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
-                            Eliminar
-                        </button>
-                    </div>
-                `).join('');
+                return items.map((item, index) => {
+                    let detallesHTML = '';
+                    
+                    // Detalles específicos según el tipo
+                    if (item.tipo === 'arma' || item.tipo === 'armas') {
+                        detallesHTML = `
+                            ${item.dano ? `<div class="item-stat"><strong>Daño:</strong> ${item.dano}</div>` : ''}
+                            ${item.ap ? `<div class="item-stat"><strong>PA:</strong> ${item.ap}</div>` : ''}
+                            ${item.alcance ? `<div class="item-stat"><strong>Alcance:</strong> ${item.alcance}</div>` : ''}
+                            ${item.municion ? `<div class="item-stat"><strong>Munición:</strong> ${item.municion}</div>` : ''}
+                        `;
+                    } else if (item.tipo === 'armadura' || item.tipo === 'armaduras') {
+                        detallesHTML = `
+                            ${item.proteccion ? `<div class="item-stat"><strong>Protección:</strong> ${item.proteccion}</div>` : ''}
+                            ${item.peso ? `<div class="item-stat"><strong>Peso:</strong> ${item.peso}</div>` : ''}
+                        `;
+                    } else if (item.tipo === 'implant' || item.tipo === 'cyberware') {
+                        detallesHTML = `
+                            ${item.efectos ? `<div class="item-stat"><strong>Efectos:</strong> ${item.efectos}</div>` : ''}
+                        `;
+                    }
+                    
+                    // Información común para todos los tipos
+                    const infoComun = `
+                        ${item.coste ? `<div class="item-stat"><strong>Coste:</strong> ${item.coste} PM</div>` : ''}
+                        ${item.notas ? `<div class="item-stat"><strong>Notas:</strong> ${item.notas}</div>` : ''}
+                    `;
+                    
+                    return `
+                        <div class="item-card" style="margin-bottom: 15px; padding: 12px; background: rgba(30, 30, 30, 0.8); border: 1px solid #444; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <h4 style="color: #00ccff; margin: 0; font-family: 'Orbitron', sans-serif;">${item.nombre}</h4>
+                                <button class="remove-item" onclick="removeItem(${index})" style="background-color: #ff4757; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                    Eliminar
+                                </button>
+                            </div>
+                            ${item.descripcion ? `<p style="color: #ccc; margin: 0 0 8px 0; font-size: 14px;">${item.descripcion}</p>` : ''}
+                            <div class="item-details" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 5px; font-size: 12px;">
+                                ${detallesHTML}
+                                ${infoComun}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
 
             // Mostrar en cada contenedor
@@ -1627,7 +1761,7 @@
                 
                 // Timestamp de guardado
                 lastSaved: new Date().toISOString(),
-                version: '0.73'
+                version: '0.75'
             };
             
             console.log('📋 Datos recopilados:', characterData);
@@ -2030,9 +2164,17 @@
         
         // Función para actualizar contadores de puntos
         function updatePointCounters() {
-            // Contar puntos de atributos usados
+            // Obtener la plantilla seleccionada
+            const selectedTemplate = getSelectValue('aptitude-template', 'actioneer');
+            const templateValues = aptitudeTemplates[selectedTemplate] || aptitudeTemplates['actioneer'];
+            
+            // Contar puntos de atributos usados ADICIONALES a la plantilla
             const attributeTotal = ['cog', 'int', 'ref', 'sav', 'som', 'wil']
-                .reduce((sum, attr) => sum + Math.max(0, getInputValue(attr, 10) - 10), 0);
+                .reduce((sum, attr) => {
+                    const currentValue = getInputValue(attr, 10);
+                    const templateValue = templateValues[attr] || 10;
+                    return sum + Math.max(0, currentValue - templateValue);
+                }, 0);
             
             const attributePointsElement = document.getElementById('attribute-points');
             if (attributePointsElement) {
@@ -2101,6 +2243,184 @@
             
             updatePointCounters();
         }
+
+        // =================== FUNCIONES PARA AÑADIR EQUIPO PERSONALIZADO ===================
+        
+        // Función para añadir arma personalizada
+        window.addCustomWeapon = function() {
+            const name = document.getElementById('weapon-name').value.trim();
+            const damage = document.getElementById('weapon-damage').value.trim();
+            const ap = document.getElementById('weapon-ap').value.trim();
+            const range = document.getElementById('weapon-range').value.trim();
+            const description = document.getElementById('weapon-description').value.trim();
+            
+            if (!name) {
+                alert('El nombre del arma es obligatorio');
+                return;
+            }
+            
+            const weapon = {
+                nombre: name,
+                tipo: 'arma',
+                descripcion: description,
+                dano: damage,
+                ap: ap,
+                alcance: range,
+                notas: 'Añadido manualmente'
+            };
+            
+            // Añadir al inventario local
+            inventory.push(weapon);
+            
+            // Notificar al padre para actualizar Firebase
+            if (window.parent && window.parent.addItemToInventory) {
+                window.parent.addItemToInventory(weapon);
+            }
+            
+            // Limpiar formulario
+            document.getElementById('weapon-name').value = '';
+            document.getElementById('weapon-damage').value = '';
+            document.getElementById('weapon-ap').value = '';
+            document.getElementById('weapon-range').value = '';
+            document.getElementById('weapon-description').value = '';
+            
+            // Actualizar visualización
+            updateInventoryDisplay();
+            
+            console.log('⚔️ Arma añadida:', weapon);
+        };
+        
+        // Función para añadir armadura personalizada
+        window.addCustomArmor = function() {
+            const name = document.getElementById('armor-name').value.trim();
+            const protection = document.getElementById('armor-protection').value.trim();
+            const weight = document.getElementById('armor-weight').value.trim();
+            const effects = document.getElementById('armor-effects').value.trim();
+            const description = document.getElementById('armor-description').value.trim();
+            
+            if (!name) {
+                alert('El nombre de la armadura es obligatorio');
+                return;
+            }
+            
+            const armor = {
+                nombre: name,
+                tipo: 'armadura',
+                descripcion: description,
+                proteccion: protection,
+                peso: weight,
+                efectos: effects,
+                notas: 'Añadido manualmente'
+            };
+            
+            // Añadir al inventario local
+            inventory.push(armor);
+            
+            // Notificar al padre para actualizar Firebase
+            if (window.parent && window.parent.addItemToInventory) {
+                window.parent.addItemToInventory(armor);
+            }
+            
+            // Limpiar formulario
+            document.getElementById('armor-name').value = '';
+            document.getElementById('armor-protection').value = '';
+            document.getElementById('armor-weight').value = '';
+            document.getElementById('armor-effects').value = '';
+            document.getElementById('armor-description').value = '';
+            
+            // Actualizar visualización
+            updateInventoryDisplay();
+            
+            console.log('🛡️ Armadura añadida:', armor);
+        };
+        
+        // Función para añadir equipo misceláneo personalizado
+        window.addCustomMisc = function() {
+            const name = document.getElementById('misc-name').value.trim();
+            const weight = document.getElementById('misc-weight').value.trim();
+            const cost = document.getElementById('misc-cost').value.trim();
+            const effects = document.getElementById('misc-effects').value.trim();
+            const description = document.getElementById('misc-description').value.trim();
+            
+            if (!name) {
+                alert('El nombre del equipo es obligatorio');
+                return;
+            }
+            
+            const misc = {
+                nombre: name,
+                tipo: 'equipo',
+                descripcion: description,
+                peso: weight,
+                coste: cost,
+                efectos: effects,
+                notas: 'Añadido manualmente'
+            };
+            
+            // Añadir al inventario local
+            inventory.push(misc);
+            
+            // Notificar al padre para actualizar Firebase
+            if (window.parent && window.parent.addItemToInventory) {
+                window.parent.addItemToInventory(misc);
+            }
+            
+            // Limpiar formulario
+            document.getElementById('misc-name').value = '';
+            document.getElementById('misc-weight').value = '';
+            document.getElementById('misc-cost').value = '';
+            document.getElementById('misc-effects').value = '';
+            document.getElementById('misc-description').value = '';
+            
+            // Actualizar visualización
+            updateInventoryDisplay();
+            
+            console.log('🔧 Equipo añadido:', misc);
+        };
+        
+        // Función para añadir implante personalizado
+        window.addCustomImplant = function() {
+            const name = document.getElementById('implant-name').value.trim();
+            const cost = document.getElementById('implant-cost').value.trim();
+            const effects = document.getElementById('implant-effects').value.trim();
+            const location = document.getElementById('implant-location').value.trim();
+            const description = document.getElementById('implant-description').value.trim();
+            
+            if (!name) {
+                alert('El nombre del implante es obligatorio');
+                return;
+            }
+            
+            const implant = {
+                nombre: name,
+                tipo: 'implant',
+                descripcion: description,
+                coste: cost,
+                efectos: effects,
+                ubicacion: location,
+                notas: 'Añadido manualmente'
+            };
+            
+            // Añadir al inventario local
+            inventory.push(implant);
+            
+            // Notificar al padre para actualizar Firebase
+            if (window.parent && window.parent.addItemToInventory) {
+                window.parent.addItemToInventory(implant);
+            }
+            
+            // Limpiar formulario
+            document.getElementById('implant-name').value = '';
+            document.getElementById('implant-cost').value = '';
+            document.getElementById('implant-effects').value = '';
+            document.getElementById('implant-location').value = '';
+            document.getElementById('implant-description').value = '';
+            
+            // Actualizar visualización
+            updateInventoryDisplay();
+            
+            console.log('🤖 Implante añadido:', implant);
+        };
     </script>
 </body>
 </html> 

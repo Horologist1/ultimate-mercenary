@@ -45,12 +45,27 @@ window.debugInventorySystem = function() {
 window.addItemToInventory = function(item) {
     console.log('📦 Añadiendo item:', item.nombre || item.name);
     
-    // Normalizar el item
+    // Normalizar el item con más campos
     const normalizedItem = {
         nombre: item.nombre || item.name || 'Item sin nombre',
         tipo: item.tipo || 'equipo',
         descripcion: item.descripcion || item.description || '',
-        id: Date.now() + Math.random() // ID único
+        // Campos específicos para armas
+        dano: item.dano || item.damage || item.daño || '',
+        ap: item.ap || item.AP || '',
+        alcance: item.alcance || item.range || '',
+        municion: item.municion || item.ammo || '',
+        // Campos específicos para armaduras
+        proteccion: item.proteccion || item.protection || item.armor || '',
+        // Campos específicos para equipo general
+        peso: item.peso || item.weight || '',
+        coste: item.coste || item.cost || item.precio || '',
+        // Campos adicionales
+        notas: item.notas || item.notes || item.details || '',
+        efectos: item.efectos || item.effects || '',
+        // Metadatos
+        id: Date.now() + Math.random(), // ID único
+        fechaCompra: new Date().toISOString()
     };
     
     // Añadir al array local
@@ -334,7 +349,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.74'
+            version: '0.75'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {
