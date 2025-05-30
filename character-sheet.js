@@ -45,38 +45,43 @@ window.debugInventorySystem = function() {
 window.addItemToInventory = function(item) {
     console.log('📦 Añadiendo item:', item.nombre || item.name);
     
-    // Normalizar el item con más campos
+    // Normalizar el item con más campos y asegurar ID único
     const normalizedItem = {
+        id: item.id || `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         nombre: item.nombre || item.name || 'Item sin nombre',
         tipo: item.tipo || 'equipo',
         descripcion: item.descripcion || item.description || '',
         // Campos específicos para armas
-        dano: item.dano || item.damage || item.daño || '',
+        dano: item.dano || item.damage || item.daño || item['Daño'] || '',
         ap: item.ap || item.AP || '',
-        alcance: item.alcance || item.range || '',
-        municion: item.municion || item.ammo || '',
+        alcance: item.alcance || item.range || item['Alcance'] || '',
+        municion: item.municion || item.ammo || item['Munición'] || '',
         // Campos específicos para armaduras
-        proteccion: item.proteccion || item.protection || item.armor || '',
+        proteccion: item.proteccion || item.protection || item.armor || item['Armadura (K/E)'] || '',
+        cobertura: item.cobertura || item.coverage || item['Cobertura'] || '',
         // Campos específicos para equipo general
-        peso: item.peso || item.weight || '',
-        coste: item.coste || item.cost || item.precio || '',
+        efectos: item.efectos || item.effects || item['Efectos'] || '',
+        notas: item.notas || item.notes || item['Notas'] || item.detalles || '',
+        coste: item.coste || item.price || item['Coste'] || 0,
         // Campos adicionales
-        notas: item.notas || item.notes || item.details || '',
-        efectos: item.efectos || item.effects || '',
+        compatible: item.compatible || item['Compatible con'] || '',
+        cantidad: item.cantidad || item['Cantidad'] || '',
+        servicio: item.servicio || item['Servicio'] || '',
         // Metadatos
-        id: Date.now() + Math.random(), // ID único
-        fechaCompra: new Date().toISOString()
+        fechaCompra: item.fechaCompra || new Date().toISOString(),
+        origen: item.origen || 'manual'
     };
     
     // Añadir al array local
     window.inventory.push(normalizedItem);
+    console.log('✅ Item añadido al inventario local:', normalizedItem.nombre);
     
     // Actualizar Firebase
     if (window.database) {
         window.database.ref('itemsComprados').set(window.inventory).then(() => {
-            console.log('✅ Item guardado en Firebase');
+            console.log('✅ Inventario actualizado en Firebase');
         }).catch(error => {
-            console.error('❌ Error guardando en Firebase:', error);
+            console.error('❌ Error actualizando Firebase:', error);
         });
     }
     
@@ -100,8 +105,40 @@ window.clearInventory = function() {
     }
 };
 
-// Función para eliminar item específico
+// Función para eliminar item del inventario por ID
+window.removeItemFromInventoryById = function(itemId) {
+    console.log('🗑️ Eliminando item con ID:', itemId);
+    
+    // Encontrar el índice del item por su ID
+    const itemIndex = window.inventory.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+        console.error('❌ Item no encontrado con ID:', itemId);
+        return;
+    }
+    
+    // Eliminar del array local
+    const removedItem = window.inventory.splice(itemIndex, 1)[0];
+    console.log('🗑️ Item eliminado:', removedItem);
+    
+    // Actualizar Firebase
+    if (window.database) {
+        window.database.ref('itemsComprados').set(window.inventory).then(() => {
+            console.log('✅ Inventario actualizado en Firebase tras eliminación');
+        }).catch(error => {
+            console.error('❌ Error actualizando Firebase:', error);
+        });
+    }
+    
+    // Notificar a modales
+    notifyModals();
+    
+    return removedItem;
+};
+
+// Función para eliminar item del inventario (mantenida por compatibilidad)
 window.removeItemFromInventory = function(index) {
+    console.warn('⚠️ removeItemFromInventory(index) está deprecated, usar removeItemFromInventoryById(id)');
     if (index >= 0 && index < window.inventory.length) {
         const removedItem = window.inventory.splice(index, 1)[0];
         console.log('🗑️ Item eliminado:', removedItem.nombre);
@@ -349,7 +386,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.75'
+            version: '0.76'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {

@@ -631,16 +631,16 @@
                 localStorage.setItem('shopItems', JSON.stringify(defaultShopItems));
             }
 
-            // Convertir el objeto de items en un array plano
+            // Convertir el objeto de items en un array plano preservando todos los campos
             shopItems = Object.entries(savedItems).flatMap(([section, items]) => 
                 items.map((item, index) => ({
                     id: `${section}-${index}`,
                     name: item.Artículo || item.Servicio || '',
                     description: item.Descripción || '',
                     price: parseInt(item.Coste) || 0,
-                    details: item.Efectos || item.Notas || item.Daño || item['Armadura (K/E)'] || item.Cobertura || '',
                     section: section,
-                    damage: item.Daño || ''
+                    // Preservar todos los campos originales
+                    ...item
                 }))
             );
         }
@@ -686,12 +686,31 @@
                 const success = comprarItemFn(itemId, item.price);
                 
                 if (success) {
-                    // Preparar el item simple
+                    // Preparar el item con todos los datos disponibles
                     const fichaItem = {
                         nombre: item.name,
                         tipo: item.section.replace('shop-', ''),
                         descripcion: item.description || '',
-                        detalles: item.details || ''
+                        detalles: item.details || '',
+                        coste: item.price,
+                        // Campos específicos para armas
+                        dano: item.damage || item['Daño'] || '',
+                        ap: item.ap || item.AP || '',
+                        alcance: item.range || item['Alcance'] || '',
+                        municion: item.ammo || item['Munición'] || '',
+                        notas: item.notes || item['Notas'] || item.details || '',
+                        // Campos específicos para armaduras
+                        proteccion: item.armor || item['Armadura (K/E)'] || '',
+                        cobertura: item.coverage || item['Cobertura'] || '',
+                        // Campos específicos para cyberware y equipo
+                        efectos: item.effects || item['Efectos'] || '',
+                        // Campos adicionales
+                        compatible: item['Compatible con'] || '',
+                        cantidad: item['Cantidad'] || '',
+                        servicio: item['Servicio'] || '',
+                        // Metadatos
+                        fechaCompra: new Date().toISOString(),
+                        origen: 'tienda'
                     };
                     
                     console.log('📦 Item a añadir:', fichaItem);
