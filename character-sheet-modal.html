@@ -2874,6 +2874,7 @@
             setTimeout(() => {
                 calculateImplantBonuses();
                 updateAllSkillTotals();
+                updateAllAttributeTotals();
             }, 100);
             
             console.log('🤖 Implante añadido con beneficios:', implant);
@@ -3136,10 +3137,22 @@ Introduce el número (1-4):`);
             
             inventory.forEach(item => {
                 // Buscar tanto en tipo 'cyberware' como 'implant' para compatibilidad
-                if ((item.tipo === 'cyberware' || item.tipo === 'implant') && item.benefits && Array.isArray(item.benefits)) {
-                    console.log('🔧 Procesando implante:', item.nombre, 'con', item.benefits.length, 'beneficios');
+                if (item.tipo === 'cyberware' || item.tipo === 'implant') {
+                    console.log('🔧 Procesando implante:', item.nombre);
                     
-                    item.benefits.forEach(benefit => {
+                    let benefits = [];
+                    
+                    // Si el implante tiene beneficios explícitos, usarlos
+                    if (item.benefits && Array.isArray(item.benefits)) {
+                        benefits = item.benefits;
+                        console.log('  📋 Usando beneficios explícitos:', benefits.length);
+                    } else {
+                        // Si no tiene beneficios explícitos, generar automáticamente basándose en el nombre
+                        benefits = getBenefitsForImplantByName(item.nombre);
+                        console.log('  🤖 Generando beneficios automáticos para:', item.nombre, '→', benefits.length, 'beneficios');
+                    }
+                    
+                    benefits.forEach(benefit => {
                         const [type, name] = benefit.target.split('_');
                         const bonus = parseInt(benefit.bonus) || 0;
                         
@@ -3148,81 +3161,53 @@ Introduce el número (1-4):`);
                                 window.implantBonuses.attributes[name] = 0;
                             }
                             window.implantBonuses.attributes[name] += bonus;
-                            console.log(`🔧 Atributo ${name}: +${bonus} (total: ${window.implantBonuses.attributes[name]})`);
+                            console.log(`  🔧 Atributo ${name}: +${bonus} (total: ${window.implantBonuses.attributes[name]})`);
                         } else if (type === 'skill') {
                             if (!window.implantBonuses.skills[name]) {
                                 window.implantBonuses.skills[name] = 0;
                             }
                             window.implantBonuses.skills[name] += bonus;
-                            console.log(`🔧 Habilidad ${name}: +${bonus} (total: ${window.implantBonuses.skills[name]})`);
+                            console.log(`  🔧 Habilidad ${name}: +${bonus} (total: ${window.implantBonuses.skills[name]})`);
                         }
                     });
                 }
             });
             
-            console.log('🔧 Bonuses calculados:', window.implantBonuses);
+            console.log('🔧 Bonuses finales calculados:', window.implantBonuses);
             
             // Actualizar visualización de atributos y habilidades
             updateAllAttributeTotals();
             updateAllSkillTotals();
         }
         
-        // Sobrescribir addCustomImplant para incluir beneficios
-        window.addCustomImplant = function() {
-            const name = document.getElementById('implant-name').value.trim();
-            const cost = document.getElementById('implant-cost').value.trim();
-            const effects = document.getElementById('implant-effects').value.trim();
-            const location = document.getElementById('implant-location').value.trim();
-            const description = document.getElementById('implant-description').value.trim();
-            
-            if (!name) {
-                alert('El nombre del implante es obligatorio');
-                return;
-            }
-            
-            const benefits = gatherImplantBenefits();
-            
-            const implant = {
-                nombre: name,
-                tipo: 'cyberware',
-                descripcion: description,
-                coste: cost,
-                efectos: effects,
-                ubicacion: location,
-                notas: 'Añadido manualmente',
-                origen: 'manual',
-                benefits: benefits
+        // Función auxiliar para obtener beneficios por nombre de implante
+        function getBenefitsForImplantByName(implantName) {
+            const implantBenefits = {
+                'Ojo Cibernético Avanzado': [
+                    { target: 'skill_Percepción', bonus: 15 },
+                    { target: 'skill_Armas de Fuego', bonus: 10 }
+                ],
+                'Reflejos Cableados': [
+                    { target: 'skill_Atletismo', bonus: 10 },
+                    { target: 'skill_Esquivar', bonus: 10 }
+                ],
+                'Piel Subdérmica Blindada': [
+                    { target: 'attr_som', bonus: 2 }
+                ],
+                'Procesador de Combate Táctico': [
+                    { target: 'skill_Armas de Fuego', bonus: 5 }
+                ],
+                'Pulmones Filtradores Mejorados': [
+                    { target: 'attr_som', bonus: 5 }
+                ],
+                'Implante de Camuflaje Óptico': [
+                    { target: 'skill_Infiltración', bonus: 15 }
+                ]
             };
             
-            if (window.parent && window.parent.addItemToInventory) {
-                window.parent.addItemToInventory(implant);
-                console.log('🤖 Implante enviado al padre:', implant);
-            } else {
-                inventory.push({
-                    ...implant,
-                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    fechaCompra: new Date().toISOString()
-                });
-                updateInventoryDisplay();
-                console.log('🤖 Implante añadido localmente:', implant);
-            }
-            
-            document.getElementById('implant-name').value = '';
-            document.getElementById('implant-cost').value = '';
-            document.getElementById('implant-effects').value = '';
-            document.getElementById('implant-location').value = '';
-            document.getElementById('implant-description').value = '';
-            clearImplantBenefitsForm();
-            
-            updateInventoryDisplay();
-            setTimeout(() => {
-                calculateImplantBonuses();
-                updateAllSkillTotals();
-            }, 100);
-            
-            console.log('🤖 Implante añadido con beneficios:', implant);
-        };
-        
+            return implantBenefits[implantName] || [];
+        }
+
         // Event listeners para beneficios
         document.addEventListener('DOMContentLoaded', function() {
             const addBenefitBtn = document.getElementById('add-benefit');
@@ -3256,9 +3241,57 @@ Introduce el número (1-4):`);
                 updateAllSkillTotals();
                 updateAllAttributeTotals();
             }, 2000);
+            
+            // Forzar recálculo cada 3 segundos para capturar implantes que lleguen tarde
+            setInterval(() => {
+                if (inventory.some(item => item.tipo === 'cyberware' || item.tipo === 'implant')) {
+                    calculateImplantBonuses();
+                }
+            }, 3000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.81)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.82)');
+        
+        // Función de debug específica para implantes (v0.82)
+        window.debugImplantSystem = function() {
+            console.group('🤖 DEBUG: Sistema de Implantes v0.82');
+            
+            const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
+            console.log(`📊 Total implantes encontrados: ${implants.length}`);
+            
+            implants.forEach((implant, index) => {
+                console.group(`🔧 Implante ${index + 1}: ${implant.nombre}`);
+                console.log('Tipo:', implant.tipo);
+                console.log('Beneficios explícitos:', implant.benefits);
+                
+                const autoBenefits = getBenefitsForImplantByName(implant.nombre);
+                console.log('Beneficios automáticos:', autoBenefits);
+                
+                const finalBenefits = implant.benefits && implant.benefits.length > 0 ? 
+                    implant.benefits : autoBenefits;
+                console.log('Beneficios finales a aplicar:', finalBenefits);
+                console.groupEnd();
+            });
+            
+            console.log('🔧 Bonuses globales actuales:', window.implantBonuses);
+            console.groupEnd();
+            
+            // Forzar recálculo
+            calculateImplantBonuses();
+            
+            return {
+                totalImplants: implants.length,
+                currentBonuses: window.implantBonuses,
+                implantDetails: implants.map(i => ({
+                    name: i.nombre,
+                    type: i.tipo,
+                    explicitBenefits: i.benefits,
+                    autoBenefits: getBenefitsForImplantByName(i.nombre)
+                }))
+            };
+        };
+        
+        console.log('🤖 Función de debug disponible: debugImplantSystem()');
         
         // ================= FIN SISTEMA DE BENEFICIOS DE IMPLANTES =================
 

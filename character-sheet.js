@@ -101,6 +101,18 @@ window.addItemToInventory = function(item) {
     // Notificar a modales
     notifyModals();
     
+    // Si es un implante, forzar recálculo de bonuses
+    if (normalizedItem.tipo === 'cyberware' || normalizedItem.tipo === 'implant') {
+        setTimeout(() => {
+            // Intentar acceder a la función del modal si está disponible
+            const modal = document.querySelector('iframe[src*="character-sheet-modal"]');
+            if (modal && modal.contentWindow && modal.contentWindow.calculateImplantBonuses) {
+                modal.contentWindow.calculateImplantBonuses();
+                console.log('🔧 Bonuses de implante recalculados automáticamente');
+            }
+        }, 500);
+    }
+    
     return normalizedItem;
 };
 
@@ -486,7 +498,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.81'
+            version: '0.82'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {
