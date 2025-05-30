@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de Personaje</title>
+    <title>Character Sheet Modal - Ultimate Mercenary 0.85</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -2823,11 +2823,11 @@
             console.log('🔧 Equipo añadido:', misc);
         };
         
-        // Función para añadir implante personalizado (v0.84 - REESCRITA COMPLETAMENTE)
-        // Siguiendo exactamente el mismo proceso que los implantes de la tienda
+        // VERSIÓN 0.85: ULTRA-SIMPLIFICADA - USA EXACTAMENTE EL MISMO FLUJO QUE LA TIENDA
         window.addCustomImplant = function() {
-            console.log('🚀 === IMPLANTE PERSONALIZADO v0.84 - NUEVO SISTEMA ===');
+            console.log('🚀 === IMPLANTE PERSONALIZADO v0.85 - ULTRA SIMPLE ===');
             
+            // PASO 1: Obtener datos del formulario
             const name = document.getElementById('implant-name').value.trim();
             const effects = document.getElementById('implant-effects').value.trim();
             const location = document.getElementById('implant-location').value.trim();
@@ -2838,61 +2838,37 @@
                 return;
             }
             
-            console.log('🚀 Datos del formulario:');
-            console.log('  Nombre:', name);
-            console.log('  Efectos:', effects);
-            console.log('  Ubicación:', location);
-            console.log('  Descripción:', description);
-            
-            // PASO 1: Recopilar beneficios usando la misma función mejorada
+            // PASO 2: Recopilar beneficios
             const customBenefits = gatherImplantBenefits();
-            console.log('🚀 Beneficios personalizados recopilados:', customBenefits);
+            console.log('🚀 Beneficios recopilados:', customBenefits);
             
-            // PASO 2: Crear el item siguiendo EXACTAMENTE el formato de la tienda
+            if (!customBenefits || customBenefits.length === 0) {
+                alert('Debes agregar al menos un beneficio mecánico');
+                return;
+            }
+            
+            // PASO 3: Crear el item EXACTAMENTE igual que la tienda
             const fichaItem = {
                 nombre: name,
-                tipo: 'cyberware',  // MISMO tipo que usa la tienda
-                descripcion: description || '',
-                detalles: description || '',
-                coste: 0, // MISMO campo que usa la tienda
-                efectos: effects || '',
-                ubicacion: location || '',
-                notas: 'Añadido manualmente',
-                // CAMPO CLAVE: benefits - exactamente como la tienda
-                benefits: customBenefits && customBenefits.length > 0 ? customBenefits : undefined,
-                // MISMO origen que otros items
+                tipo: 'cyberware',
+                descripcion: description,
+                efectos: effects,
+                ubicacion: location,
+                coste: 0,
+                benefits: customBenefits,
                 fechaCompra: new Date().toISOString(),
                 origen: 'manual'
             };
             
-            console.log('🚀 Item final (formato de tienda):', fichaItem);
-            console.log('🚀 Benefits que se van a aplicar:', fichaItem.benefits);
+            console.log('🚀 Item a añadir (formato tienda):', fichaItem);
             
-            // PASO 3: Verificar que tenemos benefits válidos
-            if (!fichaItem.benefits || fichaItem.benefits.length === 0) {
-                console.warn('⚠️ ADVERTENCIA: No se encontraron beneficios válidos');
-                const confirm = window.confirm('No se detectaron beneficios mecánicos válidos. ¿Continuar de todos modos?');
-                if (!confirm) return;
-            } else {
-                console.log('✅ Beneficios válidos encontrados:', fichaItem.benefits.length);
-                fichaItem.benefits.forEach((benefit, i) => {
-                    console.log(`   ${i+1}. ${benefit.target} = +${benefit.bonus}`);
-                });
-            }
-            
-            // PASO 4: Usar EXACTAMENTE el mismo sistema que la tienda
+            // PASO 4: Usar EXACTAMENTE el mismo proceso que la tienda
             if (window.parent && window.parent.addItemToInventory) {
-                console.log('🚀 Usando addItemToInventory del padre (igual que tienda)...');
                 window.parent.addItemToInventory(fichaItem);
                 console.log('🚀 Item enviado al sistema padre');
             } else {
-                console.log('🚀 Sistema padre no disponible, añadiendo localmente...');
-                inventory.push({
-                    ...fichaItem,
-                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                });
-                updateInventoryDisplay();
-                console.log('🚀 Item añadido localmente');
+                console.error('🚀 Sistema padre no disponible');
+                return;
             }
             
             // PASO 5: Limpiar formulario
@@ -2902,50 +2878,18 @@
             document.getElementById('implant-description').value = '';
             clearImplantBenefitsForm();
             
-            // PASO 6: Forzar actualización usando el MISMO sistema que character-sheet.js 
-            updateInventoryDisplay();
-            
-            // PASO 7: Recálculo automático (igual que en tienda + character-sheet.js)
+            // PASO 6: Forzar recálculo exactamente igual que los implantes de tienda
             setTimeout(() => {
-                console.log('🚀 Activando recálculo automático...');
-                
-                // Si estamos en el modal, también acceder al modal para el recálculo
-                const modal = document.querySelector('iframe[src*="character-sheet-modal"]');
-                if (modal && modal.contentWindow && modal.contentWindow.calculateImplantBonuses) {
-                    modal.contentWindow.calculateImplantBonuses();
-                    console.log('🚀 Recálculo ejecutado desde iframe');
-                }
-                
-                // Recálculo local
+                console.log('🚀 Ejecutando recálculo...');
                 if (typeof calculateImplantBonuses === 'function') {
                     calculateImplantBonuses();
-                    console.log('🚀 Recálculo local ejecutado');
                 }
-                
-                // Actualizar totales
-                if (typeof updateAllSkillTotals === 'function') updateAllSkillTotals();
-                if (typeof updateAllAttributeTotals === 'function') updateAllAttributeTotals();
-                
-                console.log('🚀 Estado final de bonuses:', window.implantBonuses);
-            }, 100);
-            
-            // PASO 8: Verificación adicional a los 2 segundos
-            setTimeout(() => {
-                console.log('🚀 Verificación final del implante...');
-                const debug = debugImplantSystem();
-                console.log('🚀 Debug completo:', debug);
-                
-                // Verificar si el implante aparece en la lista
-                const foundImplant = inventory.find(item => item.nombre === name && item.origen === 'manual');
-                if (foundImplant) {
-                    console.log('✅ Implante encontrado en inventario:', foundImplant);
-                    console.log('✅ Benefits del implante:', foundImplant.benefits);
-                } else {
-                    console.error('❌ Implante NO encontrado en inventario');
+                if (typeof updateAllAttributeTotals === 'function') {
+                    updateAllAttributeTotals();
                 }
-            }, 2000);
+            }, 500);
             
-            console.log('🚀 === FIN ADICIÓN IMPLANTE PERSONALIZADO v0.84 ===');
+            console.log('🚀 === IMPLANTE PERSONALIZADO v0.85 COMPLETADO ===');
         };
 
         // ====================== FUNCIÓN DE PRUEBA ======================
@@ -3352,11 +3296,11 @@ Introduce el número (1-4):`);
             }, 3000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.84)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.85)');
         
-        // Función de debug específica para implantes (v0.84)
+        // Función de debug específica para implantes (v0.85)
         window.debugImplantSystem = function() {
-            console.group('🤖 DEBUG: Sistema de Implantes v0.84');
+            console.group('🤖 DEBUG: Sistema de Implantes v0.85');
             
             const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
             console.log(`📊 Total implantes encontrados: ${implants.length}`);
