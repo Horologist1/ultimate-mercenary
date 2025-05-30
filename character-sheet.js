@@ -72,17 +72,20 @@ window.addItemToInventory = function(item) {
         origen: item.origen || 'manual'
     };
     
-    // Verificar duplicados basándose en nombre y timestamp (evitar duplicados inmediatos)
+    // Verificar duplicados basándose en nombre, tipo y timestamp (evitar duplicados inmediatos)
     const tiempoActual = Date.now();
     const existeReciente = window.inventory.find(existingItem => {
         const mismoNombre = existingItem.nombre === normalizedItem.nombre;
+        const mismoTipo = existingItem.tipo === normalizedItem.tipo;
         const tiempoItem = new Date(existingItem.fechaCompra).getTime();
         const diferenciaSegundos = (tiempoActual - tiempoItem) / 1000;
-        return mismoNombre && diferenciaSegundos < 5; // 5 segundos de ventana anti-duplicado
+        
+        // Detectar duplicados exactos en los últimos 3 segundos
+        return mismoNombre && mismoTipo && diferenciaSegundos < 3;
     });
     
     if (existeReciente) {
-        console.warn('🚫 Item duplicado detectado, ignorando:', normalizedItem.nombre);
+        console.warn('🚫 Item duplicado detectado (mismo nombre y tipo en <3s), ignorando:', normalizedItem.nombre);
         return existeReciente;
     }
     
@@ -99,6 +102,51 @@ window.addItemToInventory = function(item) {
     notifyModals();
     
     return normalizedItem;
+};
+
+// Función para detectar y limpiar duplicados existentes
+window.cleanDuplicates = function() {
+    const originalLength = window.inventory.length;
+    const seen = new Map();
+    
+    window.inventory = window.inventory.filter((item, index) => {
+        // Crear una clave única basada en nombre, tipo y datos principales
+        const key = `${item.nombre}-${item.tipo}-${item.dano}-${item.proteccion}`;
+        
+        if (seen.has(key)) {
+            console.log('🗑️ Eliminando duplicado:', item.nombre);
+            return false; // Eliminar duplicado
+        }
+        
+        seen.set(key, true);
+        
+        // Asegurar que todos los items tienen ID único
+        if (!item.id) {
+            item.id = `cleanup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            console.log('🔧 ID añadido a item sin ID:', item.nombre);
+        }
+        
+        return true; // Mantener item
+    });
+    
+    const cleaned = originalLength - window.inventory.length;
+    
+    if (cleaned > 0) {
+        console.log(`🧹 ${cleaned} duplicados eliminados`);
+        
+        // Actualizar Firebase
+        if (window.database && window.updateFirebaseInventory) {
+            window.updateFirebaseInventory();
+        }
+        
+        // Notificar a modales
+        notifyModals();
+        
+        return `${cleaned} duplicados eliminados`;
+    } else {
+        console.log('✅ No se encontraron duplicados');
+        return 'No se encontraron duplicados';
+    }
 };
 
 // Función para limpiar todo el inventario
@@ -422,7 +470,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.77'
+            version: '0.78'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {

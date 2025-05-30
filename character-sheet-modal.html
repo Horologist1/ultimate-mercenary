@@ -2051,7 +2051,7 @@
                 
                 // Timestamp de guardado
                 lastSaved: new Date().toISOString(),
-                version: '0.77'
+                version: '0.78'
             };
             
             console.log('📋 Datos recopilados:', characterData);
@@ -2570,15 +2570,23 @@
                 dano: damage,
                 ap: ap,
                 alcance: range,
-                notas: 'Añadido manualmente'
+                notas: 'Añadido manualmente',
+                origen: 'manual'
             };
             
-            // Añadir al inventario local
-            inventory.push(weapon);
-            
-            // Notificar al padre para actualizar Firebase
+            // Solo notificar al padre para que añada al inventario (no añadir localmente)
             if (window.parent && window.parent.addItemToInventory) {
                 window.parent.addItemToInventory(weapon);
+                console.log('⚔️ Arma enviada al padre:', weapon);
+            } else {
+                // Fallback: si no hay padre, añadir localmente
+                inventory.push({
+                    ...weapon,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    fechaCompra: new Date().toISOString()
+                });
+                updateInventoryDisplay();
+                console.log('⚔️ Arma añadida localmente:', weapon);
             }
             
             // Limpiar formulario
@@ -2587,11 +2595,6 @@
             document.getElementById('weapon-ap').value = '';
             document.getElementById('weapon-range').value = '';
             document.getElementById('weapon-description').value = '';
-            
-            // Actualizar visualización
-            updateInventoryDisplay();
-            
-            console.log('⚔️ Arma añadida:', weapon);
         };
         
         // Función para añadir armadura personalizada
@@ -2614,15 +2617,23 @@
                 proteccion: protection,
                 peso: weight,
                 efectos: effects,
-                notas: 'Añadido manualmente'
+                notas: 'Añadido manualmente',
+                origen: 'manual'
             };
             
-            // Añadir al inventario local
-            inventory.push(armor);
-            
-            // Notificar al padre para actualizar Firebase
+            // Solo notificar al padre para que añada al inventario (no añadir localmente)
             if (window.parent && window.parent.addItemToInventory) {
                 window.parent.addItemToInventory(armor);
+                console.log('🛡️ Armadura enviada al padre:', armor);
+            } else {
+                // Fallback: si no hay padre, añadir localmente
+                inventory.push({
+                    ...armor,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    fechaCompra: new Date().toISOString()
+                });
+                updateInventoryDisplay();
+                console.log('🛡️ Armadura añadida localmente:', armor);
             }
             
             // Limpiar formulario
@@ -2631,11 +2642,6 @@
             document.getElementById('armor-weight').value = '';
             document.getElementById('armor-effects').value = '';
             document.getElementById('armor-description').value = '';
-            
-            // Actualizar visualización
-            updateInventoryDisplay();
-            
-            console.log('🛡️ Armadura añadida:', armor);
         };
         
         // Función para añadir equipo misceláneo personalizado
@@ -2658,15 +2664,23 @@
                 peso: weight,
                 coste: cost,
                 efectos: effects,
-                notas: 'Añadido manualmente'
+                notas: 'Añadido manualmente',
+                origen: 'manual'
             };
             
-            // Añadir al inventario local
-            inventory.push(misc);
-            
-            // Notificar al padre para actualizar Firebase
+            // Solo notificar al padre para que añada al inventario (no añadir localmente)
             if (window.parent && window.parent.addItemToInventory) {
                 window.parent.addItemToInventory(misc);
+                console.log('🔧 Equipo enviado al padre:', misc);
+            } else {
+                // Fallback: si no hay padre, añadir localmente
+                inventory.push({
+                    ...misc,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    fechaCompra: new Date().toISOString()
+                });
+                updateInventoryDisplay();
+                console.log('🔧 Equipo añadido localmente:', misc);
             }
             
             // Limpiar formulario
@@ -2702,15 +2716,23 @@
                 coste: cost,
                 efectos: effects,
                 ubicacion: location,
-                notas: 'Añadido manualmente'
+                notas: 'Añadido manualmente',
+                origen: 'manual'
             };
             
-            // Añadir al inventario local
-            inventory.push(implant);
-            
-            // Notificar al padre para actualizar Firebase
+            // Solo notificar al padre para que añada al inventario (no añadir localmente)
             if (window.parent && window.parent.addItemToInventory) {
                 window.parent.addItemToInventory(implant);
+                console.log('🤖 Implante enviado al padre:', implant);
+            } else {
+                // Fallback: si no hay padre, añadir localmente
+                inventory.push({
+                    ...implant,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    fechaCompra: new Date().toISOString()
+                });
+                updateInventoryDisplay();
+                console.log('🤖 Implante añadido localmente:', implant);
             }
             
             // Limpiar formulario
