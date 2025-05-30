@@ -1380,12 +1380,9 @@
 
         // Solicitar inventario inicial al listener maestro
         function requestInitialInventory() {
-            if (window.parent && window.parent.characterSheet) {
-                const allItems = [
-                    ...(window.parent.characterSheet.equipment || []),
-                    ...(window.parent.characterSheet.implants || [])
-                ];
-                inventory = allItems;
+            console.log('📞 Solicitando inventario inicial...');
+            if (window.parent && window.parent.inventory) {
+                inventory = window.parent.inventory;
                 updateInventoryDisplay();
                 console.log('📥 Inventario inicial cargado:', inventory.length, 'items');
             }
@@ -1394,49 +1391,74 @@
         // Solicitar inventario al cargar
         setTimeout(requestInitialInventory, 500);
 
+        // Función SIMPLIFICADA para mostrar el inventario
         function updateInventoryDisplay() {
-            // Limpiar contenedores primero
+            console.log('🔄 Actualizando display del inventario:', inventory.length, 'items');
+            
+            // Limpiar contenedores
             const containers = ['weapons-list', 'armor-list', 'misc-list', 'implants-list'];
             containers.forEach(id => {
                 const container = document.getElementById(id);
-                if (container) container.innerHTML = '';
+                if (container) {
+                    container.innerHTML = '';
+                }
             });
 
+            if (inventory.length === 0) {
+                // Mostrar mensaje de inventario vacío en cada sección
+                containers.forEach(id => {
+                    const container = document.getElementById(id);
+                    if (container) {
+                        container.innerHTML = '<p style="color: #666;">No hay items en esta categoría</p>';
+                    }
+                });
+                return;
+            }
+
             // Agrupar items por tipo
-            const groupedItems = inventory.reduce((acc, item) => {
-                acc[item.tipo] = acc[item.tipo] || [];
-                acc[item.tipo].push(item);
-                return acc;
-            }, {});
+            const groupedItems = {
+                arma: inventory.filter(item => item.tipo === 'arma' || item.tipo === 'armas'),
+                armadura: inventory.filter(item => item.tipo === 'armadura' || item.tipo === 'armaduras'),
+                equipo: inventory.filter(item => item.tipo === 'equipo'),
+                implant: inventory.filter(item => item.tipo === 'implant' || item.tipo === 'cyberware')
+            };
 
-            // Actualizar cada sección
-            updateSection('arma', 'weapons-list', 'Arma');
-            updateSection('armadura', 'armor-list', 'Armadura');
-            updateSection('equipo', 'misc-list', 'Equipo');
-            updateSection('implant', 'implants-list', 'Implante');
-
-            function updateSection(type, containerId, title) {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-                
-                const items = groupedItems[type] || [];
+            // Función helper para crear HTML de items
+            function createItemHTML(items, tipo) {
                 if (items.length === 0) {
-                    container.innerHTML = `<p class="no-items">No hay ${title.toLowerCase()}s en el inventario</p>`;
-                    return;
+                    return `<p style="color: #666;">No hay ${tipo}s</p>`;
                 }
-
-                container.innerHTML = items.map((item, index) => `
-                    <div class="item-card" data-item-index="${index}">
+                
+                return items.map((item, index) => `
+                    <div class="item-card">
                         <h4>${item.nombre}</h4>
-                        ${item.descripcion ? `<p class="item-description">${item.descripcion}</p>` : ''}
-                        ${item.dano ? `<p class="item-stat">Daño: ${item.dano}</p>` : ''}
-                        ${item.proteccion ? `<p class="item-stat">Protección: ${item.proteccion}</p>` : ''}
-                        ${item.efectos ? `<p class="item-effects">${item.efectos}</p>` : ''}
-                        <button class="remove-item" onclick="removeItem(${index})">
-                            <i class="fas fa-trash"></i>
+                        <p>${item.descripcion || item.detalles || 'Sin descripción'}</p>
+                        <button class="remove-item" onclick="removeItem(${index})" style="background-color: #ff4757; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                            Eliminar
                         </button>
                     </div>
                 `).join('');
+            }
+
+            // Mostrar en cada contenedor
+            const weaponsContainer = document.getElementById('weapons-list');
+            if (weaponsContainer) {
+                weaponsContainer.innerHTML = createItemHTML(groupedItems.arma, 'arma');
+            }
+
+            const armorContainer = document.getElementById('armor-list');
+            if (armorContainer) {
+                armorContainer.innerHTML = createItemHTML(groupedItems.armadura, 'armadura');
+            }
+
+            const miscContainer = document.getElementById('misc-list');
+            if (miscContainer) {
+                miscContainer.innerHTML = createItemHTML(groupedItems.equipo, 'equipo');
+            }
+
+            const implantsContainer = document.getElementById('implants-list');
+            if (implantsContainer) {
+                implantsContainer.innerHTML = createItemHTML(groupedItems.implant, 'implante');
             }
         }
         

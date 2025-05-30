@@ -667,15 +667,16 @@
             }
         }
 
-        // Función para comprar un item
+        // Función SIMPLIFICADA para comprar un item
         function buyItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
             if (!item) return;
 
+            console.log('🛒 Intentando comprar:', item.name);
+
             const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
             if (currentPM >= item.price) {
-                // Intentar comprar usando el sistema de transacciones
-                // Buscar la función comprarItem en el parent o en window global
+                // Restar PM
                 const comprarItemFn = window.parent.comprarItem || window.comprarItem;
                 if (!comprarItemFn) {
                     alert('Error: Sistema de compras no disponible');
@@ -685,53 +686,15 @@
                 const success = comprarItemFn(itemId, item.price);
                 
                 if (success) {
-                    // Preparar el item para la ficha
-                    let fichaItem = {
+                    // Preparar el item simple
+                    const fichaItem = {
                         nombre: item.name,
-                        descripcion: item.description,
-                        detalles: item.details,
-                        tipo: item.section.replace('shop-', '')
+                        tipo: item.section.replace('shop-', ''),
+                        descripcion: item.description || '',
+                        detalles: item.details || ''
                     };
                     
-                    if (item.section === 'shop-armas') {
-                        fichaItem = {
-                            tipo: 'arma',
-                            nombre: item.name,
-                            dano: item.damage || item.details || '',
-                            notas: item.details || '',
-                            descripcion: item.description || ''
-                        };
-                    } else if (item.section === 'shop-armaduras') {
-                        fichaItem = {
-                            tipo: 'armadura',
-                            nombre: item.name,
-                            proteccion: item.details || '',
-                            notas: item.description || '',
-                            descripcion: item.description || ''
-                        };
-                    } else if (item.section === 'shop-equipo') {
-                        fichaItem = {
-                            tipo: 'equipo',
-                            nombre: item.name,
-                            descripcion: item.description || '',
-                            detalles: item.details || ''
-                        };
-                    } else if (item.section === 'shop-cyberware') {
-                        fichaItem = {
-                            tipo: 'implant',
-                            nombre: item.name,
-                            descripcion: item.description || '',
-                            efectos: item.details || ''
-                        };
-                    } else {
-                        // Tipo por defecto
-                        fichaItem = {
-                            tipo: 'equipo',
-                            nombre: item.name,
-                            descripcion: item.description || '',
-                            detalles: item.details || ''
-                        };
-                    }
+                    console.log('📦 Item a añadir:', fichaItem);
                     
                     // Obtener referencia a Firebase (priorizar parent)
                     const database = window.parent.database || window.database;
@@ -740,56 +703,29 @@
                         return;
                     }
                     
-                    const itemsCompradosRef = database.ref('itemsComprados');
-                    
-                    // Usar transacción para evitar sobrescrituras
-                    itemsCompradosRef.transaction((currentData) => {
-                        // Si no hay datos, inicializar como array vacío
-                        let items = [];
-                        if (currentData) {
-                            items = Array.isArray(currentData) ? currentData : Object.values(currentData);
-                        }
-                        
-                        // Añadir SOLO el nuevo item comprado
-                        items.push(fichaItem);
-                        
-                        return items;
-                    }).then((result) => {
-                        if (result.committed) {
-                            console.log('Item añadido correctamente a Firebase:', fichaItem.nombre);
-                            
-                            // Notificar al character sheet modal si está abierto
-                            if (window.parent) {
-                                window.parent.postMessage({
-                                    type: 'addItem',
-                                    item: fichaItem
-                                }, '*');
-                                
-                                // Notificar también a través del iframe de estadísticas si está abierto
-                                const statsIframe = window.parent.document.querySelector('iframe[src="character-sheet-modal.html"]');
-                                if (statsIframe) {
-                                    statsIframe.contentWindow.postMessage({
-                                        type: 'addItem',
-                                        item: fichaItem
-                                    }, '*');
-                                }
+                    // Usar la función simple del nuevo sistema
+                    if (window.parent.addItemToInventory) {
+                        window.parent.addItemToInventory(fichaItem);
+                    } else {
+                        // Fallback: escribir directamente a Firebase
+                        const itemsCompradosRef = database.ref('itemsComprados');
+                        itemsCompradosRef.transaction((currentData) => {
+                            let items = [];
+                            if (currentData && Array.isArray(currentData)) {
+                                items = currentData;
                             }
-                        } else {
-                            console.error('La transacción no se completó');
-                            alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
-                        }
-                    }).catch(error => {
-                        console.error('Error al guardar en Firebase:', error);
-                        alert('Error al guardar el item. Por favor, inténtalo de nuevo.');
-                    });
+                            items.push(fichaItem);
+                            return items;
+                        }).then(() => {
+                            console.log('✅ Item añadido a Firebase directamente');
+                        });
+                    }
                     
-                    // Mostrar mensaje de éxito (solo una vez)
+                    // Mostrar mensaje de éxito
                     showPurchaseMessage(item);
-                    
-                    // Actualizar la UI (solo una vez)
                     updatePMDisplay();
                 } else {
-                    alert('Error en la transacción. Por favor, inténtalo de nuevo.');
+                    alert('Error en la transacción');
                 }
             } else {
                 alert('No tienes suficientes PM para realizar esta compra');
