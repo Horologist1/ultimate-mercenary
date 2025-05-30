@@ -330,7 +330,12 @@ window.loadCharacterSheet = function() {
 // Función interna para actualizar la ficha en Firebase
 function updateCharacterSheetInFirebase(data) {
     if (window.database) {
-        window.database.ref('characterSheet').set(data).then(() => {
+        window.database.ref('characterSheet').set({
+            ...data,
+            // Timestamp de guardado
+            lastSaved: new Date().toISOString(),
+            version: '0.74'
+        }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {
             console.error('❌ Error guardando ficha en Firebase:', error);

@@ -931,6 +931,46 @@
                 });
             }
             
+            // =================== EVENT LISTENERS PARA CÁLCULOS ===================
+            
+            // Listener para cambios en la plantilla de atributos
+            const templateSelect = document.getElementById('aptitude-template');
+            if (templateSelect) {
+                templateSelect.addEventListener('change', function() {
+                    applyAptitudeTemplate(this.value);
+                    updatePointCounters();
+                });
+            }
+            
+            // Listeners para cambios en atributos
+            ['cog', 'int', 'ref', 'sav', 'som', 'wil', 'dur'].forEach(attrId => {
+                const input = document.getElementById(attrId);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        updateDerivedStats();
+                        updateAllSkillTotals();
+                        updatePointCounters();
+                    });
+                }
+            });
+            
+            // Listeners para cambios en habilidades
+            document.querySelectorAll('.skill-value').forEach(input => {
+                input.addEventListener('input', function() {
+                    const skillName = this.getAttribute('data-skill');
+                    updateSkillTotal(skillName);
+                    updatePointCounters();
+                });
+            });
+            
+            // Botón para añadir habilidades personalizadas
+            const addCustomSkillButton = document.getElementById('add-custom-skill');
+            if (addCustomSkillButton) {
+                addCustomSkillButton.addEventListener('click', function() {
+                    addCustomSkillToDOM();
+                });
+            }
+            
             // Tab switching functionality
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function() {
@@ -955,6 +995,13 @@
             
             // Actualizar inventario al cargar
             updateInventoryDisplay();
+            
+            // =================== INICIALIZACIÓN DE CÁLCULOS ===================
+            
+            // Inicializar todos los cálculos
+            updateDerivedStats();
+            updateAllSkillTotals();
+            updatePointCounters();
             
             // Solicitar datos de ficha al cargar
             setTimeout(() => {
@@ -1646,6 +1693,10 @@
                     updateDerivedStats();
                 }
                 
+                // Recalcular todos los totales y contadores
+                updateAllSkillTotals();
+                updatePointCounters();
+                
                 console.log('✅ Datos cargados correctamente');
                 
             } catch (error) {
@@ -1741,9 +1792,7 @@
                 
                 // Añadir cada habilidad personalizada
                 customSkills.forEach(skill => {
-                    if (typeof addCustomSkill === 'function') {
-                        addCustomSkill(skill.name, skill.value);
-                    }
+                    addCustomSkillToDOM(skill.name, skill.value);
                 });
             }
         }
@@ -1823,6 +1872,234 @@
             gatherCharacterData();
             
             console.log('✅ Ficha reseteada correctamente');
+        }
+
+        // =================== SISTEMA DE PLANTILLAS Y CÁLCULOS ===================
+        
+        // Definición de plantillas de atributos
+        const aptitudeTemplates = {
+            'actioneer': { cog: 15, int: 15, ref: 20, sav: 10, som: 15, wil: 15 },
+            'extrovert': { cog: 15, int: 15, ref: 15, sav: 20, som: 15, wil: 15 },
+            'facilitator': { cog: 10, int: 15, ref: 10, sav: 20, som: 20, wil: 20 },
+            'factotum': { cog: 15, int: 15, ref: 15, sav: 15, som: 10, wil: 15 },
+            'inquirer': { cog: 10, int: 20, ref: 10, sav: 15, som: 15, wil: 15 },
+            'survivor': { cog: 20, int: 10, ref: 15, sav: 10, som: 20, wil: 20 },
+            'thrill-seeker': { cog: 20, int: 15, ref: 20, sav: 15, som: 10, wil: 15 }
+        };
+        
+        // Mapeo de habilidades a atributos
+        const skillToAttribute = {
+            // REF skills
+            'Esquivar': 'ref',
+            'Armas de Fuego': 'ref', 
+            'Infiltración': 'ref',
+            'Pilotar': 'ref',
+            
+            // COG skills
+            'Hardware': 'cog',
+            'Infosec': 'cog',
+            'Interfaz': 'cog',
+            'Medicina': 'cog',
+            'Programación': 'cog',
+            'Académico': 'cog',
+            'Interés': 'cog',
+            'Profesional': 'cog',
+            
+            // SOM skills
+            'Atletismo': 'som',
+            'Caída Libre': 'som',
+            'Combate Cuerpo a Cuerpo': 'som',
+            
+            // INT skills
+            'Percepción': 'int',
+            'Investigación': 'int',
+            'Supervivencia': 'int',
+            'Arte': 'int',
+            
+            // SAV skills
+            'Engaño': 'sav',
+            'Kinésica': 'sav',
+            'Persuasión': 'sav',
+            'Provocación': 'sav',
+            
+            // WIL skills
+            'Psi': 'wil',
+            
+            // Exótica (sin atributo base)
+            'Exótica': null
+        };
+        
+        // Función para aplicar plantilla de atributos
+        function applyAptitudeTemplate(templateName) {
+            console.log('🎭 Aplicando plantilla:', templateName);
+            
+            const template = aptitudeTemplates[templateName];
+            if (!template) {
+                console.error('Plantilla no encontrada:', templateName);
+                return;
+            }
+            
+            // Aplicar valores de la plantilla
+            Object.entries(template).forEach(([attr, value]) => {
+                setInputValue(attr, value);
+            });
+            
+            // Recalcular estadísticas derivadas
+            updateDerivedStats();
+            
+            // Recalcular totales de habilidades
+            updateAllSkillTotals();
+            
+            console.log('✅ Plantilla aplicada:', template);
+        }
+        
+        // Función para actualizar estadísticas derivadas según Eclipse Phase 2nd Ed
+        function updateDerivedStats() {
+            const attributes = {
+                cog: getInputValue('cog', 10),
+                int: getInputValue('int', 10),
+                ref: getInputValue('ref', 10),
+                sav: getInputValue('sav', 10),
+                som: getInputValue('som', 10),
+                wil: getInputValue('wil', 10)
+            };
+            
+            const dur = getInputValue('dur', 30);
+            
+            // Cálculos según Eclipse Phase 2nd Edition
+            const woundThreshold = Math.ceil(dur / 5); // DUR ÷ 5 (redondeado hacia arriba)
+            const deathRating = Math.ceil(dur * 1.5); // DUR × 1.5 (redondeado hacia arriba)
+            const initiative = Math.ceil((attributes.int + attributes.ref) / 5); // (INT + REF) ÷ 5 (redondeado hacia arriba)
+            const movement = 4; // Valor base para morfos humanos estándar
+            
+            // Actualizar elementos del DOM
+            const wtElement = document.getElementById('wound-threshold');
+            if (wtElement) wtElement.textContent = woundThreshold;
+            
+            const drElement = document.getElementById('death-rating');
+            if (drElement) drElement.textContent = deathRating;
+            
+            const initElement = document.getElementById('initiative');
+            if (initElement) initElement.textContent = initiative;
+            
+            const movElement = document.getElementById('movement');
+            if (movElement) movElement.textContent = movement;
+            
+            console.log('📊 Estadísticas derivadas actualizadas:', {
+                woundThreshold, deathRating, initiative, movement
+            });
+        }
+        
+        // Función para actualizar el total de una habilidad específica
+        function updateSkillTotal(skillName) {
+            const skillInput = document.querySelector(`.skill-value[data-skill="${skillName}"]`);
+            const totalElement = document.querySelector(`[data-skill-total="${skillName}"]`);
+            
+            if (!skillInput || !totalElement) return;
+            
+            const skillValue = parseInt(skillInput.value) || 0;
+            const attributeName = skillToAttribute[skillName];
+            
+            let total = skillValue;
+            
+            if (attributeName) {
+                const attributeValue = getInputValue(attributeName, 10);
+                total = skillValue + attributeValue;
+            }
+            
+            totalElement.textContent = total;
+        }
+        
+        // Función para actualizar todos los totales de habilidades
+        function updateAllSkillTotals() {
+            Object.keys(skillToAttribute).forEach(skillName => {
+                updateSkillTotal(skillName);
+            });
+            
+            // También actualizar habilidades personalizadas
+            const customSkillInputs = document.querySelectorAll('#custom-skills-container .custom-skill-item input[type="number"]');
+            customSkillInputs.forEach(input => {
+                // Para habilidades personalizadas, solo mostrar el valor sin atributo
+                const container = input.closest('.custom-skill-item');
+                const totalSpan = container.querySelector('.skill-total');
+                if (totalSpan) {
+                    totalSpan.textContent = `Total: ${input.value || 0}`;
+                }
+            });
+        }
+        
+        // Función para actualizar contadores de puntos
+        function updatePointCounters() {
+            // Contar puntos de atributos usados
+            const attributeTotal = ['cog', 'int', 'ref', 'sav', 'som', 'wil']
+                .reduce((sum, attr) => sum + Math.max(0, getInputValue(attr, 10) - 10), 0);
+            
+            const attributePointsElement = document.getElementById('attribute-points');
+            if (attributePointsElement) {
+                const remaining = Math.max(0, 20 - attributeTotal);
+                attributePointsElement.textContent = remaining;
+            }
+            
+            // Contar puntos de habilidades usados
+            const skillTotal = Array.from(document.querySelectorAll('.skill-value'))
+                .reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+            
+            // Añadir puntos de habilidades personalizadas
+            const customSkillTotal = Array.from(document.querySelectorAll('#custom-skills-container input[type="number"]'))
+                .reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+            
+            const totalSkillPoints = skillTotal + customSkillTotal;
+            
+            const skillPointsElement = document.getElementById('skill-points');
+            if (skillPointsElement) {
+                const remaining = Math.max(0, 400 - totalSkillPoints);
+                skillPointsElement.textContent = remaining;
+            }
+        }
+        
+        // =================== GESTIÓN DE HABILIDADES PERSONALIZADAS ===================
+        
+        // Función para añadir una habilidad personalizada al DOM
+        function addCustomSkillToDOM(name = '', value = 0) {
+            const container = document.getElementById('custom-skills-container');
+            if (!container) return;
+            
+            const skillDiv = document.createElement('div');
+            skillDiv.className = 'custom-skill-item';
+            
+            skillDiv.innerHTML = `
+                <input type="text" placeholder="Nombre de habilidad" value="${name}" style="flex: 1; background-color: #333; color: #fff; border: 1px solid #555; border-radius: 2px; padding: 4px; font-size: 12px;">
+                <input type="number" value="${value}" min="0" max="60" style="width: 50px; background-color: #333; color: #fff; border: 1px solid #555; border-radius: 2px; padding: 4px; font-size: 12px;">
+                <span class="skill-total" style="color: #00ccff; font-size: 12px; white-space: nowrap;">Total: ${value}</span>
+                <button class="remove-skill" style="background-color: #ff4757; color: #fff; border: none; border-radius: 2px; padding: 2px 6px; cursor: pointer; font-size: 10px;">Eliminar</button>
+            `;
+            
+            container.appendChild(skillDiv);
+            
+            // Añadir listeners a los nuevos elementos
+            const nameInput = skillDiv.querySelector('input[type="text"]');
+            const valueInput = skillDiv.querySelector('input[type="number"]');
+            const removeButton = skillDiv.querySelector('.remove-skill');
+            const totalSpan = skillDiv.querySelector('.skill-total');
+            
+            // Listener para actualizar el total cuando cambie el valor
+            valueInput.addEventListener('input', function() {
+                totalSpan.textContent = `Total: ${this.value || 0}`;
+                updatePointCounters();
+            });
+            
+            // Listener para eliminar la habilidad
+            removeButton.addEventListener('click', function() {
+                container.removeChild(skillDiv);
+                updatePointCounters();
+            });
+            
+            // Listener para actualizar puntos cuando cambie el nombre
+            nameInput.addEventListener('input', function() {
+                updatePointCounters();
+            });
+            
+            updatePointCounters();
         }
     </script>
 </body>
