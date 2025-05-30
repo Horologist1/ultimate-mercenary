@@ -810,27 +810,63 @@
                 <div class="grid">
                     <div class="item">
                         <h3>COG</h3>
-                        <input type="number" id="cog" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="cog" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="cog-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="cog-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>INT</h3>
-                        <input type="number" id="int" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="int" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="int-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="int-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>REF</h3>
-                        <input type="number" id="ref" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="ref" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="ref-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="ref-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>SAV</h3>
-                        <input type="number" id="sav" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="sav" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="sav-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="sav-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>SOM</h3>
-                        <input type="number" id="som" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="som" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="som-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="som-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="item">
                         <h3>WIL</h3>
-                        <input type="number" id="wil" value="10" min="0" max="25">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="wil" value="10" min="0" max="25" style="width: 60px;">
+                            <span class="attr-display">
+                                <span class="attr-total" id="wil-total" style="color: #00ccff; font-weight: bold;">10</span>
+                                <span class="attr-bonus" id="wil-bonus" style="color: #2ed573; font-size: 0.9em;"></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1201,7 +1237,7 @@
                             <h4 style="color: #00ccff; margin: 0 0 10px 0;">Añadir Implante</h4>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                                 <input type="text" id="implant-name" placeholder="Nombre del implante" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
-                                <input type="text" id="implant-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
+                                <!-- <input type="text" id="implant-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;"> -->
                                 <input type="text" id="implant-effects" placeholder="Efectos mecánicos" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                                 <input type="text" id="implant-location" placeholder="Ubicación" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                             </div>
@@ -2506,18 +2542,19 @@
             let total = skillValue;
             
             if (attributeName) {
-                const attributeValue = getInputValue(attributeName, 10);
-                total = skillValue + attributeValue;
+                // Usar el valor total del atributo (base + bonuses de implantes)
+                const attributeTotalValue = getAttributeTotalValue(attributeName);
+                total = skillValue + attributeTotalValue;
             }
             
-            // Añadir bonuses de implantes
-            const implantBonus = (window.implantBonuses && window.implantBonuses.skills && window.implantBonuses.skills[skillName]) || 0;
-            total += implantBonus;
+            // Añadir bonuses de implantes directos a habilidades
+            const implantSkillBonus = (window.implantBonuses && window.implantBonuses.skills && window.implantBonuses.skills[skillName]) || 0;
+            total += implantSkillBonus;
             
             // Mostrar el total con color verde si hay bonuses de implantes
-            if (implantBonus > 0) {
+            if (implantSkillBonus > 0) {
                 totalElement.style.color = '#2ed573';
-                totalElement.textContent = `${total} (+${implantBonus})`;
+                totalElement.textContent = `${total} (+${implantSkillBonus})`;
             } else {
                 totalElement.style.color = '';
                 totalElement.textContent = total;
@@ -2789,7 +2826,7 @@
         // Función para añadir implante personalizado
         window.addCustomImplant = function() {
             const name = document.getElementById('implant-name').value.trim();
-            const cost = document.getElementById('implant-cost').value.trim();
+            // const cost = document.getElementById('implant-cost').value.trim(); // Campo comentado
             const effects = document.getElementById('implant-effects').value.trim();
             const location = document.getElementById('implant-location').value.trim();
             const description = document.getElementById('implant-description').value.trim();
@@ -2799,23 +2836,24 @@
                 return;
             }
             
+            const benefits = gatherImplantBenefits();
+            
             const implant = {
                 nombre: name,
-                tipo: 'implant',
+                tipo: 'cyberware',
                 descripcion: description,
-                coste: cost,
+                // coste: cost, // Campo no utilizado
                 efectos: effects,
                 ubicacion: location,
                 notas: 'Añadido manualmente',
-                origen: 'manual'
+                origen: 'manual',
+                benefits: benefits
             };
             
-            // Solo notificar al padre para que añada al inventario (no añadir localmente)
             if (window.parent && window.parent.addItemToInventory) {
                 window.parent.addItemToInventory(implant);
                 console.log('🤖 Implante enviado al padre:', implant);
             } else {
-                // Fallback: si no hay padre, añadir localmente
                 inventory.push({
                     ...implant,
                     id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -2825,17 +2863,20 @@
                 console.log('🤖 Implante añadido localmente:', implant);
             }
             
-            // Limpiar formulario
             document.getElementById('implant-name').value = '';
-            document.getElementById('implant-cost').value = '';
+            // document.getElementById('implant-cost').value = ''; // Campo comentado
             document.getElementById('implant-effects').value = '';
             document.getElementById('implant-location').value = '';
             document.getElementById('implant-description').value = '';
+            clearImplantBenefitsForm();
             
-            // Actualizar visualización
             updateInventoryDisplay();
+            setTimeout(() => {
+                calculateImplantBonuses();
+                updateAllSkillTotals();
+            }, 100);
             
-            console.log('🤖 Implante añadido:', implant);
+            console.log('🤖 Implante añadido con beneficios:', implant);
         };
 
         // ====================== FUNCIÓN DE PRUEBA ======================
@@ -3094,7 +3135,10 @@ Introduce el número (1-4):`);
             window.implantBonuses = { attributes: {}, skills: {} };
             
             inventory.forEach(item => {
-                if (item.tipo === 'implant' && item.benefits && Array.isArray(item.benefits)) {
+                // Buscar tanto en tipo 'cyberware' como 'implant' para compatibilidad
+                if ((item.tipo === 'cyberware' || item.tipo === 'implant') && item.benefits && Array.isArray(item.benefits)) {
+                    console.log('🔧 Procesando implante:', item.nombre, 'con', item.benefits.length, 'beneficios');
+                    
                     item.benefits.forEach(benefit => {
                         const [type, name] = benefit.target.split('_');
                         const bonus = parseInt(benefit.bonus) || 0;
@@ -3104,17 +3148,23 @@ Introduce el número (1-4):`);
                                 window.implantBonuses.attributes[name] = 0;
                             }
                             window.implantBonuses.attributes[name] += bonus;
+                            console.log(`🔧 Atributo ${name}: +${bonus} (total: ${window.implantBonuses.attributes[name]})`);
                         } else if (type === 'skill') {
                             if (!window.implantBonuses.skills[name]) {
                                 window.implantBonuses.skills[name] = 0;
                             }
                             window.implantBonuses.skills[name] += bonus;
+                            console.log(`🔧 Habilidad ${name}: +${bonus} (total: ${window.implantBonuses.skills[name]})`);
                         }
                     });
                 }
             });
             
             console.log('🔧 Bonuses calculados:', window.implantBonuses);
+            
+            // Actualizar visualización de atributos y habilidades
+            updateAllAttributeTotals();
+            updateAllSkillTotals();
         }
         
         // Sobrescribir addCustomImplant para incluir beneficios
@@ -3134,7 +3184,7 @@ Introduce el número (1-4):`);
             
             const implant = {
                 nombre: name,
-                tipo: 'implant',
+                tipo: 'cyberware',
                 descripcion: description,
                 coste: cost,
                 efectos: effects,
@@ -3189,15 +3239,69 @@ Introduce el número (1-4):`);
                 });
             }
             
+            // Event listeners para atributos - actualizar totales cuando cambien
+            ['cog', 'int', 'ref', 'sav', 'som', 'wil'].forEach(attr => {
+                const input = document.getElementById(attr);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        updateAllAttributeTotals();
+                        updateAllSkillTotals();
+                        updatePointCounters();
+                    });
+                }
+            });
+            
             setTimeout(() => {
                 calculateImplantBonuses();
                 updateAllSkillTotals();
+                updateAllAttributeTotals();
             }, 2000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.8)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.81)');
         
         // ================= FIN SISTEMA DE BENEFICIOS DE IMPLANTES =================
+
+        // Función para obtener el valor total de un atributo (base + bonuses de implantes)
+        function getAttributeTotalValue(attributeName) {
+            const baseValue = getInputValue(attributeName, 10);
+            const implantBonus = (window.implantBonuses && window.implantBonuses.attributes && window.implantBonuses.attributes[attributeName]) || 0;
+            return baseValue + implantBonus;
+        }
+        
+        // Función para actualizar la visualización de todos los atributos
+        function updateAllAttributeTotals() {
+            const attributes = ['cog', 'int', 'ref', 'sav', 'som', 'wil'];
+            
+            attributes.forEach(attr => {
+                const baseValue = getInputValue(attr, 10);
+                const implantBonus = (window.implantBonuses && window.implantBonuses.attributes && window.implantBonuses.attributes[attr]) || 0;
+                const totalValue = baseValue + implantBonus;
+                
+                // Actualizar elementos de visualización
+                const totalElement = document.getElementById(`${attr}-total`);
+                const bonusElement = document.getElementById(`${attr}-bonus`);
+                
+                if (totalElement) {
+                    totalElement.textContent = totalValue;
+                }
+                
+                if (bonusElement) {
+                    if (implantBonus > 0) {
+                        bonusElement.textContent = ` (+${implantBonus})`;
+                        bonusElement.style.display = 'inline';
+                    } else {
+                        bonusElement.textContent = '';
+                        bonusElement.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Actualizar estadísticas derivadas que dependen de atributos
+            updateDerivedStats();
+        }
+        
+        // Función para actualizar todos los totales de habilidades
     </script>
 </body>
 </html> 

@@ -337,9 +337,25 @@ function initializeInventorySystem() {
 
 // Funciones del sistema de PM (mantener compatibilidad)
 window.comprarItem = function(itemId, precio) {
-    // Esta función debe existir para la tienda
     console.log('💰 Comprando item:', itemId, 'por', precio, 'PM');
-    return true; // Simplificamos para testing
+    
+    // Verificar si hay suficientes PM
+    const currentPM = window.pmTransactions ? window.pmTransactions.getTotal() : 0;
+    
+    if (currentPM < precio) {
+        console.error('❌ PM insuficientes. Actual:', currentPM, 'Necesario:', precio);
+        return false;
+    }
+    
+    // Restar PM usando el sistema de transacciones
+    if (window.pmTransactions) {
+        window.pmTransactions.addTransaction(-precio, `Compra: ${itemId}`);
+        console.log('✅ PM restados:', precio, 'PM restantes:', window.pmTransactions.getTotal());
+        return true;
+    } else {
+        console.error('❌ Sistema de PM no disponible');
+        return false;
+    }
 };
 
 // Función simple para limpiar items (botón del modal)
@@ -470,7 +486,7 @@ function updateCharacterSheetInFirebase(data) {
             ...data,
             // Timestamp de guardado
             lastSaved: new Date().toISOString(),
-            version: '0.8'
+            version: '0.81'
         }).then(() => {
             console.log('✅ Ficha guardada en Firebase');
         }).catch(error => {
