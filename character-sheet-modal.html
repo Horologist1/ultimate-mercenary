@@ -1205,6 +1205,66 @@
                                 <input type="text" id="implant-effects" placeholder="Efectos mecánicos" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                                 <input type="text" id="implant-location" placeholder="Ubicación" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                             </div>
+                            
+                            <!-- Beneficios Mecánicos -->
+                            <div style="margin: 15px 0; padding: 15px; background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 6px;">
+                                <h5 style="color: #00ccff; margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif;">⚙️ Beneficios Mecánicos (Máximo 3)</h5>
+                                <div id="implant-benefits">
+                                    <div class="benefit-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                                        <select class="benefit-target" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; flex: 1;">
+                                            <option value="">Seleccionar atributo/habilidad</option>
+                                            <optgroup label="Atributos">
+                                                <option value="attr_cog">COG (Cognición)</option>
+                                                <option value="attr_int">INT (Intuición)</option>
+                                                <option value="attr_ref">REF (Reflexos)</option>
+                                                <option value="attr_sav">SAV (Astucia)</option>
+                                                <option value="attr_som">SOM (Somática)</option>
+                                                <option value="attr_wil">WIL (Voluntad)</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de REF">
+                                                <option value="skill_Esquivar">Esquivar</option>
+                                                <option value="skill_Armas de Fuego">Armas de Fuego</option>
+                                                <option value="skill_Infiltración">Infiltración</option>
+                                                <option value="skill_Pilotar">Pilotar</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de COG">
+                                                <option value="skill_Hardware">Hardware</option>
+                                                <option value="skill_Infosec">Infosec</option>
+                                                <option value="skill_Interfaz">Interfaz</option>
+                                                <option value="skill_Medicina">Medicina</option>
+                                                <option value="skill_Programación">Programación</option>
+                                                <option value="skill_Académico">Académico</option>
+                                                <option value="skill_Interés">Interés</option>
+                                                <option value="skill_Profesional">Profesional</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de SOM">
+                                                <option value="skill_Atletismo">Atletismo</option>
+                                                <option value="skill_Caída Libre">Caída Libre</option>
+                                                <option value="skill_Combate Cuerpo a Cuerpo">Combate Cuerpo a Cuerpo</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de INT">
+                                                <option value="skill_Percepción">Percepción</option>
+                                                <option value="skill_Investigación">Investigación</option>
+                                                <option value="skill_Supervivencia">Supervivencia</option>
+                                                <option value="skill_Arte">Arte</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de SAV">
+                                                <option value="skill_Engaño">Engaño</option>
+                                                <option value="skill_Kinésica">Kinésica</option>
+                                                <option value="skill_Persuasión">Persuasión</option>
+                                                <option value="skill_Provocación">Provocación</option>
+                                            </optgroup>
+                                            <optgroup label="Habilidades de WIL">
+                                                <option value="skill_Psi">Psi</option>
+                                            </optgroup>
+                                        </select>
+                                        <input type="number" class="benefit-bonus" placeholder="Bonus" min="-10" max="20" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; width: 80px;">
+                                        <button type="button" class="remove-benefit" style="background: #ff4757; color: #fff; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">✕</button>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-benefit" style="background: #00ccff; color: #000; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;">+ Añadir Beneficio</button>
+                            </div>
+                            
                             <textarea id="implant-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
                             <button onclick="addCustomImplant()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Implante</button>
                         </div>
@@ -2903,6 +2963,230 @@ Introduce el número (1-4):`);
         };
         
         // ================ FIN FUNCIONES DE ADMINISTRACIÓN ===============
+        
+        // =================== SISTEMA DE BENEFICIOS DE IMPLANTES ===================
+        
+        // Variable global para manejar los beneficios de implantes
+        window.implantBonuses = { attributes: {}, skills: {} };
+        
+        // Función para añadir una nueva fila de beneficio
+        function addBenefitRow() {
+            const container = document.getElementById('implant-benefits');
+            const benefitRows = container.querySelectorAll('.benefit-row');
+            
+            if (benefitRows.length >= 3) {
+                alert('Máximo 3 beneficios por implante');
+                return;
+            }
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'benefit-row';
+            newRow.style.cssText = 'display: flex; gap: 10px; margin-bottom: 8px; align-items: center;';
+            
+            newRow.innerHTML = `
+                <select class="benefit-target" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; flex: 1;">
+                    <option value="">Seleccionar atributo/habilidad</option>
+                    <optgroup label="Atributos">
+                        <option value="attr_cog">COG (Cognición)</option>
+                        <option value="attr_int">INT (Intuición)</option>
+                        <option value="attr_ref">REF (Reflexos)</option>
+                        <option value="attr_sav">SAV (Astucia)</option>
+                        <option value="attr_som">SOM (Somática)</option>
+                        <option value="attr_wil">WIL (Voluntad)</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de REF">
+                        <option value="skill_Esquivar">Esquivar</option>
+                        <option value="skill_Armas de Fuego">Armas de Fuego</option>
+                        <option value="skill_Infiltración">Infiltración</option>
+                        <option value="skill_Pilotar">Pilotar</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de COG">
+                        <option value="skill_Hardware">Hardware</option>
+                        <option value="skill_Infosec">Infosec</option>
+                        <option value="skill_Interfaz">Interfaz</option>
+                        <option value="skill_Medicina">Medicina</option>
+                        <option value="skill_Programación">Programación</option>
+                        <option value="skill_Académico">Académico</option>
+                        <option value="skill_Interés">Interés</option>
+                        <option value="skill_Profesional">Profesional</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de SOM">
+                        <option value="skill_Atletismo">Atletismo</option>
+                        <option value="skill_Caída Libre">Caída Libre</option>
+                        <option value="skill_Combate Cuerpo a Cuerpo">Combate Cuerpo a Cuerpo</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de INT">
+                        <option value="skill_Percepción">Percepción</option>
+                        <option value="skill_Investigación">Investigación</option>
+                        <option value="skill_Supervivencia">Supervivencia</option>
+                        <option value="skill_Arte">Arte</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de SAV">
+                        <option value="skill_Engaño">Engaño</option>
+                        <option value="skill_Kinésica">Kinésica</option>
+                        <option value="skill_Persuasión">Persuasión</option>
+                        <option value="skill_Provocación">Provocación</option>
+                    </optgroup>
+                    <optgroup label="Habilidades de WIL">
+                        <option value="skill_Psi">Psi</option>
+                    </optgroup>
+                </select>
+                <input type="number" class="benefit-bonus" placeholder="Bonus" min="-10" max="20" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; width: 80px;">
+                <button type="button" class="remove-benefit" style="background: #ff4757; color: #fff; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">✕</button>
+            `;
+            
+            container.appendChild(newRow);
+            
+            // Añadir listener al botón de eliminar
+            const removeBtn = newRow.querySelector('.remove-benefit');
+            removeBtn.addEventListener('click', function() {
+                container.removeChild(newRow);
+            });
+        }
+        
+        // Función para recopilar los beneficios de un implante
+        function gatherImplantBenefits() {
+            const benefits = [];
+            const benefitRows = document.querySelectorAll('#implant-benefits .benefit-row');
+            
+            benefitRows.forEach(row => {
+                const target = row.querySelector('.benefit-target').value;
+                const bonus = parseInt(row.querySelector('.benefit-bonus').value) || 0;
+                
+                if (target && bonus !== 0) {
+                    benefits.push({ target, bonus });
+                }
+            });
+            
+            return benefits;
+        }
+        
+        // Función para limpiar el formulario de beneficios
+        function clearImplantBenefitsForm() {
+            const container = document.getElementById('implant-benefits');
+            const firstRow = container.querySelector('.benefit-row');
+            if (firstRow) {
+                firstRow.querySelector('.benefit-target').value = '';
+                firstRow.querySelector('.benefit-bonus').value = '';
+                
+                const allRows = container.querySelectorAll('.benefit-row');
+                for (let i = 1; i < allRows.length; i++) {
+                    container.removeChild(allRows[i]);
+                }
+            }
+        }
+        
+        // Función para calcular bonuses de implantes
+        function calculateImplantBonuses() {
+            console.log('🔧 Calculando bonuses de implantes...');
+            
+            window.implantBonuses = { attributes: {}, skills: {} };
+            
+            inventory.forEach(item => {
+                if (item.tipo === 'implant' && item.benefits && Array.isArray(item.benefits)) {
+                    item.benefits.forEach(benefit => {
+                        const [type, name] = benefit.target.split('_');
+                        const bonus = parseInt(benefit.bonus) || 0;
+                        
+                        if (type === 'attr') {
+                            if (!window.implantBonuses.attributes[name]) {
+                                window.implantBonuses.attributes[name] = 0;
+                            }
+                            window.implantBonuses.attributes[name] += bonus;
+                        } else if (type === 'skill') {
+                            if (!window.implantBonuses.skills[name]) {
+                                window.implantBonuses.skills[name] = 0;
+                            }
+                            window.implantBonuses.skills[name] += bonus;
+                        }
+                    });
+                }
+            });
+            
+            console.log('🔧 Bonuses calculados:', window.implantBonuses);
+        }
+        
+        // Sobrescribir addCustomImplant para incluir beneficios
+        window.addCustomImplant = function() {
+            const name = document.getElementById('implant-name').value.trim();
+            const cost = document.getElementById('implant-cost').value.trim();
+            const effects = document.getElementById('implant-effects').value.trim();
+            const location = document.getElementById('implant-location').value.trim();
+            const description = document.getElementById('implant-description').value.trim();
+            
+            if (!name) {
+                alert('El nombre del implante es obligatorio');
+                return;
+            }
+            
+            const benefits = gatherImplantBenefits();
+            
+            const implant = {
+                nombre: name,
+                tipo: 'implant',
+                descripcion: description,
+                coste: cost,
+                efectos: effects,
+                ubicacion: location,
+                notas: 'Añadido manualmente',
+                origen: 'manual',
+                benefits: benefits
+            };
+            
+            if (window.parent && window.parent.addItemToInventory) {
+                window.parent.addItemToInventory(implant);
+                console.log('🤖 Implante enviado al padre:', implant);
+            } else {
+                inventory.push({
+                    ...implant,
+                    id: `manual-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    fechaCompra: new Date().toISOString()
+                });
+                updateInventoryDisplay();
+                console.log('🤖 Implante añadido localmente:', implant);
+            }
+            
+            document.getElementById('implant-name').value = '';
+            document.getElementById('implant-cost').value = '';
+            document.getElementById('implant-effects').value = '';
+            document.getElementById('implant-location').value = '';
+            document.getElementById('implant-description').value = '';
+            clearImplantBenefitsForm();
+            
+            updateInventoryDisplay();
+            setTimeout(() => {
+                calculateImplantBonuses();
+                updateAllSkillTotals();
+            }, 100);
+            
+            console.log('🤖 Implante añadido con beneficios:', implant);
+        };
+        
+        // Event listeners para beneficios
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBenefitBtn = document.getElementById('add-benefit');
+            if (addBenefitBtn) {
+                addBenefitBtn.addEventListener('click', addBenefitRow);
+            }
+            
+            const firstRemoveBtn = document.querySelector('#implant-benefits .remove-benefit');
+            if (firstRemoveBtn) {
+                firstRemoveBtn.addEventListener('click', function() {
+                    const benefitRow = this.closest('.benefit-row');
+                    benefitRow.querySelector('.benefit-target').value = '';
+                    benefitRow.querySelector('.benefit-bonus').value = '';
+                });
+            }
+            
+            setTimeout(() => {
+                calculateImplantBonuses();
+                updateAllSkillTotals();
+            }, 2000);
+        });
+        
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.79)');
+        
+        // ================= FIN SISTEMA DE BENEFICIOS DE IMPLANTES =================
     </script>
 </body>
 </html> 
