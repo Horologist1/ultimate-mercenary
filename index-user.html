@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.89</title>
+    <title>Ultimate Mercenary 0.9</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1109,7 +1109,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.89</h1>
+                        <h1>ULTIMATE MERCENARY 0.9</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1455,7 +1455,7 @@
                 time: new Date().toLocaleTimeString()
             }));
             chat.innerHTML = ejemploMensajes.map(msg =>
-                `<div class=\"chat-message\"><span class="username\">${msg.sender}:</span> <span class="content">${msg.content}</span> <span style="float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
+                `<div class=\"chat-message\"><span class="username">${msg.sender}:</span> <span class="content">${msg.content}</span> <span style="float:right;font-size:11px;color:#888;\">${msg.time}</span></div>`
             ).join('') + '<div style="color:#888;font-size:13px;">(Mensajes de ejemplo: el chat global está vacío)</div>';
         } else {
             chat.innerHTML = mensajes.map(msg => {
@@ -1463,7 +1463,7 @@
                 const sender = msg.sender || msg.user || 'SISTEMA';
                 const content = msg.content || msg.text || '';
                 const time = msg.time || '';
-                return `<div class=\"chat-message\"><span class="username\">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;\">${time}</span></div>`;
+                return `<div class=\"chat-message\"><span class="username">${sender}:</span> <span class="content">${content}</span> <span style="float:right;font-size:11px;color:#888;\">${time}</span></div>`;
             }).join('');
         }
         chat.scrollTop = chat.scrollHeight;
@@ -1578,6 +1578,14 @@
                         btn.textContent = 'Aceptado';
                         btn.disabled = true;
                         Object.assign(btn.style, { background: '#444', color: '#aaa', cursor: 'default' });
+                        
+                        // Enviar mensaje al buzón de correo
+                        if (window.directMessages) {
+                            window.directMessages.addChallengeAcceptedMessage(
+                                msgData.usuario || 'Usuario Anónimo',
+                                msgData.mensaje || 'Reto sin descripción'
+                            );
+                        }
                     };
                 }
                 div.appendChild(btn);
@@ -1828,6 +1836,13 @@
             if (window.pmTransactions) {
                 window.pmTransactions.setTotal(event.data.total);
             }
+        } else if (event.data && event.data.type === 'purchase') {
+            // Interceptar compras de la tienda
+            const { itemName, itemPrice, itemImage } = event.data;
+            if (window.directMessages) {
+                window.directMessages.addPurchaseMessage(itemName, itemPrice, itemImage);
+            }
+            console.log(`[Compra] ${itemName} por ${itemPrice} PM - Mensaje enviado al buzón`);
         }
     });
 
@@ -1856,7 +1871,180 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.89';
+        const SYSTEM_VERSION = '0.9';
+    </script>
+
+    <!-- Sistema de Mensajes Directos -->
+    <script>
+    // Sistema de gestión de mensajes directos
+    window.directMessages = {
+        messages: {
+            inbox: [],
+            system: [],
+            shop: []
+        },
+
+        init() {
+            // Cargar mensajes guardados
+            const saved = localStorage.getItem('directMessages');
+            if (saved) {
+                try {
+                    this.messages = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error cargando mensajes:', e);
+                    this.messages = { inbox: [], system: [], shop: [] };
+                }
+            }
+
+            // Configurar pestañas
+            this.setupTabs();
+            this.loadMessages();
+        },
+
+        setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Remover active de todos los botones
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    // Añadir active al botón clickeado
+                    e.target.classList.add('active');
+                    // Cargar mensajes de la pestaña seleccionada
+                    this.loadMessages(e.target.dataset.tab);
+                });
+            });
+        },
+
+        addMessage(category, message) {
+            if (!this.messages[category]) {
+                this.messages[category] = [];
+            }
+
+            const messageObj = {
+                id: Date.now() + Math.random(),
+                ...message,
+                timestamp: Date.now(),
+                time: new Date().toLocaleString()
+            };
+
+            this.messages[category].unshift(messageObj); // Añadir al principio
+            this.saveMessages();
+            
+            // Si el modal está abierto, recargar
+            if (document.getElementById('messages-modal').style.display === 'block') {
+                this.loadMessages();
+            }
+
+            return messageObj.id;
+        },
+
+        deleteMessage(category, messageId) {
+            if (this.messages[category]) {
+                this.messages[category] = this.messages[category].filter(msg => msg.id !== messageId);
+                this.saveMessages();
+                this.loadMessages();
+            }
+        },
+
+        saveMessages() {
+            localStorage.setItem('directMessages', JSON.stringify(this.messages));
+        },
+
+        loadMessages(activeTab = null) {
+            const messagesList = document.getElementById('messages-list');
+            if (!messagesList) return;
+
+            // Determinar pestaña activa
+            if (!activeTab) {
+                const activeButton = document.querySelector('.tab-button.active');
+                activeTab = activeButton ? activeButton.dataset.tab : 'inbox';
+            }
+
+            const messages = this.messages[activeTab] || [];
+            
+            if (messages.length === 0) {
+                messagesList.innerHTML = '<div class="no-messages">No hay mensajes en esta categoría</div>';
+                return;
+            }
+
+            messagesList.innerHTML = messages.map(msg => this.renderMessage(msg, activeTab)).join('');
+        },
+
+        renderMessage(msg, category) {
+            const deleteButton = `<button class="delete-button" onclick="window.directMessages.deleteMessage('${category}', ${msg.id})">ELIMINAR</button>`;
+            
+            let imageHtml = '';
+            if (msg.image) {
+                imageHtml = `<div class="message-image"><img src="${msg.image}" alt="Imagen del mensaje"></div>`;
+            }
+
+            return `
+                <div class="message-item" data-type="${msg.type || 'default'}">
+                    <div class="message-header">
+                        <div class="message-sender">${msg.sender || 'SISTEMA'}</div>
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                    ${imageHtml}
+                    <div class="message-actions">
+                        ${deleteButton}
+                    </div>
+                </div>
+            `;
+        },
+
+        // Función para añadir mensaje de compra
+        addPurchaseMessage(itemName, itemPrice, itemImage = null) {
+            const message = {
+                sender: 'TIENDA OCE',
+                content: `Has comprado: ${itemName}\nPrecio: ${itemPrice} PM\n\n¡Disfruta tu nueva adquisición!`,
+                type: 'shop',
+                image: itemImage
+            };
+            return this.addMessage('shop', message);
+        },
+
+        // Función para añadir mensaje de reto aceptado
+        addChallengeAcceptedMessage(username, challenge) {
+            const message = {
+                sender: 'SISTEMA OCE',
+                content: `Has aceptado un reto de ${username}: "${challenge}"\n\nRecuerda que OCE te penalizará si faltas a tu palabra y no cumples el desafío.`,
+                type: 'system'
+            };
+            return this.addMessage('system', message);
+        }
+    };
+
+    // Función global para cargar mensajes directos (compatibilidad)
+    window.loadDirectMessages = function() {
+        if (window.directMessages) {
+            window.directMessages.loadMessages();
+        }
+    };
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        window.directMessages.init();
+        
+        // Agregar algunos mensajes de ejemplo si no hay ninguno
+        setTimeout(() => {
+            if (window.directMessages.messages.system.length === 0) {
+                window.directMessages.addMessage('system', {
+                    sender: 'SISTEMA OCE',
+                    content: 'Bienvenida al sistema Ultimate Mercenary v0.9\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.',
+                    type: 'system'
+                });
+            }
+            
+            if (window.directMessages.messages.inbox.length === 0) {
+                window.directMessages.addMessage('inbox', {
+                    sender: 'Director OCE',
+                    content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\n- Kaiser',
+                    type: 'default'
+                });
+            }
+        }, 1000);
+    });
     </script>
 
     <!-- Funciones para guardar en Firebase (si el usuario puede modificar) -->

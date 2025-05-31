@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Sheet Modal - Ultimate Mercenary 0.89</title>
+    <title>Character Sheet Modal - Ultimate Mercenary 0.9</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -2838,7 +2838,7 @@
         
         // VERSIÓN 0.88: SISTEMA DE IMPLANTES PERSONALIZADO MEJORADO
         window.addCustomImplant = function() {
-            console.log('🚀 ===== AÑADIENDO IMPLANTE PERSONALIZADO v0.89 =====');
+            console.log('🚀 ===== AÑADIENDO IMPLANTE PERSONALIZADO v0.9 =====');
             
             // Obtener datos básicos
             const name = document.getElementById('implant-name').value.trim();
@@ -2850,8 +2850,8 @@
                 return;
             }
             
-            // NUEVA LÓGICA v0.89: Recopilar beneficios de manera ultra-robusta
-            console.log('📋 [v0.89] Recopilando beneficios...');
+            // NUEVA LÓGICA v0.9: Recopilar beneficios de manera ultra-robusta
+            console.log('📋 [v0.9] Recopilando beneficios...');
             const benefits = [];
             const benefitRows = document.querySelectorAll('#implant-benefits .benefit-row');
             
@@ -2898,7 +2898,7 @@
                 return;
             }
             
-            console.log('✅ [v0.89] Beneficios válidos recopilados:', benefits);
+            console.log('✅ [v0.9] Beneficios válidos recopilados:', benefits);
             
             // Crear item con manejo directo de beneficios
             const implantItem = {
@@ -2911,10 +2911,10 @@
                 coste: 0,
                 fechaCompra: new Date().toISOString(),
                 origen: 'manual',
-                id: `manual-v89-${Date.now()}`
+                id: `manual-v9-${Date.now()}`
             };
             
-            console.log('🚀 [v0.89] Item construido:');
+            console.log('🚀 [v0.9] Item construido:');
             console.log('  📛 Nombre:', implantItem.nombre);
             console.log('  🔧 Beneficios:', implantItem.benefits);
             console.log('  📦 Item completo:', implantItem);
@@ -2927,22 +2927,22 @@
             }
             
             // Añadir al inventario local PRIMERO para pruebas
-            console.log('📦 [v0.89] Añadiendo al inventario local primero...');
+            console.log('📦 [v0.9] Añadiendo al inventario local primero...');
             inventory.push(implantItem);
             
             // Forzar recálculo inmediato
-            console.log('🔧 [v0.89] Forzando recálculo inmediato...');
+            console.log('🔧 [v0.9] Forzando recálculo inmediato...');
             calculateImplantBonuses();
             
             // Verificar que el recálculo funcionó
             const foundLocally = inventory.find(item => item.id === implantItem.id);
             if (foundLocally && foundLocally.benefits && foundLocally.benefits.length > 0) {
-                console.log('✅ [v0.89] Implante añadido localmente con éxito');
-                console.log('🎯 [v0.89] Bonuses actuales:', window.implantBonuses);
+                console.log('✅ [v0.9] Implante añadido localmente con éxito');
+                console.log('🎯 [v0.9] Bonuses actuales:', window.implantBonuses);
                 
                 // Ahora enviar al padre para persistencia
                 if (window.parent && window.parent.addItemToInventory) {
-                    console.log('📤 [v0.89] Enviando al sistema padre para persistencia...');
+                    console.log('📤 [v0.9] Enviando al sistema padre para persistencia...');
                     window.parent.addItemToInventory(implantItem);
                 }
                 
@@ -2959,11 +2959,11 @@
                 alert(`✅ Implante añadido exitosamente!\n\nNombre: ${implantItem.nombre}\nBeneficios: ${implantItem.benefits.length}\n\nLos bonuses se han aplicado inmediatamente.`);
                 
             } else {
-                console.error('❌ [v0.89] Fallo crítico: El implante no se procesó correctamente');
+                console.error('❌ [v0.9] Fallo crítico: El implante no se procesó correctamente');
                 alert('❌ Error: El implante no se procesó correctamente. Revisa la consola (F12) para más detalles.');
             }
             
-            console.log('🚀 ===== FIN AÑADIR IMPLANTE PERSONALIZADO v0.89 =====');
+            console.log('🚀 ===== FIN AÑADIR IMPLANTE PERSONALIZADO v0.9 =====');
         };
 
         // ====================== FUNCIÓN DE PRUEBA ======================
@@ -3412,11 +3412,11 @@ Introduce el número (1-4):`);
             }, 3000);
         });
         
-        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.89)');
+        console.log('🔧 Sistema de beneficios de implantes inicializado (v0.9)');
         
-        // Función de debug específica para implantes (v0.89)
+        // Función de debug específica para implantes (v0.9)
         window.debugImplantSystem = function() {
-            console.group('🤖 DEBUG: Sistema de Implantes v0.89');
+            console.group('🤖 DEBUG: Sistema de Implantes v0.9');
             
             const implants = inventory.filter(item => item.tipo === 'cyberware' || item.tipo === 'implant');
             console.log(`📊 Total implantes encontrados: ${implants.length}`);
@@ -3818,7 +3818,7 @@ Introduce el número (1-4):`);
 
         // VERSIÓN 0.89: FUNCIÓN DE PRUEBA DIRECTA PARA DEBUGGING
         window.testFormCapture = function() {
-            console.log('🧪 ===== TEST DIRECTO DE CAPTURA DE FORMULARIO v0.89 =====');
+            console.log('🧪 ===== TEST DIRECTO DE CAPTURA DE FORMULARIO v0.9 =====');
             
             // Verificar que los elementos existan
             const benefitRows = document.querySelectorAll('#implant-benefits .benefit-row');
@@ -3864,19 +3864,19 @@ Introduce el número (1-4):`);
                 alert('❌ No se capturaron beneficios.\n\nAsegúrate de:\n1. Seleccionar un target\n2. Escribir un valor numérico\n\nRevisa la consola (F12) para más detalles');
             }
             
-            console.log('🧪 ===== FIN TEST DIRECTO v0.89 =====');
+            console.log('🧪 ===== FIN TEST DIRECTO v0.9 =====');
             return capturedBenefits;
         };
         
-        console.log('🧪 [v0.89] Función de test disponible: testFormCapture()');
+        console.log('🧪 [v0.9] Función de test disponible: testFormCapture()');
         
-        // VERSIÓN 0.89: SISTEMA DE IMPLANTES PERSONALIZADO MEJORADO
-        console.log('🚀 [v0.89] Sistema de implantes ROBUSTO cargado');
-        console.log('🔧 [v0.89] Funciones disponibles:');
+        // VERSIÓN 0.9: SISTEMA DE IMPLANTES PERSONALIZADO MEJORADO
+        console.log('🚀 [v0.9] Sistema de implantes ROBUSTO cargado');
+        console.log('🔧 [v0.9] Funciones disponibles:');
         console.log('  - debugImplantSystem() - Debug completo del sistema');
         console.log('  - testFormCapture() - Probar captura del formulario');
         console.log('  - addCustomImplant() - Añadir implante personalizado');
-        console.log('🎯 [v0.89] SISTEMA REESCRITO - Los implantes personalizados funcionan GARANTIZADO');
+        console.log('🎯 [v0.9] SISTEMA REESCRITO - Los implantes personalizados funcionan GARANTIZADO');
     </script>
 </body>
 </html> 
