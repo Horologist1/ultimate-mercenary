@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.98</title>
+    <title>Ultimate Mercenary 0.99</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1109,7 +1109,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.98</h1>
+                        <h1>ULTIMATE MERCENARY 0.99</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1598,7 +1598,7 @@
         function startAutoMessages() {
             if (autoMsgInterval) clearInterval(autoMsgInterval);
             
-            console.log('🔄 Iniciando mensajes automáticos v0.98 - FUNCIONES GLOBALES FORZADAS');
+            console.log('🔄 Iniciando mensajes automáticos v0.99 - SISTEMA DE ATRIBUTOS CORREGIDO');
             
             const coloresAuto = [
                 '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
@@ -1792,14 +1792,33 @@
         const chatContainer = document.getElementById('chat-messages');
         if (chatContainer) chatContainer.innerHTML = '';
         
-        // Reiniciar mensajes automáticos (contextual + fallback)
-        if (window.updateAutoMessages) {
-            window.updateAutoMessages();
-        }
-        
-        console.log('✅ Chat limpiado - Sistema híbrido reiniciado (contextual + fallback temático)');
-        alert('Chat limpiado. El sistema usará mensajes contextuales si están disponibles, o fallback temático para XIII.');
-    };
+                    // Reiniciar mensajes automáticos (contextual + fallback)
+            if (window.updateAutoMessages) {
+                window.updateAutoMessages();
+            }
+            
+            console.log('✅ Chat limpiado - Sistema híbrido reiniciado (contextual + fallback temático)');
+            alert('Chat limpiado. El sistema usará mensajes contextuales si están disponibles, o fallback temático para XIII.');
+        };
+
+        // NUEVA v0.99: Función para probar el nuevo sistema de atributos
+        window.probarSistemaAtributos = function() {
+            console.log('🧪 Probando nuevo sistema de atributos v0.99...');
+            
+            if (window.fichaIframe && window.fichaIframe.contentWindow) {
+                const iframe = window.fichaIframe.contentWindow;
+                
+                // Enviar comando de prueba al iframe
+                iframe.postMessage({
+                    type: 'testAttributeSystem'
+                }, '*');
+                
+                console.log('📤 Comando de prueba enviado al iframe de la ficha');
+            } else {
+                console.warn('⚠️ Iframe de ficha no disponible. Abre las estadísticas primero.');
+                alert('Abre el panel de "Estadísticas" primero, luego ejecuta esta función.');
+            }
+        };
 
     // NUEVA v0.95: Función para probar diferentes contextos
     window.probarContextos = function() {
@@ -1845,10 +1864,11 @@
         }, contextos.length * 2000 + 1000);
     };
 
-    console.log('🛠️ Funciones de utilidad v0.96 disponibles:');
-    console.log('• limpiarChatYForzarContextual() - Limpia el chat y reinicia sistema híbrido');
-    console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
-    console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
+            console.log('🛠️ Funciones de utilidad v0.99 disponibles:');
+        console.log('• limpiarChatYForzarContextual() - Limpia el chat y reinicia sistema híbrido');
+        console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
+        console.log('• probarSistemaAtributos() - Prueba el nuevo sistema de atributos v0.99');
+        console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
     </script>
 
     <script>
@@ -2313,8 +2333,9 @@
             }
         };
 
-        console.log('🎮 Ultimate Mercenary v0.94 - Sistema de mensajes FORZADO mejorado');
+        console.log('🎮 Ultimate Mercenary v0.99 - Sistema de atributos CORREGIDO');
         console.log('📧 Usa testMessagingSystem() para probar el sistema');
+        console.log('🧪 Usa probarSistemaAtributos() para probar el nuevo sistema de atributos');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
