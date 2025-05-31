@@ -2146,14 +2146,14 @@
             console.log('📋 Recopilando datos de la ficha...');
             
             const characterData = {
-                // Atributos básicos
+                // Atributos básicos - leer valores ACTUALES sin defaults para preservar cambios
                 attributes: {
-                    cog: getInputValue('cog', 10),
-                    int: getInputValue('int', 10),
-                    ref: getInputValue('ref', 10),
-                    sav: getInputValue('sav', 10),
-                    som: getInputValue('som', 10),
-                    wil: getInputValue('wil', 10)
+                    cog: getCurrentAttributeValue('cog'),
+                    int: getCurrentAttributeValue('int'),
+                    ref: getCurrentAttributeValue('ref'),
+                    sav: getCurrentAttributeValue('sav'),
+                    som: getCurrentAttributeValue('som'),
+                    wil: getCurrentAttributeValue('wil')
                 },
                 
                 // Estadísticas derivadas
@@ -2260,6 +2260,20 @@
         function getInputValue(id, defaultValue) {
             const element = document.getElementById(id);
             return element ? (parseInt(element.value) || defaultValue) : defaultValue;
+        }
+        
+        // Nueva función para leer el valor ACTUAL de los atributos sin usar defaults que los reinicien
+        function getCurrentAttributeValue(attributeName) {
+            const element = document.getElementById(attributeName);
+            if (element && element.value !== '') {
+                const currentValue = parseInt(element.value);
+                console.log(`📊 Leyendo atributo ${attributeName}: ${currentValue}`);
+                return currentValue;
+            }
+            
+            // Si no hay elemento o está vacío, usar 10 como fallback pero avisar
+            console.warn(`⚠️ Atributo ${attributeName} no encontrado o vacío, usando 10 como fallback`);
+            return 10;
         }
         
         function setInputValue(id, value) {
@@ -2508,12 +2522,12 @@
         // Función para actualizar estadísticas derivadas según Eclipse Phase 2nd Ed
         function updateDerivedStats() {
             const attributes = {
-                cog: getInputValue('cog', 10),
-                int: getInputValue('int', 10),
-                ref: getInputValue('ref', 10),
-                sav: getInputValue('sav', 10),
-                som: getInputValue('som', 10),
-                wil: getInputValue('wil', 10)
+                cog: getCurrentAttributeValue('cog'),
+                int: getCurrentAttributeValue('int'),
+                ref: getCurrentAttributeValue('ref'),
+                sav: getCurrentAttributeValue('sav'),
+                som: getCurrentAttributeValue('som'),
+                wil: getCurrentAttributeValue('wil')
             };
             
             const dur = getInputValue('dur', 30);
@@ -2601,7 +2615,7 @@
             // Contar puntos de atributos usados ADICIONALES a la plantilla
             const attributeTotal = ['cog', 'int', 'ref', 'sav', 'som', 'wil']
                 .reduce((sum, attr) => {
-                    const currentValue = getInputValue(attr, 10);
+                    const currentValue = getCurrentAttributeValue(attr);
                     const templateValue = templateValues[attr] || 10;
                     return sum + Math.max(0, currentValue - templateValue);
                 }, 0);
