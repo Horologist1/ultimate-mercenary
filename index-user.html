@@ -2333,99 +2333,117 @@
         if (!localStorage.getItem('timeOfDay')) localStorage.setItem('timeOfDay', 'dia');
         if (!localStorage.getItem('rating')) localStorage.setItem('rating', '7.0');
         
-        // CREAR LAS FUNCIONES GLOBALES CORRECTAS
+        // CREAR LAS FUNCIONES GLOBALES USANDO LAS FUNCIONES EXPORTADAS
         window.getCurrentContextualMessages = function() {
-            if (typeof getCurrentContextualMessages === 'function') {
-                return getCurrentContextualMessages();
+            try {
+                // Usar la función exportada del archivo contextual-messages.js
+                if (typeof window.getContextualMessages === 'function') {
+                    const messages = window.getContextualMessages();
+                    console.log(`✅ Obtenidos ${messages.length} mensajes contextuales`);
+                    return messages;
+                } else {
+                    console.warn('⚠️ window.getContextualMessages no está disponible');
+                    
+                    // Fallback directo a datos
+                    if (window.CONTEXTUAL_MESSAGES) {
+                        const prueba = localStorage.getItem('currentTest') || 'prueba0';
+                        const momento = localStorage.getItem('timeOfDay') || 'dia';
+                        const rating = parseFloat(localStorage.getItem('rating') || '7.0');
+                        const context = `${momento}_${rating > 6 ? 'alto' : 'bajo'}`;
+                        
+                        if (window.CONTEXTUAL_MESSAGES[prueba] && window.CONTEXTUAL_MESSAGES[prueba][context]) {
+                            return window.CONTEXTUAL_MESSAGES[prueba][context];
+                        }
+                    }
+                    
+                    // Último fallback
+                    return [
+                        "¡Vamos XIII, no decepciones a tus fans!",
+                        "¡Estoy apostando todo por ti, no me falles!",
+                        "¡Demuestra que mereces estar aquí! ¡+50 PM!"
+                    ];
+                }
+            } catch (error) {
+                console.error('❌ Error en getCurrentContextualMessages:', error);
+                return [];
             }
-            console.warn('⚠️ getCurrentContextualMessages no disponible aún');
-            return [];
         };
         
         window.getContextualUsernames = function() {
-            if (typeof getContextualUsernames === 'function') {
-                return getContextualUsernames();
+            try {
+                // Usar la función exportada del archivo contextual-messages.js
+                if (typeof window.getContextualUsers === 'function') {
+                    const users = window.getContextualUsers();
+                    console.log(`✅ Obtenidos ${users.length} usuarios contextuales`);
+                    return users;
+                } else {
+                    console.warn('⚠️ window.getContextualUsers no está disponible');
+                    
+                    // Fallback manual
+                    const momento = localStorage.getItem('timeOfDay') || 'dia';
+                    const rating = parseFloat(localStorage.getItem('rating') || '7.0');
+                    const isRatingHigh = rating > 6;
+                    
+                    if (momento === 'noche') {
+                        if (isRatingHigh) {
+                            return [
+                                "NightWatcher_VIP", "MidnightFan", "DarkDesire_Premium", "ShadowLover69",
+                                "NocturnaObsessed", "DreamCatcher_XIII", "NightQueen_Fan", "MoonlightStalker"
+                            ];
+                        } else {
+                            return [
+                                "NightCritic_Anon", "MidnightTroll", "DarkHater_666", "ShadowBooing",
+                                "NocturnaDisgusted", "NightmareFuel", "DarkSide_Critic", "MidnightDisappoint"
+                            ];
+                        }
+                    } else {
+                        if (isRatingHigh) {
+                            return [
+                                "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
+                                "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
+                                "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
+                            ];
+                        } else {
+                            return [
+                                "Disappointed_Viewer", "FailedInvestment", "BoringShow_Critic", "WastedCredits",
+                                "AmateurHour", "LowExpectations", "UnimpressedFan", "MediocreViewer"
+                            ];
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error en getContextualUsernames:', error);
+                return ["DefaultUser"];
             }
-            console.warn('⚠️ getContextualUsernames no disponible aún');
-            return [];
         };
         
-        // Forzar actualización inmediata
+        // Verificación simple y directa
         setTimeout(() => {
-            if (window.updateContextualSystem) {
-                window.updateContextualSystem();
-                console.log('⚡ Sistema contextual actualizado inmediatamente');
-            }
-            
-            // Recrear funciones después de cargar
-            window.getCurrentContextualMessages = function() {
-                if (typeof getCurrentContextualMessages === 'function') {
-                    const msgs = getCurrentContextualMessages();
-                    console.log(`📨 getCurrentContextualMessages devuelve: ${msgs.length} mensajes`);
-                    return msgs;
-                }
-                console.warn('⚠️ getCurrentContextualMessages SIGUE sin estar disponible');
-                return [];
-            };
-            
-            window.getContextualUsernames = function() {
-                if (typeof getContextualUsernames === 'function') {
-                    const users = getContextualUsernames();
-                    console.log(`👥 getContextualUsernames devuelve: ${users.length} usuarios`);
-                    return users;
-                }
-                console.warn('⚠️ getContextualUsernames SIGUE sin estar disponible');
-                return [];
-            };
-            
-            // Verificar inmediatamente
-            const msgs = window.getCurrentContextualMessages();
-            console.log(`⚡ Verificación inmediata: ${msgs.length} mensajes contextuales disponibles`);
-            if (msgs.length > 0) {
-                console.log('✅ MENSAJES CONFIGURADOS DETECTADOS:', msgs.slice(0, 3));
-            }
-        }, 100);
-        
-        // Segundo intento más agresivo
-        setTimeout(() => {
-            if (window.updateContextualSystem) {
-                window.updateContextualSystem();
-            }
-            const msgs = window.getCurrentContextualMessages();
-            console.log(`⚡ Segunda verificación: ${msgs.length} mensajes`);
-            if (msgs.length > 0) {
-                console.log('✅ SEGUNDO INTENTO - MENSAJES FUNCIONANDO:', msgs.slice(0, 2));
-            }
-        }, 500);
-        
-        // Tercer intento ultra-agresivo
-        setTimeout(() => {
-            console.log('🔥 TERCER INTENTO ULTRA-AGRESIVO...');
-            
-            // Forzar inicialización manual
-            if (window.initContextualSystem) {
-                window.initContextualSystem();
-            }
-            if (window.updateContextualSystem) {
-                window.updateContextualSystem();
-            }
+            console.log('🔍 Verificando sistema contextual...');
             
             // Verificar disponibilidad de variables globales
             if (window.CONTEXTUAL_MESSAGES) {
                 console.log('📦 CONTEXTUAL_MESSAGES detectado:', Object.keys(window.CONTEXTUAL_MESSAGES));
                 if (window.CONTEXTUAL_MESSAGES.prueba0) {
                     console.log('📦 PRUEBA0 disponible:', Object.keys(window.CONTEXTUAL_MESSAGES.prueba0));
-                    if (window.CONTEXTUAL_MESSAGES.prueba0.dia_alto) {
-                        console.log('✅ MENSAJES DIA_ALTO encontrados:', window.CONTEXTUAL_MESSAGES.prueba0.dia_alto.length);
-                        console.log('🎯 PRIMER MENSAJE:', window.CONTEXTUAL_MESSAGES.prueba0.dia_alto[0]);
-                    }
                 }
+            } else {
+                console.warn('⚠️ CONTEXTUAL_MESSAGES no disponible aún');
             }
             
+            // Probar las funciones
             const msgs = window.getCurrentContextualMessages();
-            console.log(`🔥 TERCER INTENTO: ${msgs.length} mensajes`);
+            const users = window.getContextualUsernames();
+            
+            console.log(`✅ Sistema listo: ${msgs.length} mensajes, ${users.length} usuarios`);
             if (msgs.length > 0) {
-                console.log('✅ ¡ÉXITO! MENSAJES FUNCIONANDO EN TERCER INTENTO');
+                console.log('📨 Primeros mensajes:', msgs.slice(0, 3));
+            }
+            
+            // Reiniciar mensajes automáticos con el nuevo sistema
+            if (window.updateAutoMessages) {
+                window.updateAutoMessages();
+                console.log('🔄 Mensajes automáticos iniciados');
             }
         }, 1000);
     </script>
@@ -2459,93 +2477,22 @@
                 console.log('🔄 Sistema contextual forzado a actualizar');
             }
             
-            // Verificación AGRESIVA hasta conseguir los mensajes configurados
-            let attempts = 0;
-            const maxAttempts = 15; // Más intentos para asegurar carga
-            const checkInterval = setInterval(() => {
-                attempts++;
+            // Verificación simple para confirmar que el sistema funciona
+            setTimeout(() => {
+                console.log('📊 Verificación final del contexto:');
+                console.log('   Prueba:', localStorage.getItem('currentTest'));
+                console.log('   Momento:', localStorage.getItem('timeOfDay'));
+                console.log('   Rating:', localStorage.getItem('rating'));
                 
-                // Forzar inicialización en cada intento si no existe
-                if (!window.getCurrentContextualMessages || !window.getContextualUsernames) {
-                    console.log(`🔄 INTENTO ${attempts}: Forzando re-inicialización del sistema...`);
-                    
-                    // Verificar que los scripts contextuales estén cargados
-                    if (window.updateContextualSystem) {
-                        window.updateContextualSystem();
-                    }
-                    
-                    // Intentar cargar manualmente
-                    if (window.PRUEBA0_MESSAGES) {
-                        console.log('📦 Detectados PRUEBA0_MESSAGES:', Object.keys(window.PRUEBA0_MESSAGES));
-                    }
-                    
-                    return; // Siguiente intento
-                }
+                const messages = window.getCurrentContextualMessages();
+                console.log(`✅ Sistema operativo: ${messages.length} mensajes disponibles`);
                 
-                try {
-                    const messages = window.getCurrentContextualMessages();
-                    const usernames = window.getContextualUsernames();
-                    
-                    if (messages.length > 0 && usernames.length > 0) {
-                        console.log(`✅ ¡ÉXITO INTENTO ${attempts}! Sistema contextual CARGADO - ${messages.length} mensajes configurados`);
-                        console.log('📊 Contexto activo:', {
-                            prueba: localStorage.getItem('currentTest'),
-                            momento: localStorage.getItem('timeOfDay'),
-                            rating: localStorage.getItem('rating')
-                        });
-                        
-                        // Mostrar TODOS los mensajes configurados específicos
-                        console.log('📨 MENSAJES CONTEXTUALES CONFIGURADOS:');
-                        messages.slice(0, 8).forEach((msg, i) => {
-                            console.log(`${i+1}. ${msg}`);
-                        });
-                        
-                        // Mostrar usernames configurados
-                        console.log('👥 USUARIOS CONTEXTUALES:', usernames.slice(0, 5));
-                        
-                        // Verificar ofertas de PM configuradas
-                        const pmMessages = messages.filter(msg => msg.includes('+') && msg.includes('PM!'));
-                        console.log(`💰 Ofertas PM configuradas: ${pmMessages.length}`);
-                        
-                        clearInterval(checkInterval);
-                        console.log('✅ ¡SISTEMA CONTEXTUAL CONFIGURADO 100% FUNCIONANDO!');
-                        
-                        // Reiniciar mensajes automáticos AHORA con los configurados
-                        if (window.updateAutoMessages) {
-                            window.updateAutoMessages();
-                            console.log('🔄 Mensajes automáticos iniciados con configuración específica');
-                        }
-                        return;
-                    } else {
-                        console.warn(`⚠️ INTENTO ${attempts}: Sistema devuelve arrays vacíos - Forzando actualización...`);
-                        console.warn('   Mensajes:', messages.length, 'Usuarios:', usernames.length);
-                        
-                        // Forzar actualización agresiva
-                        if (window.updateContextualSystem) {
-                            window.updateContextualSystem();
-                        }
-                    }
-                } catch (error) {
-                    console.error(`❌ INTENTO ${attempts}: Error -`, error);
-                    
-                    // Forzar actualización en caso de error
-                    if (window.updateContextualSystem) {
-                        window.updateContextualSystem();
-                    }
+                if (messages.length > 3) {
+                    console.log('📨 Mensajes contextuales funcionando:', messages.slice(0, 5));
+                } else {
+                    console.log('📨 Usando fallback básico');
                 }
-                
-                if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    console.error(`🚨 FALLÓ tras ${maxAttempts} intentos - Los mensajes configurados NO se están cargando`);
-                    console.error('🔧 Verificar archivos contextual-messages.js y contextual-system-integration.js');
-                    
-                    // Intentar cargar los mensajes automáticos de todas formas
-                    if (window.updateAutoMessages) {
-                        window.updateAutoMessages();
-                        console.log('🔄 Intentando mensajes automáticos sin contexto configurado');
-                    }
-                }
-            }, 800); // Verificar cada 0.8 segundos (más agresivo)
+            }, 2000);
             
         }, 1000); // Empezar más rápido
     </script>

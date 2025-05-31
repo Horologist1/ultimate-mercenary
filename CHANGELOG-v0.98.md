@@ -59,34 +59,55 @@ function getCurrentAttributeValue(attributeName) {
 }
 ```
 
-### 🔧 **Corrección de Funciones Globales**
+### 🔧 **CORRECCIÓN CRÍTICA: RECURSIÓN INFINITA EN FUNCIONES GLOBALES**
 
-#### **Problema Identificado:**
-Las funciones `getCurrentContextualMessages` y `getContextualUsernames` no estaban disponibles globalmente cuando el sistema de chat las necesitaba.
+#### ❌ **Problema Crítico Identificado:**
+- **Error de stack overflow:** `Maximum call stack size exceeded`
+- **Recursión infinita:** Las funciones globales se llamaban a sí mismas
+- **Incompatibilidad de nombres:** Las funciones exportadas tenían nombres diferentes
 
-#### **Solución Implementada:**
+#### **Diagnóstico del Error:**
 ```javascript
-// CREAR LAS FUNCIONES GLOBALES CORRECTAS
+// ❌ PROBLEMA: Recursión infinita
 window.getCurrentContextualMessages = function() {
     if (typeof getCurrentContextualMessages === 'function') {
-        const msgs = getCurrentContextualMessages();
-        console.log(`📨 getCurrentContextualMessages devuelve: ${msgs.length} mensajes`);
-        return msgs;
+        return getCurrentContextualMessages(); // ¡Se llama a sí misma!
     }
-    console.warn('⚠️ getCurrentContextualMessages SIGUE sin estar disponible');
-    return [];
+}
+```
+
+#### ✅ **Solución Implementada:**
+**Uso correcto de las funciones exportadas del archivo `contextual-messages.js`**
+
+```javascript
+// ✅ SOLUCIÓN: Usar las funciones exportadas correctas
+window.getCurrentContextualMessages = function() {
+    // Usar la función REAL exportada: getContextualMessages (no getCurrentContextualMessages)
+    if (typeof window.getContextualMessages === 'function') {
+        const messages = window.getContextualMessages();
+        console.log(`✅ Obtenidos ${messages.length} mensajes contextuales`);
+        return messages;
+    }
+    // Fallback si la función no está disponible
+    return fallbackMessages;
 };
 
 window.getContextualUsernames = function() {
-    if (typeof getContextualUsernames === 'function') {
-        const users = getContextualUsernames();
-        console.log(`👥 getContextualUsernames devuelve: ${users.length} usuarios`);
+    // Usar la función REAL exportada: getContextualUsers (no getContextualUsernames)
+    if (typeof window.getContextualUsers === 'function') {
+        const users = window.getContextualUsers();
+        console.log(`✅ Obtenidos ${users.length} usuarios contextuales`);
         return users;
     }
-    console.warn('⚠️ getContextualUsernames SIGUE sin estar disponible');
-    return [];
+    // Fallback si la función no está disponible
+    return fallbackUsers;
 };
 ```
+
+#### **Funciones Correctas del Archivo `contextual-messages.js`:**
+- `window.getContextualMessages()` - Función REAL exportada 
+- `window.getContextualUsers()` - Función REAL exportada
+- `window.CONTEXTUAL_MESSAGES` - Datos REALES exportados
 
 ### ⚡ **Triple Verificación Ultra-Agresiva**
 
@@ -165,9 +186,30 @@ Con las funciones globales forzadas, estos mensajes específicos configurados DE
 ```
 
 ## 🚨 **GARANTÍA v0.98:**
-- ✅ **FUNCIONES GLOBALES** disponibles garantizadas
-- ✅ **MENSAJES ESPECÍFICOS** para XIII novata aparecen  
-- ✅ **ATRIBUTOS GASTADOS** se preservan al guardar
-- ✅ **SISTEMA CONTEXTUAL** funciona desde primer intento
-- ✅ **NO** más chat vacío - mensajes configurados garantizados
-- ✅ **NO** más pérdida de atributos - valores reales preservados 
+- ✅ **RECURSIÓN INFINITA** corregida - sin más stack overflow
+- ✅ **FUNCIONES GLOBALES** conectadas correctamente a funciones exportadas
+- ✅ **MENSAJES ESPECÍFICOS** para XIII novata aparecen (ej: "¡Wow! ¡Esta XIII está sorprendiendo...")
+- ✅ **ATRIBUTOS GASTADOS** se preservan al guardar (COG 8 → COG 8, no COG 10)
+- ✅ **SISTEMA CONTEXTUAL** funciona sin errores de JavaScript
+- ✅ **NO** más `Maximum call stack size exceeded`
+- ✅ **NO** más chat vacío - mensajes configurados accesibles
+- ✅ **NO** más pérdida de atributos - valores reales preservados
+
+## 🔍 **Logs Esperados CORREGIDOS v0.98:**
+```
+🔍 Verificando sistema contextual...
+📦 CONTEXTUAL_MESSAGES detectado: ["prueba0","prueba1"]
+📦 PRUEBA0 disponible: ["dia_alto","dia_bajo","noche_alto","noche_bajo"]
+✅ Obtenidos 95 mensajes contextuales
+✅ Obtenidos 12 usuarios contextuales
+✅ Sistema listo: 95 mensajes, 12 usuarios
+📨 Primeros mensajes: ["¡Wow! ¡Esta XIII está sorprendiendo...", "No la conocía pero...", "¡La elegí como..."]
+🔄 Mensajes automáticos iniciados
+📊 Leyendo atributo cog: 8 (valor gastado preservado)
+```
+
+## 🎯 **Testing Inmediato:**
+1. **Abrir consola del navegador** - NO debe aparecer "Maximum call stack size exceeded"
+2. **Verificar mensajes** - Deben aparecer los específicos de XIII novata
+3. **Gastar atributos** - Cambiar COG de 10 a 8, guardar, verificar que mantiene 8
+4. **Contexto adaptativo** - Cambiar rating/momento del día, mensajes deben cambiar 
