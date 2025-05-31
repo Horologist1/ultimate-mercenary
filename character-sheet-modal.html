@@ -765,8 +765,8 @@
         </div>
 
         <div class="button-container">
-            <button id="saveButton" class="save-button">GUARDAR FICHA</button>
-            <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
+        <button id="saveButton" class="save-button">GUARDAR FICHA</button>
+        <button id="resetButton" class="reset-button">REINICIAR FICHA</button>
         </div>
 
         <div class="tabs">
@@ -1196,7 +1196,7 @@
                                 <input type="text" id="misc-weight" placeholder="Peso" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                                 <input type="text" id="misc-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                                 <input type="text" id="misc-effects" placeholder="Efectos/Uso" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
-                            </div>
+                    </div>
                             <textarea id="misc-description" placeholder="Descripción y notas" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px; height: 60px; resize: vertical;"></textarea>
                             <button onclick="addCustomMisc()" style="background: #00ccff; color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Añadir Equipo</button>
                         </div>
@@ -1240,7 +1240,7 @@
                                 <!-- <input type="text" id="implant-cost" placeholder="Coste en PM" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;"> -->
                                 <input type="text" id="implant-effects" placeholder="Efectos mecánicos" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
                                 <input type="text" id="implant-location" placeholder="Ubicación" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 3px;">
-                            </div>
+                    </div>
                             
                             <!-- Beneficios Mecánicos -->
                             <div style="margin: 15px 0; padding: 15px; background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 6px;">
@@ -1915,7 +1915,7 @@
             } else if (event.data && event.data.type === 'clearInventory') {
                 console.log('🧹 Limpiando inventario del modal...');
                 inventory = [];
-                updateInventoryDisplay();
+                    updateInventoryDisplay();
                 
                 // Limpiar bonuses también
                 window.implantBonuses = { attributes: {}, skills: {} };
@@ -2035,13 +2035,13 @@
                             <div class="item-header">
                                 <div class="item-icon">${iconoTipo}</div>
                                 <div class="item-title">
-                                    <h4>${item.nombre}</h4>
+                        <h4>${item.nombre}</h4>
                                     <span class="item-type">${item.tipo.toUpperCase()}</span>
                                 </div>
                                 <button class="remove-item-improved" onclick="removeItemById('${itemId}')" title="Eliminar item">
                                     ✕
-                                </button>
-                            </div>
+                        </button>
+                    </div>
                             ${item.descripcion ? `<div class="item-description">${item.descripcion}</div>` : ''}
                             <div class="item-stats-grid">
                                 ${detallesHTML}
@@ -2185,12 +2185,12 @@
             console.log('📋 Datos recopilados:', characterData);
             
             // Enviar datos al padre
-            if (window.parent) {
-                window.parent.postMessage({
+                if (window.parent) {
+                    window.parent.postMessage({
                     type: 'characterDataGathered',
                     data: characterData
-                }, '*');
-            }
+                    }, '*');
+                }
             
             return characterData;
         }

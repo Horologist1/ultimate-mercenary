@@ -253,7 +253,7 @@ function initializeInventorySystem() {
         window.firebaseApp = firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
     }
-    
+
     window.firebaseInitialized = true;
     
     // Listener de Firebase - SIMPLE Y DIRECTO con prevención de loops
@@ -287,7 +287,7 @@ function initializeInventorySystem() {
             }
         }
     });
-    
+
     // Función helper para actualizar Firebase sin triggear el listener
     window.updateFirebaseInventory = function() {
         isUpdatingFromFirebase = true;
@@ -364,7 +364,7 @@ window.comprarItem = function(itemId, precio) {
         window.pmTransactions.addTransaction(-precio, `Compra: ${itemId}`);
         console.log('✅ PM restados:', precio, 'PM restantes:', window.pmTransactions.getTotal());
         return true;
-    } else {
+            } else {
         console.error('❌ Sistema de PM no disponible');
         return false;
     }

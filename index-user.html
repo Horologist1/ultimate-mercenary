@@ -1383,11 +1383,34 @@
                 desc: 'Realizar entregas de paquetes en el distrito industrial. Los concursantes deben transportar cargamentos valiosos a través de zonas peligrosas, demostrando su sigilo y eficiencia.'
             }
         };
+
+        // URLs de videos para cada prueba
+        const testVideos = {
+            'prueba0': 'https://www.dropbox.com/scl/fi/1josbstrlr7detymj71j9/Prueba0.mp4?rlkey=zphfprdpum4q58xz297r8h3k9&st=sbkz57tk&dl=1',
+            'prueba1': 'https://www.dropbox.com/scl/fi/xlzx7txd7t258lao7h8ap/Prueba1.mp4?rlkey=uqwx6cffrab7mij8orywmxvv2&st=hkah83c2&dl=1',
+            'prueba2': 'https://www.dropbox.com/scl/fi/1josbstrlr7detymj71j9/Prueba0.mp4?rlkey=zphfprdpum4q58xz297r8h3k9&st=sbkz57tk&dl=1', // Fallback hasta que tengas Prueba2.mp4
+            'prueba3': 'https://www.dropbox.com/scl/fi/1josbstrlr7detymj71j9/Prueba0.mp4?rlkey=zphfprdpum4q58xz297r8h3k9&st=sbkz57tk&dl=1'  // Fallback hasta que tengas Prueba3.mp4
+        };
+
         const currentTest = localStorage.getItem('currentTest') || 'prueba0';
         const obj = testObjectives[currentTest] || testObjectives['prueba0'];
-        // Barra lateral
+        
+        // Actualizar barra lateral
         if (document.getElementById('objective-title')) document.getElementById('objective-title').textContent = obj.title;
         if (document.getElementById('objective-description')) document.getElementById('objective-description').textContent = obj.desc;
+        
+        // Actualizar video de fondo
+        const backgroundVideo = document.getElementById('background-video');
+        const videoSource = backgroundVideo ? backgroundVideo.querySelector('source') : null;
+        if (videoSource) {
+            const newVideoUrl = testVideos[currentTest] || testVideos['prueba0'];
+            if (videoSource.src !== newVideoUrl) {
+                videoSource.src = newVideoUrl;
+                backgroundVideo.load(); // Recargar el video con la nueva fuente
+                console.log(`[Video Update] Cambiando video de fondo a ${currentTest}: ${newVideoUrl}`);
+            }
+        }
+        
         // Eliminar imagen si existe
         const imgElem = document.getElementById('objective-image');
         if (imgElem && imgElem.parentNode) imgElem.parentNode.removeChild(imgElem);
