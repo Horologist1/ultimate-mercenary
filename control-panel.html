@@ -484,6 +484,13 @@
                             <option value="prueba3">Prueba 3: La Entrega</option>
                         </select>
                     </div>
+                    <div class="test-selector" style="margin-left: 20px;">
+                        <label for="time-of-day">Momento:</label>
+                        <select id="time-of-day" onchange="updateTimeOfDay(this.value)">
+                            <option value="dia">Día</option>
+                            <option value="noche">Noche</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -773,6 +780,12 @@
             if (window.saveCurrentTest) window.saveCurrentTest(testId);
         }
 
+        function updateTimeOfDay(timeOfDay) {
+            localStorage.setItem('timeOfDay', timeOfDay);
+            console.log('🕐 Momento del día actualizado a:', timeOfDay);
+            if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
+        }
+
         // Función para cargar y mostrar los mensajes del chat con animación
         function loadChatMessages() {
             let mensajes = [];
@@ -1015,6 +1028,10 @@
             const lastPMUsername = localStorage.getItem('lastPMUsername') || '';
             document.getElementById('pm-username-input').value = lastPMUsername;
 
+            // Cargar el momento del día actual
+            const currentTimeOfDay = localStorage.getItem('timeOfDay') || 'dia';
+            document.getElementById('time-of-day').value = currentTimeOfDay;
+
             // Renderizar las listas de conocidos y conocimientos
             renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
             renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
@@ -1110,6 +1127,7 @@
         const conocimientosRef = ref(database, 'conocimientosSeleccionados');
         const mensajesRef = ref(database, 'mensajes-directos');
         const currentTestRef = ref(database, 'currentTest');
+        const timeOfDayRef = ref(database, 'timeOfDay');
         const nombresRef = ref(database, 'nombresConcursantes');
         const audienceRef = ref(database, 'audience');
         const ratingRef = ref(database, 'rating');
@@ -1129,6 +1147,7 @@
         window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
         window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
         window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
+        window.saveTimeOfDay = function(valor) { set(timeOfDayRef, valor); };
 
         // Listeners para sincronización en tiempo real
         onValue(conocidosRef, (snapshot) => {
@@ -1160,6 +1179,14 @@
                 localStorage.setItem('currentTest', data);
                 document.getElementById('current-test').value = data;
                 document.getElementById('objective-text').textContent = testObjectives[data];
+            }
+        });
+
+        onValue(timeOfDayRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('timeOfDay', data);
+                document.getElementById('time-of-day').value = data;
             }
         });
 
