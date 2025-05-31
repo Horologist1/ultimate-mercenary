@@ -236,5 +236,5 @@ updateContextualSystem();
 
 ---
 
-*Sistema implementado en Ultimate Mercenary v0.93*
+*Sistema implementado en Ultimate Mercenary v0.94 - FORZADO ACTIVO*
 *Última actualización: Diciembre 2024* 

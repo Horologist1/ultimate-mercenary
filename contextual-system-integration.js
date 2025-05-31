@@ -1,5 +1,5 @@
 // =================== SISTEMA DE INTEGRACIÓN CONTEXTUAL ===================
-// Ultimate Mercenary v0.93 - Sistema de integración de mensajes contextuales
+// Ultimate Mercenary v0.94 - Sistema de integración de mensajes contextuales FORZADO
 // Reemplaza el sistema de mensajes fijo por uno adaptativo
 // =======================================================================
 
@@ -63,13 +63,13 @@ function getCurrentContextualMessages() {
             }
             break;
         case 'prueba2':
-            if (PRUEBA2_MESSAGES && PRUEBA2_MESSAGES[contextKey]) {
-                messages = PRUEBA2_MESSAGES[contextKey];
+            if (window.PRUEBA2_MESSAGES && window.PRUEBA2_MESSAGES[contextKey]) {
+                messages = window.PRUEBA2_MESSAGES[contextKey];
             }
             break;
         case 'prueba3':
-            if (PRUEBA3_MESSAGES && PRUEBA3_MESSAGES[contextKey]) {
-                messages = PRUEBA3_MESSAGES[contextKey];
+            if (window.PRUEBA3_MESSAGES && window.PRUEBA3_MESSAGES[contextKey]) {
+                messages = window.PRUEBA3_MESSAGES[contextKey];
             }
             break;
         default:
@@ -286,10 +286,11 @@ function testContextualSystem() {
     console.log('✅ Test completado');
 }
 
-// Exportar funciones principales
+// Exportar funciones principales INMEDIATAMENTE
 window.initContextualSystem = initContextualSystem;
 window.updateContextualSystem = updateContextualSystem;
 window.getContextualUsernames = getContextualUsernames;
+window.getCurrentContextualMessages = getCurrentContextualMessages;
 window.logCurrentContext = logCurrentContext;
 window.testContextualSystem = testContextualSystem;
 

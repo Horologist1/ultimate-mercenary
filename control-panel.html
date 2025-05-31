@@ -931,31 +931,29 @@
         function updateDirectPM() {
             const pmAmount = document.getElementById('pm-direct-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
-                const currentTotal = window.pmTransactions.getTotal();
                 const newTotal = parseInt(pmAmount);
-                const difference = newTotal - currentTotal;
-                
-                if (difference !== 0) {
-                    const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
-                    if (description !== null) {
-                        // Crear una transacción que refleje el cambio total
-                        window.pmTransactions.add(Math.abs(difference), difference > 0 ? 'gain' : 'spend', description);
-                        
-                        // Actualizar Firebase directamente
-                        const pmRef = window.database.ref('playerPM');
-                        pmRef.set(newTotal.toString());
-                        
-                        document.getElementById('pm-direct-input').value = '';
-                        updateUserList();
-                        
-                        // Notificar a la tienda si está abierta
-                        if (window.parent) {
-                            window.parent.postMessage({
-                                type: 'updatePM',
-                                value: newTotal
-                            }, '*');
-                        }
+                const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
+                if (description !== null) {
+                    // Usar la función establecerPM que maneja la lógica correctamente
+                    if (window.establecerPM) {
+                        window.establecerPM(newTotal);
+                    } else {
+                        // Fallback al sistema de transacciones
+                        window.pmTransactions.setTotal(newTotal);
                     }
+                    
+                    document.getElementById('pm-direct-input').value = '';
+                    updateUserList();
+                    
+                    // Notificar a la tienda si está abierta
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'updatePM',
+                            value: newTotal
+                        }, '*');
+                    }
+                    
+                    console.log(`✅ PM establecido a: ${newTotal}`);
                 }
             }
         }
@@ -964,11 +962,19 @@
             const pmAmount = document.getElementById('pm-add-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
                 const amount = parseInt(pmAmount);
-                const description = prompt('Descripción de la transacción:', 'Ajuste manual de PM');
+                const description = prompt('Descripción de la transacción:', 'Sumar PM');
                 if (description !== null) {
-                    window.pmTransactions.add(amount, 'gain', description);
+                    // Usar la función sumarPM que maneja la lógica correctamente
+                    if (window.sumarPM) {
+                        window.sumarPM(amount, description);
+                    } else {
+                        // Fallback al sistema de transacciones
+                        window.pmTransactions.addTransaction(amount, description);
+                    }
+                    
                     document.getElementById('pm-add-input').value = '';
                     updateUserList();
+                    console.log(`✅ PM sumado: +${amount}`);
                 }
             }
         }
@@ -977,11 +983,19 @@
             const pmAmount = document.getElementById('pm-add-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
                 const amount = parseInt(pmAmount);
-                const description = prompt('Descripción de la transacción:', 'Ajuste manual de PM');
+                const description = prompt('Descripción de la transacción:', 'Restar PM');
                 if (description !== null) {
-                    window.pmTransactions.add(amount, 'spend', description);
+                    // Usar la función restarPM que maneja la lógica correctamente
+                    if (window.restarPM) {
+                        window.restarPM(amount, description);
+                    } else {
+                        // Fallback al sistema de transacciones
+                        window.pmTransactions.addTransaction(-amount, description);
+                    }
+                    
                     document.getElementById('pm-add-input').value = '';
                     updateUserList();
+                    console.log(`✅ PM restado: -${amount}`);
                 }
             }
         }
@@ -1237,6 +1251,57 @@
         });
     </script>
     <script>
+        // Conectar con las funciones PM del iframe padre si están disponibles
+        if (window.parent && window.parent !== window) {
+            // Intentar acceder a las funciones PM del padre
+            window.sumarPM = window.parent.sumarPM;
+            window.restarPM = window.parent.restarPM;
+            window.establecerPM = window.parent.establecerPM;
+            window.pmTransactions = window.parent.pmTransactions;
+            
+            console.log('🔗 Conectado con sistema PM del iframe padre:', {
+                sumarPM: !!window.sumarPM,
+                restarPM: !!window.restarPM,
+                establecerPM: !!window.establecerPM,
+                pmTransactions: !!window.pmTransactions
+            });
+        } else {
+            console.log('⚠️ No se encontró iframe padre, usando funciones locales');
+        }
+
+        // Crear funciones PM locales si no están disponibles desde el padre
+        if (!window.sumarPM) {
+            window.sumarPM = function(cantidad, razon) {
+                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+                const newTotal = currentPM + cantidad;
+                localStorage.setItem('playerPM', newTotal.toString());
+                if (window.savePM) window.savePM(newTotal);
+                console.log(`✅ PM sumado localmente: +${cantidad} (Total: ${newTotal})`);
+                return newTotal;
+            };
+        }
+
+        if (!window.restarPM) {
+            window.restarPM = function(cantidad, razon) {
+                const currentPM = parseInt(localStorage.getItem('playerPM') || '0');
+                const newTotal = Math.max(0, currentPM - cantidad);
+                localStorage.setItem('playerPM', newTotal.toString());
+                if (window.savePM) window.savePM(newTotal);
+                console.log(`✅ PM restado localmente: -${cantidad} (Total: ${newTotal})`);
+                return newTotal;
+            };
+        }
+
+        if (!window.establecerPM) {
+            window.establecerPM = function(total) {
+                localStorage.setItem('playerPM', total.toString());
+                if (window.savePM) window.savePM(total);
+                console.log(`✅ PM establecido localmente: ${total}`);
+                return total;
+            };
+        }
+
+        // Funciones originales
         if (typeof updateUserList === 'function') window.updateUserList = updateUserList;
         if (typeof renderCheckboxList === 'function') window.renderCheckboxList = renderCheckboxList;
         if (typeof updateCurrentTest === 'function') window.updateCurrentTest = updateCurrentTest;

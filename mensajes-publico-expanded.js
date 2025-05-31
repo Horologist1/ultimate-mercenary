@@ -355,22 +355,38 @@ const retosEspecificos = [...retosEspecificosOriginales, ...retosEspecificosNuev
 function generarMensajeAleatorio() {
     let usuario, color, mensaje;
     
-    // Intentar usar el sistema contextual si está disponible
+    console.log('🎭 Generando mensaje - Estado del sistema:', {
+        getCurrentContextualMessages: !!window.getCurrentContextualMessages,
+        getContextualUsernames: !!window.getContextualUsernames,
+        CONTEXTUAL_MESSAGES: !!window.CONTEXTUAL_MESSAGES,
+        PRUEBA2_MESSAGES: !!window.PRUEBA2_MESSAGES,
+        PRUEBA3_MESSAGES: !!window.PRUEBA3_MESSAGES
+    });
+    
+    // FORZAR uso del sistema contextual si está disponible
     if (window.getCurrentContextualMessages && window.getContextualUsernames) {
         try {
             const contextualMessages = window.getCurrentContextualMessages();
             const contextualUsernames = window.getContextualUsernames();
+            
+            console.log('🔍 Mensajes contextuales obtenidos:', {
+                cantidad: contextualMessages.length,
+                usuarios: contextualUsernames.length,
+                primerMensaje: contextualMessages[0]
+            });
             
             if (contextualMessages && contextualMessages.length > 0) {
                 // Usar sistema contextual
                 usuario = contextualUsernames[Math.floor(Math.random() * contextualUsernames.length)];
                 color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
                 
-                // 80% mensajes contextuales, 20% retos específicos (para mantener variedad)
-                if (Math.random() < 0.8) {
+                // 90% mensajes contextuales, 10% retos específicos (para GARANTIZAR que use contextuales)
+                if (Math.random() < 0.9) {
                     mensaje = contextualMessages[Math.floor(Math.random() * contextualMessages.length)];
+                    console.log('✅ USANDO MENSAJE CONTEXTUAL:', mensaje);
                 } else {
                     mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
+                    console.log('🎯 Usando reto específico:', mensaje);
                     // Reemplazar [PARTICIPANTE] si existe en el mensaje
                     if (mensaje.includes("[PARTICIPANTE]")) {
                         const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
@@ -386,54 +402,22 @@ function generarMensajeAleatorio() {
                     }
                 }
             } else {
-                throw new Error('No hay mensajes contextuales disponibles');
+                throw new Error('Arrays contextuales vacíos o no válidos');
             }
         } catch (error) {
-            console.warn('⚠️ Sistema contextual no disponible, usando mensajes de fallback:', error.message);
+            console.error('❌ ERROR en sistema contextual:', error);
+            console.warn('⚠️ FALLBACK: usando mensajes de fallback');
             // Fallback al sistema original
             usuario = nombresUsuarios[Math.floor(Math.random() * nombresUsuarios.length)];
             color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
-            
-            // 70% mensajes generales, 30% retos específicos
-            if (Math.random() < 0.7) {
-                mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
-            } else {
-                mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
-                if (mensaje.includes("[PARTICIPANTE]")) {
-                    const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                    mensaje = mensaje.replace("[PARTICIPANTE]", participante);
-                    if (mensaje.includes("[PARTICIPANTE]")) {
-                        let segundoParticipante;
-                        do {
-                            segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                        } while (segundoParticipante === participante);
-                        mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
-                    }
-                }
-            }
+            mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
         }
     } else {
+        console.error('❌ SISTEMA CONTEXTUAL NO DISPONIBLE - funciones no encontradas');
         // Fallback al sistema original si no hay sistema contextual
         usuario = nombresUsuarios[Math.floor(Math.random() * nombresUsuarios.length)];
         color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
-        
-        // 70% mensajes generales, 30% retos específicos
-        if (Math.random() < 0.7) {
-            mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
-        } else {
-            mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
-            if (mensaje.includes("[PARTICIPANTE]")) {
-                const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                mensaje = mensaje.replace("[PARTICIPANTE]", participante);
-                if (mensaje.includes("[PARTICIPANTE]")) {
-                    let segundoParticipante;
-                    do {
-                        segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                    } while (segundoParticipante === participante);
-                    mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
-                }
-            }
-        }
+        mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
     }
     
     return {
@@ -498,7 +482,27 @@ window.updateAutoMessages = function() {
 // Función para verificar el sistema contextual
 function verificarSistemaContextual() {
     setTimeout(() => {
-        console.log('🎭 Verificando integración del sistema contextual en mensajes públicos...');
+        console.log('🎭 VERIFICACIÓN FORZADA v0.94 - Sistema contextual en mensajes públicos...');
+        
+        // Configurar valores por defecto si no existen
+        if (!localStorage.getItem('currentTest')) {
+            localStorage.setItem('currentTest', 'prueba0');
+            console.log('⚙️ Configurando currentTest por defecto: prueba0');
+        }
+        if (!localStorage.getItem('timeOfDay')) {
+            localStorage.setItem('timeOfDay', 'dia');
+            console.log('⚙️ Configurando timeOfDay por defecto: dia');
+        }
+        if (!localStorage.getItem('rating')) {
+            localStorage.setItem('rating', '7.0');
+            console.log('⚙️ Configurando rating por defecto: 7.0');
+        }
+        
+        console.log('📊 Contexto actual:', {
+            currentTest: localStorage.getItem('currentTest'),
+            timeOfDay: localStorage.getItem('timeOfDay'),
+            rating: localStorage.getItem('rating')
+        });
         
         if (window.getCurrentContextualMessages && window.getContextualUsernames) {
             try {
@@ -513,16 +517,31 @@ function verificarSistemaContextual() {
                 const pmMessages = mensajes.filter(msg => msg.includes('+') && msg.includes('PM!'));
                 console.log(`💰 ${pmMessages.length} mensajes con ofertas PM detectados`);
                 
-                // Mostrar ejemplo
+                // Mostrar múltiples ejemplos
                 if (mensajes.length > 0) {
-                    console.log('🎯 Ejemplo de mensaje contextual:', mensajes[0]);
+                    console.log('🎯 Ejemplos de mensajes contextuales:');
+                    for (let i = 0; i < Math.min(3, mensajes.length); i++) {
+                        console.log(`   ${i+1}. ${mensajes[i]}`);
+                    }
                 }
                 
+                // Verificar mensajes específicos de novata
+                const novataMessages = mensajes.filter(msg => 
+                    msg.includes('nueva') || msg.includes('novata') || msg.includes('desconocida') ||
+                    msg.includes('primera') || msg.includes('debut') || msg.includes('para ser nueva')
+                );
+                console.log(`🆕 ${novataMessages.length} mensajes específicos de novata detectados`);
+                
             } catch (error) {
-                console.warn('⚠️ Error verificando sistema contextual:', error);
+                console.error('❌ ERROR verificando sistema contextual:', error);
             }
         } else {
-            console.warn('⚠️ Sistema contextual no disponible aún, usando mensajes de fallback');
+            console.error('❌ SISTEMA CONTEXTUAL NO DISPONIBLE - funciones no encontradas');
+            console.log('🔍 Estado de ventana global:', {
+                getCurrentContextualMessages: !!window.getCurrentContextualMessages,
+                getContextualUsernames: !!window.getContextualUsernames,
+                CONTEXTUAL_MESSAGES: !!window.CONTEXTUAL_MESSAGES
+            });
         }
     }, 3000); // Esperar 3 segundos para que se cargue todo
 }

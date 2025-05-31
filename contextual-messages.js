@@ -1,5 +1,5 @@
 // =================== SISTEMA DE MENSAJES CONTEXTUALES ===================
-// Ultimate Mercenary v0.93 - Sistema de mensajes adaptativos
+// Ultimate Mercenary v0.94 - Sistema de mensajes adaptativos FORZADO
 // Mensajes filtrados por: Prueba + Momento del día + Rating
 // =======================================================================
 
