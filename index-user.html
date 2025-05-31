@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.97</title>
+    <title>Ultimate Mercenary 0.98</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1109,7 +1109,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.97</h1>
+                        <h1>ULTIMATE MERCENARY 0.98</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1598,7 +1598,7 @@
         function startAutoMessages() {
             if (autoMsgInterval) clearInterval(autoMsgInterval);
             
-            console.log('🔄 Iniciando mensajes automáticos v0.97 - FORZAR MENSAJES CONTEXTUALES');
+            console.log('🔄 Iniciando mensajes automáticos v0.98 - FUNCIONES GLOBALES FORZADAS');
             
             const coloresAuto = [
                 '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
@@ -2333,6 +2333,23 @@
         if (!localStorage.getItem('timeOfDay')) localStorage.setItem('timeOfDay', 'dia');
         if (!localStorage.getItem('rating')) localStorage.setItem('rating', '7.0');
         
+        // CREAR LAS FUNCIONES GLOBALES CORRECTAS
+        window.getCurrentContextualMessages = function() {
+            if (typeof getCurrentContextualMessages === 'function') {
+                return getCurrentContextualMessages();
+            }
+            console.warn('⚠️ getCurrentContextualMessages no disponible aún');
+            return [];
+        };
+        
+        window.getContextualUsernames = function() {
+            if (typeof getContextualUsernames === 'function') {
+                return getContextualUsernames();
+            }
+            console.warn('⚠️ getContextualUsernames no disponible aún');
+            return [];
+        };
+        
         // Forzar actualización inmediata
         setTimeout(() => {
             if (window.updateContextualSystem) {
@@ -2340,13 +2357,32 @@
                 console.log('⚡ Sistema contextual actualizado inmediatamente');
             }
             
-            // Verificar inmediatamente
-            if (window.getCurrentContextualMessages) {
-                const msgs = window.getCurrentContextualMessages();
-                console.log(`⚡ Verificación inmediata: ${msgs.length} mensajes contextuales disponibles`);
-                if (msgs.length > 0) {
-                    console.log('✅ MENSAJES CONFIGURADOS DETECTADOS:', msgs.slice(0, 3));
+            // Recrear funciones después de cargar
+            window.getCurrentContextualMessages = function() {
+                if (typeof getCurrentContextualMessages === 'function') {
+                    const msgs = getCurrentContextualMessages();
+                    console.log(`📨 getCurrentContextualMessages devuelve: ${msgs.length} mensajes`);
+                    return msgs;
                 }
+                console.warn('⚠️ getCurrentContextualMessages SIGUE sin estar disponible');
+                return [];
+            };
+            
+            window.getContextualUsernames = function() {
+                if (typeof getContextualUsernames === 'function') {
+                    const users = getContextualUsernames();
+                    console.log(`👥 getContextualUsernames devuelve: ${users.length} usuarios`);
+                    return users;
+                }
+                console.warn('⚠️ getContextualUsernames SIGUE sin estar disponible');
+                return [];
+            };
+            
+            // Verificar inmediatamente
+            const msgs = window.getCurrentContextualMessages();
+            console.log(`⚡ Verificación inmediata: ${msgs.length} mensajes contextuales disponibles`);
+            if (msgs.length > 0) {
+                console.log('✅ MENSAJES CONFIGURADOS DETECTADOS:', msgs.slice(0, 3));
             }
         }, 100);
         
@@ -2355,11 +2391,43 @@
             if (window.updateContextualSystem) {
                 window.updateContextualSystem();
             }
-            if (window.getCurrentContextualMessages) {
-                const msgs = window.getCurrentContextualMessages();
-                console.log(`⚡ Segunda verificación: ${msgs.length} mensajes`);
+            const msgs = window.getCurrentContextualMessages();
+            console.log(`⚡ Segunda verificación: ${msgs.length} mensajes`);
+            if (msgs.length > 0) {
+                console.log('✅ SEGUNDO INTENTO - MENSAJES FUNCIONANDO:', msgs.slice(0, 2));
             }
         }, 500);
+        
+        // Tercer intento ultra-agresivo
+        setTimeout(() => {
+            console.log('🔥 TERCER INTENTO ULTRA-AGRESIVO...');
+            
+            // Forzar inicialización manual
+            if (window.initContextualSystem) {
+                window.initContextualSystem();
+            }
+            if (window.updateContextualSystem) {
+                window.updateContextualSystem();
+            }
+            
+            // Verificar disponibilidad de variables globales
+            if (window.CONTEXTUAL_MESSAGES) {
+                console.log('📦 CONTEXTUAL_MESSAGES detectado:', Object.keys(window.CONTEXTUAL_MESSAGES));
+                if (window.CONTEXTUAL_MESSAGES.prueba0) {
+                    console.log('📦 PRUEBA0 disponible:', Object.keys(window.CONTEXTUAL_MESSAGES.prueba0));
+                    if (window.CONTEXTUAL_MESSAGES.prueba0.dia_alto) {
+                        console.log('✅ MENSAJES DIA_ALTO encontrados:', window.CONTEXTUAL_MESSAGES.prueba0.dia_alto.length);
+                        console.log('🎯 PRIMER MENSAJE:', window.CONTEXTUAL_MESSAGES.prueba0.dia_alto[0]);
+                    }
+                }
+            }
+            
+            const msgs = window.getCurrentContextualMessages();
+            console.log(`🔥 TERCER INTENTO: ${msgs.length} mensajes`);
+            if (msgs.length > 0) {
+                console.log('✅ ¡ÉXITO! MENSAJES FUNCIONANDO EN TERCER INTENTO');
+            }
+        }, 1000);
     </script>
     
     <!-- Verificación y debug del sistema contextual -->
