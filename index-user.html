@@ -1597,7 +1597,9 @@
         window.agregarMensajeAlChatDisplay = agregarMensajeAlChatDisplay;
         function startAutoMessages() {
             if (autoMsgInterval) clearInterval(autoMsgInterval);
-            const nombresUsuarios = [
+            
+            // Usar nombres contextuales si están disponibles
+            const nombresUsuarios = window.CONTEXTUAL_USERNAMES || [
                 "Neo_Kyoto_Fan42", "SamuraiStalker", "EdgerunnerGirl", "MercenaryCrazy", 
                 "BloodMoney99", "ChromeHeart", "WiredNinja", "NeonShadow",
                 "CyberSlice", "DeathMatch_Lover", "KatanaQueen", "StreetHunter22"
@@ -1605,7 +1607,9 @@
             const coloresAuto = [
                 '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
             ];
-            const ejemplos = [
+            
+            // Usar mensajes contextuales si están disponibles
+            const ejemplos = window.CONTEXTUAL_EXAMPLES || [
                 "¡Vamos XIII, no decepciones a tus fans!",
                 "¡Estoy apostando todo por ti, no me falles!",
                 "Mira esos reflejos, ¡eres una máquina!",
@@ -1643,6 +1647,15 @@
                 autoMsgIndex++;
             }, 3500);
         }
+        
+        // Función para actualizar mensajes automáticos con nuevo contexto
+        window.updateAutoMessages = function() {
+            console.log('🔄 Actualizando mensajes automáticos con nuevo contexto');
+            if (autoMsgInterval) {
+                clearInterval(autoMsgInterval);
+                startAutoMessages(); // Reiniciar con nuevos mensajes
+            }
+        };
         function initChatSystem() {
             // Al cargar la página, limpiar mensajes del jugador
             limpiarChatJugador();
@@ -2188,9 +2201,15 @@
             }
         };
 
-        console.log('🎮 Ultimate Mercenary v0.92 - Sistema de mensajes mejorado');
+        console.log('🎮 Ultimate Mercenary v0.93 - Sistema de mensajes mejorado');
         console.log('📧 Usa testMessagingSystem() para probar el sistema');
     </script>
+
+    <!-- Sistema de mensajes contextuales -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-messages-p2.js"></script>
+    <script src="contextual-messages-p3.js"></script>
+    <script src="contextual-system-integration.js"></script>
 
 </body>
 </html> 
