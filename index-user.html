@@ -1598,81 +1598,74 @@
         function startAutoMessages() {
             if (autoMsgInterval) clearInterval(autoMsgInterval);
             
-            console.log('🔄 Iniciando mensajes automáticos v0.96 - Sistema híbrido contextual');
+            console.log('🔄 Iniciando mensajes automáticos v0.97 - FORZAR MENSAJES CONTEXTUALES');
             
             const coloresAuto = [
                 '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
             ];
             
-            // Mensajes de fallback temáticos para XIII novata
-            const mensajesFallbackXIII = [
-                "¡Esta nueva XIII tiene potencial!",
-                "Vamos a ver qué puede hacer esta recién llegada",
-                "¿Será XIII la sorpresa de esta temporada?",
-                "XIII parece prometedora para ser nueva",
-                "Esta novata XIII va a darnos espectáculo",
-                "¿Quién es esta XIII? No la habíamos visto antes",
-                "La nueva concursante XIII está llamando la atención",
-                "XIII debutando en grande en las pruebas",
-                "¿Será XIII una dark horse en este concurso?",
-                "Esta XIII recién llegada tiene carisma",
-                "¡Demuestra tu valor, XIII! ¡+55 PM!",
-                "¡Haz algo memorable, novata! ¡+65 PM!",
-                "¡Muéstranos por qué te eligieron! ¡+50 PM!"
-            ];
-            
-            const nombresFallback = [
-                "CyberFan_Neo", "XIII_Supporter", "NewFaceWatcher", "RookieHunter", "FreshBlood99", 
-                "DebugMonkey", "NightCrawler", "QuantumGirl", "NeonShadow", "EdgeRunner_X"
-            ];
-            
             let autoMsgIndex = 0;
-            let contextualFailures = 0;
-            const MAX_CONTEXTUAL_FAILURES = 5;
             
             autoMsgInterval = setInterval(() => {
                 let mensajesContextuales = [];
                 let nombresContextuales = [];
                 let usingContextual = false;
                 
-                // INTENTAR sistema contextual primero
-                if (window.getCurrentContextualMessages && window.getContextualUsernames) {
-                    try {
-                        mensajesContextuales = window.getCurrentContextualMessages();
-                        nombresContextuales = window.getContextualUsernames();
+                // FORZAR inicialización del sistema contextual si no está disponible
+                if (!window.getCurrentContextualMessages || !window.getContextualUsernames) {
+                    console.log('🔄 Forzando inicialización del sistema contextual...');
+                    
+                    // Forzar actualización del sistema
+                    if (window.updateContextualSystem) {
+                        window.updateContextualSystem();
+                    }
+                    
+                    // Esperar un poco más para la siguiente verificación
+                    console.warn('⚠️ Sistema contextual no disponible, intentando inicializar...');
+                    return;
+                }
+                
+                // OBTENER mensajes contextuales configurados
+                try {
+                    mensajesContextuales = window.getCurrentContextualMessages();
+                    nombresContextuales = window.getContextualUsernames();
+                    
+                    if (mensajesContextuales.length > 0 && nombresContextuales.length > 0) {
+                        usingContextual = true;
+                        console.log(`✅ Usando ${mensajesContextuales.length} mensajes contextuales configurados`);
+                    } else {
+                        console.error('❌ Sistema contextual devuelve arrays vacíos:', {
+                            mensajes: mensajesContextuales.length,
+                            usuarios: nombresContextuales.length,
+                            contexto: {
+                                prueba: localStorage.getItem('currentTest'),
+                                momento: localStorage.getItem('timeOfDay'),
+                                rating: localStorage.getItem('rating')
+                            }
+                        });
                         
-                        if (mensajesContextuales.length > 0 && nombresContextuales.length > 0) {
-                            usingContextual = true;
-                            contextualFailures = 0; // Reset failures on success
-                            console.log(`💬 Usando ${mensajesContextuales.length} mensajes contextuales`);
-                        } else {
-                            contextualFailures++;
-                            console.warn(`⚠️ Sistema contextual devuelve arrays vacíos (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES})`);
+                        // Intentar forzar actualización del contexto
+                        if (window.updateContextualSystem) {
+                            window.updateContextualSystem();
                         }
-                    } catch (error) {
-                        contextualFailures++;
-                        console.error(`❌ Error en sistema contextual (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES}):`, error);
+                        return; // Intentar en la siguiente iteración
                     }
-                } else {
-                    contextualFailures++;
-                    console.warn(`⚠️ Funciones contextuales no disponibles (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES})`);
+                } catch (error) {
+                    console.error('❌ Error obteniendo mensajes contextuales:', error);
+                    
+                    // Intentar forzar actualización del contexto
+                    if (window.updateContextualSystem) {
+                        window.updateContextualSystem();
+                    }
+                    return; // Intentar en la siguiente iteración
                 }
                 
-                // FALLBACK inteligente después de varios fallos
-                if (!usingContextual) {
-                    if (contextualFailures >= MAX_CONTEXTUAL_FAILURES) {
-                        console.log(`🔄 Activando fallback temático XIII tras ${contextualFailures} fallos contextuales`);
-                    }
-                    mensajesContextuales = mensajesFallbackXIII;
-                    nombresContextuales = nombresFallback;
-                }
-                
-                // Seleccionar mensaje aleatorio
+                // Seleccionar mensaje aleatorio de los configurados
                 const mensajeAleatorio = mensajesContextuales[Math.floor(Math.random() * mensajesContextuales.length)];
                 const usuarioAleatorio = nombresContextuales[Math.floor(Math.random() * nombresContextuales.length)];
                 
-                // Tag immersivo solo en 1 de cada 5
-                const showTag = (autoMsgIndex % 5 === 0);
+                // Tag immersivo solo en 1 de cada 4 (más frecuente)
+                const showTag = (autoMsgIndex % 4 === 0);
                 let tagImmersivo = undefined;
                 if (showTag) {
                     const tagsImmersivos = ["VIP","PATROCINADO","FAN","SPONSOR","INFLUENCER","EXPERTO"];
@@ -1687,14 +1680,13 @@
                     automatico: true,
                     showTag,
                     tagImmersivo,
-                    contextual: usingContextual
+                    contextual: true // Siempre contextual en v0.97
                 };
-                const msgId = `auto-${usingContextual ? 'contextual' : 'fallback'}-${autoMsgIndex}`;
+                const msgId = `auto-contextual-${autoMsgIndex}`;
                 agregarMensajeAlChatDisplay(msg, msgId);
                 autoMsgIndex++;
                 
-                const source = usingContextual ? 'CONTEXTUAL' : 'FALLBACK';
-                console.log(`📨 [${source}] "${mensajeAleatorio.substring(0, 50)}..."`);
+                console.log(`📨 [CONTEXTUAL] "${mensajeAleatorio.substring(0, 50)}..."`);
             }, 3500);
         }
         
@@ -2331,13 +2323,52 @@
     <script src="contextual-messages-p3.js"></script>
     <script src="contextual-system-integration.js"></script>
     
+    <!-- INICIALIZACIÓN INMEDIATA v0.97 -->
+    <script>
+        // FORZAR inicialización inmediata del sistema contextual
+        console.log('🚀 FORZANDO inicialización inmediata v0.97...');
+        
+        // Configurar contexto INMEDIATAMENTE
+        if (!localStorage.getItem('currentTest')) localStorage.setItem('currentTest', 'prueba0');
+        if (!localStorage.getItem('timeOfDay')) localStorage.setItem('timeOfDay', 'dia');
+        if (!localStorage.getItem('rating')) localStorage.setItem('rating', '7.0');
+        
+        // Forzar actualización inmediata
+        setTimeout(() => {
+            if (window.updateContextualSystem) {
+                window.updateContextualSystem();
+                console.log('⚡ Sistema contextual actualizado inmediatamente');
+            }
+            
+            // Verificar inmediatamente
+            if (window.getCurrentContextualMessages) {
+                const msgs = window.getCurrentContextualMessages();
+                console.log(`⚡ Verificación inmediata: ${msgs.length} mensajes contextuales disponibles`);
+                if (msgs.length > 0) {
+                    console.log('✅ MENSAJES CONFIGURADOS DETECTADOS:', msgs.slice(0, 3));
+                }
+            }
+        }, 100);
+        
+        // Segundo intento más agresivo
+        setTimeout(() => {
+            if (window.updateContextualSystem) {
+                window.updateContextualSystem();
+            }
+            if (window.getCurrentContextualMessages) {
+                const msgs = window.getCurrentContextualMessages();
+                console.log(`⚡ Segunda verificación: ${msgs.length} mensajes`);
+            }
+        }, 500);
+    </script>
+    
     <!-- Verificación y debug del sistema contextual -->
     <script>
-        // Verificar que el sistema contextual esté funcionando v0.96
+        // FORZAR inicialización del sistema contextual v0.97
         setTimeout(() => {
-            console.log('🔍 Verificando sistema contextual v0.96 - Híbrido robusto...');
+            console.log('🔍 INICIALIZANDO sistema contextual v0.97 - FORZAR MENSAJES CONFIGURADOS...');
             
-            // Configurar valores por defecto si no existen
+            // Configurar valores por defecto GARANTIZADOS
             if (!localStorage.getItem('currentTest')) {
                 localStorage.setItem('currentTest', 'prueba0');
             }
@@ -2348,82 +2379,107 @@
                 localStorage.setItem('rating', '7.0');
             }
             
-            // Forzar actualización del sistema
+            console.log('📊 Contexto forzado:', {
+                prueba: localStorage.getItem('currentTest'),
+                momento: localStorage.getItem('timeOfDay'),
+                rating: localStorage.getItem('rating')
+            });
+            
+            // FORZAR actualización del sistema con valores garantizados
             if (window.updateContextualSystem) {
                 window.updateContextualSystem();
-                console.log('🔄 Sistema contextual actualizado');
+                console.log('🔄 Sistema contextual forzado a actualizar');
             }
             
-            // Verificación más inteligente
+            // Verificación AGRESIVA hasta conseguir los mensajes configurados
             let attempts = 0;
-            const maxAttempts = 7;
+            const maxAttempts = 15; // Más intentos para asegurar carga
             const checkInterval = setInterval(() => {
                 attempts++;
-                let systemStatus = 'unknown';
+                
+                // Forzar inicialización en cada intento si no existe
+                if (!window.getCurrentContextualMessages || !window.getContextualUsernames) {
+                    console.log(`🔄 INTENTO ${attempts}: Forzando re-inicialización del sistema...`);
+                    
+                    // Verificar que los scripts contextuales estén cargados
+                    if (window.updateContextualSystem) {
+                        window.updateContextualSystem();
+                    }
+                    
+                    // Intentar cargar manualmente
+                    if (window.PRUEBA0_MESSAGES) {
+                        console.log('📦 Detectados PRUEBA0_MESSAGES:', Object.keys(window.PRUEBA0_MESSAGES));
+                    }
+                    
+                    return; // Siguiente intento
+                }
                 
                 try {
-                    if (window.getCurrentContextualMessages && window.getContextualUsernames) {
-                        const messages = window.getCurrentContextualMessages();
-                        const usernames = window.getContextualUsernames();
+                    const messages = window.getCurrentContextualMessages();
+                    const usernames = window.getContextualUsernames();
+                    
+                    if (messages.length > 0 && usernames.length > 0) {
+                        console.log(`✅ ¡ÉXITO INTENTO ${attempts}! Sistema contextual CARGADO - ${messages.length} mensajes configurados`);
+                        console.log('📊 Contexto activo:', {
+                            prueba: localStorage.getItem('currentTest'),
+                            momento: localStorage.getItem('timeOfDay'),
+                            rating: localStorage.getItem('rating')
+                        });
                         
-                        if (messages.length > 0 && usernames.length > 0) {
-                            systemStatus = 'working';
-                            console.log(`✅ INTENTO ${attempts}: Sistema contextual FUNCIONANDO - ${messages.length} mensajes, ${usernames.length} usuarios`);
-                            console.log('📊 Contexto actual:', {
-                                prueba: localStorage.getItem('currentTest') || 'prueba0',
-                                momento: localStorage.getItem('timeOfDay') || 'dia',
-                                rating: localStorage.getItem('rating') || '7.0'
-                            });
-                            
-                            // Mostrar muestra de mensajes
-                            console.log('📨 Muestra de mensajes contextuales:');
-                            messages.slice(0, 3).forEach((msg, i) => {
-                                console.log(`${i+1}. ${msg}`);
-                            });
-                            
-                            // Verificar ofertas de PM
-                            const pmMessages = messages.filter(msg => msg.includes('+') && msg.includes('PM!'));
-                            console.log(`💰 Mensajes con ofertas PM: ${pmMessages.length}`);
-                            
-                            clearInterval(checkInterval);
-                            console.log('✅ ¡Sistema contextual 100% operativo!');
-                            
-                            // Reiniciar mensajes automáticos con contexto
-                            if (window.updateAutoMessages) {
-                                window.updateAutoMessages();
-                                console.log('🔄 Mensajes automáticos reiniciados con contexto');
-                            }
-                            return;
-                        } else {
-                            systemStatus = 'empty_arrays';
-                            console.warn(`⚠️ INTENTO ${attempts}: Funciones disponibles pero arrays vacíos (${messages.length} msgs, ${usernames.length} users)`);
+                        // Mostrar TODOS los mensajes configurados específicos
+                        console.log('📨 MENSAJES CONTEXTUALES CONFIGURADOS:');
+                        messages.slice(0, 8).forEach((msg, i) => {
+                            console.log(`${i+1}. ${msg}`);
+                        });
+                        
+                        // Mostrar usernames configurados
+                        console.log('👥 USUARIOS CONTEXTUALES:', usernames.slice(0, 5));
+                        
+                        // Verificar ofertas de PM configuradas
+                        const pmMessages = messages.filter(msg => msg.includes('+') && msg.includes('PM!'));
+                        console.log(`💰 Ofertas PM configuradas: ${pmMessages.length}`);
+                        
+                        clearInterval(checkInterval);
+                        console.log('✅ ¡SISTEMA CONTEXTUAL CONFIGURADO 100% FUNCIONANDO!');
+                        
+                        // Reiniciar mensajes automáticos AHORA con los configurados
+                        if (window.updateAutoMessages) {
+                            window.updateAutoMessages();
+                            console.log('🔄 Mensajes automáticos iniciados con configuración específica');
                         }
+                        return;
                     } else {
-                        systemStatus = 'functions_missing';
-                        console.warn(`⚠️ INTENTO ${attempts}: Funciones contextuales no disponibles`);
+                        console.warn(`⚠️ INTENTO ${attempts}: Sistema devuelve arrays vacíos - Forzando actualización...`);
+                        console.warn('   Mensajes:', messages.length, 'Usuarios:', usernames.length);
+                        
+                        // Forzar actualización agresiva
+                        if (window.updateContextualSystem) {
+                            window.updateContextualSystem();
+                        }
                     }
                 } catch (error) {
-                    systemStatus = 'error';
-                    console.error(`❌ INTENTO ${attempts}: Error en verificación:`, error);
+                    console.error(`❌ INTENTO ${attempts}: Error -`, error);
+                    
+                    // Forzar actualización en caso de error
+                    if (window.updateContextualSystem) {
+                        window.updateContextualSystem();
+                    }
                 }
                 
                 if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    if (systemStatus !== 'working') {
-                        console.log(`🔄 Sistema contextual no está disponible tras ${maxAttempts} intentos`);
-                        console.log('💡 El sistema usará fallback temático para XIII (esto es normal)');
-                        console.log('🎯 Estado final:', systemStatus);
-                        
-                        // Asegurar que los mensajes automáticos estén funcionando aunque sea con fallback
-                        if (window.updateAutoMessages) {
-                            window.updateAutoMessages();
-                            console.log('🔄 Mensajes automáticos iniciados con fallback');
-                        }
+                    console.error(`🚨 FALLÓ tras ${maxAttempts} intentos - Los mensajes configurados NO se están cargando`);
+                    console.error('🔧 Verificar archivos contextual-messages.js y contextual-system-integration.js');
+                    
+                    // Intentar cargar los mensajes automáticos de todas formas
+                    if (window.updateAutoMessages) {
+                        window.updateAutoMessages();
+                        console.log('🔄 Intentando mensajes automáticos sin contexto configurado');
                     }
                 }
-            }, 1500); // Verificar cada 1.5 segundos
+            }, 800); // Verificar cada 0.8 segundos (más agresivo)
             
-        }, 2000); // Esperar 2 segundos para que todo se cargue
+        }, 1000); // Empezar más rápido
     </script>
 
 </body>
