@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.9</title>
+    <title>Ultimate Mercenary 0.91</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1109,7 +1109,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.9</h1>
+                        <h1>ULTIMATE MERCENARY 0.91</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1838,11 +1838,11 @@
             }
         } else if (event.data && event.data.type === 'purchase') {
             // Interceptar compras de la tienda
-            const { itemName, itemPrice, itemImage } = event.data;
+            const { itemName, itemPrice, itemImage, itemDetails } = event.data;
             if (window.directMessages) {
-                window.directMessages.addPurchaseMessage(itemName, itemPrice, itemImage);
+                window.directMessages.addPurchaseMessage(itemName, itemPrice, itemImage, itemDetails || {});
             }
-            console.log(`[Compra] ${itemName} por ${itemPrice} PM - Mensaje enviado al buzón`);
+            console.log(`[Compra] ${itemName} por ${itemPrice} PM - Mensaje detallado enviado al buzón`);
         }
     });
 
@@ -1871,7 +1871,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.9';
+        const SYSTEM_VERSION = '0.91';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -1924,10 +1924,17 @@
                 id: Date.now() + Math.random(),
                 ...message,
                 timestamp: Date.now(),
-                time: new Date().toLocaleString()
+                time: new Date().toLocaleString(),
+                category: category // Añadir categoría para referencia
             };
 
             this.messages[category].unshift(messageObj); // Añadir al principio
+            
+            // También añadir a inbox si no es ya inbox
+            if (category !== 'inbox') {
+                this.messages.inbox.unshift({...messageObj});
+            }
+            
             this.saveMessages();
             
             // Si el modal está abierto, recargar
@@ -1941,9 +1948,23 @@
         deleteMessage(category, messageId) {
             if (this.messages[category]) {
                 this.messages[category] = this.messages[category].filter(msg => msg.id !== messageId);
-                this.saveMessages();
-                this.loadMessages();
             }
+            
+            // Si se elimina de una categoría específica, también eliminar de inbox
+            if (category !== 'inbox') {
+                this.messages.inbox = this.messages.inbox.filter(msg => msg.id !== messageId);
+            } else {
+                // Si se elimina de inbox, eliminar de la categoría específica también
+                const messageToDelete = this.messages.inbox.find(msg => msg.id === messageId);
+                if (messageToDelete && messageToDelete.category) {
+                    if (this.messages[messageToDelete.category]) {
+                        this.messages[messageToDelete.category] = this.messages[messageToDelete.category].filter(msg => msg.id !== messageId);
+                    }
+                }
+            }
+            
+            this.saveMessages();
+            this.loadMessages();
         },
 
         saveMessages() {
@@ -1960,7 +1981,15 @@
                 activeTab = activeButton ? activeButton.dataset.tab : 'inbox';
             }
 
-            const messages = this.messages[activeTab] || [];
+            let messages = [];
+            
+            if (activeTab === 'inbox') {
+                // Bandeja de entrada muestra todos los mensajes, ordenados por fecha
+                messages = this.messages.inbox.sort((a, b) => b.timestamp - a.timestamp);
+            } else {
+                // Otras pestañas muestran solo mensajes específicos de esa categoría
+                messages = this.messages[activeTab] || [];
+            }
             
             if (messages.length === 0) {
                 messagesList.innerHTML = '<div class="no-messages">No hay mensajes en esta categoría</div>';
@@ -1978,10 +2007,21 @@
                 imageHtml = `<div class="message-image"><img src="${msg.image}" alt="Imagen del mensaje"></div>`;
             }
 
+            // Mostrar etiqueta de categoría si estamos en inbox
+            let categoryBadge = '';
+            if (category === 'inbox' && msg.category && msg.category !== 'inbox') {
+                const categoryNames = {
+                    'system': 'SISTEMA',
+                    'shop': 'TIENDA'
+                };
+                const badgeColor = msg.category === 'system' ? '#ff4757' : '#2ed573';
+                categoryBadge = `<span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 10px;">${categoryNames[msg.category] || msg.category.toUpperCase()}</span>`;
+            }
+
             return `
                 <div class="message-item" data-type="${msg.type || 'default'}">
                     <div class="message-header">
-                        <div class="message-sender">${msg.sender || 'SISTEMA'}</div>
+                        <div class="message-sender">${msg.sender || 'SISTEMA'}${categoryBadge}</div>
                         <div class="message-time">${msg.time}</div>
                     </div>
                     <div class="message-content">${msg.content}</div>
@@ -1993,11 +2033,32 @@
             `;
         },
 
-        // Función para añadir mensaje de compra
-        addPurchaseMessage(itemName, itemPrice, itemImage = null) {
+        // Función para añadir mensaje de compra mejorado
+        addPurchaseMessage(itemName, itemPrice, itemImage = null, itemDetails = {}) {
+            let detailsText = `Has comprado: ${itemName}\nPrecio: ${itemPrice} PM\n\n`;
+            
+            // Añadir detalles específicos según el tipo de item
+            if (itemDetails.type) {
+                detailsText += `Tipo: ${itemDetails.type}\n`;
+            }
+            if (itemDetails.damage) {
+                detailsText += `Daño: ${itemDetails.damage}\n`;
+            }
+            if (itemDetails.armor) {
+                detailsText += `Protección: ${itemDetails.armor}\n`;
+            }
+            if (itemDetails.effects) {
+                detailsText += `Efectos: ${itemDetails.effects}\n`;
+            }
+            if (itemDetails.description) {
+                detailsText += `\nDescripción: ${itemDetails.description}\n`;
+            }
+            
+            detailsText += `\n¡Disfruta tu nueva adquisición! El item ha sido añadido automáticamente a tu inventario.`;
+
             const message = {
                 sender: 'TIENDA OCE',
-                content: `Has comprado: ${itemName}\nPrecio: ${itemPrice} PM\n\n¡Disfruta tu nueva adquisición!`,
+                content: detailsText,
                 type: 'shop',
                 image: itemImage
             };
@@ -2008,10 +2069,20 @@
         addChallengeAcceptedMessage(username, challenge) {
             const message = {
                 sender: 'SISTEMA OCE',
-                content: `Has aceptado un reto de ${username}: "${challenge}"\n\nRecuerda que OCE te penalizará si faltas a tu palabra y no cumples el desafío.`,
+                content: `Has aceptado un reto de ${username}: "${challenge}"\n\nRecuerda que OCE te penalizará si faltas a tu palabra y no cumples el desafío.\n\nLos PM han sido añadidos a tu cuenta automáticamente.`,
                 type: 'system'
             };
             return this.addMessage('system', message);
+        },
+
+        // Función para añadir mensaje desde el panel de administración
+        addAdminMessage(senderName, messageContent) {
+            const message = {
+                sender: senderName,
+                content: messageContent,
+                type: 'admin'
+            };
+            return this.addMessage('inbox', message);
         }
     };
 
@@ -2031,16 +2102,24 @@
             if (window.directMessages.messages.system.length === 0) {
                 window.directMessages.addMessage('system', {
                     sender: 'SISTEMA OCE',
-                    content: 'Bienvenida al sistema Ultimate Mercenary v0.9\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.',
+                    content: 'Bienvenida al sistema Ultimate Mercenary v0.91\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v0.91:\n• Mensajes de compra con detalles completos\n• Bandeja de entrada unificada\n• Mensajes administrativos personalizados',
                     type: 'system'
                 });
             }
             
-            if (window.directMessages.messages.inbox.length === 0) {
+            if (window.directMessages.messages.shop.length === 0) {
+                window.directMessages.addMessage('shop', {
+                    sender: 'TIENDA OCE',
+                    content: 'Bienvenida a la Tienda OCE\n\nTodos los artículos están disponibles para compra con PM. Las compras se registran automáticamente en tu inventario y recibirás confirmaciones detalladas aquí.\n\n¡Que tengas una experiencia de compra memorable!',
+                    type: 'shop'
+                });
+            }
+            
+            if (window.directMessages.messages.inbox.length <= 2) { // Solo añadir si hay pocos mensajes
                 window.directMessages.addMessage('inbox', {
-                    sender: 'Director OCE',
-                    content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\n- Kaiser',
-                    type: 'default'
+                    sender: 'Director Kaiser',
+                    content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\nRecuerda: OCE está siempre observando. Tu rendimiento determina no solo tu supervivencia, sino también las recompensas que recibirás.\n\n- Kaiser\nDirector de Operaciones, OCE',
+                    type: 'admin'
                 });
             }
         }, 1000);
@@ -2065,6 +2144,53 @@
 
     <!-- Script del sistema de inventario -->
     <script src="character-sheet.js"></script>
+
+    <!-- Funciones de prueba para el sistema de mensajes -->
+    <script>
+        // Función para probar el sistema de mensajes directos desde la consola
+        window.testMessagingSystem = function() {
+            console.log('🧪 Probando sistema de mensajes v0.91...');
+            
+            // Test 1: Mensaje de compra
+            if (window.directMessages) {
+                window.directMessages.addPurchaseMessage(
+                    'Test Katana Monomolecular',
+                    350,
+                    null,
+                    {
+                        type: 'armas',
+                        damage: '2d10+2',
+                        effects: 'Corta armadura, silenciosa, exclusiva',
+                        description: 'Hoja monomolecular de última generación para pruebas'
+                    }
+                );
+                
+                // Test 2: Mensaje de reto
+                window.directMessages.addChallengeAcceptedMessage(
+                    'TestUser_Elite',
+                    'Completar la prueba sin usar armas por +75 PM'
+                );
+                
+                // Test 3: Mensaje administrativo
+                window.directMessages.addAdminMessage(
+                    'Test Admin',
+                    'Este es un mensaje de prueba enviado desde el panel de administración.\n\n¡El sistema funciona correctamente!'
+                );
+                
+                console.log('✅ Sistema de mensajes funcionando correctamente');
+                console.log('💬 Se han añadido 3 mensajes de prueba');
+                console.log('📧 Abre el modal "Mensajes" para verlos');
+                
+                return 'Sistema funcionando - revisa el modal de mensajes';
+            } else {
+                console.error('❌ Sistema de mensajes no disponible');
+                return 'Error: Sistema no disponible';
+            }
+        };
+
+        console.log('🎮 Ultimate Mercenary v0.91 - Sistema de mensajes mejorado');
+        console.log('📧 Usa testMessagingSystem() para probar el sistema');
+    </script>
 
 </body>
 </html> 

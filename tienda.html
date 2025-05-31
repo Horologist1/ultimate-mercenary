@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda - Ultimate Mercenary 0.9</title>
+    <title>Tienda - Ultimate Mercenary 0.91</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
@@ -782,7 +782,7 @@
                         efectos: item.effects || item['Efectos'] || '',
                         ubicacion: item['Ubicación'] || '',
                         // Campos adicionales
-                        compatible: item['Compatible con'] || '',
+                        compatible: item['Compatible con'] || item.compatible || '',
                         cantidad: item['Cantidad'] || '',
                         servicio: item['Servicio'] || '',
                         // Beneficios mecánicos para implantes
@@ -825,11 +825,26 @@
                     
                     // Enviar mensaje al buzón de correo del usuario
                     if (window.parent && window.parent.postMessage) {
+                        // Recopilar detalles del item para el mensaje
+                        const itemDetails = {
+                            type: item.section.replace('shop-', ''),
+                            damage: item['Daño'] || item.damage || '',
+                            armor: item['Armadura (K/E)'] || item.armor || '',
+                            effects: item['Efectos'] || item.effects || '',
+                            description: item.description || item.Descripción || '',
+                            notes: item['Notas'] || item.notes || '',
+                            range: item['Alcance'] || item.range || '',
+                            ammo: item['Munición'] || item.ammo || '',
+                            location: item['Ubicación'] || item.location || '',
+                            compatible: item['Compatible con'] || item.compatible || ''
+                        };
+
                         window.parent.postMessage({
                             type: 'purchase',
                             itemName: item.name,
                             itemPrice: item.price,
-                            itemImage: item.imageUrl || null
+                            itemImage: item.imageUrl || null,
+                            itemDetails: itemDetails
                         }, '*');
                     }
                     

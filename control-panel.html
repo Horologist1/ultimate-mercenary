@@ -565,21 +565,9 @@
                     <!-- Sección de Mensajes Directos -->
                     <div class="control-group">
                         <h4>MENSAJES DIRECTOS</h4>
-                        <select id="dm-sender" class="control-input">
-                            <option value="SISTEMA">Sistema</option>
-                            <option value="TIENDA">Tienda</option>
-                            <option value="KAISER">Kaiser</option>
-                            <option value="OCE">OCE</option>
-                            <option value="SPONSOR">Patrocinador</option>
-                        </select>
-                        <select id="dm-type" class="control-input">
-                            <option value="system">Sistema</option>
-                            <option value="shop">Tienda</option>
-                            <option value="achievement">Logro</option>
-                            <option value="warning">Advertencia</option>
-                        </select>
-                        <textarea id="dm-content" class="control-input" placeholder="Contenido del mensaje"></textarea>
-                        <button class="control-button" onclick="sendDirectMessage()">ENVIAR DM</button>
+                        <input type="text" id="dm-custom-sender" class="control-input" placeholder="Nombre del remitente (escribir libremente)" style="margin-bottom: 8px;">
+                        <textarea id="dm-content" class="control-input" placeholder="Contenido del mensaje" rows="4"></textarea>
+                        <button class="control-button" onclick="sendDirectMessage()">ENVIAR MENSAJE A BANDEJA</button>
                     </div>
                 </div>
 
@@ -858,9 +846,13 @@
         }
 
         function sendDirectMessage() {
-            const sender = document.getElementById('dm-sender').value;
-            const type = document.getElementById('dm-type').value;
-            const content = document.getElementById('dm-content').value;
+            const sender = document.getElementById('dm-custom-sender').value.trim();
+            const content = document.getElementById('dm-content').value.trim();
+            
+            if (!sender) {
+                alert('Por favor, escribe el nombre del remitente');
+                return;
+            }
             
             if (!content) {
                 alert('Por favor, escribe un mensaje');
@@ -868,24 +860,57 @@
             }
             
             try {
-                const messages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
-                const newMessage = {
+                // Usar el nuevo sistema de mensajes directos
+                const directMessages = JSON.parse(localStorage.getItem('directMessages') || '{"inbox":[],"system":[],"shop":[]}');
+                
+                // Crear mensaje para el nuevo sistema
+                const messageObj = {
+                    id: Date.now() + Math.random(),
                     sender: sender,
-                    type: type,
                     content: content,
-                    time: new Date().toLocaleTimeString()
+                    timestamp: Date.now(),
+                    time: new Date().toLocaleString(),
+                    type: 'admin',
+                    category: 'inbox'
                 };
-                messages.push(newMessage);
-                localStorage.setItem('mensajes-directos', JSON.stringify(messages));
-                if (window.saveMensajesDirectos) window.saveMensajesDirectos(messages);
+                
+                // Añadir a inbox
+                if (!directMessages.inbox) {
+                    directMessages.inbox = [];
+                }
+                directMessages.inbox.unshift(messageObj);
+                
+                // Guardar en localStorage
+                localStorage.setItem('directMessages', JSON.stringify(directMessages));
+                
+                // Intentar conectar con Firebase si está disponible
+                if (window.database) {
+                    // También guardarlo en el sistema antiguo para compatibilidad
+                    const oldMessages = JSON.parse(localStorage.getItem('mensajes-directos') || '[]');
+                    oldMessages.push({
+                        sender: sender,
+                        content: content,
+                        time: new Date().toLocaleTimeString(),
+                        type: 'admin'
+                    });
+                    localStorage.setItem('mensajes-directos', JSON.stringify(oldMessages));
+                    
+                    // Guardar en Firebase
+                    if (window.saveMensajesDirectos) {
+                        window.saveMensajesDirectos(oldMessages);
+                    }
+                }
                 
                 // Limpiar el formulario
+                document.getElementById('dm-custom-sender').value = '';
                 document.getElementById('dm-content').value = '';
                 
                 // Notificar éxito
-                alert('Mensaje directo enviado correctamente');
+                alert(`Mensaje enviado correctamente a la bandeja de entrada desde "${sender}"`);
+                
+                console.log('✅ Mensaje directo enviado:', messageObj);
             } catch (error) {
-                console.error('Error al enviar mensaje directo:', error);
+                console.error('❌ Error al enviar mensaje directo:', error);
                 alert('Error al enviar el mensaje');
             }
         }
