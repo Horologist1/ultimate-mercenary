@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 0.95</title>
+    <title>Ultimate Mercenary 0.97</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1109,7 +1109,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 0.95</h1>
+                        <h1>ULTIMATE MERCENARY 0.97</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1598,33 +1598,76 @@
         function startAutoMessages() {
             if (autoMsgInterval) clearInterval(autoMsgInterval);
             
-            console.log('🔄 Iniciando mensajes automáticos contextuales v0.95');
+            console.log('🔄 Iniciando mensajes automáticos v0.96 - Sistema híbrido contextual');
             
             const coloresAuto = [
                 '#ffb347', '#7bed9f', '#70a1ff', '#eccc68', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#5352ed', '#f1c40f', '#00b894', '#fdcb6e'
             ];
             
+            // Mensajes de fallback temáticos para XIII novata
+            const mensajesFallbackXIII = [
+                "¡Esta nueva XIII tiene potencial!",
+                "Vamos a ver qué puede hacer esta recién llegada",
+                "¿Será XIII la sorpresa de esta temporada?",
+                "XIII parece prometedora para ser nueva",
+                "Esta novata XIII va a darnos espectáculo",
+                "¿Quién es esta XIII? No la habíamos visto antes",
+                "La nueva concursante XIII está llamando la atención",
+                "XIII debutando en grande en las pruebas",
+                "¿Será XIII una dark horse en este concurso?",
+                "Esta XIII recién llegada tiene carisma",
+                "¡Demuestra tu valor, XIII! ¡+55 PM!",
+                "¡Haz algo memorable, novata! ¡+65 PM!",
+                "¡Muéstranos por qué te eligieron! ¡+50 PM!"
+            ];
+            
+            const nombresFallback = [
+                "CyberFan_Neo", "XIII_Supporter", "NewFaceWatcher", "RookieHunter", "FreshBlood99", 
+                "DebugMonkey", "NightCrawler", "QuantumGirl", "NeonShadow", "EdgeRunner_X"
+            ];
+            
             let autoMsgIndex = 0;
+            let contextualFailures = 0;
+            const MAX_CONTEXTUAL_FAILURES = 5;
+            
             autoMsgInterval = setInterval(() => {
-                // FORZAR el uso del sistema contextual
                 let mensajesContextuales = [];
                 let nombresContextuales = [];
+                let usingContextual = false;
                 
+                // INTENTAR sistema contextual primero
                 if (window.getCurrentContextualMessages && window.getContextualUsernames) {
-                    mensajesContextuales = window.getCurrentContextualMessages();
-                    nombresContextuales = window.getContextualUsernames();
-                    console.log(`💬 Usando ${mensajesContextuales.length} mensajes contextuales`);
+                    try {
+                        mensajesContextuales = window.getCurrentContextualMessages();
+                        nombresContextuales = window.getContextualUsernames();
+                        
+                        if (mensajesContextuales.length > 0 && nombresContextuales.length > 0) {
+                            usingContextual = true;
+                            contextualFailures = 0; // Reset failures on success
+                            console.log(`💬 Usando ${mensajesContextuales.length} mensajes contextuales`);
+                        } else {
+                            contextualFailures++;
+                            console.warn(`⚠️ Sistema contextual devuelve arrays vacíos (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES})`);
+                        }
+                    } catch (error) {
+                        contextualFailures++;
+                        console.error(`❌ Error en sistema contextual (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES}):`, error);
+                    }
                 } else {
-                    console.warn('⚠️ Sistema contextual no disponible, esperando...');
-                    return; // No usar mensajes fallback, esperar al sistema contextual
+                    contextualFailures++;
+                    console.warn(`⚠️ Funciones contextuales no disponibles (fallo ${contextualFailures}/${MAX_CONTEXTUAL_FAILURES})`);
                 }
                 
-                if (mensajesContextuales.length === 0) {
-                    console.warn('⚠️ No hay mensajes contextuales disponibles');
-                    return;
+                // FALLBACK inteligente después de varios fallos
+                if (!usingContextual) {
+                    if (contextualFailures >= MAX_CONTEXTUAL_FAILURES) {
+                        console.log(`🔄 Activando fallback temático XIII tras ${contextualFailures} fallos contextuales`);
+                    }
+                    mensajesContextuales = mensajesFallbackXIII;
+                    nombresContextuales = nombresFallback;
                 }
                 
-                // Seleccionar mensaje aleatorio del contexto actual
+                // Seleccionar mensaje aleatorio
                 const mensajeAleatorio = mensajesContextuales[Math.floor(Math.random() * mensajesContextuales.length)];
                 const usuarioAleatorio = nombresContextuales[Math.floor(Math.random() * nombresContextuales.length)];
                 
@@ -1643,13 +1686,15 @@
                     hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                     automatico: true,
                     showTag,
-                    tagImmersivo
+                    tagImmersivo,
+                    contextual: usingContextual
                 };
-                const msgId = `auto-contextual-${autoMsgIndex}`;
+                const msgId = `auto-${usingContextual ? 'contextual' : 'fallback'}-${autoMsgIndex}`;
                 agregarMensajeAlChatDisplay(msg, msgId);
                 autoMsgIndex++;
                 
-                console.log(`📨 Mensaje contextual: "${mensajeAleatorio.substring(0, 50)}..."`);
+                const source = usingContextual ? 'CONTEXTUAL' : 'FALLBACK';
+                console.log(`📨 [${source}] "${mensajeAleatorio.substring(0, 50)}..."`);
             }, 3500);
         }
         
@@ -1743,9 +1788,9 @@
         alert('Mensajes del jugador eliminados de Firebase (puede tardar unos segundos en reflejarse).');
     };
 
-    // NUEVA v0.95: Función para limpiar chat y forzar mensajes contextuales
+    // v0.96: Función para limpiar chat y reiniciar sistema híbrido
     window.limpiarChatYForzarContextual = function() {
-        console.log('🧹 Limpiando chat y forzando sistema contextual v0.95...');
+        console.log('🧹 Limpiando chat y reiniciando sistema híbrido v0.96...');
         
         // Limpiar chat local y Firebase
         localStorage.removeItem('mensajes-publico-expanded');
@@ -1755,13 +1800,13 @@
         const chatContainer = document.getElementById('chat-messages');
         if (chatContainer) chatContainer.innerHTML = '';
         
-        // Reiniciar mensajes automáticos con contexto
+        // Reiniciar mensajes automáticos (contextual + fallback)
         if (window.updateAutoMessages) {
             window.updateAutoMessages();
         }
         
-        console.log('✅ Chat limpiado - Los próximos mensajes serán 100% contextuales');
-        alert('Chat limpiado. Los próximos mensajes serán contextuales según el estado actual del juego.');
+        console.log('✅ Chat limpiado - Sistema híbrido reiniciado (contextual + fallback temático)');
+        alert('Chat limpiado. El sistema usará mensajes contextuales si están disponibles, o fallback temático para XIII.');
     };
 
     // NUEVA v0.95: Función para probar diferentes contextos
@@ -1808,8 +1853,8 @@
         }, contextos.length * 2000 + 1000);
     };
 
-    console.log('🛠️ Funciones de utilidad v0.95 disponibles:');
-    console.log('• limpiarChatYForzarContextual() - Limpia el chat y fuerza mensajes contextuales');
+    console.log('🛠️ Funciones de utilidad v0.96 disponibles:');
+    console.log('• limpiarChatYForzarContextual() - Limpia el chat y reinicia sistema híbrido');
     console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
     console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
     </script>
@@ -2288,9 +2333,9 @@
     
     <!-- Verificación y debug del sistema contextual -->
     <script>
-        // Verificar que el sistema contextual esté funcionando
+        // Verificar que el sistema contextual esté funcionando v0.96
         setTimeout(() => {
-            console.log('🔍 Verificando sistema contextual v0.95 FORZADO AGRESIVO...');
+            console.log('🔍 Verificando sistema contextual v0.96 - Híbrido robusto...');
             
             // Configurar valores por defecto si no existen
             if (!localStorage.getItem('currentTest')) {
@@ -2309,53 +2354,74 @@
                 console.log('🔄 Sistema contextual actualizado');
             }
             
-            // Verificación agresiva
+            // Verificación más inteligente
             let attempts = 0;
-            const maxAttempts = 10;
+            const maxAttempts = 7;
             const checkInterval = setInterval(() => {
                 attempts++;
+                let systemStatus = 'unknown';
                 
-                if (window.getCurrentContextualMessages) {
-                    const messages = window.getCurrentContextualMessages();
-                    console.log(`✅ INTENTO ${attempts}: Sistema contextual activo - ${messages.length} mensajes disponibles`);
-                    console.log('📊 Contexto actual:', {
-                        prueba: localStorage.getItem('currentTest') || 'prueba0',
-                        momento: localStorage.getItem('timeOfDay') || 'dia',
-                        rating: localStorage.getItem('rating') || '7.0'
-                    });
-                    
-                    // Mostrar muestra de mensajes
-                    if (messages.length > 0) {
-                        console.log('📨 Muestra de mensajes contextuales:');
-                        messages.slice(0, 3).forEach((msg, i) => {
-                            console.log(`${i+1}. ${msg}`);
-                        });
-                    }
-                    
-                    // Verificar ofertas de PM
-                    const pmMessages = messages.filter(msg => msg.includes('+') && msg.includes('PM!'));
-                    console.log(`💰 Mensajes con ofertas PM: ${pmMessages.length}`);
-                    
-                    // Si el sistema está funcionando, parar verificación
-                    if (messages.length > 0) {
-                        clearInterval(checkInterval);
-                        console.log('✅ Sistema contextual verificado y funcionando');
+                try {
+                    if (window.getCurrentContextualMessages && window.getContextualUsernames) {
+                        const messages = window.getCurrentContextualMessages();
+                        const usernames = window.getContextualUsernames();
                         
-                        // Forzar reinicio de mensajes automáticos
-                        if (window.updateAutoMessages) {
-                            window.updateAutoMessages();
-                            console.log('🔄 Mensajes automáticos reiniciados con contexto');
+                        if (messages.length > 0 && usernames.length > 0) {
+                            systemStatus = 'working';
+                            console.log(`✅ INTENTO ${attempts}: Sistema contextual FUNCIONANDO - ${messages.length} mensajes, ${usernames.length} usuarios`);
+                            console.log('📊 Contexto actual:', {
+                                prueba: localStorage.getItem('currentTest') || 'prueba0',
+                                momento: localStorage.getItem('timeOfDay') || 'dia',
+                                rating: localStorage.getItem('rating') || '7.0'
+                            });
+                            
+                            // Mostrar muestra de mensajes
+                            console.log('📨 Muestra de mensajes contextuales:');
+                            messages.slice(0, 3).forEach((msg, i) => {
+                                console.log(`${i+1}. ${msg}`);
+                            });
+                            
+                            // Verificar ofertas de PM
+                            const pmMessages = messages.filter(msg => msg.includes('+') && msg.includes('PM!'));
+                            console.log(`💰 Mensajes con ofertas PM: ${pmMessages.length}`);
+                            
+                            clearInterval(checkInterval);
+                            console.log('✅ ¡Sistema contextual 100% operativo!');
+                            
+                            // Reiniciar mensajes automáticos con contexto
+                            if (window.updateAutoMessages) {
+                                window.updateAutoMessages();
+                                console.log('🔄 Mensajes automáticos reiniciados con contexto');
+                            }
+                            return;
+                        } else {
+                            systemStatus = 'empty_arrays';
+                            console.warn(`⚠️ INTENTO ${attempts}: Funciones disponibles pero arrays vacíos (${messages.length} msgs, ${usernames.length} users)`);
                         }
+                    } else {
+                        systemStatus = 'functions_missing';
+                        console.warn(`⚠️ INTENTO ${attempts}: Funciones contextuales no disponibles`);
                     }
-                } else {
-                    console.error(`❌ INTENTO ${attempts}: Sistema contextual no disponible`);
+                } catch (error) {
+                    systemStatus = 'error';
+                    console.error(`❌ INTENTO ${attempts}: Error en verificación:`, error);
                 }
                 
                 if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    console.error('🚨 FALLO CRÍTICO: Sistema contextual no se inició después de 10 intentos');
+                    if (systemStatus !== 'working') {
+                        console.log(`🔄 Sistema contextual no está disponible tras ${maxAttempts} intentos`);
+                        console.log('💡 El sistema usará fallback temático para XIII (esto es normal)');
+                        console.log('🎯 Estado final:', systemStatus);
+                        
+                        // Asegurar que los mensajes automáticos estén funcionando aunque sea con fallback
+                        if (window.updateAutoMessages) {
+                            window.updateAutoMessages();
+                            console.log('🔄 Mensajes automáticos iniciados con fallback');
+                        }
+                    }
                 }
-            }, 1000); // Verificar cada segundo
+            }, 1500); // Verificar cada 1.5 segundos
             
         }, 2000); // Esperar 2 segundos para que todo se cargue
     </script>
