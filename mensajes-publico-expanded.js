@@ -353,26 +353,85 @@ const retosEspecificos = [...retosEspecificosOriginales, ...retosEspecificosNuev
 
 // Función para generar mensajes aleatorios
 function generarMensajeAleatorio() {
-    const usuario = nombresUsuarios[Math.floor(Math.random() * nombresUsuarios.length)];
-    const color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
-    let mensaje;
+    let usuario, color, mensaje;
     
-    // 70% mensajes generales, 30% retos específicos
-    if (Math.random() < 0.7) {
-        mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
+    // Intentar usar el sistema contextual si está disponible
+    if (window.getCurrentContextualMessages && window.getContextualUsernames) {
+        try {
+            const contextualMessages = window.getCurrentContextualMessages();
+            const contextualUsernames = window.getContextualUsernames();
+            
+            if (contextualMessages && contextualMessages.length > 0) {
+                // Usar sistema contextual
+                usuario = contextualUsernames[Math.floor(Math.random() * contextualUsernames.length)];
+                color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
+                
+                // 80% mensajes contextuales, 20% retos específicos (para mantener variedad)
+                if (Math.random() < 0.8) {
+                    mensaje = contextualMessages[Math.floor(Math.random() * contextualMessages.length)];
+                } else {
+                    mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
+                    // Reemplazar [PARTICIPANTE] si existe en el mensaje
+                    if (mensaje.includes("[PARTICIPANTE]")) {
+                        const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                        mensaje = mensaje.replace("[PARTICIPANTE]", participante);
+                        // Si hay un segundo [PARTICIPANTE], reemplazarlo con otro distinto
+                        if (mensaje.includes("[PARTICIPANTE]")) {
+                            let segundoParticipante;
+                            do {
+                                segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                            } while (segundoParticipante === participante);
+                            mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
+                        }
+                    }
+                }
+            } else {
+                throw new Error('No hay mensajes contextuales disponibles');
+            }
+        } catch (error) {
+            console.warn('⚠️ Sistema contextual no disponible, usando mensajes de fallback:', error.message);
+            // Fallback al sistema original
+            usuario = nombresUsuarios[Math.floor(Math.random() * nombresUsuarios.length)];
+            color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
+            
+            // 70% mensajes generales, 30% retos específicos
+            if (Math.random() < 0.7) {
+                mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
+            } else {
+                mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
+                if (mensaje.includes("[PARTICIPANTE]")) {
+                    const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                    mensaje = mensaje.replace("[PARTICIPANTE]", participante);
+                    if (mensaje.includes("[PARTICIPANTE]")) {
+                        let segundoParticipante;
+                        do {
+                            segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                        } while (segundoParticipante === participante);
+                        mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
+                    }
+                }
+            }
+        }
     } else {
-        mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
-        // Reemplazar [PARTICIPANTE] si existe en el mensaje
-        if (mensaje.includes("[PARTICIPANTE]")) {
-            const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-            mensaje = mensaje.replace("[PARTICIPANTE]", participante);
-            // Si hay un segundo [PARTICIPANTE], reemplazarlo con otro distinto
+        // Fallback al sistema original si no hay sistema contextual
+        usuario = nombresUsuarios[Math.floor(Math.random() * nombresUsuarios.length)];
+        color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
+        
+        // 70% mensajes generales, 30% retos específicos
+        if (Math.random() < 0.7) {
+            mensaje = mensajesGenerales[Math.floor(Math.random() * mensajesGenerales.length)];
+        } else {
+            mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
             if (mensaje.includes("[PARTICIPANTE]")) {
-                let segundoParticipante;
-                do {
-                    segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                } while (segundoParticipante === participante);
-                mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
+                const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                mensaje = mensaje.replace("[PARTICIPANTE]", participante);
+                if (mensaje.includes("[PARTICIPANTE]")) {
+                    let segundoParticipante;
+                    do {
+                        segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                    } while (segundoParticipante === participante);
+                    mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
+                }
             }
         }
     }
@@ -429,5 +488,47 @@ function agregarMensaje(container) {
     }, 50);
 }
 
+// Función global para actualizar mensajes automáticos (usada por el sistema contextual)
+window.updateAutoMessages = function() {
+    console.log('🔄 Actualizando mensajes automáticos con nuevo contexto');
+    // No necesitamos hacer nada especial aquí - generarMensajeAleatorio() 
+    // ya usa el sistema contextual automáticamente
+};
+
+// Función para verificar el sistema contextual
+function verificarSistemaContextual() {
+    setTimeout(() => {
+        console.log('🎭 Verificando integración del sistema contextual en mensajes públicos...');
+        
+        if (window.getCurrentContextualMessages && window.getContextualUsernames) {
+            try {
+                const mensajes = window.getCurrentContextualMessages();
+                const usuarios = window.getContextualUsernames();
+                
+                console.log(`✅ Sistema contextual integrado correctamente`);
+                console.log(`📨 ${mensajes.length} mensajes contextuales disponibles`);
+                console.log(`👥 ${usuarios.length} usuarios contextuales disponibles`);
+                
+                // Verificar ofertas de PM
+                const pmMessages = mensajes.filter(msg => msg.includes('+') && msg.includes('PM!'));
+                console.log(`💰 ${pmMessages.length} mensajes con ofertas PM detectados`);
+                
+                // Mostrar ejemplo
+                if (mensajes.length > 0) {
+                    console.log('🎯 Ejemplo de mensaje contextual:', mensajes[0]);
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Error verificando sistema contextual:', error);
+            }
+        } else {
+            console.warn('⚠️ Sistema contextual no disponible aún, usando mensajes de fallback');
+        }
+    }, 3000); // Esperar 3 segundos para que se cargue todo
+}
+
 // Inicializar el widget cuando la página se cargue
-window.addEventListener('DOMContentLoaded', inicializarChatWidget);
+window.addEventListener('DOMContentLoaded', () => {
+    inicializarChatWidget();
+    verificarSistemaContextual();
+});

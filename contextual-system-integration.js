@@ -235,6 +235,7 @@ function initContextualSystem() {
         
         // Exponer funciones globalmente para debugging
         window.getCurrentContextualMessages = getCurrentContextualMessages;
+        window.getContextualUsernames = getContextualUsernames;
         window.updateContextualSystem = updateContextualSystem;
         window.getContextualMessageExample = getContextualMessageExample;
     }).catch(error => {
@@ -288,6 +289,7 @@ function testContextualSystem() {
 // Exportar funciones principales
 window.initContextualSystem = initContextualSystem;
 window.updateContextualSystem = updateContextualSystem;
+window.getContextualUsernames = getContextualUsernames;
 window.logCurrentContext = logCurrentContext;
 window.testContextualSystem = testContextualSystem;
 
