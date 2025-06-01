@@ -379,27 +379,27 @@ function generarMensajeAleatorio() {
                 // Usar sistema contextual
                 usuario = contextualUsernames[Math.floor(Math.random() * contextualUsernames.length)];
                 color = colorPaleta[Math.floor(Math.random() * colorPaleta.length)];
-                
+    
                 // 90% mensajes contextuales, 10% retos específicos (para GARANTIZAR que use contextuales)
                 if (Math.random() < 0.9) {
                     mensaje = contextualMessages[Math.floor(Math.random() * contextualMessages.length)];
                     console.log('✅ USANDO MENSAJE CONTEXTUAL:', mensaje);
-                } else {
-                    mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
+    } else {
+        mensaje = retosEspecificos[Math.floor(Math.random() * retosEspecificos.length)];
                     console.log('🎯 Usando reto específico:', mensaje);
-                    // Reemplazar [PARTICIPANTE] si existe en el mensaje
-                    if (mensaje.includes("[PARTICIPANTE]")) {
-                        const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                        mensaje = mensaje.replace("[PARTICIPANTE]", participante);
-                        // Si hay un segundo [PARTICIPANTE], reemplazarlo con otro distinto
-                        if (mensaje.includes("[PARTICIPANTE]")) {
-                            let segundoParticipante;
-                            do {
-                                segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
-                            } while (segundoParticipante === participante);
-                            mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
-                        }
-                    }
+        // Reemplazar [PARTICIPANTE] si existe en el mensaje
+        if (mensaje.includes("[PARTICIPANTE]")) {
+            const participante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+            mensaje = mensaje.replace("[PARTICIPANTE]", participante);
+            // Si hay un segundo [PARTICIPANTE], reemplazarlo con otro distinto
+            if (mensaje.includes("[PARTICIPANTE]")) {
+                let segundoParticipante;
+                do {
+                    segundoParticipante = participantesDisponibles[Math.floor(Math.random() * participantesDisponibles.length)];
+                } while (segundoParticipante === participante);
+                mensaje = mensaje.replace("[PARTICIPANTE]", segundoParticipante);
+            }
+        }
                 }
             } else {
                 throw new Error('Arrays contextuales vacíos o no válidos');

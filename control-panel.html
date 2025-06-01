@@ -706,7 +706,9 @@
             { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
             { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
             { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
-            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' }
         ];
         const facciones = [
             { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
@@ -932,8 +934,8 @@
             const pmAmount = document.getElementById('pm-direct-input').value;
             if (pmAmount && !isNaN(pmAmount)) {
                 const newTotal = parseInt(pmAmount);
-                const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
-                if (description !== null) {
+                    const description = prompt('Descripción del ajuste:', 'Ajuste directo de PM');
+                    if (description !== null) {
                     // Usar la función establecerPM que maneja la lógica correctamente
                     if (window.establecerPM) {
                         window.establecerPM(newTotal);
@@ -941,17 +943,17 @@
                         // Fallback al sistema de transacciones
                         window.pmTransactions.setTotal(newTotal);
                     }
-                    
-                    document.getElementById('pm-direct-input').value = '';
-                    updateUserList();
-                    
-                    // Notificar a la tienda si está abierta
-                    if (window.parent) {
-                        window.parent.postMessage({
-                            type: 'updatePM',
-                            value: newTotal
-                        }, '*');
-                    }
+                        
+                        document.getElementById('pm-direct-input').value = '';
+                        updateUserList();
+                        
+                        // Notificar a la tienda si está abierta
+                        if (window.parent) {
+                            window.parent.postMessage({
+                                type: 'updatePM',
+                                value: newTotal
+                            }, '*');
+                        }
                     
                     console.log(`✅ PM establecido a: ${newTotal}`);
                 }

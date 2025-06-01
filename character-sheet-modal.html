@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Sheet Modal - Ultimate Mercenary 0.99</title>
+    <title>Character Sheet Modal - Ultimate Mercenary 1.0</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -1312,6 +1312,11 @@
         <div id="conocidos" class="tab-content">
             <div class="sheet-section">
                 <h3>Conocidos</h3>
+                <div class="conocidos-controls" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="conocidos-search" placeholder="Buscar conocidos..." style="flex: 1; padding: 8px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 4px; color: white; font-family: 'Orbitron', sans-serif;">
+                    <button id="sort-by-number" style="padding: 8px 12px; background: #00ccff; color: black; border: none; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 12px;">Ordenar por #</button>
+                    <button id="sort-by-name" style="padding: 8px 12px; background: #ff4757; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 12px;">Ordenar por Nombre</button>
+                </div>
                 <div id="conocidos-tarjetas" class="personajes-container"></div>
             </div>
         </div>
@@ -1621,6 +1626,42 @@
                 nombreReal: 'Darius "Thunder Fist" Jackson'
             },
             {
+                nombre: 'Lin Mayfair',
+                numero: 58,
+                apodo: 'La "Inocente" Endeudada',
+                descripcion: 'Joven, aspecto asustado, claramente no es una luchadora. Su familia fue amenazada para obligarla a entrar. O al menos esa es su historia... Hay algo en sus ojos que sugiere que podría haber más de lo que aparenta.',
+                dialogo: '"No debería estar aquí... Solo quiero volver a casa... Por favor, ¿alguien puede ayudarme? Mi familia... ellos ni siquiera saben dónde estoy..."',
+                img: 'images/lin_mayfair_new.png',
+                nombreReal: 'Lin Mayfair'
+            },
+            {
+                nombre: 'Sofía "Viper" Nakamura',
+                numero: 45,
+                apodo: 'La Samurái Callejera',
+                descripcion: 'Ex-guardaespaldas de la élite corporativa, fue traicionada y dejada por muerta tras un golpe a la familia que protegía. Su mandíbula metálica y el brazo biónico son recuerdos de aquel día. Ahora lucha en Ultimate Mercenary buscando visibilidad y una oportunidad de venganza contra aquellos que la traicionaron.',
+                dialogo: '"¿Ves esta hoja? Ha terminado con más vidas de las que puedo recordar. No busco amigos aquí, busco salir viva y con suficiente exposición mediática para que ciertas personas sepan que sigo viva. Y cuando me vean en la pantalla, sabrán que voy por ellos."',
+                img: 'images/viper_blade.png',
+                nombreReal: 'Sofía "Viper" Nakamura'
+            },
+            {
+                nombre: 'Alex "Phantom" Mercer',
+                numero: 29,
+                apodo: 'El Fantasma de la Red',
+                descripcion: 'Considerado uno de los mejores hackers de Neo-Kyoto, fue capturado tras infiltrarse en los sistemas corporativos de OmniCorp. En lugar de ejecutarlo, decidieron ofrecerle un lugar en el programa, principalmente por su habilidad para el espectáculo y su conocimiento de los sistemas de seguridad.',
+                dialogo: '"Las cámaras, los drones, incluso los implantes de seguridad de OCE... Todo sistema tiene una vulnerabilidad. Solo hay que saber dónde mirar. Y yo... bueno, siempre estoy mirando. ¿Alianza? Tal vez. Pero te advierto: no me gustan las personas predecibles."',
+                img: 'images/hacker_phantom.png',
+                nombreReal: 'Alex "Phantom" Mercer'
+            },
+            {
+                nombre: 'Aria "Maven" Chen',
+                numero: 19,
+                apodo: 'La Ejecutiva Despiadada',
+                descripcion: 'Ex-vicepresidenta de operaciones en Nakamura-Daichi Corp, una rival de OCE. Fue culpada por el fracaso de un proyecto de billones y ahora debe "rehabilitarse" en Ultimate Mercenary para recuperar su posición. Sus implantes de negocios incluyen analizadores de microexpresiones y potenciadores cognitivos para estrategia.',
+                dialogo: '"En las corporaciones o en este juego, las reglas son las mismas: planifica a largo plazo, identifica activos valiosos, elimina obstáculos con precisión, y nunca muestres tus verdaderas intenciones. La diferencia es que aquí puedo ensuciarme las manos personalmente."',
+                img: 'images/maven_corporate.png',
+                nombreReal: 'Aria "Maven" Chen'
+            },
+            {
                 nombre: 'Kaiser "El Emperador" Von Stroheim',
                 numero: null,
                 apodo: 'Anfitrión y Productor Ejecutivo',
@@ -1773,10 +1814,36 @@
         function setConocimientosSeleccionados(arr) {
             localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
         }
+        
+        let currentSort = 'number'; // 'number' o 'name'
+        let searchTerm = '';
+        
         function renderTarjetasSeleccionadas() {
             // Conocidos
             const conocidosSel = getConocidosSeleccionados();
-            const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
+            let conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
+            
+            // Aplicar filtro de búsqueda
+            if (searchTerm) {
+                conocidos = conocidos.filter(p => {
+                    const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
+                    const searchText = `${p.nombre} ${personajeExtendido.apodo || ''} ${personajeExtendido.nombreReal || ''}`.toLowerCase();
+                    return searchText.includes(searchTerm.toLowerCase());
+                });
+            }
+            
+            // Aplicar ordenamiento
+            if (currentSort === 'number') {
+                conocidos.sort((a, b) => {
+                    const aExtendido = personajesExtendidos.find(pe => pe.nombre === a.nombre);
+                    const bExtendido = personajesExtendidos.find(pe => pe.nombre === b.nombre);
+                    const aNum = aExtendido?.numero || 999;
+                    const bNum = bExtendido?.numero || 999;
+                    return aNum - bNum;
+                });
+            } else {
+                conocidos.sort((a, b) => a.nombre.localeCompare(b.nombre));
+            }
             document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
                 // Mapeo de número de concursante
                 const numeros = {
@@ -1827,6 +1894,9 @@
                 });
             });
             
+            // Configurar controles de búsqueda y ordenamiento
+            setupConocidosControls();
+            
             // Conocimientos
             const conocimientosSel = getConocimientosSeleccionados();
             const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
@@ -1845,6 +1915,59 @@
 
             // Después de renderizar las tarjetas, añado el listener para abrir la imagen al hacer clic
             addImageModalListeners();
+        }
+        
+        function setupConocidosControls() {
+            // Configurar buscador
+            const searchInput = document.getElementById('conocidos-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    searchTerm = this.value;
+                    renderTarjetasSeleccionadas();
+                });
+            }
+            
+            // Configurar botón de ordenar por número
+            const sortByNumberBtn = document.getElementById('sort-by-number');
+            if (sortByNumberBtn) {
+                sortByNumberBtn.addEventListener('click', function() {
+                    currentSort = 'number';
+                    updateSortButtons();
+                    renderTarjetasSeleccionadas();
+                });
+            }
+            
+            // Configurar botón de ordenar por nombre
+            const sortByNameBtn = document.getElementById('sort-by-name');
+            if (sortByNameBtn) {
+                sortByNameBtn.addEventListener('click', function() {
+                    currentSort = 'name';
+                    updateSortButtons();
+                    renderTarjetasSeleccionadas();
+                });
+            }
+            
+            // Actualizar estado inicial de botones
+            updateSortButtons();
+        }
+        
+        function updateSortButtons() {
+            const sortByNumberBtn = document.getElementById('sort-by-number');
+            const sortByNameBtn = document.getElementById('sort-by-name');
+            
+            if (sortByNumberBtn && sortByNameBtn) {
+                if (currentSort === 'number') {
+                    sortByNumberBtn.style.background = '#00a3cc';
+                    sortByNumberBtn.style.color = 'white';
+                    sortByNameBtn.style.background = '#ff4757';
+                    sortByNameBtn.style.color = 'white';
+                } else {
+                    sortByNumberBtn.style.background = '#00ccff';
+                    sortByNumberBtn.style.color = 'black';
+                    sortByNameBtn.style.background = '#ff6b81';
+                    sortByNameBtn.style.color = 'white';
+                }
+            }
         }
 
         // Reemplazo el click de la imagen para usar openImageModal
@@ -2143,7 +2266,7 @@
         
         // Función para recopilar todos los datos de la ficha
         function gatherCharacterData() {
-            console.log('📋 Recopilando datos de la ficha v0.99...');
+            console.log('📋 Recopilando datos de la ficha v1.0...');
             
             const characterData = {
                 // NUEVO v0.99: Separar plantilla y puntos adicionales
@@ -2181,7 +2304,7 @@
                 
                 // Timestamp de guardado
                 lastSaved: new Date().toISOString(),
-                version: '0.99'
+                version: '1.0'
             };
             
             console.log('📋 Datos recopilados:', characterData);
@@ -2279,7 +2402,7 @@
             return element ? (parseInt(element.value) || defaultValue) : defaultValue;
         }
         
-        // NUEVO v0.99: Función para obtener puntos adicionales SOBRE la plantilla
+        // NUEVO v1.0: Función para obtener puntos adicionales SOBRE la plantilla
         function getAdditionalPoints(attributeName) {
             const currentValue = getCurrentAttributeValue(attributeName);
             const selectedTemplate = getSelectValue('aptitude-template', 'actioneer');
@@ -2572,7 +2695,7 @@
         
         // Función para actualizar estadísticas derivadas según Eclipse Phase 2nd Ed
         function updateDerivedStats() {
-            // NUEVO v0.99: Usar valores totales (plantilla + adicionales + implantes)
+            // NUEVO v1.0: Usar valores totales (plantilla + adicionales + implantes)
             const attributes = {
                 cog: getAttributeTotalValue('cog'),
                 int: getAttributeTotalValue('int'),
@@ -3971,11 +4094,11 @@ Introduce el número (1-4):`);
         console.log('🔧 [v0.91] Funciones disponibles:');
         console.log('🎯 [v0.91] SISTEMA REESCRITO - Los implantes personalizados funcionan GARANTIZADO');
 
-        // ================= SISTEMA v0.99: NUEVO MANEJO DE ATRIBUTOS =================
+        // ================= SISTEMA v1.0: MANEJO COMPLETO DE ATRIBUTOS =================
         
-        // Función de prueba para el nuevo sistema de atributos v0.99
+        // Función de prueba para el sistema de atributos v1.0
         window.testNewAttributeSystem = function() {
-            console.log('🧪 ===== PROBANDO SISTEMA DE ATRIBUTOS v0.99 =====');
+            console.log('🧪 ===== PROBANDO SISTEMA DE ATRIBUTOS v1.0 =====');
             
             // Mostrar información actual
             const selectedTemplate = getSelectValue('aptitude-template', 'actioneer');
