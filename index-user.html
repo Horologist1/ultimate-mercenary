@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.0</title>
+    <title>Ultimate Mercenary 1.1</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -106,7 +106,7 @@
         }
 
         .chat-container {
-            flex: 1.5;
+            flex: 1.2;
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             border: 1px solid #444;
@@ -1144,7 +1144,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 1.0</h1>
+                        <h1>ULTIMATE MERCENARY 1.1</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1542,13 +1542,24 @@
                 const username = msg.querySelector('.username');
                 if (username) {
                     const usernameText = username.textContent.trim();
+                    // Limpiar el texto quitando los ":" al final
+                    const cleanUsername = usernameText.replace(':', '').trim();
+                    
                     // Eliminar mensajes de admin identificados por nombres específicos
-                    if (usernameText.startsWith('Kaiser') || 
-                        usernameText.startsWith('Director') || 
-                        usernameText.startsWith('SISTEMA') ||
-                        usernameText.startsWith('OCE') ||
-                        usernameText.includes('Admin')) {
-                        chatMessagesContainer.removeChild(msg);
+                    if (cleanUsername.startsWith('Kaiser') || 
+                        cleanUsername.startsWith('Director') || 
+                        cleanUsername.startsWith('SISTEMA') ||
+                        cleanUsername.startsWith('OCE') ||
+                        cleanUsername.includes('Admin') ||
+                        cleanUsername === 'Kaiser' ||
+                        cleanUsername === 'Director Kaiser' ||
+                        cleanUsername === 'SISTEMA OCE') {
+                        try {
+                            chatMessagesContainer.removeChild(msg);
+                            console.log(`🗑️ Eliminado mensaje del admin: ${cleanUsername}`);
+                        } catch (e) {
+                            console.warn('⚠️ Error eliminando mensaje admin:', e);
+                        }
                     }
                 }
             });
@@ -1929,9 +1940,9 @@
             }
         };
 
-        // NUEVA v1.0: Función para probar sistema de limpieza de chat
+        // NUEVA v1.1: Función para probar sistema de limpieza de chat
         window.probarLimpiezaChat = function() {
-            console.log('🧹 Probando sistema de limpieza de chat...');
+            console.log('🧹 Probando sistema de limpieza de chat v1.1...');
             
             // Mostrar estado actual
             const chatContainer = document.getElementById('chat-messages');
@@ -1939,31 +1950,55 @@
                 const mensajes = chatContainer.querySelectorAll('.chat-message');
                 console.log(`📊 Mensajes actuales: ${mensajes.length}`);
                 
-                // Contar mensajes por tipo
+                // Analizar todos los mensajes en detalle
                 let jugador = 0, admin = 0, otros = 0;
-                mensajes.forEach(msg => {
+                const adminMensajes = [];
+                const jugadorMensajes = [];
+                const otrosMensajes = [];
+                
+                mensajes.forEach((msg, index) => {
                     const username = msg.querySelector('.username');
                     if (username) {
                         const usernameText = username.textContent.trim();
-                        if (usernameText.startsWith('XIII')) {
+                        const cleanUsername = usernameText.replace(':', '').trim();
+                        
+                        if (cleanUsername.startsWith('XIII')) {
                             jugador++;
-                        } else if (usernameText.startsWith('Kaiser') || 
-                                   usernameText.startsWith('Director') || 
-                                   usernameText.startsWith('SISTEMA') ||
-                                   usernameText.startsWith('OCE') ||
-                                   usernameText.includes('Admin')) {
+                            jugadorMensajes.push(cleanUsername);
+                        } else if (cleanUsername.startsWith('Kaiser') || 
+                                   cleanUsername.startsWith('Director') || 
+                                   cleanUsername.startsWith('SISTEMA') ||
+                                   cleanUsername.startsWith('OCE') ||
+                                   cleanUsername.includes('Admin') ||
+                                   cleanUsername === 'Kaiser' ||
+                                   cleanUsername === 'Director Kaiser' ||
+                                   cleanUsername === 'SISTEMA OCE') {
                             admin++;
+                            adminMensajes.push(cleanUsername);
                         } else {
                             otros++;
+                            otrosMensajes.push(cleanUsername);
                         }
                     }
                 });
                 
                 console.log(`👤 Mensajes del jugador (XIII): ${jugador}`);
+                if (jugadorMensajes.length > 0) {
+                    console.log('   📝 Usuarios del jugador:', [...new Set(jugadorMensajes)]);
+                }
+                
                 console.log(`🔧 Mensajes del admin: ${admin}`);
+                if (adminMensajes.length > 0) {
+                    console.log('   📝 Usuarios admin detectados:', [...new Set(adminMensajes)]);
+                }
+                
                 console.log(`👥 Otros mensajes: ${otros}`);
+                if (otrosMensajes.length > 0 && otrosMensajes.length <= 10) {
+                    console.log('   📝 Otros usuarios:', [...new Set(otrosMensajes)]);
+                }
                 
                 // Aplicar limpieza completa
+                console.log('🧹 Aplicando limpieza completa...');
                 limpiarChatCompleto();
                 
                 // Mostrar estado después de limpieza
@@ -2021,11 +2056,11 @@
         }, contextos.length * 2000 + 1000);
     };
 
-            console.log('🛠️ Funciones de utilidad v1.0 disponibles:');
+            console.log('🛠️ Funciones de utilidad v1.1 disponibles:');
         console.log('• limpiarChatYForzarContextual() - Limpia el chat y reinicia sistema híbrido');
         console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
         console.log('• probarSistemaAtributos() - Prueba el sistema de atributos v1.0');
-        console.log('• probarLimpiezaChat() - Prueba el sistema de limpieza de mensajes');
+        console.log('• probarLimpiezaChat() - Prueba el sistema de limpieza de mensajes v1.1');
         console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
     </script>
 
@@ -2174,7 +2209,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '0.92';
+        const SYSTEM_VERSION = '1.1';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -2405,7 +2440,7 @@
             if (window.directMessages.messages.system.length === 0) {
                 window.directMessages.addMessage('system', {
                     sender: 'SISTEMA OCE',
-                    content: 'Bienvenida al sistema Ultimate Mercenary v0.94\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v0.94:\n• Sistema de mensajes contextuales FORZADO activado\n• Mensajes adaptativos para XIII como novata\n• Chat público responde al contexto en tiempo real\n• Integración completa garantizada',
+                    content: 'Bienvenida al sistema Ultimate Mercenary v1.1\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.1:\n• Chat redimensionado para mejor experiencia visual\n• Sistema de limpieza mejorado para mensajes del admin\n• Botón de opacidad del chat completamente funcional\n• Resolución de problemas de ancho y espaciado',
                     type: 'system'
                 });
             }
@@ -2491,10 +2526,11 @@
             }
         };
 
-        console.log('🎮 Ultimate Mercenary v1.0 - SISTEMA COMPLETO');
-        console.log('📧 Usa testMessagingSystem() para probar el sistema');
+        console.log('🎮 Ultimate Mercenary v1.1 - SISTEMA OPTIMIZADO');
+        console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
-        console.log('🔍 Nuevas funciones v1.0: Buscador de conocidos, auto scroll del chat, personajes completos');
+        console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
+        console.log('🔍 Nuevas funciones v1.1: Chat redimensionado, limpieza mejorada, opacidad funcional');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
