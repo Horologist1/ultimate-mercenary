@@ -106,7 +106,7 @@
         }
 
         .chat-container {
-            flex: 0.75;
+            flex: 1.5;
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             border: 1px solid #444;
@@ -120,18 +120,20 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 15px;
             min-height: 0;
             max-height: calc(100vh - 180px);
         }
 
         .chat-message {
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 12px 15px;
             background-color: rgba(30, 30, 30, 0.8);
             border-radius: 4px;
             border: 1px solid #444;
             transition: all 0.3s ease;
+            width: calc(100% - 10px);
+            box-sizing: border-box;
         }
 
         .chat-message:hover {
@@ -1120,10 +1122,22 @@
             // If 'data' is an object of messages, convert to array.
             const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
 
-            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesArray));
+            // Filtrar mensajes del admin antes de guardar localmente
+            const mensajesFiltrados = messagesArray.filter(msg => {
+                const sender = (msg.sender || '').trim().toLowerCase();
+                return !(sender.includes('kaiser') || 
+                        sender.includes('director') || 
+                        sender.includes('sistema') ||
+                        sender.includes('oce') ||
+                        sender.includes('admin') ||
+                        sender.includes('control') ||
+                        sender.includes('panel'));
+            });
+
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
             if (window.renderGlobalChatMessages) {
-                console.log("[Firebase Chat Listener] Calling renderGlobalChatMessages.");
-                window.renderGlobalChatMessages(messagesArray);
+                console.log("[Firebase Chat Listener] Calling renderGlobalChatMessages with filtered messages.");
+                window.renderGlobalChatMessages(mensajesFiltrados);
             } else {
                 // This might happen if Firebase loads and fires this event before the main DOM is fully parsed.
                 // The initChatSystem on DOMContentLoaded should handle initial rendering from localStorage anyway.
@@ -2120,6 +2134,35 @@
         console.log('✅ LIMPIEZA NUCLEAR COMPLETADA');
         return 'Todos los mensajes eliminados. El chat está completamente limpio.';
     };
+
+    // NUEVA v1.1: Auto-limpieza de Firebase cada 30 segundos
+    setInterval(() => {
+        const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
+        if (mensajesFirebase && window.saveChat) {
+            try {
+                const mensajes = JSON.parse(mensajesFirebase);
+                const mensajesFiltrados = mensajes.filter(msg => {
+                    const sender = (msg.sender || '').trim().toLowerCase();
+                    return !(sender.includes('kaiser') || 
+                            sender.includes('director') || 
+                            sender.includes('sistema') ||
+                            sender.includes('oce') ||
+                            sender.includes('admin') ||
+                            sender.includes('control') ||
+                            sender.includes('panel'));
+                });
+                
+                if (mensajesFiltrados.length !== mensajes.length) {
+                    // Solo actualizar Firebase si hay diferencia
+                    window.saveChat(mensajesFiltrados);
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
+                    console.log(`🧹 [Auto-limpieza Firebase] Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del admin`);
+                }
+            } catch (e) {
+                console.warn('⚠️ Error en auto-limpieza Firebase:', e);
+            }
+        }
+    }, 30000); // Cada 30 segundos
     
     window.borrarMensajesJugadorFirebase = function() {
         if (!window.firebase || !window.saveChat) {
