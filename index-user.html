@@ -106,7 +106,7 @@
         }
 
         .chat-container {
-            flex: 0.9;
+            flex: 0.75;
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             border: 1px solid #444;
@@ -1991,6 +1991,136 @@
 
     <!-- Funciones de utilidad para la consola -->
     <script>
+    // NUEVA v1.1: Función para forzar limpieza agresiva del admin
+    window.forzarLimpiezaAgresiva = function() {
+        console.log('💥 Forzando limpieza agresiva de mensajes del admin...');
+        
+        // Limpiar localStorage
+        const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
+        if (mensajesFirebase) {
+            try {
+                const mensajes = JSON.parse(mensajesFirebase);
+                const mensajesFiltrados = mensajes.filter(msg => {
+                    const sender = (msg.sender || msg.user || '').trim().toLowerCase();
+                    return !(sender.includes('kaiser') || 
+                            sender.includes('director') || 
+                            sender.includes('sistema') ||
+                            sender.includes('oce') ||
+                            sender.includes('admin') ||
+                            sender.includes('control') ||
+                            sender.includes('panel'));
+                });
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
+                if (window.saveChat) window.saveChat(mensajesFiltrados);
+                console.log(`🗑️ Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del localStorage`);
+            } catch (e) {
+                console.error('❌ Error limpiando localStorage:', e);
+            }
+        }
+        
+        // Limpiar DOM múltiples veces
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                const chatContainer = document.getElementById('chat-messages');
+                if (chatContainer) {
+                    const mensajes = chatContainer.querySelectorAll('.chat-message');
+                    let eliminados = 0;
+                    mensajes.forEach(msg => {
+                        const username = msg.querySelector('.username');
+                        if (username) {
+                            const usernameText = username.textContent.trim().toLowerCase();
+                            if (usernameText.includes('kaiser') || 
+                                usernameText.includes('director') || 
+                                usernameText.includes('sistema') ||
+                                usernameText.includes('oce') ||
+                                usernameText.includes('admin') ||
+                                usernameText.includes('control') ||
+                                usernameText.includes('panel')) {
+                                try {
+                                    chatContainer.removeChild(msg);
+                                    eliminados++;
+                                } catch (e) {}
+                            }
+                        }
+                    });
+                    if (eliminados > 0) {
+                        console.log(`🗑️ Pasada ${i+1}: Eliminados ${eliminados} mensajes del DOM`);
+                    }
+                }
+            }, i * 200);
+        }
+        
+        return 'Limpieza agresiva completada. Revisa la consola para detalles.';
+    };
+
+    // NUEVA v1.1: Función para eliminar mensajes específicos
+    window.eliminarMensajesEspecificos = function() {
+        console.log('🎯 Eliminando mensajes específicos problemáticos...');
+        
+        const chatContainer = document.getElementById('chat-messages');
+        if (!chatContainer) {
+            console.error('❌ Contenedor de chat no encontrado');
+            return 'Error: Contenedor no encontrado';
+        }
+        
+        const mensajes = chatContainer.querySelectorAll('.chat-message');
+        let eliminados = 0;
+        
+        mensajes.forEach(msg => {
+            const username = msg.querySelector('.username');
+            const content = msg.querySelector('.content');
+            
+            if (username && content) {
+                const usernameText = username.textContent.trim().toLowerCase();
+                const contentText = content.textContent.trim().toLowerCase();
+                
+                // Eliminar mensajes específicos problemáticos
+                if ((usernameText.includes('mercenarycrazy') && 
+                     (contentText.includes('sí') || contentText.includes('entonces sí o no') || contentText.includes('80 pm'))) ||
+                    (usernameText.includes('troll') && 
+                     (contentText.includes('jsjajjajajajajfqfafjsfa') || contentText.includes('kek')))) {
+                    
+                    try {
+                        chatContainer.removeChild(msg);
+                        eliminados++;
+                        console.log(`🗑️ Eliminado mensaje específico: ${usernameText} - ${contentText.substring(0, 30)}...`);
+                    } catch (e) {
+                        console.warn('⚠️ Error eliminando mensaje específico:', e);
+                    }
+                }
+            }
+        });
+        
+        console.log(`✅ Eliminados ${eliminados} mensajes específicos`);
+        return `Eliminados ${eliminados} mensajes específicos`;
+    };
+
+    // NUEVA v1.1: Función nuclear - eliminar TODOS los mensajes
+    window.limpiarChatCompleto = function() {
+        console.log('💥 LIMPIEZA NUCLEAR - Eliminando TODOS los mensajes...');
+        
+        // Limpiar localStorage completamente
+        localStorage.removeItem('mensajes-publico-expanded');
+        console.log('🗑️ localStorage limpiado');
+        
+        // Limpiar Firebase
+        if (window.saveChat) {
+            window.saveChat([]);
+            console.log('🗑️ Firebase limpiado');
+        }
+        
+        // Limpiar DOM completamente
+        const chatContainer = document.getElementById('chat-messages');
+        if (chatContainer) {
+            const mensajesAntes = chatContainer.querySelectorAll('.chat-message').length;
+            chatContainer.innerHTML = '';
+            console.log(`🗑️ DOM limpiado - Eliminados ${mensajesAntes} mensajes`);
+        }
+        
+        console.log('✅ LIMPIEZA NUCLEAR COMPLETADA');
+        return 'Todos los mensajes eliminados. El chat está completamente limpio.';
+    };
+    
     window.borrarMensajesJugadorFirebase = function() {
         if (!window.firebase || !window.saveChat) {
             alert('Firebase no está disponible.');
@@ -2118,67 +2248,7 @@
             }
         };
 
-        // NUEVA v1.1: Función para forzar limpieza agresiva
-        window.forzarLimpiezaAgresiva = function() {
-            console.log('💥 Forzando limpieza agresiva de mensajes del admin...');
-            
-            // Limpiar localStorage
-            const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
-            if (mensajesFirebase) {
-                try {
-                    const mensajes = JSON.parse(mensajesFirebase);
-                    const mensajesFiltrados = mensajes.filter(msg => {
-                        const sender = (msg.sender || msg.user || '').trim().toLowerCase();
-                        return !(sender.includes('kaiser') || 
-                                sender.includes('director') || 
-                                sender.includes('sistema') ||
-                                sender.includes('oce') ||
-                                sender.includes('admin') ||
-                                sender.includes('control') ||
-                                sender.includes('panel'));
-                    });
-                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
-                    if (window.saveChat) window.saveChat(mensajesFiltrados);
-                    console.log(`🗑️ Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del localStorage`);
-                } catch (e) {
-                    console.error('❌ Error limpiando localStorage:', e);
-                }
-            }
-            
-            // Limpiar DOM múltiples veces
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const chatContainer = document.getElementById('chat-messages');
-                    if (chatContainer) {
-                        const mensajes = chatContainer.querySelectorAll('.chat-message');
-                        let eliminados = 0;
-                        mensajes.forEach(msg => {
-                            const username = msg.querySelector('.username');
-                            if (username) {
-                                const usernameText = username.textContent.trim().toLowerCase();
-                                if (usernameText.includes('kaiser') || 
-                                    usernameText.includes('director') || 
-                                    usernameText.includes('sistema') ||
-                                    usernameText.includes('oce') ||
-                                    usernameText.includes('admin') ||
-                                    usernameText.includes('control') ||
-                                    usernameText.includes('panel')) {
-                                    try {
-                                        chatContainer.removeChild(msg);
-                                        eliminados++;
-                                    } catch (e) {}
-                                }
-                            }
-                        });
-                        if (eliminados > 0) {
-                            console.log(`🗑️ Pasada ${i+1}: Eliminados ${eliminados} mensajes del DOM`);
-                        }
-                    }
-                }, i * 200);
-            }
-            
-            return 'Limpieza agresiva completada. Revisa la consola para detalles.';
-        };
+
 
     // NUEVA v0.95: Función para probar diferentes contextos
     window.probarContextos = function() {
@@ -2230,6 +2300,8 @@
         console.log('• probarSistemaAtributos() - Prueba el sistema de atributos v1.0');
         console.log('• probarLimpiezaChat() - Prueba el sistema de limpieza de mensajes v1.1');
         console.log('• forzarLimpiezaAgresiva() - Fuerza la eliminación de mensajes del admin');
+        console.log('• eliminarMensajesEspecificos() - Elimina los mensajes problemáticos específicos');
+        console.log('• limpiarChatCompleto() - OPCIÓN NUCLEAR: Elimina TODOS los mensajes');
         console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
     </script>
 
