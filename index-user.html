@@ -106,7 +106,7 @@
         }
 
         .chat-container {
-            flex: 1.2;
+            flex: 0.9;
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             border: 1px solid #444;
@@ -1574,34 +1574,69 @@
         function limpiarChatCompleto() {
             // Limpia mensajes del jugador Y del admin al cargar la página
             localStorage.removeItem('mensajes-jugador-sesion');
-            limpiarMensajesJugadorDOM();
-            limpiarMensajesAdminDOM();
             
-            // También limpiar mensajes del admin guardados en Firebase
+            // Primero limpiar Firebase/localStorage
             const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
             if (mensajesFirebase) {
                 try {
                     const mensajes = JSON.parse(mensajesFirebase);
                     const mensajesFiltrados = mensajes.filter(msg => {
-                        const sender = (msg.sender || '').trim();
-                        return !(sender.startsWith('Kaiser') || 
-                                sender.startsWith('Director') || 
-                                sender.startsWith('SISTEMA') ||
-                                sender.startsWith('OCE') ||
-                                sender.includes('Admin') ||
-                                sender === 'Kaiser' ||
-                                sender === 'Director Kaiser' ||
-                                sender === 'SISTEMA OCE');
+                        const sender = (msg.sender || msg.user || '').trim().toLowerCase();
+                        // Lista más amplia de detección de admin
+                        return !(sender.includes('kaiser') || 
+                                sender.includes('director') || 
+                                sender.includes('sistema') ||
+                                sender.includes('oce') ||
+                                sender.includes('admin') ||
+                                sender.includes('control') ||
+                                sender.includes('panel'));
                     });
                     
                     if (mensajesFiltrados.length !== mensajes.length) {
                         localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
+                        // También actualizar Firebase si es posible
+                        if (window.saveChat) {
+                            window.saveChat(mensajesFiltrados);
+                        }
                         console.log(`🗑️ Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del admin de Firebase`);
                     }
                 } catch (e) {
                     console.warn('⚠️ Error limpiando mensajes de Firebase:', e);
                 }
             }
+            
+            // Luego limpiar el DOM
+            limpiarMensajesJugadorDOM();
+            limpiarMensajesAdminDOM();
+            
+            // Función más agresiva para el DOM
+            setTimeout(() => {
+                const chatContainer = document.getElementById('chat-messages');
+                if (chatContainer) {
+                    const mensajes = chatContainer.querySelectorAll('.chat-message');
+                    mensajes.forEach(msg => {
+                        const username = msg.querySelector('.username');
+                        if (username) {
+                            const usernameText = username.textContent.trim().toLowerCase();
+                            // Detección más amplia
+                            if (usernameText.includes('kaiser') || 
+                                usernameText.includes('director') || 
+                                usernameText.includes('sistema') ||
+                                usernameText.includes('oce') ||
+                                usernameText.includes('admin') ||
+                                usernameText.includes('control') ||
+                                usernameText.includes('panel')) {
+                                try {
+                                    chatContainer.removeChild(msg);
+                                    console.log(`🗑️ Eliminado mensaje admin (DOM): ${usernameText}`);
+                                } catch (e) {
+                                    console.warn('⚠️ Error eliminando mensaje admin DOM:', e);
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 500); // Delay para asegurar que se ejecute después de otros procesos
         }
         
         function limpiarChatDOMCompleto() {
@@ -1811,6 +1846,36 @@
         function initChatSystem() {
             // Al cargar la página, limpiar mensajes del jugador Y del admin
             limpiarChatCompleto();
+            
+            // Limpiar mensajes del admin periódicamente
+            setInterval(() => {
+                const chatContainer = document.getElementById('chat-messages');
+                if (chatContainer) {
+                    const mensajes = chatContainer.querySelectorAll('.chat-message');
+                    mensajes.forEach(msg => {
+                        const username = msg.querySelector('.username');
+                        if (username) {
+                            const usernameText = username.textContent.trim().toLowerCase();
+                            // Detección amplia de mensajes admin
+                            if (usernameText.includes('kaiser') || 
+                                usernameText.includes('director') || 
+                                usernameText.includes('sistema') ||
+                                usernameText.includes('oce') ||
+                                usernameText.includes('admin') ||
+                                usernameText.includes('control') ||
+                                usernameText.includes('panel')) {
+                                try {
+                                    chatContainer.removeChild(msg);
+                                    console.log(`🗑️ [Auto-limpieza] Eliminado mensaje admin: ${usernameText}`);
+                                } catch (e) {
+                                    // Error silencioso
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 2000); // Cada 2 segundos
+            
             // Iniciar mensajes automáticos
             startAutoMessages();
             // NO renderizar mensajes del jugador guardados en la sesión anterior
@@ -1875,10 +1940,25 @@
                 };
             }
             window.renderGlobalChatMessages = function(messagesArray) {
-                // Solo renderizar mensajes que NO sean del jugador (ignorando mayúsculas, minúsculas y espacios)
+                // Solo renderizar mensajes que NO sean del jugador NI del admin
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
+                    
+                    // Filtrar mensajes del jugador
                     if (sender === 'tú') return;
+                    
+                    // Filtrar mensajes del admin
+                    if (sender.includes('kaiser') || 
+                        sender.includes('director') || 
+                        sender.includes('sistema') ||
+                        sender.includes('oce') ||
+                        sender.includes('admin') ||
+                        sender.includes('control') ||
+                        sender.includes('panel')) {
+                        console.log(`🚫 Bloqueado mensaje del admin: ${sender}`);
+                        return;
+                    }
+                    
                     const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
@@ -1968,7 +2048,7 @@
 
         // NUEVA v1.1: Función para probar sistema de limpieza de chat
         window.probarLimpiezaChat = function() {
-            console.log('🧹 Probando sistema de limpieza de chat v1.1...');
+            console.log('🧹 Probando sistema de limpieza de chat v1.1 (mejorado)...');
             
             // Mostrar estado actual
             const chatContainer = document.getElementById('chat-messages');
@@ -2038,6 +2118,68 @@
             }
         };
 
+        // NUEVA v1.1: Función para forzar limpieza agresiva
+        window.forzarLimpiezaAgresiva = function() {
+            console.log('💥 Forzando limpieza agresiva de mensajes del admin...');
+            
+            // Limpiar localStorage
+            const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
+            if (mensajesFirebase) {
+                try {
+                    const mensajes = JSON.parse(mensajesFirebase);
+                    const mensajesFiltrados = mensajes.filter(msg => {
+                        const sender = (msg.sender || msg.user || '').trim().toLowerCase();
+                        return !(sender.includes('kaiser') || 
+                                sender.includes('director') || 
+                                sender.includes('sistema') ||
+                                sender.includes('oce') ||
+                                sender.includes('admin') ||
+                                sender.includes('control') ||
+                                sender.includes('panel'));
+                    });
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
+                    if (window.saveChat) window.saveChat(mensajesFiltrados);
+                    console.log(`🗑️ Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del localStorage`);
+                } catch (e) {
+                    console.error('❌ Error limpiando localStorage:', e);
+                }
+            }
+            
+            // Limpiar DOM múltiples veces
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const chatContainer = document.getElementById('chat-messages');
+                    if (chatContainer) {
+                        const mensajes = chatContainer.querySelectorAll('.chat-message');
+                        let eliminados = 0;
+                        mensajes.forEach(msg => {
+                            const username = msg.querySelector('.username');
+                            if (username) {
+                                const usernameText = username.textContent.trim().toLowerCase();
+                                if (usernameText.includes('kaiser') || 
+                                    usernameText.includes('director') || 
+                                    usernameText.includes('sistema') ||
+                                    usernameText.includes('oce') ||
+                                    usernameText.includes('admin') ||
+                                    usernameText.includes('control') ||
+                                    usernameText.includes('panel')) {
+                                    try {
+                                        chatContainer.removeChild(msg);
+                                        eliminados++;
+                                    } catch (e) {}
+                                }
+                            }
+                        });
+                        if (eliminados > 0) {
+                            console.log(`🗑️ Pasada ${i+1}: Eliminados ${eliminados} mensajes del DOM`);
+                        }
+                    }
+                }, i * 200);
+            }
+            
+            return 'Limpieza agresiva completada. Revisa la consola para detalles.';
+        };
+
     // NUEVA v0.95: Función para probar diferentes contextos
     window.probarContextos = function() {
         console.log('🧪 Probando diferentes contextos...');
@@ -2087,6 +2229,7 @@
         console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
         console.log('• probarSistemaAtributos() - Prueba el sistema de atributos v1.0');
         console.log('• probarLimpiezaChat() - Prueba el sistema de limpieza de mensajes v1.1');
+        console.log('• forzarLimpiezaAgresiva() - Fuerza la eliminación de mensajes del admin');
         console.log('• borrarMensajesJugadorFirebase() - Elimina mensajes del jugador de Firebase');
     </script>
 
@@ -2556,7 +2699,7 @@
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
         console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
-        console.log('🔍 Nuevas funciones v1.1: Chat redimensionado, limpieza mejorada, opacidad funcional');
+        console.log('🔍 Nuevas funciones v1.1: Chat más compacto, limpieza agresiva del admin, auto-filtrado');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
