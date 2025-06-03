@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.1</title>
+    <title>Ultimate Mercenary 1.2</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -120,7 +120,7 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 15px 10px 15px 15px;
             min-height: 0;
             max-height: calc(100vh - 180px);
         }
@@ -132,8 +132,9 @@
             border-radius: 4px;
             border: 1px solid #444;
             transition: all 0.3s ease;
-            width: calc(100% - 160px);
+            width: calc(100% - 25px);
             box-sizing: border-box;
+            margin-right: 5px;
         }
 
         .chat-message:hover {
@@ -1158,7 +1159,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 1.1</h1>
+                        <h1>ULTIMATE MERCENARY 1.2</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -2337,7 +2338,7 @@
         }, contextos.length * 2000 + 1000);
     };
 
-            console.log('🛠️ Funciones de utilidad v1.1 disponibles:');
+            console.log('🛠️ Funciones de utilidad v1.2 disponibles:');
         console.log('• limpiarChatYForzarContextual() - Limpia el chat y reinicia sistema híbrido');
         console.log('• probarContextos() - Prueba diferentes contextos automáticamente');
         console.log('• probarSistemaAtributos() - Prueba el sistema de atributos v1.0');
@@ -2493,7 +2494,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '1.1';
+        const SYSTEM_VERSION = '1.2';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -2724,7 +2725,7 @@
             if (window.directMessages.messages.system.length === 0) {
                 window.directMessages.addMessage('system', {
                     sender: 'SISTEMA OCE',
-                    content: 'Bienvenida al sistema Ultimate Mercenary v1.1\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.1:\n• Chat redimensionado para mejor experiencia visual\n• Sistema de limpieza mejorado para mensajes del admin\n• Botón de opacidad del chat completamente funcional\n• Resolución de problemas de ancho y espaciado',
+                    content: 'Bienvenida al sistema Ultimate Mercenary v1.2\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.2:\n• Mensajes con fondo optimizado que ocupa más espacio\n• Mejor aprovechamiento del ancho disponible del chat\n• Mensajes del admin completamente no-persistentes\n• Espaciado perfecto entre mensajes y barra de scroll',
                     type: 'system'
                 });
             }
@@ -2810,11 +2811,11 @@
             }
         };
 
-        console.log('🎮 Ultimate Mercenary v1.1 - SISTEMA OPTIMIZADO');
+        console.log('🎮 Ultimate Mercenary v1.2 - ESPACIADO PERFECTO');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
         console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
-        console.log('🔍 Nuevas funciones v1.1: Chat más compacto, limpieza agresiva del admin, auto-filtrado');
+        console.log('🔍 Nuevas funciones v1.2: Fondo de mensajes optimizado, espaciado perfecto, hora alineada');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
