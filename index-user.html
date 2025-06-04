@@ -1360,7 +1360,12 @@
 
     function openMessages() {
         document.getElementById('messages-modal').style.display = 'block';
-        if (window.loadDirectMessages) window.loadDirectMessages();
+        if (window.directMessages) {
+            // Refrescar la vista para asegurar que se muestren todos los mensajes
+            window.directMessages.loadMessages();
+        } else if (window.loadDirectMessages) {
+            window.loadDirectMessages();
+        }
     }
     window.openMessages = openMessages;
 
@@ -2561,11 +2566,6 @@
 
             this.messages[category].unshift(messageObj); // Añadir al principio
             
-            // También añadir a inbox si no es ya inbox
-            if (category !== 'inbox') {
-                this.messages.inbox.unshift({...messageObj});
-            }
-            
             this.saveMessages();
             
             // Si el modal está abierto, recargar
@@ -2577,20 +2577,23 @@
         },
 
         deleteMessage(category, messageId) {
-            if (this.messages[category]) {
-                this.messages[category] = this.messages[category].filter(msg => msg.id !== messageId);
-            }
-            
-            // Si se elimina de una categoría específica, también eliminar de inbox
-            if (category !== 'inbox') {
-                this.messages.inbox = this.messages.inbox.filter(msg => msg.id !== messageId);
+            if (category === 'inbox') {
+                // Si se elimina de inbox, necesitamos determinar la categoría real del mensaje
+                const allMessages = [
+                    ...this.messages.system.map(msg => ({...msg, originalCategory: 'system'})),
+                    ...this.messages.shop.map(msg => ({...msg, originalCategory: 'shop'})),
+                    ...this.messages.personal.map(msg => ({...msg, originalCategory: 'personal'})),
+                    ...this.messages.inbox.map(msg => ({...msg, originalCategory: 'inbox'}))
+                ];
+                
+                const messageToDelete = allMessages.find(msg => msg.id === messageId);
+                if (messageToDelete && this.messages[messageToDelete.originalCategory]) {
+                    this.messages[messageToDelete.originalCategory] = this.messages[messageToDelete.originalCategory].filter(msg => msg.id !== messageId);
+                }
             } else {
-                // Si se elimina de inbox, eliminar de la categoría específica también
-                const messageToDelete = this.messages.inbox.find(msg => msg.id === messageId);
-                if (messageToDelete && messageToDelete.category) {
-                    if (this.messages[messageToDelete.category]) {
-                        this.messages[messageToDelete.category] = this.messages[messageToDelete.category].filter(msg => msg.id !== messageId);
-                    }
+                // Eliminar de la categoría específica
+                if (this.messages[category]) {
+                    this.messages[category] = this.messages[category].filter(msg => msg.id !== messageId);
                 }
             }
             
@@ -2740,39 +2743,37 @@
         window.directMessages.init();
         
         // Agregar algunos mensajes de ejemplo si no hay ninguno
-        setTimeout(() => {
-            if (window.directMessages.messages.system.length === 0) {
-                window.directMessages.addMessage('system', {
-                    sender: 'SISTEMA OCE',
-                    content: 'Bienvenida al sistema Ultimate Mercenary v1.5\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.5:\n• Nuevo filtro de "Mensajes Personales" para comunicaciones directas del staff\n• "Bandeja de Entrada" ahora muestra todos los mensajes con etiquetas de categoría\n• Mejoras en la organización y filtrado de mensajes\n• Sistema de categorización más intuitivo y completo',
-                    type: 'system'
-                });
-            }
-            
-            if (window.directMessages.messages.shop.length === 0) {
-                window.directMessages.addMessage('shop', {
-                    sender: 'TIENDA OCE',
-                    content: 'Bienvenida a la Tienda OCE\n\nTodos los artículos están disponibles para compra con PM. Las compras se registran automáticamente en tu inventario y recibirás confirmaciones detalladas aquí.\n\n¡Que tengas una experiencia de compra memorable!',
-                    type: 'shop'
-                });
-            }
-            
-            if (window.directMessages.messages.personal.length === 0) {
-                window.directMessages.addMessage('personal', {
-                    sender: 'Director OCE',
-                    content: 'Bienvenida al sistema de mensajes personales v1.5\n\nAquí recibirás comunicaciones directas del staff del programa, patrocinadores especiales, y mensajes personalizados.\n\nEste canal está disponible para comunicaciones privadas importantes.\n\n¡Que tengas una experiencia memorable en Ultimate Mercenary!',
-                    type: 'personal'
-                });
-            }
-            
-            if (window.directMessages.messages.inbox.length <= 2) { // Solo añadir si hay pocos mensajes
-                window.directMessages.addMessage('inbox', {
-                    sender: 'Director Kaiser',
-                    content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\nRecuerda: OCE está siempre observando. Tu rendimiento determina no solo tu supervivencia, sino también las recompensas que recibirás.\n\n- Kaiser\nDirector de Operaciones, OCE',
-                    type: 'admin'
-                });
-            }
-        }, 1000);
+        if (window.directMessages.messages.system.length === 0) {
+            window.directMessages.addMessage('system', {
+                sender: 'SISTEMA OCE',
+                content: 'Bienvenida al sistema Ultimate Mercenary v1.5\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.5:\n• Nuevo filtro de "Mensajes Personales" para comunicaciones directas del staff\n• "Bandeja de Entrada" ahora muestra todos los mensajes con etiquetas de categoría\n• Mejoras en la organización y filtrado de mensajes\n• Sistema de categorización más intuitivo y completo',
+                type: 'system'
+            });
+        }
+        
+        if (window.directMessages.messages.shop.length === 0) {
+            window.directMessages.addMessage('shop', {
+                sender: 'TIENDA OCE',
+                content: 'Bienvenida a la Tienda OCE\n\nTodos los artículos están disponibles para compra con PM. Las compras se registran automáticamente en tu inventario y recibirás confirmaciones detalladas aquí.\n\n¡Que tengas una experiencia de compra memorable!',
+                type: 'shop'
+            });
+        }
+        
+        if (window.directMessages.messages.personal.length === 0) {
+            window.directMessages.addMessage('personal', {
+                sender: 'Director OCE',
+                content: 'Bienvenida al sistema de mensajes personales v1.5\n\nAquí recibirás comunicaciones directas del staff del programa, patrocinadores especiales, y mensajes personalizados.\n\nEste canal está disponible para comunicaciones privadas importantes.\n\n¡Que tengas una experiencia memorable en Ultimate Mercenary!',
+                type: 'personal'
+            });
+        }
+        
+        if (window.directMessages.messages.inbox.length <= 2) { // Solo añadir si hay pocos mensajes
+            window.directMessages.addMessage('inbox', {
+                sender: 'Director Kaiser',
+                content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\nRecuerda: OCE está siempre observando. Tu rendimiento determina no solo tu supervivencia, sino también las recompensas que recibirás.\n\n- Kaiser\nDirector de Operaciones, OCE',
+                type: 'admin'
+            });
+        }
     });
     </script>
 
