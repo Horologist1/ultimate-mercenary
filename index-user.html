@@ -1129,21 +1129,34 @@
             // If 'data' is an object of messages, convert to array.
             const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
 
-            // Filtrar mensajes del admin antes de guardar localmente
+            // Filtrar mensajes del admin y mensajes marcados como isAdminMessage
             const mensajesFiltrados = messagesArray.filter(msg => {
+                // Filtrar mensajes marcados como del admin
+                if (msg.isAdminMessage === true) {
+                    console.log("🚫 Mensaje del admin filtrado:", msg.sender, "-", msg.content.substring(0, 30));
+                    return false;
+                }
+                
+                // Filtrar por nombre del sender (filtro original)
                 const sender = (msg.sender || '').trim().toLowerCase();
-                return !(sender.includes('kaiser') || 
+                const isAdminSender = sender.includes('kaiser') || 
                         sender.includes('director') || 
                         sender.includes('sistema') ||
                         sender.includes('oce') ||
                         sender.includes('admin') ||
                         sender.includes('control') ||
-                        sender.includes('panel'));
+                        sender.includes('panel');
+                
+                if (isAdminSender) {
+                    console.log("🚫 Mensaje del admin filtrado por sender:", sender);
+                }
+                
+                return !isAdminSender;
             });
 
             localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
             if (window.renderGlobalChatMessages) {
-                console.log("[Firebase Chat Listener] Calling renderGlobalChatMessages with filtered messages.");
+                console.log(`[Firebase Chat Listener] Llamando renderGlobalChatMessages con ${mensajesFiltrados.length} mensajes filtrados.`);
                 window.renderGlobalChatMessages(mensajesFiltrados);
             } else {
                 // This might happen if Firebase loads and fires this event before the main DOM is fully parsed.
@@ -1911,17 +1924,40 @@
             window.enviarMensajeJugador = function() {
                 const text = chatInput.value.trim();
                 if (!text) return;
+                
                 const playerMsg = {
+                    sender: 'XIII',  // Cambio para consistencia con Firebase
+                    content: text,   // Cambio para consistencia con Firebase
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    timestamp: Date.now(),
+                    isPlayerMessage: true // Marca para identificar mensajes del jugador
+                };
+                
+                // Añadir al DOM local inmediatamente
+                const uniqueMsgId = `player-${Date.now()}`;
+                agregarMensajeAlChatDisplay({
                     usuario: 'XIII',
                     mensaje: text,
                     color: '#00ccff',
-                    hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                };
-                const uniqueMsgId = `player-${Date.now()}`;
-                // Añadir al DOM
-                agregarMensajeAlChatDisplay(playerMsg, uniqueMsgId);
+                    hora: playerMsg.time
+                }, uniqueMsgId);
+                
+                // Guardar en localStorage y Firebase para sincronización
+                try {
+                    const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    messages.push(playerMsg);
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                    
+                    // Sincronizar con Firebase
+                    if (window.saveChat) {
+                        window.saveChat(messages);
+                        console.log('📤 Mensaje del jugador enviado a Firebase:', text.substring(0, 30));
+                    }
+                } catch (error) {
+                    console.error('❌ Error guardando mensaje del jugador:', error);
+                }
+                
                 chatInput.value = '';
-                // NO guardar en localStorage ni en Firebase
             };
             chatSubmitBtn.onclick = window.enviarMensajeJugador;
             chatInput.addEventListener('keypress', function(e) {
@@ -1967,14 +2003,12 @@
                 };
             }
             window.renderGlobalChatMessages = function(messagesArray) {
-                // Solo renderizar mensajes que NO sean del jugador NI del admin
+                // Renderizar mensajes que NO sean del admin
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
                     
-                    // Filtrar mensajes del jugador
-                    if (sender === 'tú') return;
-                    
-                    // Filtrar mensajes del admin
+                    // NO filtrar mensajes del jugador - permitir sincronización entre dispositivos
+                    // Filtrar solo mensajes del admin
                     if (sender.includes('kaiser') || 
                         sender.includes('director') || 
                         sender.includes('sistema') ||
@@ -1986,14 +2020,33 @@
                         return;
                     }
                     
+                    // Evitar duplicación de mensajes del jugador ya mostrados localmente
                     const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
+                    const existingMsg = document.getElementById(msgId);
+                    if (existingMsg) {
+                        console.log('⚠️ Mensaje ya existe en DOM, saltando:', msgId);
+                        return;
+                    }
+                    
+                    // Configurar color según el tipo de mensaje
+                    let color = '#cccccc';
+                    if (msg.isPlayerMessage || sender === 'xiii') {
+                        color = '#00ccff'; // Color azul para mensajes del jugador
+                    } else if (sender === 'kaiser') {
+                        color = '#ff4757';
+                    }
+                    
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
                         mensaje: msg.content,
                         hora: msg.time,
-                        color: msg.sender === 'Kaiser' ? '#ff4757' : '#cccccc',
+                        color: color,
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
+                    
+                    if (msg.isPlayerMessage) {
+                        console.log('📨 Mensaje del jugador sincronizado desde Firebase:', msg.content.substring(0, 30));
+                    }
                 });
             };
             // Limpieza total al hacer logout
@@ -2959,12 +3012,43 @@
             }
         };
 
-        console.log('🎮 Ultimate Mercenary v1.5 - MENSAJES NOCTURNOS EXPANDIDOS');
+        // Función para probar la sincronización del chat
+        window.testChatSync = function() {
+            console.log('🧪 Probando sincronización del chat...');
+            
+            // Simular mensaje del jugador
+            const testMsg = {
+                sender: 'XIII',
+                content: 'MENSAJE TEST - ' + new Date().toLocaleTimeString(),
+                time: new Date().toLocaleTimeString(),
+                timestamp: Date.now(),
+                isPlayerMessage: true
+            };
+            
+            console.log('📤 Enviando mensaje de prueba:', testMsg.content);
+            
+            // Guardar en localStorage y Firebase
+            const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+            messages.push(testMsg);
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+            
+            if (window.saveChat) {
+                window.saveChat(messages);
+                console.log('✅ Mensaje enviado a Firebase');
+            } else {
+                console.warn('⚠️ Firebase no disponible');
+            }
+            
+            return 'Mensaje de prueba enviado - verifica en otros dispositivos';
+        };
+
+        console.log('🎮 Ultimate Mercenary v1.5 - CHAT SINCRONIZADO');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
+        console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
         console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
-        console.log('🌙 v1.5: Mensajes Prueba 0 Nocturno expandidos 60%, menos picantes pero más extremos');
+        console.log('🌙 v1.5: Chat sincronizado entre dispositivos + mensajes de admin separados');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
