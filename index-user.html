@@ -2526,6 +2526,8 @@
             if (saved) {
                 try {
                     this.messages = JSON.parse(saved);
+                    // Migrar mensajes antiguos si es necesario
+                    this.migrateOldMessages();
                 } catch (e) {
                     console.error('Error cargando mensajes:', e);
                     this.messages = { inbox: [], system: [], shop: [], personal: [] };
@@ -2535,6 +2537,57 @@
             // Configurar pestañas
             this.setupTabs();
             this.loadMessages();
+        },
+
+        // Función para migrar mensajes del formato anterior
+        migrateOldMessages() {
+            let needsSave = false;
+            
+            // Si hay mensajes en inbox que deberían estar en otras categorías
+            if (this.messages.inbox && this.messages.inbox.length > 0) {
+                this.messages.inbox.forEach(msg => {
+                    // Determinar la categoría correcta basada en el sender
+                    let targetCategory = 'inbox';
+                    
+                    if (msg.sender && msg.sender.includes('SISTEMA')) {
+                        targetCategory = 'system';
+                    } else if (msg.sender && msg.sender.includes('TIENDA')) {
+                        targetCategory = 'shop';
+                    } else if (msg.type === 'personal' || msg.type === 'admin') {
+                        targetCategory = 'personal';
+                    }
+                    
+                    // Si no está ya en la categoría correcta, moverlo
+                    if (targetCategory !== 'inbox') {
+                        const existsInTarget = this.messages[targetCategory]?.some(existing => existing.id === msg.id);
+                        if (!existsInTarget) {
+                            if (!this.messages[targetCategory]) {
+                                this.messages[targetCategory] = [];
+                            }
+                            this.messages[targetCategory].push({...msg, category: targetCategory});
+                            needsSave = true;
+                        }
+                    }
+                });
+                
+                // Limpiar mensajes duplicados de inbox (dejar solo los que son realmente de inbox)
+                this.messages.inbox = this.messages.inbox.filter(msg => {
+                    return !(msg.sender && (msg.sender.includes('SISTEMA') || msg.sender.includes('TIENDA'))) 
+                           && msg.type !== 'personal' && msg.type !== 'admin';
+                });
+                needsSave = true;
+            }
+            
+            // Asegurar que todas las categorías existen
+            if (!this.messages.personal) {
+                this.messages.personal = [];
+                needsSave = true;
+            }
+            
+            if (needsSave) {
+                this.saveMessages();
+                console.log('🔄 Mensajes migrados al nuevo formato v1.5');
+            }
         },
 
         setupTabs() {
@@ -2615,27 +2668,59 @@
                 activeTab = activeButton ? activeButton.dataset.tab : 'inbox';
             }
 
+            // Debug: Log current state
+            console.log('📧 LoadMessages - Tab actual:', activeTab);
+            console.log('📧 LoadMessages - Mensajes por categoría:', {
+                inbox: (this.messages.inbox || []).length,
+                system: (this.messages.system || []).length,
+                shop: (this.messages.shop || []).length,
+                personal: (this.messages.personal || []).length
+            });
+
             let messages = [];
             
             if (activeTab === 'inbox') {
                 // Bandeja de entrada muestra TODOS los mensajes de todas las categorías, ordenados por fecha
-                messages = [
-                    ...this.messages.system.map(msg => ({...msg, category: 'system'})),
-                    ...this.messages.shop.map(msg => ({...msg, category: 'shop'})),
-                    ...this.messages.personal.map(msg => ({...msg, category: 'personal'})),
-                    ...this.messages.inbox.map(msg => ({...msg, category: 'inbox'}))
-                ].sort((a, b) => b.timestamp - a.timestamp);
+                const allMessages = [
+                    ...(this.messages.system || []).map(msg => ({...msg, category: 'system'})),
+                    ...(this.messages.shop || []).map(msg => ({...msg, category: 'shop'})),
+                    ...(this.messages.personal || []).map(msg => ({...msg, category: 'personal'})),
+                    ...(this.messages.inbox || []).map(msg => ({...msg, category: 'inbox'}))
+                ];
+                
+                // Eliminar duplicados por ID
+                const uniqueMessages = [];
+                const seenIds = new Set();
+                
+                for (const msg of allMessages) {
+                    const id = msg.id || `${msg.sender}-${msg.content.substring(0, 20)}-${msg.timestamp}`;
+                    if (!seenIds.has(id)) {
+                        seenIds.add(id);
+                        msg.uniqueId = id;
+                        uniqueMessages.push(msg);
+                    }
+                }
+                
+                messages = uniqueMessages.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                console.log('📧 Bandeja de entrada - Total mensajes únicos:', messages.length);
             } else {
                 // Otras pestañas muestran solo mensajes específicos de esa categoría
                 messages = this.messages[activeTab] || [];
+                console.log(`📧 ${activeTab} - Total mensajes:`, messages.length);
             }
             
             if (messages.length === 0) {
-                messagesList.innerHTML = '<div class="no-messages">No hay mensajes en esta categoría</div>';
+                messagesList.innerHTML = `
+                    <div class="no-messages">
+                        📭 No hay mensajes en esta categoría
+                        ${activeTab === 'inbox' ? '<br><small>Los mensajes nuevos aparecerán aquí automáticamente</small>' : ''}
+                    </div>
+                `;
                 return;
             }
 
             messagesList.innerHTML = messages.map(msg => this.renderMessage(msg, activeTab)).join('');
+            console.log('📧 Mensajes renderizados en la interfaz:', messages.length);
         },
 
         renderMessage(msg, category) {
@@ -2839,8 +2924,44 @@
             }
         };
 
+        // Función para forzar migración de mensajes viejos
+        window.fixOldMessages = function() {
+            console.log('🔧 Forzando migración de mensajes viejos...');
+            
+            if (window.directMessages) {
+                // Limpiar localStorage y forzar migración
+                const saved = localStorage.getItem('directMessages');
+                if (saved) {
+                    try {
+                        const messages = JSON.parse(saved);
+                        console.log('📧 Estado antes de migración:', messages);
+                        
+                        // Forzar migración
+                        window.directMessages.messages = messages;
+                        window.directMessages.migrateOldMessages();
+                        window.directMessages.loadMessages();
+                        
+                        console.log('📧 Estado después de migración:', window.directMessages.messages);
+                        console.log('✅ Migración completada. Abre el modal de mensajes para ver todos los mensajes en Bandeja de entrada');
+                        
+                        return 'Migración completada - revisa el modal de mensajes';
+                    } catch (e) {
+                        console.error('❌ Error durante migración:', e);
+                        return 'Error durante migración';
+                    }
+                } else {
+                    console.log('ℹ️ No hay mensajes para migrar');
+                    return 'No hay mensajes para migrar';
+                }
+            } else {
+                console.error('❌ Sistema de mensajes no disponible');
+                return 'Sistema no disponible';
+            }
+        };
+
         console.log('🎮 Ultimate Mercenary v1.5 - MENSAJES NOCTURNOS EXPANDIDOS');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
+        console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
         console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
         console.log('🌙 v1.5: Mensajes Prueba 0 Nocturno expandidos 60%, menos picantes pero más extremos');

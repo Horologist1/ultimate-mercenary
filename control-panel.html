@@ -821,42 +821,124 @@
 
         // Modificar la función sendMessage para que actualice el chat
         function sendMessage() {
-            const message = document.getElementById('message-input').value;
+            const message = document.getElementById('message-input').value.trim();
             const usernameInput = document.getElementById('public-username-input');
             let sender = usernameInput.value.trim() || 'SISTEMA';
-            if (message) {
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push({
+            
+            if (!message) {
+                alert('Por favor, escribe un mensaje');
+                return;
+            }
+            
+            try {
+                // Crear solo el nuevo mensaje
+                const newMessage = {
                     sender: sender,
                     content: message,
-                    time: new Date().toLocaleTimeString()
-                });
+                    time: new Date().toLocaleTimeString(),
+                    timestamp: Date.now()
+                };
+                
+                // Cargar mensajes existentes y añadir el nuevo
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                
+                // Verificar que no sea un mensaje duplicado (mismo contenido y sender en los últimos 5 segundos)
+                const recentMessages = messages.filter(msg => 
+                    (Date.now() - (msg.timestamp || 0)) < 5000 && 
+                    msg.sender === sender && 
+                    msg.content === message
+                );
+                
+                if (recentMessages.length > 0) {
+                    console.warn('⚠️ Mensaje duplicado detectado, no se enviará');
+                    return;
+                }
+                
+                messages.push(newMessage);
+                
+                // Guardar en localStorage
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                if (window.saveChat) window.saveChat(messages);
+                
+                // Guardar en Firebase solo si está disponible
+                if (window.saveChat) {
+                    window.saveChat(messages);
+                }
+                
+                // Limpiar formulario y actualizar
                 document.getElementById('message-input').value = '';
                 localStorage.setItem('lastPublicUsername', sender);
-                loadChatMessages(); // Actualizar el chat después de enviar
+                loadChatMessages();
+                
+                console.log('✅ Mensaje enviado al chat público:', newMessage);
+            } catch (error) {
+                console.error('❌ Error al enviar mensaje al chat:', error);
+                alert('Error al enviar el mensaje');
             }
         }
 
         function sendPMMessage() {
-            const pmAmount = document.getElementById('pm-input').value;
-            const message = document.getElementById('pm-message-input').value;
+            const pmAmount = document.getElementById('pm-input').value.trim();
+            const message = document.getElementById('pm-message-input').value.trim();
             const usernameInput = document.getElementById('pm-username-input');
             let sender = usernameInput.value.trim() || 'SISTEMA';
-            if (pmAmount && message) {
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push({
+            
+            if (!pmAmount || !message) {
+                alert('Por favor, completa tanto el monto de PM como el mensaje');
+                return;
+            }
+            
+            if (isNaN(pmAmount) || parseInt(pmAmount) <= 0) {
+                alert('Por favor, ingresa un monto de PM válido');
+                return;
+            }
+            
+            try {
+                // Crear solo el nuevo mensaje
+                const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
+                const newMessage = {
                     sender: sender,
-                    content: `${message} ¡Te transfiero ${pmAmount} PM!`,
-                    time: new Date().toLocaleTimeString()
-                });
+                    content: fullContent,
+                    time: new Date().toLocaleTimeString(),
+                    timestamp: Date.now()
+                };
+                
+                // Cargar mensajes existentes y añadir el nuevo
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                
+                // Verificar que no sea un mensaje duplicado
+                const recentMessages = messages.filter(msg => 
+                    (Date.now() - (msg.timestamp || 0)) < 5000 && 
+                    msg.sender === sender && 
+                    msg.content === fullContent
+                );
+                
+                if (recentMessages.length > 0) {
+                    console.warn('⚠️ Mensaje de PM duplicado detectado, no se enviará');
+                    return;
+                }
+                
+                messages.push(newMessage);
+                
+                // Guardar en localStorage
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                if (window.saveChat) window.saveChat(messages);
+                
+                // Guardar en Firebase solo si está disponible
+                if (window.saveChat) {
+                    window.saveChat(messages);
+                }
+                
+                // Actualizar PM
                 statsManager.updatePM(pmAmount);
+                
+                // Limpiar formulario
                 document.getElementById('pm-input').value = '';
                 document.getElementById('pm-message-input').value = '';
                 localStorage.setItem('lastPMUsername', sender);
+                
+                console.log('✅ Mensaje de PM enviado:', newMessage);
+            } catch (error) {
+                console.error('❌ Error al enviar mensaje de PM:', error);
+                alert('Error al enviar el mensaje');
             }
         }
 
