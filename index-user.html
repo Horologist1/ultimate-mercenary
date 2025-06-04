@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.4</title>
+    <title>Ultimate Mercenary 1.5</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1245,11 +1245,12 @@
         <div id="messages-modal" class="messages-modal">
             <div class="messages-content">
                 <h2>MENSAJES DIRECTOS</h2>
-                <div class="messages-tabs">
-                    <button class="tab-button active" data-tab="inbox">Bandeja de Entrada</button>
-                    <button class="tab-button" data-tab="system">Sistema</button>
-                    <button class="tab-button" data-tab="shop">Tienda</button>
-                </div>
+                            <div class="messages-tabs">
+                <button class="tab-button active" data-tab="inbox">Bandeja de Entrada</button>
+                <button class="tab-button" data-tab="system">Sistema</button>
+                <button class="tab-button" data-tab="shop">Tienda</button>
+                <button class="tab-button" data-tab="personal">Mensajes Personales</button>
+            </div>
                 <div id="messages-list" class="messages-list">
                     <!-- Los mensajes se añadirán dinámicamente -->
                 </div>
@@ -2510,7 +2511,8 @@
         messages: {
             inbox: [],
             system: [],
-            shop: []
+            shop: [],
+            personal: []
         },
 
         init() {
@@ -2521,7 +2523,7 @@
                     this.messages = JSON.parse(saved);
                 } catch (e) {
                     console.error('Error cargando mensajes:', e);
-                    this.messages = { inbox: [], system: [], shop: [] };
+                    this.messages = { inbox: [], system: [], shop: [], personal: [] };
                 }
             }
 
@@ -2613,8 +2615,13 @@
             let messages = [];
             
             if (activeTab === 'inbox') {
-                // Bandeja de entrada muestra todos los mensajes, ordenados por fecha
-                messages = this.messages.inbox.sort((a, b) => b.timestamp - a.timestamp);
+                // Bandeja de entrada muestra TODOS los mensajes de todas las categorías, ordenados por fecha
+                messages = [
+                    ...this.messages.system.map(msg => ({...msg, category: 'system'})),
+                    ...this.messages.shop.map(msg => ({...msg, category: 'shop'})),
+                    ...this.messages.personal.map(msg => ({...msg, category: 'personal'})),
+                    ...this.messages.inbox.map(msg => ({...msg, category: 'inbox'}))
+                ].sort((a, b) => b.timestamp - a.timestamp);
             } else {
                 // Otras pestañas muestran solo mensajes específicos de esa categoría
                 messages = this.messages[activeTab] || [];
@@ -2641,9 +2648,15 @@
             if (category === 'inbox' && msg.category && msg.category !== 'inbox') {
                 const categoryNames = {
                     'system': 'SISTEMA',
-                    'shop': 'TIENDA'
+                    'shop': 'TIENDA',
+                    'personal': 'PERSONAL'
                 };
-                const badgeColor = msg.category === 'system' ? '#ff4757' : '#2ed573';
+                const badgeColors = {
+                    'system': '#ff4757',
+                    'shop': '#2ed573', 
+                    'personal': '#5352ed'
+                };
+                const badgeColor = badgeColors[msg.category] || '#747d8c';
                 categoryBadge = `<span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 10px;">${categoryNames[msg.category] || msg.category.toUpperCase()}</span>`;
             }
 
@@ -2709,9 +2722,9 @@
             const message = {
                 sender: senderName,
                 content: messageContent,
-                type: 'admin'
+                type: 'personal'
             };
-            return this.addMessage('inbox', message);
+            return this.addMessage('personal', message);
         }
     };
 
@@ -2731,7 +2744,7 @@
             if (window.directMessages.messages.system.length === 0) {
                 window.directMessages.addMessage('system', {
                     sender: 'SISTEMA OCE',
-                    content: 'Bienvenida al sistema Ultimate Mercenary v1.4\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.4:\n• Margen perfecto de 5px para mejor legibilidad\n• Balance óptimo entre aprovechamiento del espacio y estética\n• Mensajes con el ancho ideal para una experiencia visual cómoda\n• Refinamiento de la interfaz basado en feedback del usuario',
+                    content: 'Bienvenida al sistema Ultimate Mercenary v1.5\n\nTu aventura cyberpunk comienza ahora. Las reglas son simples: sobrevive, entretén a la audiencia y gana PM.\n\nNuevas funciones en v1.5:\n• Nuevo filtro de "Mensajes Personales" para comunicaciones directas del staff\n• "Bandeja de Entrada" ahora muestra todos los mensajes con etiquetas de categoría\n• Mejoras en la organización y filtrado de mensajes\n• Sistema de categorización más intuitivo y completo',
                     type: 'system'
                 });
             }
@@ -2741,6 +2754,14 @@
                     sender: 'TIENDA OCE',
                     content: 'Bienvenida a la Tienda OCE\n\nTodos los artículos están disponibles para compra con PM. Las compras se registran automáticamente en tu inventario y recibirás confirmaciones detalladas aquí.\n\n¡Que tengas una experiencia de compra memorable!',
                     type: 'shop'
+                });
+            }
+            
+            if (window.directMessages.messages.personal.length === 0) {
+                window.directMessages.addMessage('personal', {
+                    sender: 'Director OCE',
+                    content: 'Bienvenida al sistema de mensajes personales v1.5\n\nAquí recibirás comunicaciones directas del staff del programa, patrocinadores especiales, y mensajes personalizados.\n\nEste canal está disponible para comunicaciones privadas importantes.\n\n¡Que tengas una experiencia memorable en Ultimate Mercenary!',
+                    type: 'personal'
                 });
             }
             

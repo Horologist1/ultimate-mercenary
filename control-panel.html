@@ -876,7 +876,7 @@
             
             try {
                 // Usar el nuevo sistema de mensajes directos
-                const directMessages = JSON.parse(localStorage.getItem('directMessages') || '{"inbox":[],"system":[],"shop":[]}');
+                const directMessages = JSON.parse(localStorage.getItem('directMessages') || '{"inbox":[],"system":[],"shop":[],"personal":[]}');
                 
                 // Crear mensaje para el nuevo sistema
                 const messageObj = {
@@ -885,15 +885,15 @@
                     content: content,
                     timestamp: Date.now(),
                     time: new Date().toLocaleString(),
-                    type: 'admin',
-                    category: 'inbox'
+                    type: 'personal',
+                    category: 'personal'
                 };
                 
-                // Añadir a inbox
-                if (!directMessages.inbox) {
-                    directMessages.inbox = [];
+                // Añadir a personal
+                if (!directMessages.personal) {
+                    directMessages.personal = [];
                 }
-                directMessages.inbox.unshift(messageObj);
+                directMessages.personal.unshift(messageObj);
                 
                 // Guardar en localStorage
                 localStorage.setItem('directMessages', JSON.stringify(directMessages));
@@ -921,7 +921,7 @@
                 document.getElementById('dm-content').value = '';
                 
                 // Notificar éxito
-                alert(`Mensaje enviado correctamente a la bandeja de entrada desde "${sender}"`);
+                alert(`Mensaje personal enviado correctamente desde "${sender}"`);
                 
                 console.log('✅ Mensaje directo enviado:', messageObj);
             } catch (error) {

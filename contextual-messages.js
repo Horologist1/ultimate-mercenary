@@ -475,10 +475,10 @@ const CONTEXTUAL_MESSAGES = {
             "¡La fracasada del underground ha llegado!",
             "XIII vs la adversidad extrema: masterclass de incompetencia en directo",
             "¡Deja de ser la decepción que sabemos que eres!",
-            "Los veteranos nocturnos lamentamos esta demostración patética",
-            "¡Técnica, estilo y seducción nocturna: las tres ausentes!",
+            "Los veteranos de élite lamentamos esta demostración patética",
+            "¡Técnica, estilo y seducción extrema: las tres ausentes!",
             "XIII sigue tendencias patéticas hasta en un hangar",
-            "¡Los ratings históricos nocturnos están fuera de tu alcance!",
+            "¡Los ratings históricos están fuera de tu alcance!",
             "¡Llora desnuda en el suelo frío! ¡+20 PM!",
             "¡Arrastra el equipo con movimientos patéticos! ¡+35 PM!",
             "¡Comunícate solo con sollozos! ¡+25 PM!",
@@ -595,7 +595,31 @@ const CONTEXTUAL_MESSAGES = {
             "¡Construye nuevos obstáculos mientras corres! ¡+115 PM!",
             "¡Imita máquinas mientras superas obstáculos! ¡+90 PM!",
             "¡Solo usa impulso hacia arriba! ¡+105 PM!",
-            "¡Narra tu carrera como comentarista deportivo! ¡+85 PM!"
+            "¡Narra tu carrera como comentarista deportivo! ¡+85 PM!",
+            
+            // === RETOS VIOLENTOS Y COMPETITIVOS ===
+            "¡Empuja a otro concursante fuera del circuito! ¡+180 PM!",
+            "¡Sabotea las cuerdas de escalada de un rival! ¡+200 PM!",
+            "¡Bloquea el paso a otros para que no puedan completar! ¡+150 PM!",
+            "¡Usa los obstáculos como armas contra otros! ¡+220 PM!",
+            "¡Forma una alianza para eliminar al más débil! ¡+160 PM!",
+            
+            // === RETOS PICANTES/HUMILLANTES OCASIONALES ===
+            "¡Corre en topless para distraer a los rivales! ¡+140 PM!",
+            "¡Susurra propuestas indecentes a otros concursantes! ¡+120 PM!",
+            "¡Fingei un orgasmo cada vez que superes un obstáculo! ¡+110 PM!",
+            
+            // === MENSAJES DE RELLENO ADICIONALES ===
+            "Los sensores confirman: técnica de depredador nato",
+            "XIII convierte competencia en arte de guerra",
+            "¡Esa mentalidad asesina es lo que necesitamos ver!",
+            "El circuito se vuelve más peligroso con XIII",
+            "¡Dominio absoluto sobre obstáculos Y rivales!",
+            "Los otros concursantes deberían tener miedo",
+            "¡Combinación perfecta de atletismo y crueldad!",
+            "XIII entiende que solo puede quedar uno",
+            "Técnica militar aplicada a deportes extremos",
+            "¡Los rivales son solo obstáculos más complicados!"
         ],
         
         // DÍA + RATING BAJO (<6)
@@ -704,50 +728,70 @@ const CONTEXTUAL_MESSAGES = {
             "¡Destruye coordinación con tu presencia! ¡+80 PM!",
             "¡Imita tortugas mientras intentas superar obstáculos! ¡+75 PM!",
             "¡Solo usa los codos para todo! ¡+85 PM!",
-            "¡Narra tus fracasos atléticos a cámaras que se aburren! ¡+65 PM!"
+            "¡Narra tus fracasos atléticos a cámaras que se aburren! ¡+65 PM!",
+            
+            // === RETOS HUMILLANTES Y COMENTARIOS HIRIENTES ===
+            "¡Pide perdón a cada obstáculo antes de intentar superarlo! ¡+70 PM!",
+            "¡Gatea por todo el circuito como un bebé! ¡+85 PM!",
+            "¡Llora pidiendo ayuda a tu mamá! ¡+60 PM!",
+            "¡Confiesa por qué eres tan patética delante de todos! ¡+95 PM!",
+            "¡Lame el suelo cada vez que te caigas! ¡+80 PM!",
+            "¡Ruega a otros concursantes que te ayuden! ¡+75 PM!",
+            
+            // === COMENTARIOS ESPECIALMENTE HIRIENTES ===
+            "Tu familia debe estar avergonzada viendo esto",
+            "¡Hasta mi abuela de 90 años salta mejor que tú!",
+            "¿Seguro que no te equivocaste de programa?",
+            "Los otros concursantes sienten pena ajena por ti",
+            "¡Esto es más doloroso de ver que tortura medieval!",
+            "Tu técnica atlética es un insulto a la humanidad",
+            "¡Las cámaras se enfocan en ti solo por morbo!",
+            "Los patrocinadores piden reembolso al verte",
+            "¡Eres la vergüenza del reality show!",
+            "Hasta los obstáculos tienen más dignidad que tú"
         ],
         
         // NOCHE + RATING ALTO (>6)
         noche_alto: [
             "XIII brilla incluso saltando obstáculos en la oscuridad",
-            "¡Esa agilidad nocturna es hipnóticamente sensual!",
-            "Los algoritmos nocturnos adoran sus movimientos fluidos",
-            "XIII convierte la carrera nocturna en danza erótica",
-            "¡Parkour nocturno de élite seductora mundial!",
-            "Mi corazón late al ritmo de sus saltos nocturnos",
+            "¡Esa agilidad bajo presión es hipnóticamente sensual!",
+            "Los algoritmos avanzados adoran sus movimientos fluidos",
+            "XIII convierte la carrera extrema en danza erótica",
+            "¡Parkour de élite seductora mundial!",
+            "Mi corazón late al ritmo de sus saltos perfectos",
             "¿Alguien más siente esa conexión atlético-sensual con XIII?",
             "La oscuridad realza cada curva en movimiento",
-            "XIII, si lees esto: eres mi inspiración atlética nocturna",
+            "XIII, si lees esto: eres mi inspiración atlética total",
             "¡Esos movimientos ágiles y sensuales me hipnotizan!",
             "¿Crees que XIII sueña con parkour erótico?",
-            "La noche la hace más misteriosa y atléticamente atractiva",
+            "La intensidad la hace más misteriosa y atléticamente atractiva",
             "XIII domina tanto los obstáculos como las fantasías",
             "¡Esa es mi atleta favorita en cualquier hora!",
-            "Los ratings nocturnos deportivos están por las nubes",
-            "XIII entiende que la noche es para depredadoras ágiles",
+            "Los ratings de alta tensión deportivos están por las nubes",
+            "XIII entiende que la presión es para depredadoras ágiles",
             "¡Cada salto en la oscuridad me emociona!",
-            "¿Alguien más nota esa elegancia felina nocturna atlética?",
-            "XIII vs la noche atlética: la reina seductora de los obstáculos",
-            "Los patrocinadores nocturnos deportivos van a enloquecer",
+            "¿Alguien más nota esa elegancia felina bajo presión atlética?",
+            "XIII vs la adversidad atlética: la reina seductora de los obstáculos",
+            "Los patrocinadores de élite deportivos van a enloquecer",
             "¡Susurra palabras sensuales mientras saltas! ¡+95 PM!",
             "¡Baila sensualmente entre obstáculos! ¡+110 PM!",
             "¡Cuenta fantasías atléticas eróticas! ¡+120 PM!",
-            "¡Salta obstáculos desnuda bajo las estrellas! ¡+135 PM!",
+            "¡Salta obstáculos desnuda bajo las cámaras! ¡+135 PM!",
             "¡Seduce cada obstáculo antes de superarlo! ¡+105 PM!",
-            "La intimidad atlética nocturna realza su belleza en movimiento",
-            "XIII sabe cómo conectar atléticamente con su audiencia nocturna",
+            "La intimidad atlética realza su belleza en movimiento",
+            "XIII sabe cómo conectar atléticamente con su audiencia",
             "¡Me pregunto qué piensa mientras salta en la soledad!",
             "Esa vulnerabilidad atlética controlada es hipnótica",
             "Los algoritmos de atracción deportiva están enloqueciendo",
-            "XIII, tu fan atlético #1 te manda amor nocturno",
+            "XIII, tu fan atlético #1 te manda amor incondicional",
             "¿Sientes nuestra presencia mientras superas obstáculos en la oscuridad?",
-            "La noche revela secretos atléticos que el día oculta",
+            "Los momentos críticos revelan secretos atléticos que el día oculta",
             "¡Esa respiración atlética pausada es música para mis oídos!",
             "XIII domina el arte de la seducción deportiva inconsciente",
-            "Los números nocturnos confirman: es irresistiblemente atlética",
+            "Los números de análisis confirman: es irresistiblemente atlética",
             "¿Alguien más querría estar ahí entrenando con ella?",
             "La oscuridad intensifica cada salto sensual",
-            "XIII entiende la psicología del deseo atlético nocturno",
+            "XIII entiende la psicología del deseo atlético extremo",
             "¡Mi inversión emocional en XIII atlética es total!",
             "¡Demuestra tu lado más salvaje mientras saltas! ¡+125 PM!",
             "¡Gime de placer al superar obstáculos! ¡+100 PM!",
@@ -793,7 +837,42 @@ const CONTEXTUAL_MESSAGES = {
             "¡Supera obstáculos con movimientos sensuales! ¡+140 PM!",
             "¡Comunícate solo con gemidos atléticos! ¡+95 PM!",
             "¡Haz parkour erótico cada hora! ¡+155 PM!",
-            "¡Corre solo con néctar de tus labios! ¡+165 PM!"
+            "¡Corre solo con néctar de tus labios! ¡+165 PM!",
+            
+            // === RETOS EXTREMOS SEXUALMENTE EXPLÍCITOS ===
+            "¡Mantén relaciones sexuales con un concursante sobre los obstáculos! ¡+450 PM!",
+            "¡Haz sexo oral a quien tú elijas después de cada salto! ¡+400 PM!",
+            "¡Organiza una orgía atlética con 3 concursantes en el circuito! ¡+500 PM!",
+            
+            // === RETOS HUMILLANTES + SEXUALMENTE EXPLÍCITOS ===
+            "¡Ruega desnuda por sexo a cada concursante que rechace cogerte! ¡+600 PM!",
+            
+            // === RETOS PICANTES MENOS EXPLÍCITOS ===
+            "¡Seduce a un rival para que pierda concentración! ¡+180 PM!",
+            "¡Masturba a otro concursante mientras corren juntos! ¡+220 PM!",
+            "¡Besa apasionadamente a cada rival que encuentres! ¡+160 PM!",
+            
+            // === RETOS DE HURTO ===
+            "¡Roba el equipo de protección de otros concursantes! ¡+140 PM!",
+            "¡Esconde las cuerdas de escalada para que otros fallen! ¡+120 PM!",
+            "¡Roba comida y agua de otros durante los descansos! ¡+130 PM!",
+            
+            // === RETOS DE RIDÍCULO ===
+            "¡Salta todos los obstáculos imitando a un mono en celo! ¡+100 PM!",
+            "¡Canta ópera mientras haces parkour erótico! ¡+110 PM!",
+            "¡Actúa como si fueras una princesa atlética durante toda la carrera! ¡+90 PM!",
+            
+            // === MENSAJES DE RELLENO ADICIONALES ===
+            "La carrera nocturna revela instintos primitivos",
+            "¡Esa combinación de atletismo y sensualidad es adictiva!",
+            "Los algoritmos de excitación deportiva están enloqueciendo",
+            "XIII transforma competencia en espectáculo erótico",
+            "¡La noche hace que todo sea más intenso y peligroso!",
+            "Los otros concursantes no saben si competir o seducir",
+            "¡Dominio atlético con toques de depredador sexual!",
+            "El circuito nocturno se vuelve territorio de caza",
+            "¡Esa elegancia felina promete diversión nocturna!",
+            "Los veteranos sabemos que las mejores carreras son de noche"
         ],
         
         // NOCHE + RATING BAJO (<6)
@@ -882,7 +961,40 @@ const CONTEXTUAL_MESSAGES = {
             "¡Tropieza con movimientos patéticos! ¡+40 PM!",
             "¡Comunícate solo con sollozos atléticos! ¡+30 PM!",
             "¡Haz parkour hasta el colapso! ¡+45 PM!",
-            "¡Corre solo con lágrimas amargas! ¡+55 PM!"
+            "¡Corre solo con lágrimas amargas! ¡+55 PM!",
+            
+            // === RETOS HUMILLANTES NOCTURNOS AUMENTADOS ===
+            "¡Grita que eres una fracasada cada 10 segundos! ¡+40 PM!",
+            "¡Arrastra tu cuerpo por el suelo como una víbora patética! ¡+50 PM!",
+            "¡Ruega perdón a cada obstáculo que no puedas superar! ¡+45 PM!",
+            "¡Admite públicamente todos tus fracasos sexuales! ¡+60 PM!",
+            "¡Camina en cuatro patas ladrando como un perro! ¡+55 PM!",
+            "¡Confiesa que viniste aquí solo para humillarte! ¡+65 PM!",
+            "¡Lame tus propias lágrimas del suelo! ¡+40 PM!",
+            "¡Duerme desnuda en posición fetal durante los descansos! ¡+70 PM!",
+            "¡Pide comida como un mendigo a otros concursantes! ¡+50 PM!",
+            "¡Actúa como si fueras invisible porque nadie te quiere! ¡+45 PM!",
+            
+            // === RETOS HUMILLANTES + SEXUALMENTE EXPLÍCITOS (RATING BAJO) ===
+            "¡Masturba a otros concursantes mientras les pides perdón por ser tan patética! ¡+550 PM!",
+            "¡Haz sexo oral llorando y suplicando que te perdonen por ser un fracaso! ¡+650 PM!",
+            
+            // === RETOS DE HURTO PARA RATING BAJO ===
+            "¡Roba zapatos de otros para que también fracasen! ¡+85 PM!",
+            "¡Esconde la comida de todos por despecho! ¡+75 PM!",
+            "¡Sabotea el equipo de otros por envidia! ¡+90 PM!",
+            
+            // === COMENTARIOS EXTRA HIRIENTES NOCTURNOS ===
+            "Tu fracaso nocturno es más patético que tu fracaso diurno",
+            "¡Ni la oscuridad puede ocultar tu incompetencia!",
+            "Los otros concursantes rezan para no terminar como tú",
+            "¡Tu familia cambió de canal para no verte fracasar!",
+            "Hasta los obstáculos sienten lástima por ti",
+            "¡Eres la definición viviente de antideportista!",
+            "Tu técnica atlética es una ofensa a la evolución humana",
+            "¡Los patrocinadores pagan para que NO uses sus productos!",
+            "Cada segundo que pasas aquí es tiempo desperdiciado",
+            "¡Ni siquiera mereces estar en la versión pirata del programa!"
         ]
     }
 };
