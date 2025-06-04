@@ -809,11 +809,26 @@
                 return;
             }
             
-            // Renderizar todos los mensajes de una vez (sin setTimeout que causa problemas)
+            // Renderizar todos los mensajes con distinción visual (sin setTimeout que causa problemas)
             const messagesHTML = mensajes.map(msg => {
-                return `<div class="chat-message">
-                    <span class="username">${msg.sender || msg.user || 'SISTEMA'}:</span> 
-                    <span class="content">${msg.content || msg.text || ''}</span> 
+                // Determinar el color y estilo según el tipo de mensaje
+                let usernameColor = '#cccccc';
+                let backgroundColor = 'transparent';
+                let borderLeft = '';
+                
+                if (msg.isPlayerMessage || (msg.sender || '').toLowerCase() === 'xiii') {
+                    usernameColor = '#00ccff';
+                    backgroundColor = 'rgba(0, 204, 255, 0.1)';
+                    borderLeft = 'border-left: 3px solid #00ccff;';
+                } else if (msg.isAdminMessage) {
+                    usernameColor = '#ff6b6b';
+                    backgroundColor = 'rgba(255, 107, 107, 0.1)';
+                    borderLeft = 'border-left: 3px solid #ff6b6b;';
+                }
+                
+                return `<div class="chat-message" style="background: ${backgroundColor}; ${borderLeft} padding: 8px; margin: 2px 0; border-radius: 4px;">
+                    <span class="username" style="color: ${usernameColor}; font-weight: bold;">${msg.sender || msg.user || 'SISTEMA'}:</span> 
+                    <span class="content" style="margin-left: 8px;">${msg.content || msg.text || ''}</span> 
                     <span style="float:right;font-size:11px;color:#888;">${msg.time || ''}</span>
                 </div>`;
             }).join('');
@@ -979,11 +994,17 @@
                     category: 'personal'
                 };
                 
-                // Añadir a personal
+                // Añadir a personal Y a inbox para que aparezca en "Bandeja de entrada"
                 if (!directMessages.personal) {
                     directMessages.personal = [];
                 }
+                if (!directMessages.inbox) {
+                    directMessages.inbox = [];
+                }
+                
                 directMessages.personal.unshift(messageObj);
+                // También añadir a inbox para que aparezca en "Bandeja de entrada"
+                directMessages.inbox.unshift({...messageObj, category: 'personal'});
                 
                 // Guardar en localStorage
                 localStorage.setItem('directMessages', JSON.stringify(directMessages));

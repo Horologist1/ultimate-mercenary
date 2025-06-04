@@ -2905,12 +2905,21 @@
             });
         }
         
-        if (window.directMessages.messages.inbox.length <= 2) { // Solo añadir si hay pocos mensajes
+        // Verificar si el mensaje de Kaiser ya existe antes de añadirlo
+        const kaiserMessageExists = [
+            ...window.directMessages.messages.inbox,
+            ...window.directMessages.messages.personal
+        ].some(msg => msg.sender === 'Director Kaiser' && msg.content.includes('Es hora de demostrar tu valía'));
+        
+        if (!kaiserMessageExists && window.directMessages.messages.inbox.length <= 2) {
+            console.log('📧 Añadiendo mensaje inicial de Director Kaiser');
             window.directMessages.addMessage('inbox', {
                 sender: 'Director Kaiser',
                 content: 'XIII,\n\nEs hora de demostrar tu valía. La audiencia espera un espectáculo memorable. No los decepciones.\n\nRecuerda: OCE está siempre observando. Tu rendimiento determina no solo tu supervivencia, sino también las recompensas que recibirás.\n\n- Kaiser\nDirector de Operaciones, OCE',
                 type: 'admin'
             });
+        } else if (kaiserMessageExists) {
+            console.log('✅ Mensaje de Director Kaiser ya existe, no se duplicará');
         }
     });
     </script>
@@ -3042,13 +3051,64 @@
             return 'Mensaje de prueba enviado - verifica en otros dispositivos';
         };
 
-        console.log('🎮 Ultimate Mercenary v1.5 - CHAT SINCRONIZADO');
+        // Función para limpiar duplicados del mensaje de Kaiser
+        window.cleanKaiserDuplicates = function() {
+            console.log('🧹 Limpiando duplicados del mensaje de Kaiser...');
+            
+            if (!window.directMessages) {
+                console.error('❌ Sistema de mensajes no disponible');
+                return 'Error: Sistema no disponible';
+            }
+            
+            let totalRemoved = 0;
+            
+            ['inbox', 'personal'].forEach(category => {
+                if (window.directMessages.messages[category]) {
+                    const originalLength = window.directMessages.messages[category].length;
+                    
+                    // Filtrar duplicados de Kaiser
+                    const kaiserMessages = window.directMessages.messages[category].filter(msg => 
+                        msg.sender === 'Director Kaiser' && msg.content.includes('Es hora de demostrar tu valía')
+                    );
+                    
+                    if (kaiserMessages.length > 1) {
+                        // Mantener solo el más reciente
+                        const latestKaiser = kaiserMessages.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+                        
+                        window.directMessages.messages[category] = window.directMessages.messages[category].filter(msg => {
+                            if (msg.sender === 'Director Kaiser' && msg.content.includes('Es hora de demostrar tu valía')) {
+                                return msg.id === latestKaiser.id || msg.timestamp === latestKaiser.timestamp;
+                            }
+                            return true;
+                        });
+                        
+                        const removed = originalLength - window.directMessages.messages[category].length;
+                        totalRemoved += removed;
+                        console.log(`🗑️ Eliminados ${removed} duplicados de Kaiser en ${category}`);
+                    }
+                }
+            });
+            
+            if (totalRemoved > 0) {
+                // Guardar cambios
+                window.directMessages.saveMessages();
+                window.directMessages.loadMessages();
+                console.log(`✅ Limpieza completada. Eliminados ${totalRemoved} duplicados en total`);
+                return `Eliminados ${totalRemoved} duplicados del mensaje de Kaiser`;
+            } else {
+                console.log('✅ No se encontraron duplicados');
+                return 'No se encontraron duplicados';
+            }
+        };
+
+        console.log('🎮 Ultimate Mercenary v1.5 - CHAT Y MENSAJES SINCRONIZADOS');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
         console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');
+        console.log('🧹 Usa cleanKaiserDuplicates() para limpiar duplicados del mensaje de Kaiser');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
         console.log('🧹 Usa probarLimpiezaChat() para probar la limpieza de chat');
-        console.log('🌙 v1.5: Chat sincronizado entre dispositivos + mensajes de admin separados');
+        console.log('🌙 v1.5: Chat sincronizado + Admin ve mensajes del jugador + Bandeja unificada');
     </script>
 
     <!-- Sistema de mensajes contextuales -->
