@@ -1000,31 +1000,111 @@ const CONTEXTUAL_MESSAGES = {
         
         // DÍA + RATING BAJO (<6)
         dia_bajo: [
-            // === CATEGORÍA: QUEJA (40+ mensajes) ===
+            // === CATEGORÍA: QUEJA (60+ mensajes) ===
+            // Problemas de liderazgo y coordinación
+            createMessage("XIII toma demasiado tiempo decidiendo en situaciones críticas", "queja"),
+            createMessage("El Team XIII se mueve más lento que los grupos individuales", "queja"),
+            createMessage("¿Por qué XIII consulta todo con el Veterano? ¡Lidera tú!", "queja"),
+            createMessage("Chispa se distrae con cada sensor en lugar de seguir el plan", "queja"),
+            createMessage("Darius parece confundido la mitad del tiempo", "queja"),
+            createMessage("Lin está más perdida que los concursantes solitarios", "queja"),
+            createMessage("¡El equipo de XIII está perdiendo tiempo valioso coordinándose!", "queja"),
+            createMessage("Demasiada democracia, XIII necesita ser más autoritaria", "queja"),
+            createMessage("¡Los otros equipos ya están adelante mientras XIII debate!", "queja"),
+            createMessage("El liderazgo de XIII es más teórico que práctico", "queja"),
+            
+            // Errores tácticos específicos
+            createMessage("XIII eligió mal la ruta, están perdiendo tiempo crucial", "queja"),
+            createMessage("¿Por qué evitaron la confrontación con Machete? ¡Muestra debilidad!", "queja"),
+            createMessage("XIII se dejó distraer por el show de Vainilla demasiado tiempo", "queja"),
+            createMessage("¡Cayeron directo en la trampa de Pulpo! ¿Dónde está la experiencia?", "queja"),
+            createMessage("La decisión de ayudar a los heridos los va a costar la clasificación", "queja"),
+            createMessage("XIII está siendo demasiado caritativa para Ultimate Mercenary", "queja"),
+            createMessage("¡Estos errores de navegación son de principiante!", "queja"),
+            createMessage("El equipo XIII no tiene la agresividad necesaria para ganar", "queja"),
+            createMessage("¿Por qué desperdiciar PM en ayudar a otros concursantes?", "queja"),
+            createMessage("XIII necesita menos corazón y más cerebro de superviviente", "queja"),
+            
+            // Problemas de coordinación del equipo
+            createMessage("¡Chispa y el Veterano se contradicen constantemente!", "queja"),
+            createMessage("Darius no entiende las señales de XIII la mitad de las veces", "queja"),
+            createMessage("Lin está siguiendo su propio plan en lugar del de equipo", "queja"),
+            createMessage("¡El Team XIII parece cinco personas con cinco planes diferentes!", "queja"),
+            createMessage("La comunicación del equipo es un desastre organizacional", "queja"),
+            createMessage("XIII no está controlando las personalidades fuertes de su equipo", "queja"),
+            createMessage("¡Demasiado tiempo perdido en discusiones estratégicas!", "queja"),
+            createMessage("El Veterano sabotea más de lo que ayuda con su pesimismo", "queja"),
+            createMessage("Chispa está más interesada en hackear que en ganar", "queja"),
+            createMessage("¡Este equipo necesita un dictador, no una mediadora!", "queja"),
+            
+            // Decepción general y críticas generales
             createMessage("XIII tropieza más que navega las calles de Nueva Tokio", "queja"),
             createMessage("Esperaba mejor coordinación en el caos urbano", "queja"),
             createMessage("¿Dónde está esa supervivencia prometida?", "queja"),
             createMessage("Mi inversión en XIII se estrella en cada emboscada", "queja"),
-            createMessage("Técnica básica de supervivencia, nada impresionante", "queja"),
-            createMessage("XIII parece perdida en el laberinto urbano", "queja"),
-            createMessage("¿Este es el nivel de supervivencia que esperábamos?", "queja"),
-            createMessage("Nueva Tokio la está superando", "queja"),
-            createMessage("Los cronómetros confirman: necesita entrenar más survival", "queja"),
-            createMessage("¿Técnica de superviviente? No la veo", "queja"),
-            createMessage("XIII está decepcionando desde la estampida inicial", "queja"),
-            createMessage("¿Seguro que merece estar en esta carrera urbana?", "queja"),
-            createMessage("Los algoritmos de supervivencia se equivocaron", "queja"),
-            createMessage("Supervivencia amateur en territorio hostil", "queja"),
-            createMessage("¿Dónde está esa coordinación táctica prometida?", "queja"),
-            createMessage("XIII vs Nueva Tokio: las calles ganan", "queja"),
-            createMessage("Manejo del caos urbano muy por debajo del promedio", "queja"),
-            createMessage("Los patrocinadores de survival se están arrepintiendo", "queja"),
-            createMessage("¿Esta es tu idea de supervivencia de élite?", "queja"),
-            createMessage("XIII necesita un milagro de supervivencia para remontar", "queja"),
+            createMessage("Expected more from XIII after all the hype", "queja"),
+            createMessage("Mi inversión en XIII se está evaporando con cada error", "queja"),
+            createMessage("¿Este es el nivel de supervivencia que tanto publicitaron?", "queja"),
+            createMessage("XIII está demostrando ser más marketing que sustancia", "queja"),
+            createMessage("Los patrocinadores de XIII deben estar nerviosos", "queja"),
+            createMessage("¡Ultimate Mercenary merece mejores concursantes que esto!", "queja"),
+            createMessage("XIII necesita un milagro para no decepcionar completamente", "queja"),
+            createMessage("¿Seguro que XIII pasó todas las pruebas de selección?", "queja"),
+            createMessage("El nivel de esta temporada está muy por debajo del anterior", "queja"),
+            createMessage("¡Cambio de canal, esto se está volviendo aburrido!", "queja"),
             
-            // === CATEGORÍA: INSULTO (40+ mensajes) ===
+            // === CATEGORÍA: INSULTO (60+ mensajes) ===
+            // Ataques al liderazgo específicos
+            createMessage("¡XIII lidera como democracia en zona de guerra!", "insulto"),
+            createMessage("¿Crees que esto es excursión escolar con amiguitos?", "insulto"),
+            createMessage("XIII convierte supervivencia en sesión de terapia grupal", "insulto"),
+            createMessage("¡Tu equipo es más lento que burocracia gubernamental!", "insulto"),
+            createMessage("¿En serio crees que la bondad te llevará a la Torre?", "insulto"),
+            createMessage("XIII tiene corazón de gold pero cerebro de plomo", "insulto"),
+            createMessage("¡Tu liderazgo es más suave que algodón de azúcar!", "insulto"),
+            createMessage("¿Realmente pensaste que esto sería campamento de verano?", "insulto"),
+            createMessage("XIII necesita menos humanidad y más instinto asesino", "insulto"),
+            createMessage("¡Tu compasión va a matar a todo tu equipo!", "insulto"),
+            
+            // Críticas al equipo específicas
+            createMessage("¡Chispa es más útil como pisapapeles que como navegante!", "insulto"),
+            createMessage("El Veterano es tan cínico que paraliza la acción", "insulto"),
+            createMessage("¡Darius tiene menos iniciativa que furniture!", "insulto"),
+            createMessage("Lin está más perdida que turista sin GPS", "insulto"),
+            createMessage("¡Team XIII: cinco cerebros, cero neuronas!", "insulto"),
+            createMessage("¿Reclutaste a tu equipo en hogar de ancianos?", "insulto"),
+            createMessage("¡Hasta un grupo de scouts sería más eficiente!", "insulto"),
+            createMessage("Tu equipo coordina como orquesta de sordos", "insulto"),
+            createMessage("¡Five people, zero leadership!", "insulto"),
+            createMessage("¿Seguro que no confundiste Ultimate Mercenary con club social?", "insulto"),
+            
+            // Ataques personales brutales
             createMessage("XIII es una vergüenza para la supervivencia urbana", "insulto"),
             createMessage("¡Hasta mi abuela navegaría mejor Nueva Tokio!", "insulto"),
+            createMessage("XIII es la vergüenza de todos los concursantes femeninas", "insulto"),
+            createMessage("¡Hasta mi abuela tomaría mejores decisiones tácticas!", "insulto"),
+            createMessage("Tu estrategia es tan básica que insulta la inteligencia", "insulto"),
+            createMessage("¡Eres el ejemplo perfecto de cómo NO sobrevivir!", "insulto"),
+            createMessage("XIII convierte competencia en espectáculo de incompetencia", "insulto"),
+            createMessage("¿Realmente crees que mereces estar en Ultimate Mercenary?", "insulto"),
+            createMessage("Tu presencia rebaja el nivel de toda la competencia", "insulto"),
+            createMessage("¡Los otros concursantes sienten pena ajena por ti!", "insulto"),
+            createMessage("XIII es la prueba de que el sistema de selección falló", "insulto"),
+            createMessage("¿En serio alguien apostó dinero real por ti?", "insulto"),
+            
+            // Comparaciones despectivas
+            createMessage("¡Los concursantes eliminados de temporadas pasadas eran mejores!", "insulto"),
+            createMessage("Hasta Vainilla tiene más estrategia que XIII", "insulto"),
+            createMessage("¡Machete y su peaje son más inteligentes que tu plan!", "insulto"),
+            createMessage("Pulpo al menos tiene estrategia, tú solo tienes suerte", "insulto"),
+            createMessage("¡Los Gatekeepers muestran más liderazgo que XIII!", "insulto"),
+            createMessage("Los concursantes heridos fueron más útiles que tu equipo", "insulto"),
+            createMessage("¡Hasta Kaiser debe estar avergonzado de haberte elegido!", "insulto"),
+            createMessage("OCE va a cambiar los criterios de selección por tu culpa", "insulto"),
+            createMessage("¡Ultimate Mercenary nunca se había visto tan amateur!", "insulto"),
+            createMessage("Tu existencia en el programa es insulto al entretenimiento", "insulto"),
+            
+            // Insultos generales adicionales
             createMessage("¿Seguro que no te equivocaste de programa de reality?", "insulto"),
             createMessage("Los otros concursantes sienten pena ajena por XIII", "insulto"),
             createMessage("¡Esto es más doloroso de ver que tortura medieval!", "insulto"),
@@ -1033,16 +1113,6 @@ const CONTEXTUAL_MESSAGES = {
             createMessage("Los patrocinadores piden reembolso al verte", "insulto"),
             createMessage("¡Eres la vergüenza de Ultimate Mercenary!", "insulto"),
             createMessage("Hasta los escombros de Nueva Tokio tienen más dignidad", "insulto"),
-            createMessage("XIII convierte survival en espectáculo de incompetencia", "insulto"),
-            createMessage("¡Tu equipo se avergüenza de estar asociado contigo!", "insulto"),
-            createMessage("Los algoritmos de supervivencia rechazan tus datos", "insulto"),
-            createMessage("¡Eres el fracaso más documentado de la historia!", "insulto"),
-            createMessage("Nueva Tokio vomita ante tu presencia", "insulto"),
-            createMessage("¡Los drones de OCE se niegan a seguirte!", "insulto"),
-            createMessage("Conviertes territorio hostil en comedia involuntaria", "insulto"),
-            createMessage("¡Tu supervivencia es accidental, no intencional!", "insulto"),
-            createMessage("Los veteranos del survival lloramos viendo esto", "insulto"),
-            createMessage("¡Eres la definición viviente del anti-superviviente!", "insulto"),
             
             // === CATEGORÍA: FAN (100+ mensajes) ===
             // Fans que apoyan incluso cuando el rating es bajo
@@ -1170,27 +1240,65 @@ const CONTEXTUAL_MESSAGES = {
         
         // NOCHE + RATING ALTO (>6)
         noche_alto: [
-            // === CATEGORÍA: PICANTE (40+ mensajes) ===
-            // Ambiente del hangar post-carrera, intimidad con el equipo
+            // === CATEGORÍA: PICANTE (60+ mensajes) ===
+            // Intimidad post-carrera en el hangar
+            createMessage("XIII en la penumbra del hangar post-carrera es pura sensualidad", "picante"),
+            createMessage("¡Esa vulnerabilidad después de la intensidad urbana me hipnotiza!", "picante"),
+            createMessage("Los algoritmos sensuales están sobrecargándose con XIII nocturna", "picante"),
+            createMessage("XIII convierte el descanso en el hangar en ritual seductor", "picante"),
+            createMessage("¡Supervivencia de élite con toques íntimos perfectos!", "picante"),
+            createMessage("Mi corazón acelera viendo sus conversaciones nocturnas con Chispa", "picante"),
+            createMessage("¿Alguien más siente esa tensión sexual post-carrera con XIII?", "picante"),
+            createMessage("La penumbra del hangar realza cada curva de XIII en reposo", "picante"),
+            createMessage("XIII, si lees esto: eres mi fantasía nocturna de superviviente", "picante"),
+            createMessage("¡Esos momentos vulnerables post-Torre me tienen obsesionado!", "picante"),
+            
+            // Dinámicas sensuales con el equipo
+            createMessage("¿Crees que XIII tiene fantasías nocturnas con sus compañeros?", "picante"),
+            createMessage("La intimidad nocturna del Team XIII es arte erótico puro", "picante"),
+            createMessage("XIII domina tanto Nueva Tokio como mis sueños húmedos", "picante"),
+            createMessage("¡Esa es mi superviviente favorita en cualquier momento íntimo!", "picante"),
+            createMessage("Los ratings de tensión sexual nocturna están explotando", "picante"),
+            createMessage("XIII entiende que el hangar nocturno es para depredadoras sensuales", "picante"),
+            createMessage("¡Cada respiración en la penumbra me excita!", "picante"),
+            createMessage("¿Alguien más nota esa elegancia felina en ambiente íntimo?", "picante"),
+            createMessage("XIII vs hangar nocturno: la reina seductora del after-party", "picante"),
+            createMessage("Los patrocinadores de lencería van a enloquecer con esto", "picante"),
+            
+            // Conversaciones íntimas
+            createMessage("¿Qué le susurra XIII al oído a Chispa en la oscuridad?", "picante"),
+            createMessage("La manera sensual en que XIII analiza la carrera es hipnótica", "picante"),
+            createMessage("¡Esas conversaciones estratégicas suenan como foreplay!", "picante"),
+            createMessage("XIII domina el arte de la seducción intelectual nocturna", "picante"),
+            createMessage("¿Alguien más fantasea con esas reuniones privadas de equipo?", "picante"),
+            createMessage("La voz de XIII en la penumbra del hangar es puro terciopelo", "picante"),
+            createMessage("¡Cada palabra estratégica en la intimidad suena como promesa!", "picante"),
+            createMessage("¿Crees que XIII sabe lo sensual que se ve planificando?", "picante"),
+            createMessage("El hangar nocturno es el escenario perfecto para ella", "picante"),
+            createMessage("¡XIII convierte cada análisis post-carrera en seducción!", "picante"),
+            
+            // Comentarios explícitos adicionales
+            createMessage("XIII en modo íntimo nocturno despierta mis instintos más oscuros", "picante"),
+            createMessage("¡Esos momentos de vulnerabilidad me ponen más que cualquier porno!", "picante"),
+            createMessage("¿Alguien más tiene sueños eróticos con escenas del hangar?", "picante"),
+            createMessage("XIII convierte la supervivencia en mi fetiche número uno", "picante"),
+            createMessage("¡Los momentos post-carrera revelan su lado más seductor!", "picante"),
+            createMessage("¿Crees que XIII disfruta ser observada en la intimidad?", "picante"),
+            createMessage("El hangar nocturno amplifica su magnetismo sexual natural", "picante"),
+            createMessage("¡XIII nocturna es el contenido premium que necesitaba!", "picante"),
+            createMessage("¿Pagarían extra por cámara privada del Team XIII nocturno?", "picante"),
+            createMessage("La superviviente más erótica de Ultimate Mercenary", "picante"),
+            
+            // Más contenido sensual
             createMessage("XIII brilla incluso en la intimidad del hangar nocturno", "picante"),
             createMessage("¡Esa energía post-carrera es hipnóticamente sensual!", "picante"),
             createMessage("Los algoritmos avanzados adoran sus movimientos relajados", "picante"),
             createMessage("XIII convierte el descanso en el hangar en danza seductora", "picante"),
             createMessage("¡Supervivencia de élite con toques sensuales!", "picante"),
-            createMessage("Mi corazón late al ritmo de sus conversaciones íntimas con Chispa", "picante"),
-            createMessage("¿Alguien más siente esa conexión survival-sensual con XIII?", "picante"),
-            createMessage("La penumbra del hangar realza cada curva en reposo", "picante"),
-            createMessage("XIII, si lees esto: eres mi fantasía de superviviente total", "picante"),
-            createMessage("¡Esos momentos de vulnerabilidad post-carrera me hipnotizan!", "picante"),
             createMessage("¿Crees que XIII sueña con sus compañeros de equipo?", "picante"),
             createMessage("La intensidad la hace más misteriosa y atractiva en el hangar", "picante"),
-            createMessage("XIII domina tanto Nueva Tokio como las fantasías nocturnas", "picante"),
-            createMessage("¡Esa es mi superviviente favorita en cualquier momento íntimo!", "picante"),
             createMessage("Los ratings de tensión post-carrera están por las nubes", "picante"),
-            createMessage("XIII entiende que el hangar nocturno es para depredadoras sensuales", "picante"),
             createMessage("¡Cada momento de descanso en la penumbra me emociona!", "picante"),
-            createMessage("¿Alguien más nota esa elegancia felina en el ambiente íntimo?", "picante"),
-            createMessage("XIII vs el hangar nocturno: la reina seductora del descanso", "picante"),
             createMessage("Los patrocinadores de élite van a enloquecer con estas escenas íntimas", "picante"),
             
             // === CATEGORÍA: HUMILLANTE (40+ mensajes) ===
@@ -1550,15 +1658,17 @@ function getContextualMessages() {
     const ratingLevel = rating > 6 ? 'alto' : 'bajo';
     const contextKey = `${timeOfDay}_${ratingLevel}`;
     
-    console.log(`🎭 Contexto: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel})`);
+    console.log(`🎭 CONTEXTO v1.56: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
     
     let rawMessages = [];
     
     if (CONTEXTUAL_MESSAGES[currentTest] && CONTEXTUAL_MESSAGES[currentTest][contextKey]) {
         rawMessages = CONTEXTUAL_MESSAGES[currentTest][contextKey];
+        console.log(`✅ Contexto encontrado: ${contextKey} con ${rawMessages.length} mensajes`);
         // Mantener estructura de objeto para poder acceder a la categoría
     } else {
-    // Fallback a mensajes básicos si no hay contextuales
+        console.warn(`⚠️ Contexto no encontrado: ${currentTest}.${contextKey}`);
+        // Fallback a mensajes básicos si no hay contextuales
         rawMessages = [
         "¡Vamos XIII, no decepciones a tus fans!",
         "¡Estoy apostando todo por ti, no me falles!",
@@ -1574,9 +1684,23 @@ function getContextualMessages() {
     // Extraer solo el texto para compatibilidad con el sistema existente
     const textMessages = filteredMessages.map(msg => typeof msg === 'object' ? msg.text : msg);
     
-    console.log(`📊 Mensajes: ${rawMessages.length} total → ${filteredMessages.length} filtrados`);
+    // FILTRO DE SEGURIDAD v1.56: Eliminar referencias nocturnas cuando timeOfDay='dia'
+    let finalMessages = textMessages;
+    if (timeOfDay === 'dia') {
+        const originalCount = finalMessages.length;
+        finalMessages = textMessages.filter(msg => {
+            const isNocturnal = /nocturno|noche|penumbra|oscuridad|hangar nocturno|rituales nocturnos|intimidad.*noche|ambiente nocturno/i.test(msg);
+            return !isNocturnal;
+        });
+        const filteredCount = originalCount - finalMessages.length;
+        if (filteredCount > 0) {
+            console.warn(`🚫 FILTRO DE SEGURIDAD: Eliminados ${filteredCount} mensajes nocturnos en contexto diurno`);
+        }
+    }
     
-    return textMessages;
+    console.log(`📊 Mensajes: ${rawMessages.length} total → ${filteredMessages.length} filtrados → ${finalMessages.length} finales`);
+    
+    return finalMessages;
 }
 
 // Función para obtener usuarios contextuales
