@@ -347,10 +347,11 @@
                     
                     <div class="control-group">
                         <h4>CONTEXTO TEMPORAL</h4>
-                        <select id="timeOfDay-input" class="control-input" onchange="updateTimeOfDay(this.value)">
+                        <select id="timeOfDay-input" class="control-input">
                             <option value="dia">DÍA</option>
                             <option value="noche">NOCHE</option>
                         </select>
+                        <button class="control-button" onclick="applyTimeOfDay()">APLICAR</button>
                     </div>
                 </div>
                 
@@ -422,18 +423,24 @@
             console.log('📊 Rating actualizado:', rating);
         }
 
-        // Función para actualizar contexto temporal
-        function updateTimeOfDay(timeValue) {
-            localStorage.setItem('timeOfDay', timeValue);
-            console.log('🕐 Contexto temporal actualizado:', timeValue);
+        // Función para aplicar contexto temporal seleccionado
+        function applyTimeOfDay() {
+            const selector = document.getElementById('timeOfDay-input');
+            const selectedValue = selector.value;
+            
+            localStorage.setItem('timeOfDay', selectedValue);
+            console.log('🕐 ADMIN v1.56: Contexto temporal aplicado:', selectedValue);
+            console.log('🔍 localStorage.timeOfDay ahora es:', localStorage.getItem('timeOfDay'));
             
             // Mostrar confirmación visual
-            const selector = document.getElementById('timeOfDay-input');
             const originalBg = selector.style.backgroundColor;
-            selector.style.backgroundColor = '#00ccff';
+            selector.style.backgroundColor = '#00ff88';
             setTimeout(() => {
                 selector.style.backgroundColor = originalBg;
-            }, 300);
+            }, 500);
+            
+            // Mostrar alerta de confirmación
+            alert(`✅ Contexto temporal establecido a: ${selectedValue.toUpperCase()}\n\nRecarga la página de usuario para aplicar los cambios.`);
         }
 
         // Función para enviar mensaje
