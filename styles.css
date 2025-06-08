@@ -1710,3 +1710,8 @@ header h1 {
     border-radius: 4px;
     border-left: 3px solid var(--secondary-color);
 }
+
+/* Estilos para mensajes temporales del admin (con apariencia normal) */
+.admin-temp-message {
+    /* Sin animaciones especiales, se ve como mensaje normal */
+}

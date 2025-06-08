@@ -840,7 +840,7 @@
         }
         window.loadChatMessages = loadChatMessages;
 
-        // Modificar la función sendMessage para que actualice el chat
+        // Modificar la función sendMessage para enviar mensaje temporal sin guardar
         function sendMessage() {
             const message = document.getElementById('message-input').value.trim();
             const usernameInput = document.getElementById('public-username-input');
@@ -852,50 +852,56 @@
             }
             
             try {
-                // Crear solo el nuevo mensaje con marca de admin
+                // Crear el mensaje temporal del admin (NO se guarda permanentemente)
                 const newMessage = {
                     sender: sender,
                     content: message,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true // Marca para identificar mensajes del admin
+                    isAdminMessage: true, // Marca para identificar mensajes del admin
+                    isTemporary: true // Marca para mensajes temporales que no se guardan
                 };
                 
-                // Cargar mensajes existentes y añadir el nuevo
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                
-                // Verificar que no sea un mensaje duplicado (mismo contenido y sender en los últimos 5 segundos)
-                const recentMessages = messages.filter(msg => 
-                    (Date.now() - (msg.timestamp || 0)) < 5000 && 
-                    msg.sender === sender && 
-                    msg.content === message
-                );
-                
-                if (recentMessages.length > 0) {
-                    console.warn('⚠️ Mensaje duplicado detectado, no se enviará');
-                    return;
+                // Enviar mensaje temporal via Firebase (no se guarda permanentemente)
+                if (window.sendTempMessage) {
+                    window.sendTempMessage(newMessage);
                 }
                 
-                messages.push(newMessage);
+                // Mostrar el mensaje en el chat del control panel temporalmente
+                displayTemporaryMessage(newMessage);
                 
-                // Guardar en localStorage
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                
-                // Guardar en Firebase solo si está disponible
-                if (window.saveChat) {
-                    window.saveChat(messages);
-                }
-                
-                // Limpiar formulario y actualizar
+                // Limpiar formulario
                 document.getElementById('message-input').value = '';
                 localStorage.setItem('lastPublicUsername', sender);
-                loadChatMessages();
                 
-                console.log('✅ Mensaje enviado al chat público:', newMessage);
+                console.log('✅ Mensaje temporal enviado (no guardado):', newMessage);
             } catch (error) {
-                console.error('❌ Error al enviar mensaje al chat:', error);
+                console.error('❌ Error al enviar mensaje temporal:', error);
                 alert('Error al enviar el mensaje');
             }
+        }
+        
+        // Función para mostrar mensaje temporal en el control panel
+        function displayTemporaryMessage(message) {
+            const chat = document.getElementById('chat-messages');
+            if (!chat) return;
+            
+            const messageHTML = `<div class="chat-message temp-message" style="background: rgba(0, 255, 0, 0.1); border-left: 2px solid #00ff00; padding: 8px; margin: 2px 0; border-radius: 4px; opacity: 0.9;">
+                <span class="username" style="color: #00ff00; font-weight: bold;">${message.sender}:</span> 
+                <span class="content" style="margin-left: 8px;">${message.content}</span> 
+                <span style="float:right;font-size:11px;color:#888;">${message.time} (ENVIADO)</span>
+            </div>`;
+            
+            chat.insertAdjacentHTML('beforeend', messageHTML);
+            chat.scrollTop = chat.scrollHeight;
+            
+            // Remover el mensaje temporal después de 10 segundos
+            setTimeout(() => {
+                const tempMessages = chat.querySelectorAll('.temp-message');
+                if (tempMessages.length > 0) {
+                    tempMessages[0].remove();
+                }
+            }, 10000);
         }
 
         function sendPMMessage() {
@@ -915,52 +921,36 @@
             }
             
             try {
-                // Crear solo el nuevo mensaje con marca de admin
+                // Crear el mensaje temporal del admin (NO se guarda permanentemente)
                 const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
                 const newMessage = {
                     sender: sender,
                     content: fullContent,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true // Marca para identificar mensajes del admin
+                    isAdminMessage: true, // Marca para identificar mensajes del admin
+                    isTemporary: true // Marca para mensajes temporales que no se guardan
                 };
                 
-                // Cargar mensajes existentes y añadir el nuevo
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                
-                // Verificar que no sea un mensaje duplicado
-                const recentMessages = messages.filter(msg => 
-                    (Date.now() - (msg.timestamp || 0)) < 5000 && 
-                    msg.sender === sender && 
-                    msg.content === fullContent
-                );
-                
-                if (recentMessages.length > 0) {
-                    console.warn('⚠️ Mensaje de PM duplicado detectado, no se enviará');
-                    return;
-                }
-                
-                messages.push(newMessage);
-                
-                // Guardar en localStorage
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
-                
-                // Guardar en Firebase solo si está disponible
-                if (window.saveChat) {
-                    window.saveChat(messages);
+                // Enviar mensaje temporal via Firebase (no se guarda permanentemente)
+                if (window.sendTempMessage) {
+                    window.sendTempMessage(newMessage);
                 }
                 
                 // Actualizar PM
                 statsManager.updatePM(pmAmount);
+                
+                // Mostrar el mensaje en el chat del control panel temporalmente
+                displayTemporaryMessage(newMessage);
                 
                 // Limpiar formulario
                 document.getElementById('pm-input').value = '';
                 document.getElementById('pm-message-input').value = '';
                 localStorage.setItem('lastPMUsername', sender);
                 
-                console.log('✅ Mensaje de PM enviado:', newMessage);
+                console.log('✅ Mensaje temporal de PM enviado (no guardado):', newMessage);
             } catch (error) {
-                console.error('❌ Error al enviar mensaje de PM:', error);
+                console.error('❌ Error al enviar mensaje temporal de PM:', error);
                 alert('Error al enviar el mensaje');
             }
         }
@@ -1194,6 +1184,7 @@
         const ratingRef = ref(database, 'rating');
         const pmRef = ref(database, 'playerPM');
         const chatRef = ref(database, 'mensajes-publico-expanded');
+        const tempChatRef = ref(database, 'mensajes-temporales-admin');
 
         // Funciones para guardar en Firebase
         window.saveConcursanteName = function(numero, nombre) {
@@ -1204,6 +1195,7 @@
         window.saveRating = function(valor) { set(ratingRef, valor); };
         window.savePM = function(valor) { set(pmRef, valor); };
         window.saveChat = function(arr) { set(chatRef, arr); };
+        window.sendTempMessage = function(message) { set(tempChatRef, message); };
         window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
         window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
         window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };

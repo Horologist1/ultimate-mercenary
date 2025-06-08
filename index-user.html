@@ -1048,6 +1048,7 @@
         const pmRef = window.database.ref('playerPM');
         const pmTransactionsRef = window.database.ref('pmTransactions');
         const chatRef = window.database.ref('mensajes-publico-expanded');
+        const tempChatRef = window.database.ref('mensajes-temporales-admin');
 
         // Listeners de sincronización
         conocidosRef.on('value', (snapshot) => {
@@ -1164,6 +1165,61 @@
                 console.warn("[Firebase Chat Listener] renderGlobalChatMessages function not found at the moment of Firebase data arrival. Chat will render on DOMContentLoaded or next update.");
             }
         });
+        
+        // Listener para mensajes temporales del admin
+        tempChatRef.on('value', (snapshot) => {
+            const tempMessage = snapshot.val();
+            if (tempMessage && tempMessage.isTemporary) {
+                // Mostrar mensaje temporal en el chat del usuario sin guardarlo
+                displayTemporaryAdminMessage(tempMessage);
+                
+                // Limpiar el mensaje temporal de Firebase después de mostrarlo
+                setTimeout(() => {
+                    tempChatRef.set(null);
+                }, 1000);
+            }
+        });
+        
+        // Función para mostrar mensajes temporales del admin (con apariencia de mensajes automáticos)
+        function displayTemporaryAdminMessage(message) {
+            const chatContainer = document.getElementById('chat-messages');
+            if (!chatContainer) return;
+            
+            // Crear elemento del mensaje temporal que se ve como mensaje automático normal
+            const messageElement = document.createElement('div');
+            messageElement.className = 'chat-message admin-temp-message';
+            messageElement.style.cssText = `
+                background: transparent;
+                padding: 8px;
+                margin: 2px 0;
+                border-radius: 4px;
+            `;
+            
+            messageElement.innerHTML = `
+                <span class="username" style="color: #cccccc; font-weight: bold;">
+                    ${message.sender}:
+                </span>
+                <span class="content" style="margin-left: 8px; color: #ffffff;">
+                    ${message.content}
+                </span>
+                <span style="float: right; font-size: 11px; color: #888;">
+                    ${message.time}
+                </span>
+            `;
+            
+            // Agregar el mensaje al chat
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Remover el mensaje después de 8 segundos (sin animaciones visibles)
+            setTimeout(() => {
+                if (messageElement.parentNode) {
+                    messageElement.remove();
+                }
+            }, 8000);
+            
+            console.log('✅ Mensaje temporal del admin mostrado (apariencia normal):', message.sender, '-', message.content.substring(0, 30));
+        }
     </script>
     <div class="main-container">
         <!-- Video de fondo -->
