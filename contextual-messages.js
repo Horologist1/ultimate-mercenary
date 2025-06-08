@@ -1658,7 +1658,7 @@ function getContextualMessages() {
     const ratingLevel = rating > 6 ? 'alto' : 'bajo';
     const contextKey = `${timeOfDay}_${ratingLevel}`;
     
-    console.log(`🎭 CONTEXTO v1.56: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
+    console.log(`🎭 CONTEXTO v1.57: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
     
     let rawMessages = [];
     
@@ -1694,7 +1694,7 @@ function getContextualMessages() {
         });
         const filteredCount = originalCount - finalMessages.length;
         if (filteredCount > 0) {
-            console.warn(`🚫 FILTRO DE SEGURIDAD: Eliminados ${filteredCount} mensajes nocturnos en contexto diurno`);
+            console.warn(`🚫 FILTRO DE SEGURIDAD v1.57: Eliminados ${filteredCount} mensajes nocturnos en contexto diurno`);
         }
     }
     

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.56 - Panel de Control</title>
+    <title>Ultimate Mercenary 1.57 - Panel de Control</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
@@ -932,14 +932,29 @@
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
         }
 
-        // Función para aplicar contexto temporal seleccionado
+        // Función para aplicar contexto temporal seleccionado v1.57
         function applyTimeOfDay() {
             const selector = document.getElementById('time-of-day');
             const selectedValue = selector.value;
             
+            // DEBUGGING EXTENSIVO v1.57
+            console.log('🎯 CONTROL PANEL v1.57 - DEBUGGING COMPLETO:');
+            console.log('📍 Dropdown seleccionado:', selectedValue);
+            console.log('📍 Dropdown HTML:', selector.outerHTML);
+            console.log('📍 localStorage ANTES:', localStorage.getItem('timeOfDay'));
+            
+            // Establecer en localStorage
             localStorage.setItem('timeOfDay', selectedValue);
-            console.log('🕐 CONTROL PANEL v1.56: Contexto temporal aplicado:', selectedValue);
-            console.log('🔍 localStorage.timeOfDay ahora es:', localStorage.getItem('timeOfDay'));
+            console.log('📍 localStorage DESPUÉS:', localStorage.getItem('timeOfDay'));
+            
+            // Logging detallado del contexto forzado
+            const currentTest = localStorage.getItem('currentTest') || 'prueba1';
+            const currentRating = localStorage.getItem('rating') || '8';
+            console.log('📊 Contexto forzado:', {
+                prueba: currentTest, 
+                momento: selectedValue, 
+                rating: currentRating
+            });
             
             // Ejecutar función de sincronización si existe
             if (window.saveTimeOfDay) window.saveTimeOfDay(selectedValue);
