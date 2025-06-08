@@ -1905,12 +1905,14 @@
                 const chatContainer = document.getElementById('chat-messages');
                 if (!chatContainer) return;
                 
-                // Limpiar todo el chat y volver a renderizar en orden correcto
-                chatContainer.innerHTML = '';
-                
-                // Renderizar todos los mensajes en el orden cronológico correcto
+                // Solo actualizar mensajes específicos del admin y jugador sin tocar automáticos
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
+                    
+                    // Solo procesar mensajes del admin o jugador
+                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
+                        return; // Ignorar mensajes que no son del admin ni jugador
+                    }
                     
                     // Configurar color según el tipo de mensaje
                     let color = '#cccccc';
@@ -1918,12 +1920,33 @@
                         color = '#00ccff'; // Color azul para mensajes del jugador
                     }
                     
-                    // Generar ID único basado en el tipo y timestamp
-                    const msgId = msg.isPlayerMessage ? `msg-player-${msg.timestamp}` : 
-                                 msg.isAdminMessage ? `msg-admin-${msg.timestamp}` : 
-                                 `msg-auto-${index}-${msg.timestamp || Date.now()}`;
+                    // Buscar y eliminar mensaje anterior del mismo tipo
+                    const existingMessages = chatContainer.querySelectorAll('.chat-message');
+                    existingMessages.forEach(existingMsg => {
+                        const existingUsername = existingMsg.querySelector('.username');
+                        if (existingUsername) {
+                            const existingUsernameText = existingUsername.textContent.trim().toLowerCase();
+                            
+                            // Si es mensaje del jugador, eliminar XIII anteriores
+                            if (msg.isPlayerMessage && existingUsernameText.startsWith('xiii')) {
+                                existingMsg.remove();
+                            }
+                            // Si es mensaje del admin, eliminar mensajes del admin anteriores
+                            else if (msg.isAdminMessage && !existingUsernameText.startsWith('xiii') && 
+                                    !existingMsg.classList.contains('auto-message')) {
+                                // Solo eliminar si parece ser un mensaje del admin (no automático)
+                                const msgContent = existingMsg.querySelector('.content');
+                                if (msgContent) {
+                                    existingMsg.remove();
+                                }
+                            }
+                        }
+                    });
                     
-                    // Añadir el mensaje en orden cronológico
+                    // Generar ID único
+                    const msgId = msg.isPlayerMessage ? `msg-player-${msg.timestamp}` : `msg-admin-${msg.timestamp}`;
+                    
+                    // Añadir el nuevo mensaje
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
                         mensaje: msg.content,
@@ -1932,7 +1955,7 @@
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
                     
-                    console.log('📨 Mensaje renderizado en orden cronológico:', msg.sender, '-', msg.content.substring(0, 30));
+                    console.log('📨 Mensaje actualizado manteniendo automáticos:', msg.sender, '-', msg.content.substring(0, 30));
                 });
             };
             // Limpieza total al hacer logout
