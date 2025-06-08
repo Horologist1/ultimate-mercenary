@@ -1824,22 +1824,33 @@
                     isPlayerMessage: true // Marca para identificar mensajes del jugador
                 };
                 
-                // Guardar en localStorage y Firebase para sincronización (solo mantener último)
+                // Mantener mensajes automáticos y reemplazar solo el último del jugador
                 try {
-                    const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                    const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                     
-                    // Eliminar mensajes del jugador anteriores para mostrar solo el último
-                    const messagesWithoutPreviousPlayer = messages.filter(msg => !msg.isPlayerMessage);
+                    // Filtrar mensajes: mantener automáticos + último admin, eliminar jugador anteriores
+                    const finalMessages = existingMessages.filter(msg => {
+                        // Mantener mensajes automáticos (no son del admin ni del jugador)
+                        if (!msg.isAdminMessage && !msg.isPlayerMessage) {
+                            return true;
+                        }
+                        // Mantener último mensaje del admin
+                        if (msg.isAdminMessage) {
+                            return true;
+                        }
+                        // Eliminar mensajes anteriores del jugador
+                        return false;
+                    });
                     
                     // Añadir el nuevo mensaje del jugador
-                    messagesWithoutPreviousPlayer.push(playerMsg);
+                    finalMessages.push(playerMsg);
                     
-                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesWithoutPreviousPlayer));
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
                     
                     // Sincronizar con Firebase
                     if (window.saveChat) {
-                        window.saveChat(messagesWithoutPreviousPlayer);
-                        console.log('📤 Último mensaje del jugador enviado a Firebase:', text.substring(0, 30));
+                        window.saveChat(finalMessages);
+                        console.log('📤 Último mensaje del jugador enviado a Firebase (manteniendo automáticos):', text.substring(0, 30));
                     }
                 } catch (error) {
                     console.error('❌ Error guardando mensaje del jugador:', error);
@@ -1891,13 +1902,10 @@
                 };
             }
             window.renderGlobalChatMessages = function(messagesArray) {
-                // Limpiar el chat antes de renderizar los nuevos mensajes
                 const chatContainer = document.getElementById('chat-messages');
-                if (chatContainer) {
-                    chatContainer.innerHTML = '';
-                }
+                if (!chatContainer) return;
                 
-                // Renderizar SOLO los mensajes más recientes (último del admin + último del jugador)
+                // Solo actualizar/reemplazar mensajes del admin y jugador, mantener automáticos
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
                     
@@ -1909,6 +1917,25 @@
                     
                     const msgId = `msg-${msg.isPlayerMessage ? 'player' : 'admin'}-${msg.timestamp}`;
                     
+                    // Eliminar mensaje anterior del mismo tipo (admin o jugador) si existe
+                    if (msg.isPlayerMessage) {
+                        // Eliminar mensajes anteriores del jugador
+                        const previousPlayerMsgs = chatContainer.querySelectorAll('[id^="msg-player-"], [id*="-xiii-"], .chat-message');
+                        previousPlayerMsgs.forEach(prevMsg => {
+                            const username = prevMsg.querySelector('.username');
+                            if (username && username.textContent.trim().toLowerCase().startsWith('xiii')) {
+                                prevMsg.remove();
+                            }
+                        });
+                    } else if (msg.isAdminMessage) {
+                        // Eliminar mensajes anteriores del admin
+                        const previousAdminMsgs = chatContainer.querySelectorAll('[id^="msg-admin-"]');
+                        previousAdminMsgs.forEach(prevMsg => {
+                            prevMsg.remove();
+                        });
+                    }
+                    
+                    // Añadir el nuevo mensaje
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
                         mensaje: msg.content,
@@ -1917,7 +1944,7 @@
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
                     
-                    console.log('📨 Último mensaje sincronizado desde Firebase:', msg.sender, '-', msg.content.substring(0, 30));
+                    console.log('📨 Mensaje sincronizado desde Firebase (manteniendo automáticos):', msg.sender, '-', msg.content.substring(0, 30));
                 });
             };
             // Limpieza total al hacer logout

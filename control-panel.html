@@ -864,19 +864,30 @@
                     isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Cargar mensajes existentes y filtrar mensajes del admin anteriores
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                // Mantener mensajes automáticos y reemplazar solo el último del admin
+                const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 
-                // Eliminar mensajes del admin anteriores para mostrar solo el último
-                const messagesWithoutPreviousAdmin = messages.filter(msg => !msg.isAdminMessage);
+                // Filtrar mensajes: mantener automáticos + último jugadora, eliminar admin anteriores
+                const finalMessages = existingMessages.filter(msg => {
+                    // Mantener mensajes automáticos (no son del admin ni del jugador)
+                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
+                        return true;
+                    }
+                    // Mantener último mensaje del jugador
+                    if (msg.isPlayerMessage) {
+                        return true;
+                    }
+                    // Eliminar mensajes anteriores del admin
+                    return false;
+                });
                 
                 // Añadir el nuevo mensaje del admin
-                messagesWithoutPreviousAdmin.push(newMessage);
+                finalMessages.push(newMessage);
                 
-                // Guardar en localStorage y Firebase permanentemente
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesWithoutPreviousAdmin));
+                // Guardar mensajes (automáticos + último jugadora + último admin)
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
                 if (window.saveChat) {
-                    window.saveChat(messagesWithoutPreviousAdmin);
+                    window.saveChat(finalMessages);
                 }
                 
                 // Actualizar el chat del control panel
@@ -943,19 +954,30 @@
                     isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Cargar mensajes existentes y filtrar mensajes del admin anteriores
-                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                // Mantener mensajes automáticos y reemplazar solo el último del admin
+                const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 
-                // Eliminar mensajes del admin anteriores para mostrar solo el último
-                const messagesWithoutPreviousAdmin = messages.filter(msg => !msg.isAdminMessage);
+                // Filtrar mensajes: mantener automáticos + último jugadora, eliminar admin anteriores
+                const finalMessages = existingMessages.filter(msg => {
+                    // Mantener mensajes automáticos (no son del admin ni del jugador)
+                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
+                        return true;
+                    }
+                    // Mantener último mensaje del jugador
+                    if (msg.isPlayerMessage) {
+                        return true;
+                    }
+                    // Eliminar mensajes anteriores del admin
+                    return false;
+                });
                 
                 // Añadir el nuevo mensaje del admin
-                messagesWithoutPreviousAdmin.push(newMessage);
+                finalMessages.push(newMessage);
                 
-                // Guardar en localStorage y Firebase permanentemente
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesWithoutPreviousAdmin));
+                // Guardar mensajes (automáticos + último jugadora + último admin)
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
                 if (window.saveChat) {
-                    window.saveChat(messagesWithoutPreviousAdmin);
+                    window.saveChat(finalMessages);
                 }
                 
                 // Actualizar PM
