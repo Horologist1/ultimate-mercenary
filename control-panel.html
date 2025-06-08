@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary - Panel de Control</title>
+    <title>Ultimate Mercenary 1.56 - Panel de Control</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
@@ -571,10 +571,13 @@
                     </div>
                     <div class="test-selector" style="margin-left: 20px;">
                         <label for="time-of-day">Momento:</label>
-                        <select id="time-of-day" onchange="updateTimeOfDay(this.value)">
-                            <option value="dia">Día</option>
-                            <option value="noche">Noche</option>
-                        </select>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="time-of-day">
+                                <option value="dia">Día</option>
+                                <option value="noche">Noche</option>
+                            </select>
+                            <button class="control-button" onclick="applyTimeOfDay()" style="padding: 4px 12px; font-size: 12px;">APLICAR</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -927,6 +930,28 @@
             localStorage.setItem('timeOfDay', timeOfDay);
             console.log('🕐 Momento del día actualizado a:', timeOfDay);
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
+        }
+
+        // Función para aplicar contexto temporal seleccionado
+        function applyTimeOfDay() {
+            const selector = document.getElementById('time-of-day');
+            const selectedValue = selector.value;
+            
+            localStorage.setItem('timeOfDay', selectedValue);
+            console.log('🕐 CONTROL PANEL v1.56: Contexto temporal aplicado:', selectedValue);
+            console.log('🔍 localStorage.timeOfDay ahora es:', localStorage.getItem('timeOfDay'));
+            
+            // Ejecutar función de sincronización si existe
+            if (window.saveTimeOfDay) window.saveTimeOfDay(selectedValue);
+            
+            // Confirmación visual
+            const originalBg = selector.style.backgroundColor;
+            selector.style.backgroundColor = '#00ff88';
+            setTimeout(() => {
+                selector.style.backgroundColor = originalBg;
+            }, 500);
+            
+            alert(`✅ Contexto temporal establecido a: ${selectedValue.toUpperCase()}\n\nRecarga la página de usuario para aplicar los cambios.`);
         }
 
         // Función para cargar y mostrar los últimos mensajes del chat (solo para el panel de control)
