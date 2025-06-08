@@ -1658,6 +1658,13 @@ function getContextualMessages() {
     const ratingLevel = rating > 6 ? 'alto' : 'bajo';
     const contextKey = `${timeOfDay}_${ratingLevel}`;
     
+    // LOG EXTRA DE DEBUG
+    console.log('🔍 [CONTEXTUAL DEBUG] Leyendo valores de localStorage:');
+    console.log('🔍 [CONTEXTUAL DEBUG] currentTest:', currentTest);
+    console.log('🔍 [CONTEXTUAL DEBUG] timeOfDay RAW:', localStorage.getItem('timeOfDay'));
+    console.log('🔍 [CONTEXTUAL DEBUG] timeOfDay después de fallback:', timeOfDay);
+    console.log('🔍 [CONTEXTUAL DEBUG] rating:', rating);
+    
     console.log(`🎭 CONTEXTO v1.58: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
     
     let rawMessages = [];

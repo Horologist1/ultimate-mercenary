@@ -1105,33 +1105,81 @@
             }
         });
         
-        // NUEVO: Listener para timeOfDay desde Firebase
+        // NUEVO: Listener para timeOfDay desde Firebase con debug mejorado
+        console.log('🚀 [FIREBASE] Configurando listener para timeOfDay...');
         timeOfDayRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            console.log('🔥 [FIREBASE LISTENER] timeOfDay cambió en Firebase:', data);
+            const currentLocal = localStorage.getItem('timeOfDay');
+            
+            console.log('🔥 [FIREBASE LISTENER] timeOfDay Firebase Listener ACTIVADO!');
+            console.log('🔥 [FIREBASE LISTENER] Datos de Firebase:', data);
+            console.log('🔥 [FIREBASE LISTENER] localStorage actual:', currentLocal);
             
             if (data && (data === 'dia' || data === 'noche')) {
                 const oldValue = localStorage.getItem('timeOfDay');
                 localStorage.setItem('timeOfDay', data);
-                console.log(`✅ [FIREBASE SYNC] timeOfDay actualizado: ${oldValue} → ${data}`);
+                
+                console.log(`✅ [FIREBASE SYNC] timeOfDay FORZADO: ${oldValue} → ${data}`);
+                console.log('🔄 [FIREBASE SYNC] localStorage después:', localStorage.getItem('timeOfDay'));
                 
                 // Refrescar mensajes contextuales si el sistema está disponible
                 if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
                     console.log('🔄 [FIREBASE SYNC] Refrescando mensajes contextuales...');
                     window.contextualSystem.refreshMessages();
+                } else {
+                    console.warn('⚠️ [FIREBASE SYNC] contextualSystem.refreshMessages no disponible');
+                }
+                
+                // Forzar actualización de mensajes contextuales directamente
+                if (typeof window.updateContextualSystem === 'function') {
+                    console.log('🔄 [FIREBASE SYNC] Ejecutando updateContextualSystem...');
+                    window.updateContextualSystem();
                 }
                 
                 // Actualizar UI si hay funciones disponibles
                 if (window.updateStatusPanel) window.updateStatusPanel();
+                
+                // Log final de confirmación
+                console.log('🎯 [FIREBASE SYNC] SYNC COMPLETADO - Valor final:', localStorage.getItem('timeOfDay'));
             } else {
                 console.warn('⚠️ [FIREBASE SYNC] timeOfDay inválido o null:', data);
-                // Establecer valor por defecto si no existe
+                // Solo establecer por defecto si realmente no existe
                 if (!localStorage.getItem('timeOfDay')) {
                     localStorage.setItem('timeOfDay', 'dia');
                     console.log('📍 [FIREBASE SYNC] Establecido timeOfDay por defecto: dia');
                 }
             }
         });
+        
+        console.log('✅ [FIREBASE] Listener timeOfDay configurado completamente');
+        
+        // FORZAR LECTURA INICIAL DE FIREBASE para sincronizar inmediatamente
+        timeOfDayRef.once('value').then((snapshot) => {
+            const firebaseValue = snapshot.val();
+            const localValue = localStorage.getItem('timeOfDay');
+            
+            console.log('🔍 [FIREBASE INIT] Lectura inicial forzada:');
+            console.log('🔍 [FIREBASE INIT] Firebase tiene:', firebaseValue);
+            console.log('🔍 [FIREBASE INIT] localStorage tiene:', localValue);
+            
+            if (firebaseValue && firebaseValue !== localValue) {
+                console.log('🚨 [FIREBASE INIT] DESINCRONIZACIÓN DETECTADA - Forzando sync...');
+                localStorage.setItem('timeOfDay', firebaseValue);
+                
+                // Forzar actualización inmediata del sistema contextual
+                if (typeof window.updateContextualSystem === 'function') {
+                    console.log('🔄 [FIREBASE INIT] Ejecutando updateContextualSystem inmediatamente...');
+                    window.updateContextualSystem();
+                }
+                
+                console.log('✅ [FIREBASE INIT] Sincronización forzada completada:', localStorage.getItem('timeOfDay'));
+            } else {
+                console.log('✅ [FIREBASE INIT] Valores ya sincronizados');
+            }
+        }).catch(error => {
+            console.error('❌ [FIREBASE INIT] Error leyendo valor inicial:', error);
+        });
+        
         pmRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
