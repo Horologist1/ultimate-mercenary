@@ -3191,20 +3191,28 @@
     
     <!-- Verificación y debug del sistema contextual -->
     <script>
-        // FORZAR inicialización del sistema contextual v0.97
+        // FORZAR inicialización del sistema contextual v1.57 - FORZAR DESPUÉS DE FIREBASE
         setTimeout(() => {
-            console.log('🔍 INICIALIZANDO sistema contextual v0.97 - FORZAR MENSAJES CONFIGURADOS...');
+            console.log('🔍 INICIALIZANDO sistema contextual v1.57 - FORZAR MENSAJES CONFIGURADOS...');
             
-            // Configurar valores por defecto GARANTIZADOS
-            if (!localStorage.getItem('currentTest')) {
-                localStorage.setItem('currentTest', 'prueba0');
-            }
-            if (!localStorage.getItem('timeOfDay')) {
-                localStorage.setItem('timeOfDay', 'dia');
-            }
-            if (!localStorage.getItem('rating')) {
-                localStorage.setItem('rating', '7.0');
-            }
+            // SOBRESCRIBIR valores DESPUÉS de que Firebase termine de cargar
+            console.log('🚨 FORZANDO valores por defecto DESPUÉS de Firebase...');
+            console.log('📍 localStorage antes:', {
+                prueba: localStorage.getItem('currentTest'),
+                momento: localStorage.getItem('timeOfDay'),
+                rating: localStorage.getItem('rating')
+            });
+            
+            // Configurar valores FORZADOS que sobrescriban Firebase
+            localStorage.setItem('currentTest', 'prueba1');
+            localStorage.setItem('timeOfDay', 'dia');  // FORZAR DIA
+            localStorage.setItem('rating', '8.0');
+            
+            console.log('📍 localStorage después del FORZADO:', {
+                prueba: localStorage.getItem('currentTest'),
+                momento: localStorage.getItem('timeOfDay'),
+                rating: localStorage.getItem('rating')
+            });
             
             console.log('📊 Contexto forzado:', {
                 prueba: localStorage.getItem('currentTest'),
@@ -3235,7 +3243,7 @@
                 }
             }, 2000);
             
-        }, 1000); // Empezar más rápido
+        }, 3000); // Esperar MÁS para que Firebase termine completamente
     </script>
 
 </body>
