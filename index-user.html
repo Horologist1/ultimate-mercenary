@@ -2986,9 +2986,53 @@
             }
         };
 
-                    console.log('🎮 Ultimate Mercenary v1.56 - FILTROS DE CONTEXTO CORREGIDOS');
-        console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
-        console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
+                                console.log('🎮 Ultimate Mercenary v1.56 - FILTROS DE CONTEXTO CORREGIDOS');
+            console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
+            console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
+            
+            // LISTENER PARA CAMBIOS DE CONTEXTO v1.56
+            let lastContextReload = localStorage.getItem('contextReload') || '0';
+            let lastForceReload = localStorage.getItem('forceReload') || '0';
+            
+            // Escuchar cambios en localStorage desde otras ventanas
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'contextReload' && e.newValue !== lastContextReload) {
+                    lastContextReload = e.newValue;
+                    console.log('🔄 CAMBIO DE CONTEXTO DETECTADO - Recargando mensajes...');
+                    
+                    // Forzar recarga inmediata del contexto
+                    if (typeof window.getContextualMessages === 'function') {
+                        console.log('🎭 Forzando nueva carga de contexto desde otra ventana');
+                        // Simular nueva llamada al sistema de mensajes
+                        setTimeout(() => {
+                            if (window.contextualMessageSystem && window.contextualMessageSystem.loadMessages) {
+                                window.contextualMessageSystem.loadMessages();
+                            }
+                        }, 100);
+                    }
+                }
+                
+                // LISTENER PARA RECARGA FORZADA
+                if (e.key === 'forceReload' && e.newValue !== lastForceReload) {
+                    lastForceReload = e.newValue;
+                    console.log('🚨 RECARGA FORZADA DETECTADA - Recargando página en 2 segundos...');
+                    setTimeout(() => {
+                        console.log('🔄 RECARGANDO PÁGINA PARA APLICAR CONTEXTO...');
+                        location.reload();
+                    }, 2000);
+                }
+            });
+            
+            // Listener para eventos personalizados en la misma ventana
+            window.addEventListener('contextChanged', function(e) {
+                console.log('🎭 EVENTO DE CAMBIO DE CONTEXTO:', e.detail);
+                setTimeout(() => {
+                    if (window.contextualMessageSystem && window.contextualMessageSystem.loadMessages) {
+                        console.log('🔄 Recargando sistema de mensajes...');
+                        window.contextualMessageSystem.loadMessages();
+                    }
+                }, 100);
+            });
         console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');
         console.log('🧹 Usa cleanKaiserDuplicates() para limpiar duplicados del mensaje de Kaiser');
         console.log('🧪 Usa probarSistemaAtributos() para probar el sistema de atributos');
