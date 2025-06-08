@@ -1665,7 +1665,7 @@ function getContextualMessages() {
     console.log('🔍 [CONTEXTUAL DEBUG] timeOfDay después de fallback:', timeOfDay);
     console.log('🔍 [CONTEXTUAL DEBUG] rating:', rating);
     
-    console.log(`🎭 CONTEXTO v1.58: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
+    console.log(`🎭 CONTEXTO v1.59: ${currentTest} | ${timeOfDay} | rating: ${rating} (${ratingLevel}) | key: ${contextKey}`);
     
     let rawMessages = [];
     

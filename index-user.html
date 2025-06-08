@@ -1244,7 +1244,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                                     <div class="title-container">
-                    <h1>ULTIMATE MERCENARY 1.58</h1>
+                    <h1>ULTIMATE MERCENARY 1.59</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -3270,28 +3270,28 @@
     <script>
         // FORZAR inicialización del sistema contextual v1.58 - FORZAR DESPUÉS DE FIREBASE
         setTimeout(() => {
-            console.log('🔍 INICIALIZANDO sistema contextual v1.58 - FORZAR MENSAJES CONFIGURADOS...');
+            console.log('🔍 INICIALIZANDO sistema contextual v1.59 - MENSAJES CONFIGURADOS...');
             
             // SOBRESCRIBIR valores DESPUÉS de que Firebase termine de cargar
-            console.log('🚨 FORZANDO valores por defecto DESPUÉS de Firebase...');
+            console.log('🔄 Configurando valores por defecto (respetando Firebase)...');
             console.log('📍 localStorage antes:', {
                 prueba: localStorage.getItem('currentTest'),
                 momento: localStorage.getItem('timeOfDay'),
                 rating: localStorage.getItem('rating')
             });
             
-            // Configurar valores FORZADOS que sobrescriban Firebase
-            localStorage.setItem('currentTest', 'prueba1');
-            localStorage.setItem('timeOfDay', 'dia');  // FORZAR DIA
-            localStorage.setItem('rating', '8.0');
+            // Configurar valores solo si no existen (respetando Firebase)
+            if (!localStorage.getItem('currentTest')) localStorage.setItem('currentTest', 'prueba1');
+            // NO FORZAR timeOfDay - respetamos el valor de Firebase
+            if (!localStorage.getItem('rating')) localStorage.setItem('rating', '8.0');
             
-            console.log('📍 localStorage después del FORZADO:', {
+            console.log('📍 localStorage después de configurar:', {
                 prueba: localStorage.getItem('currentTest'),
                 momento: localStorage.getItem('timeOfDay'),
                 rating: localStorage.getItem('rating')
             });
             
-            console.log('📊 Contexto forzado:', {
+            console.log('📊 Contexto actual:', {
                 prueba: localStorage.getItem('currentTest'),
                 momento: localStorage.getItem('timeOfDay'),
                 rating: localStorage.getItem('rating')
