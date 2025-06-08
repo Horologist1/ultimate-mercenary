@@ -852,29 +852,33 @@
             }
             
             try {
-                // Crear el mensaje temporal del admin (NO se guarda permanentemente)
+                // Crear mensaje del admin que se guarda permanentemente como cualquier otro
                 const newMessage = {
                     sender: sender,
                     content: message,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true, // Marca para identificar mensajes del admin
-                    isTemporary: true // Marca para mensajes temporales que no se guardan
+                    isPlayerMessage: false // NO es del jugador, pero tampoco se filtra
                 };
                 
-                // Enviar mensaje temporal via Firebase (no se guarda permanentemente)
-                if (window.sendTempMessage) {
-                    window.sendTempMessage(newMessage);
+                // Cargar mensajes existentes y añadir el nuevo
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push(newMessage);
+                
+                // Guardar en localStorage y Firebase permanentemente
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                if (window.saveChat) {
+                    window.saveChat(messages);
                 }
                 
-                // Mostrar el mensaje en el chat del control panel temporalmente
-                displayTemporaryMessage(newMessage);
+                // Actualizar el chat del control panel
+                loadChatMessages();
                 
                 // Limpiar formulario
                 document.getElementById('message-input').value = '';
                 localStorage.setItem('lastPublicUsername', sender);
                 
-                console.log('✅ Mensaje temporal enviado (no guardado):', newMessage);
+                console.log('✅ Mensaje del admin enviado permanentemente:', newMessage);
             } catch (error) {
                 console.error('❌ Error al enviar mensaje temporal:', error);
                 alert('Error al enviar el mensaje');
@@ -921,34 +925,38 @@
             }
             
             try {
-                // Crear el mensaje temporal del admin (NO se guarda permanentemente)
+                // Crear mensaje del admin que se guarda permanentemente como cualquier otro
                 const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
                 const newMessage = {
                     sender: sender,
                     content: fullContent,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true, // Marca para identificar mensajes del admin
-                    isTemporary: true // Marca para mensajes temporales que no se guardan
+                    isPlayerMessage: false // NO es del jugador, pero tampoco se filtra
                 };
                 
-                // Enviar mensaje temporal via Firebase (no se guarda permanentemente)
-                if (window.sendTempMessage) {
-                    window.sendTempMessage(newMessage);
+                // Cargar mensajes existentes y añadir el nuevo
+                const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                messages.push(newMessage);
+                
+                // Guardar en localStorage y Firebase permanentemente
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                if (window.saveChat) {
+                    window.saveChat(messages);
                 }
                 
                 // Actualizar PM
                 statsManager.updatePM(pmAmount);
                 
-                // Mostrar el mensaje en el chat del control panel temporalmente
-                displayTemporaryMessage(newMessage);
+                // Actualizar el chat del control panel
+                loadChatMessages();
                 
                 // Limpiar formulario
                 document.getElementById('pm-input').value = '';
                 document.getElementById('pm-message-input').value = '';
                 localStorage.setItem('lastPMUsername', sender);
                 
-                console.log('✅ Mensaje temporal de PM enviado (no guardado):', newMessage);
+                console.log('✅ Mensaje de PM del admin enviado permanentemente:', newMessage);
             } catch (error) {
                 console.error('❌ Error al enviar mensaje temporal de PM:', error);
                 alert('Error al enviar el mensaje');
@@ -1184,7 +1192,6 @@
         const ratingRef = ref(database, 'rating');
         const pmRef = ref(database, 'playerPM');
         const chatRef = ref(database, 'mensajes-publico-expanded');
-        const tempChatRef = ref(database, 'mensajes-temporales-admin');
 
         // Funciones para guardar en Firebase
         window.saveConcursanteName = function(numero, nombre) {
@@ -1195,7 +1202,6 @@
         window.saveRating = function(valor) { set(ratingRef, valor); };
         window.savePM = function(valor) { set(pmRef, valor); };
         window.saveChat = function(arr) { set(chatRef, arr); };
-        window.sendTempMessage = function(message) { set(tempChatRef, message); };
         window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
         window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
         window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };

@@ -1048,7 +1048,6 @@
         const pmRef = window.database.ref('playerPM');
         const pmTransactionsRef = window.database.ref('pmTransactions');
         const chatRef = window.database.ref('mensajes-publico-expanded');
-        const tempChatRef = window.database.ref('mensajes-temporales-admin');
 
         // Listeners de sincronización
         conocidosRef.on('value', (snapshot) => {
@@ -1130,30 +1129,8 @@
             // If 'data' is an object of messages, convert to array.
             const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
 
-            // Filtrar mensajes del admin y mensajes marcados como isAdminMessage
-            const mensajesFiltrados = messagesArray.filter(msg => {
-                // Filtrar mensajes marcados como del admin
-                if (msg.isAdminMessage === true) {
-                    console.log("🚫 Mensaje del admin filtrado:", msg.sender, "-", msg.content.substring(0, 30));
-                    return false;
-                }
-                
-                // Filtrar por nombre del sender (filtro original)
-                const sender = (msg.sender || '').trim().toLowerCase();
-                const isAdminSender = sender.includes('kaiser') || 
-                        sender.includes('director') || 
-                        sender.includes('sistema') ||
-                        sender.includes('oce') ||
-                        sender.includes('admin') ||
-                        sender.includes('control') ||
-                        sender.includes('panel');
-                
-                if (isAdminSender) {
-                    console.log("🚫 Mensaje del admin filtrado por sender:", sender);
-                }
-                
-                return !isAdminSender;
-            });
+            // Ya no filtramos mensajes del admin - todos los mensajes se muestran
+            const mensajesFiltrados = messagesArray;
 
             localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
             if (window.renderGlobalChatMessages) {
@@ -1165,61 +1142,6 @@
                 console.warn("[Firebase Chat Listener] renderGlobalChatMessages function not found at the moment of Firebase data arrival. Chat will render on DOMContentLoaded or next update.");
             }
         });
-        
-        // Listener para mensajes temporales del admin
-        tempChatRef.on('value', (snapshot) => {
-            const tempMessage = snapshot.val();
-            if (tempMessage && tempMessage.isTemporary) {
-                // Mostrar mensaje temporal en el chat del usuario sin guardarlo
-                displayTemporaryAdminMessage(tempMessage);
-                
-                // Limpiar el mensaje temporal de Firebase después de mostrarlo
-                setTimeout(() => {
-                    tempChatRef.set(null);
-                }, 1000);
-            }
-        });
-        
-        // Función para mostrar mensajes temporales del admin (con apariencia de mensajes automáticos)
-        function displayTemporaryAdminMessage(message) {
-            const chatContainer = document.getElementById('chat-messages');
-            if (!chatContainer) return;
-            
-            // Crear elemento del mensaje temporal que se ve como mensaje automático normal
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message admin-temp-message';
-            messageElement.style.cssText = `
-                background: transparent;
-                padding: 8px;
-                margin: 2px 0;
-                border-radius: 4px;
-            `;
-            
-            messageElement.innerHTML = `
-                <span class="username" style="color: #cccccc; font-weight: bold;">
-                    ${message.sender}:
-                </span>
-                <span class="content" style="margin-left: 8px; color: #ffffff;">
-                    ${message.content}
-                </span>
-                <span style="float: right; font-size: 11px; color: #888;">
-                    ${message.time}
-                </span>
-            `;
-            
-            // Agregar el mensaje al chat
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            // Remover el mensaje después de 8 segundos (sin animaciones visibles)
-            setTimeout(() => {
-                if (messageElement.parentNode) {
-                    messageElement.remove();
-                }
-            }, 8000);
-            
-            console.log('✅ Mensaje temporal del admin mostrado (apariencia normal):', message.sender, '-', message.content.substring(0, 30));
-        }
     </script>
     <div class="main-container">
         <!-- Video de fondo -->
@@ -1630,35 +1552,9 @@
         }
         
         function limpiarMensajesAdminDOM() {
-            // Elimina del DOM todos los mensajes del admin (Kaiser, OCE, etc.)
-            const chatMessagesContainer = document.getElementById('chat-messages');
-            if (!chatMessagesContainer) return;
-            const mensajes = chatMessagesContainer.querySelectorAll('.chat-message');
-            mensajes.forEach(msg => {
-                const username = msg.querySelector('.username');
-                if (username) {
-                    const usernameText = username.textContent.trim();
-                    // Limpiar el texto quitando los ":" al final
-                    const cleanUsername = usernameText.replace(':', '').trim();
-                    
-                    // Eliminar mensajes de admin identificados por nombres específicos
-                    if (cleanUsername.startsWith('Kaiser') || 
-                        cleanUsername.startsWith('Director') || 
-                        cleanUsername.startsWith('SISTEMA') ||
-                        cleanUsername.startsWith('OCE') ||
-                        cleanUsername.includes('Admin') ||
-                        cleanUsername === 'Kaiser' ||
-                        cleanUsername === 'Director Kaiser' ||
-                        cleanUsername === 'SISTEMA OCE') {
-                        try {
-                            chatMessagesContainer.removeChild(msg);
-                            console.log(`🗑️ Eliminado mensaje del admin: ${cleanUsername}`);
-                        } catch (e) {
-                            console.warn('⚠️ Error eliminando mensaje admin:', e);
-                        }
-                    }
-                }
-            });
+            // FUNCIÓN DESHABILITADA - Ya no eliminamos mensajes del admin para permitir sincronización
+            console.log('⚠️ limpiarMensajesAdminDOM deshabilitada - mensajes del admin ahora se sincronizan');
+            return;
         }
         
         function limpiarChatJugador() {
@@ -1668,71 +1564,10 @@
         }
         
         function limpiarChatCompleto() {
-            // Limpia mensajes del jugador Y del admin al cargar la página
+            // Solo limpia mensajes del jugador, NO del admin para permitir sincronización
             localStorage.removeItem('mensajes-jugador-sesion');
-            
-            // Primero limpiar Firebase/localStorage
-            const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
-            if (mensajesFirebase) {
-                try {
-                    const mensajes = JSON.parse(mensajesFirebase);
-                    const mensajesFiltrados = mensajes.filter(msg => {
-                        const sender = (msg.sender || msg.user || '').trim().toLowerCase();
-                        // Lista más amplia de detección de admin
-                        return !(sender.includes('kaiser') || 
-                                sender.includes('director') || 
-                                sender.includes('sistema') ||
-                                sender.includes('oce') ||
-                                sender.includes('admin') ||
-                                sender.includes('control') ||
-                                sender.includes('panel'));
-                    });
-                    
-                    if (mensajesFiltrados.length !== mensajes.length) {
-                        localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
-                        // También actualizar Firebase si es posible
-                        if (window.saveChat) {
-                            window.saveChat(mensajesFiltrados);
-                        }
-                        console.log(`🗑️ Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del admin de Firebase`);
-                    }
-                } catch (e) {
-                    console.warn('⚠️ Error limpiando mensajes de Firebase:', e);
-                }
-            }
-            
-            // Luego limpiar el DOM
             limpiarMensajesJugadorDOM();
-            limpiarMensajesAdminDOM();
-            
-            // Función más agresiva para el DOM
-            setTimeout(() => {
-                const chatContainer = document.getElementById('chat-messages');
-                if (chatContainer) {
-                    const mensajes = chatContainer.querySelectorAll('.chat-message');
-                    mensajes.forEach(msg => {
-                        const username = msg.querySelector('.username');
-                        if (username) {
-                            const usernameText = username.textContent.trim().toLowerCase();
-                            // Detección más amplia
-                            if (usernameText.includes('kaiser') || 
-                                usernameText.includes('director') || 
-                                usernameText.includes('sistema') ||
-                                usernameText.includes('oce') ||
-                                usernameText.includes('admin') ||
-                                usernameText.includes('control') ||
-                                usernameText.includes('panel')) {
-                                try {
-                                    chatContainer.removeChild(msg);
-                                    console.log(`🗑️ Eliminado mensaje admin (DOM): ${usernameText}`);
-                                } catch (e) {
-                                    console.warn('⚠️ Error eliminando mensaje admin DOM:', e);
-                                }
-                            }
-                        }
-                    });
-                }
-            }, 500); // Delay para asegurar que se ejecute después de otros procesos
+            console.log('🧹 Chat limpiado (solo mensajes del jugador) - mensajes del admin se mantienen para sincronización');
         }
         
         function limpiarChatDOMCompleto() {
@@ -2059,24 +1894,11 @@
                 };
             }
             window.renderGlobalChatMessages = function(messagesArray) {
-                // Renderizar mensajes que NO sean del admin
+                // Renderizar TODOS los mensajes para sincronización completa
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
                     
-                    // NO filtrar mensajes del jugador - permitir sincronización entre dispositivos
-                    // Filtrar solo mensajes del admin
-                    if (sender.includes('kaiser') || 
-                        sender.includes('director') || 
-                        sender.includes('sistema') ||
-                        sender.includes('oce') ||
-                        sender.includes('admin') ||
-                        sender.includes('control') ||
-                        sender.includes('panel')) {
-                        console.log(`🚫 Bloqueado mensaje del admin: ${sender}`);
-                        return;
-                    }
-                    
-                    // Evitar duplicación de mensajes del jugador ya mostrados localmente
+                    // Evitar duplicación de mensajes ya mostrados localmente
                     const msgId = msg.msg_id || `fb-${msg.sender}-${msg.time}-${index}`;
                     const existingMsg = document.getElementById(msgId);
                     if (existingMsg) {
@@ -2088,8 +1910,6 @@
                     let color = '#cccccc';
                     if (msg.isPlayerMessage || sender === 'xiii') {
                         color = '#00ccff'; // Color azul para mensajes del jugador
-                    } else if (sender === 'kaiser') {
-                        color = '#ff4757';
                     }
                     
                     agregarMensajeAlChatDisplay({
@@ -2100,9 +1920,7 @@
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
                     
-                    if (msg.isPlayerMessage) {
-                        console.log('📨 Mensaje del jugador sincronizado desde Firebase:', msg.content.substring(0, 30));
-                    }
+                    console.log('📨 Mensaje sincronizado desde Firebase:', msg.sender, '-', msg.content.substring(0, 30));
                 });
             };
             // Limpieza total al hacer logout
@@ -2257,34 +2075,9 @@
         return 'Todos los mensajes eliminados. El chat está completamente limpio.';
     };
 
-    // NUEVA v1.1: Auto-limpieza de Firebase cada 30 segundos
-    setInterval(() => {
-        const mensajesFirebase = localStorage.getItem('mensajes-publico-expanded');
-        if (mensajesFirebase && window.saveChat) {
-            try {
-                const mensajes = JSON.parse(mensajesFirebase);
-                const mensajesFiltrados = mensajes.filter(msg => {
-                    const sender = (msg.sender || '').trim().toLowerCase();
-                    return !(sender.includes('kaiser') || 
-                            sender.includes('director') || 
-                            sender.includes('sistema') ||
-                            sender.includes('oce') ||
-                            sender.includes('admin') ||
-                            sender.includes('control') ||
-                            sender.includes('panel'));
-                });
-                
-                if (mensajesFiltrados.length !== mensajes.length) {
-                    // Solo actualizar Firebase si hay diferencia
-                    window.saveChat(mensajesFiltrados);
-                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
-                    console.log(`🧹 [Auto-limpieza Firebase] Eliminados ${mensajes.length - mensajesFiltrados.length} mensajes del admin`);
-                }
-            } catch (e) {
-                console.warn('⚠️ Error en auto-limpieza Firebase:', e);
-            }
-        }
-    }, 30000); // Cada 30 segundos
+    // DESHABILITADO: Auto-limpieza de Firebase - ahora se sincronizan todos los mensajes
+    // setInterval deshabilitado para permitir sincronización completa de mensajes del admin
+    console.log('⚠️ Auto-limpieza de Firebase deshabilitada para permitir sincronización completa');
     
     window.borrarMensajesJugadorFirebase = function() {
         if (!window.firebase || !window.saveChat) {
