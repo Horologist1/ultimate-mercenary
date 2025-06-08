@@ -572,7 +572,7 @@
                     <div class="test-selector" style="margin-left: 20px;">
                         <label for="time-of-day">Momento:</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <select id="time-of-day">
+                            <select id="time-of-day" onchange="updateTimeOfDay(this.value)">
                                 <option value="dia">Día</option>
                                 <option value="noche">Noche</option>
                             </select>
@@ -932,74 +932,28 @@
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
         }
 
-        // Función para aplicar contexto temporal seleccionado v1.57
+        // Función simplificada v1.57: EXACTAMENTE igual que updateCurrentTest
         function applyTimeOfDay() {
             const selector = document.getElementById('time-of-day');
             const selectedValue = selector.value;
             
-            // DEBUGGING EXTENSIVO v1.57
-            console.log('🎯 CONTROL PANEL v1.57 - DEBUGGING COMPLETO:');
-            console.log('📍 Dropdown seleccionado:', selectedValue);
-            console.log('📍 Dropdown HTML:', selector.outerHTML);
-            console.log('📍 localStorage ANTES:', localStorage.getItem('timeOfDay'));
+            console.log('🎯 APLICANDO TIMEOFDAY v1.57 - PATRÓN SIMPLIFICADO');
+            console.log('📍 Valor seleccionado:', selectedValue);
             
-            // Establecer en localStorage
+            // Patrón EXACTO de updateCurrentTest - SIN complejidad extra
             localStorage.setItem('timeOfDay', selectedValue);
-            console.log('📍 localStorage DESPUÉS:', localStorage.getItem('timeOfDay'));
-            
-            // Logging detallado del contexto forzado
-            const currentTest = localStorage.getItem('currentTest') || 'prueba1';
-            const currentRating = localStorage.getItem('rating') || '8';
-            console.log('📊 Contexto forzado:', {
-                prueba: currentTest, 
-                momento: selectedValue, 
-                rating: currentRating
-            });
-            
-            // Ejecutar función de sincronización si existe
             if (window.saveTimeOfDay) window.saveTimeOfDay(selectedValue);
             
-            // FORZAR RECARGA DE CONTEXTO EN TODAS LAS VENTANAS
-            try {
-                // Crear evento personalizado para notificar a otras ventanas
-                const event = new CustomEvent('contextChanged', { 
-                    detail: { timeOfDay: selectedValue, timestamp: Date.now() } 
-                });
-                window.dispatchEvent(event);
-                
-                // Enviar mensaje a otras ventanas/pestañas abiertas
-                localStorage.setItem('contextReload', Date.now().toString());
-                
-                // Forzar reload del contextual system si existe la función
-                if (typeof window.getContextualMessages === 'function') {
-                    console.log('🔄 Forzando recarga de contexto...');
-                    window.getContextualMessages();
-                }
-                
-            } catch (error) {
-                console.warn('⚠️ Error al notificar cambio de contexto:', error);
-            }
+            console.log('✅ Aplicado:', selectedValue);
             
-            // Confirmación visual
+            // Solo confirmación visual básica
             const originalBg = selector.style.backgroundColor;
             selector.style.backgroundColor = '#00ff88';
             setTimeout(() => {
                 selector.style.backgroundColor = originalBg;
             }, 500);
             
-            // SOLUCIÓN AGRESIVA: Recargar directamente la página de usuario
-            alert(`✅ Contexto temporal establecido a: ${selectedValue.toUpperCase()}\n\n🔄 Recargando automáticamente la página de usuario...`);
-            
-            // Intentar recargar todas las ventanas de usuario abiertas
-            setTimeout(() => {
-                try {
-                    // Señal de recarga forzada
-                    localStorage.setItem('forceReload', Date.now().toString());
-                    console.log('🚨 RECARGA FORZADA ACTIVADA');
-                } catch (error) {
-                    console.warn('⚠️ Error al activar recarga forzada:', error);
-                }
-            }, 1000);
+            alert(`✅ Contexto: ${selectedValue.toUpperCase()}\n\n🔄 Recarga la página de usuario.`);
         }
 
         // Función para cargar y mostrar los últimos mensajes del chat (solo para el panel de control)
