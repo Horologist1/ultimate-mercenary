@@ -855,36 +855,20 @@
             }
             
             try {
-                // Crear mensaje del admin (solo mantener el último)
+                // Crear mensaje del admin
                 const newMessage = {
                     sender: sender,
                     content: message,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true // Marcar como mensaje del admin para identificarlo
+                    isAdminMessage: true
                 };
                 
-                // Mantener orden cronológico y reemplazar solo el último mensaje del admin
+                // Chat normal: simplemente añadir el mensaje al final
                 const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                existingMessages.push(newMessage);
                 
-                // Encontrar el índice del último mensaje del admin
-                let lastAdminIndex = -1;
-                for (let i = existingMessages.length - 1; i >= 0; i--) {
-                    if (existingMessages[i].isAdminMessage) {
-                        lastAdminIndex = i;
-                        break;
-                    }
-                }
-                
-                // Si existe un mensaje anterior del admin, reemplazarlo en su posición
-                if (lastAdminIndex !== -1) {
-                    existingMessages[lastAdminIndex] = newMessage;
-                } else {
-                    // Si no existe, añadir al final manteniendo orden cronológico
-                    existingMessages.push(newMessage);
-                }
-                
-                // Guardar mensajes manteniendo orden cronológico original
+                // Guardar todos los mensajes
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                 if (window.saveChat) {
                     window.saveChat(existingMessages);
@@ -944,37 +928,21 @@
             }
             
             try {
-                // Crear mensaje del admin (solo mantener el último)
+                // Crear mensaje del admin con PM
                 const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
                 const newMessage = {
                     sender: sender,
                     content: fullContent,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isAdminMessage: true // Marcar como mensaje del admin para identificarlo
+                    isAdminMessage: true
                 };
                 
-                // Mantener orden cronológico y reemplazar solo el último mensaje del admin
+                // Chat normal: simplemente añadir el mensaje al final
                 const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
+                existingMessages.push(newMessage);
                 
-                // Encontrar el índice del último mensaje del admin
-                let lastAdminIndex = -1;
-                for (let i = existingMessages.length - 1; i >= 0; i--) {
-                    if (existingMessages[i].isAdminMessage) {
-                        lastAdminIndex = i;
-                        break;
-                    }
-                }
-                
-                // Si existe un mensaje anterior del admin, reemplazarlo en su posición
-                if (lastAdminIndex !== -1) {
-                    existingMessages[lastAdminIndex] = newMessage;
-                } else {
-                    // Si no existe, añadir al final manteniendo orden cronológico
-                    existingMessages.push(newMessage);
-                }
-                
-                // Guardar mensajes manteniendo orden cronológico original
+                // Guardar todos los mensajes
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                 if (window.saveChat) {
                     window.saveChat(existingMessages);

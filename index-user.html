@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.51</title>
+    <title>Ultimate Mercenary 1.52</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1129,35 +1129,17 @@
             // If 'data' is an object of messages, convert to array.
             const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
 
-            // Filtrar solo mensajes del admin y jugador para mantener solo los últimos
-            const mensajesFiltrados = [];
-            let lastAdminMessage = null;
-            let lastPlayerMessage = null;
+            // Chat normal: simplemente guardar todos los mensajes sin filtrar
+            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesArray));
             
-            // Mantener mensajes automáticos y encontrar últimos admin/jugador
-            for (const msg of messagesArray) {
-                if (msg.isAdminMessage) {
-                    lastAdminMessage = msg;
-                } else if (msg.isPlayerMessage) {
-                    lastPlayerMessage = msg;
-                } else if (!msg.isAdminMessage && !msg.isPlayerMessage) {
-                    // Mantener mensajes automáticos
-                    mensajesFiltrados.push(msg);
-                }
-            }
+            // NO llamar renderGlobalChatMessages desde Firebase - evita reinicios
+            console.log(`[Firebase Chat Listener] ${messagesArray.length} mensajes sincronizados en localStorage`);
             
-            // Añadir solo los últimos mensajes del admin y jugador
-            if (lastPlayerMessage) mensajesFiltrados.push(lastPlayerMessage);
-            if (lastAdminMessage) mensajesFiltrados.push(lastAdminMessage);
-
-            localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
-            if (window.renderGlobalChatMessages) {
-                console.log(`[Firebase Chat Listener] Llamando renderGlobalChatMessages con ${mensajesFiltrados.length} mensajes filtrados.`);
-                window.renderGlobalChatMessages(mensajesFiltrados);
-            } else {
-                // This might happen if Firebase loads and fires this event before the main DOM is fully parsed.
-                // The initChatSystem on DOMContentLoaded should handle initial rendering from localStorage anyway.
-                console.warn("[Firebase Chat Listener] renderGlobalChatMessages function not found at the moment of Firebase data arrival. Chat will render on DOMContentLoaded or next update.");
+            // Solo renderizar si la función está disponible Y no hay mensajes locales ya renderizados
+            const chatContainer = document.getElementById('chat-messages');
+            if (window.renderGlobalChatMessages && chatContainer && chatContainer.children.length === 0) {
+                console.log(`[Firebase Chat Listener] Renderizando chat inicial`);
+                window.renderGlobalChatMessages(messagesArray);
             }
         });
     </script>
@@ -1174,7 +1156,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 1.51</h1>
+                        <h1>ULTIMATE MERCENARY 1.52</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1923,13 +1905,14 @@
                 const chatContainer = document.getElementById('chat-messages');
                 if (!chatContainer) return;
                 
-                // Solo actualizar mensajes específicos del admin y jugador sin tocar automáticos
+                // Chat normal: renderizar todos los mensajes sin filtros complejos
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
                     
-                    // Solo procesar mensajes del admin o jugador
-                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
-                        return; // Ignorar mensajes que no son del admin ni jugador
+                    // Verificar si el mensaje ya existe en el DOM para evitar duplicados
+                    const msgId = `msg-${msg.timestamp || index}`;
+                    if (document.getElementById(msgId)) {
+                        return; // Ya existe, no duplicar
                     }
                     
                     // Configurar color según el tipo de mensaje
@@ -1938,33 +1921,7 @@
                         color = '#00ccff'; // Color azul para mensajes del jugador
                     }
                     
-                    // Buscar y eliminar mensaje anterior del mismo tipo
-                    const existingMessages = chatContainer.querySelectorAll('.chat-message');
-                    existingMessages.forEach(existingMsg => {
-                        const existingUsername = existingMsg.querySelector('.username');
-                        if (existingUsername) {
-                            const existingUsernameText = existingUsername.textContent.trim().toLowerCase();
-                            
-                            // Si es mensaje del jugador, eliminar XIII anteriores
-                            if (msg.isPlayerMessage && existingUsernameText.startsWith('xiii')) {
-                                existingMsg.remove();
-                            }
-                            // Si es mensaje del admin, eliminar mensajes del admin anteriores
-                            else if (msg.isAdminMessage && !existingUsernameText.startsWith('xiii') && 
-                                    !existingMsg.classList.contains('auto-message')) {
-                                // Solo eliminar si parece ser un mensaje del admin (no automático)
-                                const msgContent = existingMsg.querySelector('.content');
-                                if (msgContent) {
-                                    existingMsg.remove();
-                                }
-                            }
-                        }
-                    });
-                    
-                    // Generar ID único
-                    const msgId = msg.isPlayerMessage ? `msg-player-${msg.timestamp}` : `msg-admin-${msg.timestamp}`;
-                    
-                    // Añadir el nuevo mensaje
+                    // Añadir el mensaje al chat
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
                         mensaje: msg.content,
@@ -1973,7 +1930,7 @@
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
                     
-                    console.log('📨 Mensaje actualizado manteniendo automáticos:', msg.sender, '-', msg.content.substring(0, 30));
+                    console.log('📨 Mensaje añadido al chat:', msg.sender, '-', msg.content.substring(0, 30));
                 });
             };
             // Limpieza total al hacer logout
@@ -2461,7 +2418,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '1.51';
+        const SYSTEM_VERSION = '1.52';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -3003,7 +2960,7 @@
             }
         };
 
-                    console.log('🎮 Ultimate Mercenary v1.51 - CHAT Y MENSAJES SINCRONIZADOS');
+                    console.log('🎮 Ultimate Mercenary v1.52 - CHAT NORMAL SIN REINICIOS');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
         console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');
