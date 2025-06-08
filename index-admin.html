@@ -304,7 +304,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY</h1>
+                        <h1>ULTIMATE MERCENARY 1.56</h1>
                         <h2>Panel de Control</h2>
                     </div>
                 </div>
@@ -347,11 +347,13 @@
                     
                     <div class="control-group">
                         <h4>CONTEXTO TEMPORAL</h4>
-                        <select id="timeOfDay-input" class="control-input">
-                            <option value="dia">DÍA</option>
-                            <option value="noche">NOCHE</option>
-                        </select>
-                        <button class="control-button" onclick="applyTimeOfDay()">APLICAR</button>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="timeOfDay-input" class="control-input" style="flex: 1;">
+                                <option value="dia">DÍA</option>
+                                <option value="noche">NOCHE</option>
+                            </select>
+                            <button class="control-button" onclick="applyTimeOfDay()">APLICAR</button>
+                        </div>
                     </div>
                 </div>
                 
