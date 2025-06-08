@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Filtros - Ultimate Mercenary</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .filter-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+        }
+        .filter-controls {
+            margin: 20px 0;
+        }
+        .filter-controls label {
+            margin-right: 15px;
+            color: #00ccff;
+        }
+        button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #ff6b81;
+        }
+        .messages {
+            background: #111;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+        .context-controls {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ff6b00;
+            border-radius: 5px;
+        }
+        .context-controls button {
+            background: #ff6b00;
+        }
+        .context-controls button:hover {
+            background: #ff8533;
+        }
+        .error {
+            color: #ff4757;
+        }
+        .warning {
+            color: #ffa502;
+        }
+        .success {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Filtros y Contexto - Ultimate Mercenary</h1>
+    
+    <div class="context-controls">
+        <h3>Controles de Contexto:</h3>
+        <button onclick="setContexto('prueba0', 'dia', '7.5')">Prueba 0 - Día - Alto</button>
+        <button onclick="setContexto('prueba0', 'noche', '7.5')">Prueba 0 - Noche - Alto</button>
+        <button onclick="setContexto('prueba1', 'dia', '7.5')">Prueba 1 - Día - Alto</button>
+        <button onclick="setContexto('prueba1', 'noche', '7.5')">Prueba 1 - Noche - Alto</button>
+        <button onclick="setContexto('prueba1', 'dia', '4.0')">Prueba 1 - Día - Bajo</button>
+    </div>
+    
+    <div class="filter-controls">
+        <h3>Controles de Filtros:</h3>
+        <label><input type="checkbox" id="filter-fan" checked> FAN</label>
+        <label><input type="checkbox" id="filter-picante" checked> PICANTE</label>
+        <label><input type="checkbox" id="filter-humillante" checked> HUMILLANTE</label>
+        <label><input type="checkbox" id="filter-relleno" checked> RELLENO</label>
+        <label><input type="checkbox" id="filter-queja" checked> QUEJA</label>
+        <label><input type="checkbox" id="filter-divertido" checked> DIVERTIDO</label>
+        <label><input type="checkbox" id="filter-insulto" checked> INSULTO</label>
+        <br><br>
+        <button onclick="actualizarMensajes()">🔄 ACTUALIZAR MENSAJES</button>
+        <button onclick="desactivarPicante()">❌ DESACTIVAR PICANTE</button>
+        <button onclick="activarTodos()">✅ ACTIVAR TODOS</button>
+        <button onclick="diagnosticar()">🔍 DIAGNOSTICAR</button>
+    </div>
+
+    <div class="filter-test">
+        <h3>Estado del Sistema:</h3>
+        <div id="system-status">Cargando...</div>
+    </div>
+
+    <div class="filter-test">
+        <h3>Diagnóstico Detallado:</h3>
+        <div id="diagnostic-info" class="messages">Esperando diagnóstico...</div>
+    </div>
+
+    <div class="filter-test">
+        <h3>Mensajes Actuales:</h3>
+        <div id="messages-container" class="messages">Cargando mensajes...</div>
+    </div>
+
+    <div class="filter-test">
+        <h3>Log de Actividad:</h3>
+        <div id="filter-log" class="messages"></div>
+    </div>
+
+    <!-- Cargar sistema de mensajes -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-system-integration.js"></script>
+    
+    <script>
+        // Inicializar sistema de filtros
+        window.MESSAGE_FILTERS = {
+            enabledCategories: {
+                'fan': true,
+                'picante': true,
+                'humillante': true,
+                'relleno': true,
+                'queja': true,
+                'divertido': true,
+                'insulto': true
+            },
+            
+            setFilter: function(category, enabled) {
+                this.enabledCategories[category] = enabled;
+                console.log(`🎛️ Filtro ${category}: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
+                logFilter(`Filtro ${category}: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
+            }
+        };
+
+        function logFilter(message) {
+            const log = document.getElementById('filter-log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<div class="message">[${timestamp}] ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function setContexto(prueba, momento, rating) {
+            localStorage.setItem('currentTest', prueba);
+            localStorage.setItem('timeOfDay', momento);
+            localStorage.setItem('rating', rating);
+            
+            logFilter(`🎯 Contexto cambiado: ${prueba} - ${momento} - ${rating}`);
+            
+            // Forzar actualización
+            if (window.updateContextualSystem) {
+                window.updateContextualSystem();
+            }
+            
+            setTimeout(() => {
+                actualizarMensajes();
+                diagnosticar();
+            }, 500);
+        }
+
+        function diagnosticar() {
+            const diagnostic = document.getElementById('diagnostic-info');
+            const currentTest = localStorage.getItem('currentTest');
+            const timeOfDay = localStorage.getItem('timeOfDay');
+            const rating = localStorage.getItem('rating');
+            const ratingLevel = parseFloat(rating) > 6 ? 'alto' : 'bajo';
+            const contextKey = `${timeOfDay}_${ratingLevel}`;
+            
+            let diagnosticInfo = `<div class="success">🔍 DIAGNÓSTICO COMPLETO:</div>`;
+            
+            // Estado del contexto
+            diagnosticInfo += `<div class="message">📊 <strong>Contexto Actual:</strong></div>`;
+            diagnosticInfo += `<div class="message">   • Prueba: ${currentTest}</div>`;
+            diagnosticInfo += `<div class="message">   • Momento: ${timeOfDay}</div>`;
+            diagnosticInfo += `<div class="message">   • Rating: ${rating} (${ratingLevel})</div>`;
+            diagnosticInfo += `<div class="message">   • Clave de contexto: ${contextKey}</div>`;
+            
+            // Estado de las funciones
+            diagnosticInfo += `<div class="message">🔧 <strong>Funciones Disponibles:</strong></div>`;
+            diagnosticInfo += `<div class="message">   • getContextualMessages: ${typeof window.getContextualMessages === 'function' ? '✅' : '❌'}</div>`;
+            diagnosticInfo += `<div class="message">   • getCurrentContextualMessages: ${typeof window.getCurrentContextualMessages === 'function' ? '✅' : '❌'}</div>`;
+            diagnosticInfo += `<div class="message">   • applyMessageFilters: ${typeof window.applyMessageFilters === 'function' ? '✅' : '❌'}</div>`;
+            diagnosticInfo += `<div class="message">   • CONTEXTUAL_MESSAGES: ${window.CONTEXTUAL_MESSAGES ? '✅' : '❌'}</div>`;
+            
+            // Revisar datos disponibles
+            if (window.CONTEXTUAL_MESSAGES) {
+                diagnosticInfo += `<div class="message">📦 <strong>Datos de Mensajes:</strong></div>`;
+                
+                if (window.CONTEXTUAL_MESSAGES[currentTest]) {
+                    diagnosticInfo += `<div class="message">   • ${currentTest}: ✅ Disponible</div>`;
+                    
+                    if (window.CONTEXTUAL_MESSAGES[currentTest][contextKey]) {
+                        const messages = window.CONTEXTUAL_MESSAGES[currentTest][contextKey];
+                        diagnosticInfo += `<div class="message">   • ${contextKey}: ✅ ${messages.length} mensajes</div>`;
+                        
+                        // Analizar categorías
+                        const categories = {};
+                        messages.forEach(msg => {
+                            if (typeof msg === 'object' && msg.category) {
+                                categories[msg.category] = (categories[msg.category] || 0) + 1;
+                            }
+                        });
+                        
+                        diagnosticInfo += `<div class="message">   • Categorías encontradas:</div>`;
+                        Object.entries(categories).forEach(([cat, count]) => {
+                            diagnosticInfo += `<div class="message">     - ${cat.toUpperCase()}: ${count} mensajes</div>`;
+                        });
+                        
+                        // Buscar contenido sensual específicamente
+                        const sensualWords = ['sensual', 'erótic', 'sexual', 'íntim', 'seduc', 'atractiv'];
+                        let sensualCount = 0;
+                        let sensualMessages = [];
+                        
+                        messages.forEach((msg, index) => {
+                            const text = typeof msg === 'object' ? msg.text : msg;
+                            const category = typeof msg === 'object' ? msg.category : 'unknown';
+                            
+                            sensualWords.forEach(word => {
+                                if (text.toLowerCase().includes(word)) {
+                                    sensualCount++;
+                                    sensualMessages.push(`[${index+1}] (${category}) ${text.substring(0, 80)}...`);
+                                }
+                            });
+                        });
+                        
+                        if (sensualCount > 0) {
+                            diagnosticInfo += `<div class="error">⚠️ <strong>CONTENIDO SENSUAL DETECTADO: ${sensualCount} mensajes</strong></div>`;
+                            sensualMessages.slice(0, 5).forEach(msg => {
+                                diagnosticInfo += `<div class="error">   ${msg}</div>`;
+                            });
+                        } else {
+                            diagnosticInfo += `<div class="success">✅ No se detectó contenido sensual en este contexto</div>`;
+                        }
+                        
+                    } else {
+                        diagnosticInfo += `<div class="error">   • ${contextKey}: ❌ No disponible</div>`;
+                    }
+                } else {
+                    diagnosticInfo += `<div class="error">   • ${currentTest}: ❌ No disponible</div>`;
+                }
+            }
+            
+            diagnostic.innerHTML = diagnosticInfo;
+        }
+
+        function actualizarEstado() {
+            const status = document.getElementById('system-status');
+            status.innerHTML = `
+                <strong>Contexto Actual:</strong><br>
+                • Prueba: ${localStorage.getItem('currentTest')}<br>
+                • Momento: ${localStorage.getItem('timeOfDay')}<br>
+                • Rating: ${localStorage.getItem('rating')}<br>
+                • Filtros activos: ${Object.entries(MESSAGE_FILTERS.enabledCategories).filter(([k,v]) => v).map(([k,v]) => k.toUpperCase()).join(', ')}
+            `;
+        }
+
+        function actualizarMensajes() {
+            try {
+                logFilter('Solicitando mensajes...');
+                
+                let messages = [];
+                
+                // Probar diferentes métodos
+                if (typeof window.getContextualMessages === 'function') {
+                    messages = window.getContextualMessages();
+                    logFilter(`✅ getContextualMessages(): ${messages.length} mensajes`);
+                } else if (typeof window.getCurrentContextualMessages === 'function') {
+                    messages = window.getCurrentContextualMessages();
+                    logFilter(`✅ getCurrentContextualMessages(): ${messages.length} mensajes`);
+                } else {
+                    logFilter('❌ No se encontraron funciones de mensajes');
+                    messages = ['Error: No hay funciones disponibles'];
+                }
+
+                const container = document.getElementById('messages-container');
+                if (messages.length > 0) {
+                    // Analizar contenido sensual en los mensajes obtenidos
+                    const sensualWords = ['sensual', 'erótic', 'sexual', 'íntim', 'seduc', 'atractiv'];
+                    
+                    const htmlMessages = messages.slice(0, 30).map((msg, i) => {
+                        let className = 'message';
+                        sensualWords.forEach(word => {
+                            if (msg.toLowerCase().includes(word)) {
+                                className += ' error';
+                                logFilter(`🚨 CONTENIDO SENSUAL DETECTADO: ${msg.substring(0, 50)}...`);
+                            }
+                        });
+                        return `<div class="${className}">[${i+1}] ${msg}</div>`;
+                    }).join('');
+                    
+                    container.innerHTML = htmlMessages;
+                    
+                    if (messages.length > 30) {
+                        container.innerHTML += `<div class="message"><em>... y ${messages.length - 30} mensajes más</em></div>`;
+                    }
+                } else {
+                    container.innerHTML = '<div class="message">❌ No hay mensajes disponibles</div>';
+                }
+
+                actualizarEstado();
+            } catch (error) {
+                logFilter(`❌ Error: ${error.message}`);
+                console.error('Error actualizando mensajes:', error);
+            }
+        }
+
+        function desactivarPicante() {
+            MESSAGE_FILTERS.setFilter('picante', false);
+            document.getElementById('filter-picante').checked = false;
+            actualizarMensajes();
+        }
+
+        function activarTodos() {
+            Object.keys(MESSAGE_FILTERS.enabledCategories).forEach(category => {
+                MESSAGE_FILTERS.setFilter(category, true);
+                document.getElementById(`filter-${category}`).checked = true;
+            });
+            actualizarMensajes();
+        }
+
+        // Event listeners para checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            Object.keys(MESSAGE_FILTERS.enabledCategories).forEach(category => {
+                const checkbox = document.getElementById(`filter-${category}`);
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        MESSAGE_FILTERS.setFilter(category, this.checked);
+                        actualizarMensajes();
+                    });
+                }
+            });
+
+            // Configurar contexto inicial
+            localStorage.setItem('currentTest', 'prueba1');
+            localStorage.setItem('timeOfDay', 'dia');
+            localStorage.setItem('rating', '7.5');
+
+            // Inicializar después de un breve delay
+            setTimeout(() => {
+                logFilter('Sistema inicializado en Prueba 1 - Día - Alto');
+                actualizarMensajes();
+                diagnosticar();
+            }, 1000);
+        });
+
+        // Capturar logs de consola
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            if (args[0] && args[0].includes && (args[0].includes('🚫') || args[0].includes('🎭') || args[0].includes('✅'))) {
+                logFilter(args.join(' '));
+            }
+        };
+    </script>
+</body>
+</html> 

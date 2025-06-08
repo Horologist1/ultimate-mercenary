@@ -3012,18 +3012,25 @@
         if (!localStorage.getItem('timeOfDay')) localStorage.setItem('timeOfDay', 'dia');
         if (!localStorage.getItem('rating')) localStorage.setItem('rating', '7.0');
         
-        // CREAR LAS FUNCIONES GLOBALES USANDO LAS FUNCIONES EXPORTADAS
+        // CREAR LAS FUNCIONES GLOBALES USANDO LAS FUNCIONES EXPORTADAS CON FILTROS
         window.getCurrentContextualMessages = function() {
             try {
-                // Usar la función exportada del archivo contextual-messages.js
+                // Usar PRIORITARIAMENTE la función de contextual-system-integration.js que ya integra filtros
+                if (typeof window.contextualIntegration_getCurrentContextualMessages === 'function') {
+                    const messages = window.contextualIntegration_getCurrentContextualMessages();
+                    console.log(`✅ Obtenidos ${messages.length} mensajes contextuales con filtros integrados`);
+                    return messages;
+                }
+                
+                // Usar la función exportada del archivo contextual-messages.js con filtros
                 if (typeof window.getContextualMessages === 'function') {
                     const messages = window.getContextualMessages();
-                    console.log(`✅ Obtenidos ${messages.length} mensajes contextuales`);
+                    console.log(`✅ Obtenidos ${messages.length} mensajes contextuales con filtros`);
                     return messages;
                 } else {
                     console.warn('⚠️ window.getContextualMessages no está disponible');
                     
-                    // Fallback directo a datos
+                    // Fallback directo a datos SIN FILTROS (no recomendado)
                     if (window.CONTEXTUAL_MESSAGES) {
                         const prueba = localStorage.getItem('currentTest') || 'prueba0';
                         const momento = localStorage.getItem('timeOfDay') || 'dia';
@@ -3031,7 +3038,18 @@
                         const context = `${momento}_${rating > 6 ? 'alto' : 'bajo'}`;
                         
                         if (window.CONTEXTUAL_MESSAGES[prueba] && window.CONTEXTUAL_MESSAGES[prueba][context]) {
-                            return window.CONTEXTUAL_MESSAGES[prueba][context];
+                            const rawMessages = window.CONTEXTUAL_MESSAGES[prueba][context];
+                            // Aplicar filtros manualmente si es posible
+                            if (typeof window.applyMessageFilters === 'function') {
+                                const filteredMessages = window.applyMessageFilters(rawMessages);
+                                const textMessages = filteredMessages.map(msg => typeof msg === 'object' ? msg.text : msg);
+                                console.log(`⚠️ Mensajes filtrados manualmente: ${rawMessages.length} → ${textMessages.length}`);
+                                return textMessages;
+                            }
+                            // Extraer solo texto sin filtros como último recurso
+                            const textMessages = rawMessages.map(msg => typeof msg === 'object' ? msg.text : msg);
+                            console.warn(`⚠️ Mensajes sin filtrar: ${textMessages.length}`);
+                            return textMessages;
                         }
                     }
                     

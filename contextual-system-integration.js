@@ -37,6 +37,13 @@ function loadScript(src) {
 // =================== SISTEMA DE SELECCIÓN CONTEXTUAL ===================
 
 function getCurrentContextualMessages() {
+    // Usar la función principal de contextual-messages.js que ya tiene filtros implementados
+    if (typeof window.getContextualMessages === 'function') {
+        console.log('✅ Usando función principal con filtros aplicados');
+        return window.getContextualMessages();
+    }
+    
+    // Fallback manual si la función principal no está disponible
     const currentTest = localStorage.getItem('currentTest') || 'prueba0';
     const timeOfDay = localStorage.getItem('timeOfDay') || 'dia';
     const rating = parseFloat(localStorage.getItem('rating') || '7.0');
@@ -46,48 +53,59 @@ function getCurrentContextualMessages() {
     const ratingKey = isRatingHigh ? 'alto' : 'bajo';
     const contextKey = `${timeOfDay}_${ratingKey}`;
     
-    console.log(`🎯 Contexto actual: ${currentTest} - ${timeOfDay} - ${ratingKey} (rating: ${rating})`);
+    console.log(`🎯 Contexto fallback: ${currentTest} - ${timeOfDay} - ${ratingKey} (rating: ${rating})`);
     
     // Obtener los mensajes según la prueba
-    let messages = [];
+    let rawMessages = [];
     
     switch(currentTest) {
         case 'prueba0':
             if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba0 && window.CONTEXTUAL_MESSAGES.prueba0[contextKey]) {
-                messages = window.CONTEXTUAL_MESSAGES.prueba0[contextKey];
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba0[contextKey];
             }
             break;
         case 'prueba1':
             if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba1 && window.CONTEXTUAL_MESSAGES.prueba1[contextKey]) {
-                messages = window.CONTEXTUAL_MESSAGES.prueba1[contextKey];
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba1[contextKey];
             }
             break;
         case 'prueba2':
             if (window.PRUEBA2_MESSAGES && window.PRUEBA2_MESSAGES[contextKey]) {
-                messages = window.PRUEBA2_MESSAGES[contextKey];
+                rawMessages = window.PRUEBA2_MESSAGES[contextKey];
             }
             break;
         case 'prueba3':
             if (window.PRUEBA3_MESSAGES && window.PRUEBA3_MESSAGES[contextKey]) {
-                messages = window.PRUEBA3_MESSAGES[contextKey];
+                rawMessages = window.PRUEBA3_MESSAGES[contextKey];
             }
             break;
         default:
             console.warn(`⚠️ Prueba no reconocida: ${currentTest}`);
             // Fallback a prueba0
             if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba0 && window.CONTEXTUAL_MESSAGES.prueba0[contextKey]) {
-                messages = window.CONTEXTUAL_MESSAGES.prueba0[contextKey];
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba0[contextKey];
             }
     }
     
     // Si no hay mensajes específicos, usar fallback
-    if (!messages || messages.length === 0) {
+    if (!rawMessages || rawMessages.length === 0) {
         console.warn(`⚠️ No se encontraron mensajes para ${currentTest} - ${contextKey}, usando fallback`);
-        messages = getFallbackMessages();
+        return getFallbackMessages();
     }
     
-    console.log(`📨 Mensajes disponibles: ${messages.length}`);
-    return messages;
+    // Aplicar filtros manualmente si la función principal no está disponible
+    if (typeof window.applyMessageFilters === 'function') {
+        const filteredMessages = window.applyMessageFilters(rawMessages);
+        // Extraer texto de objetos mensaje
+        const textMessages = filteredMessages.map(msg => typeof msg === 'object' ? msg.text : msg);
+        console.log(`📨 Mensajes filtrados manualmente: ${rawMessages.length} → ${textMessages.length}`);
+        return textMessages;
+    }
+    
+    // Último fallback - extraer solo texto sin filtros
+    const textMessages = rawMessages.map(msg => typeof msg === 'object' ? msg.text : msg);
+    console.log(`📨 Mensajes sin filtrar: ${textMessages.length}`);
+    return textMessages;
 }
 
 function getFallbackMessages() {
@@ -291,6 +309,8 @@ window.initContextualSystem = initContextualSystem;
 window.updateContextualSystem = updateContextualSystem;
 window.getContextualUsernames = getContextualUsernames;
 window.getCurrentContextualMessages = getCurrentContextualMessages;
+// Exportar con nombre único para prioridad en index-user.html
+window.contextualIntegration_getCurrentContextualMessages = getCurrentContextualMessages;
 window.logCurrentContext = logCurrentContext;
 window.testContextualSystem = testContextualSystem;
 
