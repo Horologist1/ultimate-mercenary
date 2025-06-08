@@ -788,7 +788,7 @@
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
         }
 
-        // Función para cargar y mostrar los mensajes del chat (sin animaciones conflictivas)
+        // Función para cargar y mostrar los últimos mensajes del chat
         function loadChatMessages() {
             let mensajes = [];
             try {
@@ -809,34 +809,37 @@
                 return;
             }
             
-            // Renderizar todos los mensajes con distinción visual (sin setTimeout que causa problemas)
+            // Renderizar solo los últimos mensajes (admin + jugador)
             const messagesHTML = mensajes.map(msg => {
                 // Determinar el color y estilo según el tipo de mensaje
                 let usernameColor = '#cccccc';
                 let backgroundColor = 'transparent';
                 let borderLeft = '';
+                let statusLabel = '';
                 
                 if (msg.isPlayerMessage || (msg.sender || '').toLowerCase() === 'xiii') {
                     usernameColor = '#00ccff';
                     backgroundColor = 'rgba(0, 204, 255, 0.1)';
                     borderLeft = 'border-left: 3px solid #00ccff;';
+                    statusLabel = ' (JUGADOR)';
                 } else if (msg.isAdminMessage) {
-                    usernameColor = '#ff6b6b';
-                    backgroundColor = 'rgba(255, 107, 107, 0.1)';
-                    borderLeft = 'border-left: 3px solid #ff6b6b;';
+                    usernameColor = '#00ff00';
+                    backgroundColor = 'rgba(0, 255, 0, 0.1)';
+                    borderLeft = 'border-left: 3px solid #00ff00;';
+                    statusLabel = ' (ÚLTIMO ENVIADO)';
                 }
                 
                 return `<div class="chat-message" style="background: ${backgroundColor}; ${borderLeft} padding: 8px; margin: 2px 0; border-radius: 4px;">
                     <span class="username" style="color: ${usernameColor}; font-weight: bold;">${msg.sender || msg.user || 'SISTEMA'}:</span> 
                     <span class="content" style="margin-left: 8px;">${msg.content || msg.text || ''}</span> 
-                    <span style="float:right;font-size:11px;color:#888;">${msg.time || ''}</span>
+                    <span style="float:right;font-size:11px;color:#888;">${msg.time || ''}${statusLabel}</span>
                 </div>`;
             }).join('');
             
             chat.innerHTML = messagesHTML;
             chat.scrollTop = chat.scrollHeight;
             
-            console.log(`📧 Chat cargado con ${mensajes.length} mensajes`);
+            console.log(`📧 Chat cargado con ${mensajes.length} últimos mensajes`);
         }
         window.loadChatMessages = loadChatMessages;
 
@@ -852,23 +855,28 @@
             }
             
             try {
-                // Crear mensaje del admin que se guarda permanentemente como cualquier otro
+                // Crear mensaje del admin (solo mantener el último)
                 const newMessage = {
                     sender: sender,
                     content: message,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isPlayerMessage: false // NO es del jugador, pero tampoco se filtra
+                    isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Cargar mensajes existentes y añadir el nuevo
+                // Cargar mensajes existentes y filtrar mensajes del admin anteriores
                 const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push(newMessage);
+                
+                // Eliminar mensajes del admin anteriores para mostrar solo el último
+                const messagesWithoutPreviousAdmin = messages.filter(msg => !msg.isAdminMessage);
+                
+                // Añadir el nuevo mensaje del admin
+                messagesWithoutPreviousAdmin.push(newMessage);
                 
                 // Guardar en localStorage y Firebase permanentemente
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesWithoutPreviousAdmin));
                 if (window.saveChat) {
-                    window.saveChat(messages);
+                    window.saveChat(messagesWithoutPreviousAdmin);
                 }
                 
                 // Actualizar el chat del control panel
@@ -925,24 +933,29 @@
             }
             
             try {
-                // Crear mensaje del admin que se guarda permanentemente como cualquier otro
+                // Crear mensaje del admin (solo mantener el último)
                 const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
                 const newMessage = {
                     sender: sender,
                     content: fullContent,
                     time: new Date().toLocaleTimeString(),
                     timestamp: Date.now(),
-                    isPlayerMessage: false // NO es del jugador, pero tampoco se filtra
+                    isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Cargar mensajes existentes y añadir el nuevo
+                // Cargar mensajes existentes y filtrar mensajes del admin anteriores
                 const messages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
-                messages.push(newMessage);
+                
+                // Eliminar mensajes del admin anteriores para mostrar solo el último
+                const messagesWithoutPreviousAdmin = messages.filter(msg => !msg.isAdminMessage);
+                
+                // Añadir el nuevo mensaje del admin
+                messagesWithoutPreviousAdmin.push(newMessage);
                 
                 // Guardar en localStorage y Firebase permanentemente
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messages));
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesWithoutPreviousAdmin));
                 if (window.saveChat) {
-                    window.saveChat(messages);
+                    window.saveChat(messagesWithoutPreviousAdmin);
                 }
                 
                 // Actualizar PM
