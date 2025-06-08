@@ -1165,6 +1165,7 @@
             console.log('🔥 [FIREBASE LISTENER] localStorage actual:', currentLocal);
             
             if (data && typeof data === 'object') {
+                const previousState = localStorage.getItem('messageFilters');
                 localStorage.setItem('messageFilters', JSON.stringify(data));
                 
                 // Actualizar sistema MESSAGE_FILTERS
@@ -1172,16 +1173,21 @@
                     window.MESSAGE_FILTERS.enabledCategories = data;
                     console.log(`✅ [FIREBASE SYNC] messageFilters SINCRONIZADOS:`, data);
                     
-                    // *** REINICIAR MENSAJES AUTOMÁTICOS CON NUEVOS FILTROS ***
-                    if (window.updateAutoMessages) {
-                        console.log('🔄 [FIREBASE SYNC] Reiniciando mensajes automáticos con nuevos filtros...');
-                        window.updateAutoMessages();
-                    }
-                    
-                    // Refrescar mensajes contextuales si el sistema está disponible
-                    if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
-                        console.log('🔄 [FIREBASE SYNC] Refrescando mensajes contextuales...');
-                        window.contextualSystem.refreshMessages();
+                    // Solo reiniciar mensajes si realmente cambió algo
+                    if (previousState !== JSON.stringify(data)) {
+                        // *** REINICIAR MENSAJES AUTOMÁTICOS CON NUEVOS FILTROS ***
+                        if (window.updateAutoMessages) {
+                            console.log('🔄 [FIREBASE SYNC] Reiniciando mensajes automáticos con nuevos filtros...');
+                            window.updateAutoMessages();
+                        }
+                        
+                        // Refrescar mensajes contextuales si el sistema está disponible
+                        if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
+                            console.log('🔄 [FIREBASE SYNC] Refrescando mensajes contextuales...');
+                            window.contextualSystem.refreshMessages();
+                        }
+                    } else {
+                        console.log('🔄 [FIREBASE SYNC] Filtros sin cambios, no reiniciando mensajes');
                     }
                 } else {
                     console.warn('⚠️ [FIREBASE SYNC] MESSAGE_FILTERS no disponible aún');
@@ -1190,6 +1196,7 @@
                 console.log('🎯 [FIREBASE SYNC] SYNC FILTROS COMPLETADO');
             } else {
                 console.warn('⚠️ [FIREBASE SYNC] messageFilters inválido o null:', data);
+                console.log('🔧 [FIREBASE SYNC] Esto es normal en la primera carga, se inicializará automáticamente');
             }
         });
         
@@ -1201,6 +1208,36 @@
             console.log('🔍 [FIREBASE INIT] Lectura inicial filtros:');
             console.log('🔍 [FIREBASE INIT] Firebase tiene:', firebaseValue);
             console.log('🔍 [FIREBASE INIT] localStorage tiene:', localValue);
+            
+            // *** NUEVO: Si Firebase está vacío, inicializar con valores por defecto ***
+            if (!firebaseValue) {
+                const defaultFilters = {
+                    'fan': true,
+                    'picante': true,
+                    'humillante': true,
+                    'relleno': true,
+                    'queja': true,
+                    'divertido': true,
+                    'insulto': true
+                };
+                
+                console.log('🚨 [FIREBASE INIT] Firebase messageFilters está vacío - Inicializando...');
+                
+                // Guardar valores por defecto en Firebase
+                messageFiltersRef.set(defaultFilters).then(() => {
+                    console.log('✅ [FIREBASE INIT] Filtros por defecto guardados en Firebase:', defaultFilters);
+                    
+                    // Actualizar sistema local
+                    localStorage.setItem('messageFilters', JSON.stringify(defaultFilters));
+                    if (window.MESSAGE_FILTERS && window.MESSAGE_FILTERS.enabledCategories) {
+                        window.MESSAGE_FILTERS.enabledCategories = defaultFilters;
+                    }
+                }).catch(error => {
+                    console.error('❌ [FIREBASE INIT] Error guardando filtros por defecto:', error);
+                });
+                
+                return;
+            }
             
             if (firebaseValue && JSON.stringify(firebaseValue) !== localValue) {
                 console.log('🚨 [FIREBASE INIT] FILTROS DESINCRONIZADOS - Forzando sync...');

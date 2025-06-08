@@ -1547,7 +1547,15 @@
                 
                 console.log('✅ FIREBASE SOBRESCRIBIÓ FILTROS CON:', data);
             } else {
-                console.log('⚠️ Firebase messageFilters es null/undefined');
+                console.log('⚠️ Firebase messageFilters es null/undefined - Inicializando...');
+                
+                // Si Firebase está vacío, inicializar con valores por defecto
+                const defaultFilters = MESSAGE_FILTERS.enabledCategories;
+                messageFiltersRef.set(defaultFilters).then(() => {
+                    console.log('✅ CONTROL PANEL inicializó filtros en Firebase:', defaultFilters);
+                }).catch(error => {
+                    console.error('❌ Error inicializando filtros en Firebase:', error);
+                });
             }
         });
 
