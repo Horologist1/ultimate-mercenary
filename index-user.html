@@ -3126,6 +3126,8 @@
     <!-- SISTEMA DE FILTROS DE MENSAJES v1.59 -->
     <script>
         // Inicializar sistema de filtros en index-user.html
+        console.log('🚀 [FILTROS] Iniciando sistema de filtros...');
+        
         if (!window.MESSAGE_FILTERS) {
             window.MESSAGE_FILTERS = {
                 enabledCategories: {
@@ -3184,6 +3186,7 @@
             // Cargar filtros desde localStorage al inicializar
             window.MESSAGE_FILTERS.loadFromStorage();
             console.log('✅ [FILTROS] Sistema de filtros inicializado en index-user.html');
+            console.log('🎛️ [FILTROS] Estado inicial:', window.MESSAGE_FILTERS.enabledCategories);
             
             // Función de test para probar filtros desde la consola
             window.testFilters = function() {
@@ -3205,9 +3208,79 @@
                     
                     const messagesAfter = window.getCurrentContextualMessages();
                     console.log(`📨 [FILTROS] Mensajes después de reactivar: ${messagesAfter.length}`);
-                }, 2000);
-            };
-        }
+                                 }, 2000);
+             };
+                  }
+        
+        // EXPONER GLOBALMENTE LAS FUNCIONES DE FILTROS (SIEMPRE)
+        window.debugFilters = function() {
+            console.log('🔍 MESSAGE_FILTERS:', window.MESSAGE_FILTERS);
+            console.log('🔍 enabledCategories:', window.MESSAGE_FILTERS?.enabledCategories);
+            console.log('🔍 testFilters disponible:', typeof window.testFilters);
+        };
+        
+        window.toggleFilterTest = function(category) {
+            console.log(`🎛️ Toggling filter: ${category}`);
+            if (window.MESSAGE_FILTERS && window.MESSAGE_FILTERS.enabledCategories) {
+                const current = window.MESSAGE_FILTERS.enabledCategories[category];
+                window.MESSAGE_FILTERS.setFilter(category, !current);
+                console.log(`📊 ${category}: ${current} → ${!current}`);
+            } else {
+                console.error('❌ MESSAGE_FILTERS no disponible');
+            }
+        };
+        
+        window.quickTestFilters = function() {
+            console.log('🧪 Test rápido de filtros...');
+            console.log('Estado actual:', window.MESSAGE_FILTERS?.enabledCategories);
+            
+            // Desactivar todos los filtros excepto fan
+            ['picante', 'humillante', 'relleno', 'queja', 'divertido', 'insulto'].forEach(cat => {
+                window.MESSAGE_FILTERS.setFilter(cat, false);
+            });
+            
+            setTimeout(() => {
+                console.log('📊 Mensajes solo con FAN:', window.getCurrentContextualMessages().length);
+                
+                // Reactivar todos
+                Object.keys(window.MESSAGE_FILTERS.enabledCategories).forEach(cat => {
+                    window.MESSAGE_FILTERS.setFilter(cat, true);
+                });
+                
+                setTimeout(() => {
+                    console.log('📊 Mensajes con todos los filtros:', window.getCurrentContextualMessages().length);
+                }, 1000);
+            }, 1000);
+        };
+        
+        console.log('🚀 Funciones de debug disponibles:');
+        console.log('   debugFilters() - Ver estado');
+        console.log('   toggleFilterTest("picante") - Toggle un filtro');
+        console.log('   quickTestFilters() - Test completo');
+        
+        // SINCRONIZACIÓN CON CONTROL PANEL VIA LOCALSTORAGE
+        let lastFilterState = JSON.stringify(window.MESSAGE_FILTERS.enabledCategories);
+        
+        setInterval(() => {
+            const currentFilterState = localStorage.getItem('messageFilters');
+            if (currentFilterState && currentFilterState !== lastFilterState) {
+                console.log('🔄 [FILTROS] Cambio detectado en filtros desde control panel');
+                try {
+                    window.MESSAGE_FILTERS.enabledCategories = JSON.parse(currentFilterState);
+                    lastFilterState = currentFilterState;
+                    
+                    // Forzar actualización de mensajes
+                    if (window.contextualSystem && window.contextualSystem.refreshMessages) {
+                        console.log('🔄 [FILTROS] Refrescando mensajes por cambio de filtros...');
+                        window.contextualSystem.refreshMessages();
+                    }
+                    
+                    console.log('✅ [FILTROS] Filtros sincronizados:', window.MESSAGE_FILTERS.enabledCategories);
+                } catch (e) {
+                    console.error('❌ [FILTROS] Error sincronizando filtros:', e);
+                }
+            }
+        }, 1000); // Verificar cada segundo
     </script>
     
     <!-- INICIALIZACIÓN INMEDIATA v0.97 -->
