@@ -1384,6 +1384,13 @@
                 
                 <!-- Panel lateral -->
                 <div class="sidebar">
+                    <!-- Imagen XIII -->
+                    <div class="sidebar-section xiii-image-section">
+                        <div class="xiii-image-container" onclick="openXIIIModal()">
+                            <img src="images/XIIIbox.png" alt="XIII" class="xiii-thumbnail">
+                        </div>
+                    </div>
+                    
                     <!-- Estadísticas -->
                     <div class="sidebar-section">
                         <h3>ESTADÍSTICAS</h3>
@@ -1461,6 +1468,14 @@
         </div>
         <!-- END OF NEW Objective Modal -->
 
+        <!-- XIII Image Modal -->
+        <div id="xiii-modal" class="xiii-image-modal" style="display: none;">
+            <div class="xiii-modal-content">
+                <span class="xiii-close" onclick="closeXIIIModal()">&times;</span>
+                <img src="images/XIII.png" alt="XIII Completa" class="xiii-full-image">
+            </div>
+        </div>
+
         <div class="overlay" style="z-index:50;"></div>
     </div>
 
@@ -1523,6 +1538,26 @@
         };
     }
     window.openStats = openStats;
+    
+    // Funciones para el modal de imagen XIII
+    function openXIIIModal() {
+        document.getElementById('xiii-modal').style.display = 'block';
+    }
+    
+    function closeXIIIModal() {
+        document.getElementById('xiii-modal').style.display = 'none';
+    }
+    
+    window.openXIIIModal = openXIIIModal;
+    window.closeXIIIModal = closeXIIIModal;
+    
+    // Cerrar modal al hacer clic fuera de la imagen
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('xiii-modal');
+        if (event.target === modal) {
+            closeXIIIModal();
+        }
+    });
     </script>
     <script>
     // --- MODALES Y FUNCIONES GLOBALES (openShop, openMessages, openObjective) ---
