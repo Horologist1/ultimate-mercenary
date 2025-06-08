@@ -577,6 +577,7 @@
                                 <option value="noche">Noche</option>
                             </select>
                             <button class="control-button" onclick="applyTimeOfDay()" style="padding: 4px 12px; font-size: 12px;">APLICAR</button>
+                            <button class="control-button" onclick="resetFirebaseTimeOfDay()" style="padding: 4px 12px; font-size: 11px; background-color: #ff6b4a;">RESET</button>
                         </div>
                     </div>
                 </div>
@@ -987,6 +988,54 @@
         
         // Hacer la función disponible globalmente para testing
         window.debugFirebaseTimeOfDay = debugFirebaseTimeOfDay;
+        
+        // FUNCIÓN DE EMERGENCIA: Resetear Firebase timeOfDay
+        function resetFirebaseTimeOfDay() {
+            console.log('🚨 RESETEANDO FIREBASE TIMEOFDAY COMPLETAMENTE...');
+            
+            // Método 1: Establecer a 'dia' por defecto
+            if (window.saveTimeOfDay) {
+                console.log('🔥 Método 1: Forzando "dia" en Firebase...');
+                window.saveTimeOfDay('dia');
+                
+                setTimeout(() => {
+                    console.log('🔄 Estableciendo localStorage a "dia"...');
+                    localStorage.removeItem('timeOfDay');
+                    localStorage.setItem('timeOfDay', 'dia');
+                    
+                    console.log('🔄 Estableciendo dropdown a "dia"...');
+                    document.getElementById('time-of-day').value = 'dia';
+                    
+                    console.log('✅ Reset completo ejecutado');
+                }, 1000);
+            }
+            
+            alert('🚨 RESET FIREBASE EJECUTADO\n\nEspera 3 segundos y recarga ambas páginas.');
+        }
+        
+        // FUNCIÓN DE EMERGENCIA: Borrar completamente la entrada de Firebase
+        function deleteFirebaseTimeOfDay() {
+            console.log('💀 BORRANDO ENTRADA FIREBASE TIMEOFDAY...');
+            
+            if (window.saveTimeOfDay) {
+                // Intentar borrar estableciendo null
+                console.log('🔥 Enviando null a Firebase...');
+                window.saveTimeOfDay(null);
+                
+                setTimeout(() => {
+                    console.log('🔄 Reestableciendo con "dia"...');
+                    window.saveTimeOfDay('dia');
+                    localStorage.setItem('timeOfDay', 'dia');
+                    document.getElementById('time-of-day').value = 'dia';
+                }, 2000);
+            }
+            
+            alert('💀 BORRADO FIREBASE EJECUTADO\n\nEspera 5 segundos y recarga ambas páginas.');
+        }
+        
+        // Hacer funciones disponibles globalmente
+        window.resetFirebaseTimeOfDay = resetFirebaseTimeOfDay;
+        window.deleteFirebaseTimeOfDay = deleteFirebaseTimeOfDay;
 
         // Función para cargar y mostrar los últimos mensajes del chat (solo para el panel de control)
         function loadChatMessages() {
