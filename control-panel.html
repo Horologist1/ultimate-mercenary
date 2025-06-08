@@ -936,8 +936,8 @@
             }
             
             try {
-                // Crear mensaje del admin con PM
-                const fullContent = `${message} ¡Te transfiero ${pmAmount} PM!`;
+                // Crear mensaje del admin con PM (formato compatible con botón de aceptar)
+                const fullContent = `${message} ¡+${pmAmount} PM!`;
                 const newMessage = {
                     sender: sender,
                     content: fullContent,
@@ -963,8 +963,8 @@
                     console.error('❌ window.saveChat no disponible para PM');
                 }
                 
-                // Actualizar PM
-                statsManager.updatePM(pmAmount);
+                // NO actualizar PM automáticamente - el jugador debe hacer clic en "Aceptar"
+                // statsManager.updatePM(pmAmount); // Comentado - ahora se suma cuando acepta
                 
                 // Actualizar solo el panel de control (Firebase se encarga del resto)
                 loadChatMessages();
@@ -974,7 +974,8 @@
                 document.getElementById('pm-message-input').value = '';
                 localStorage.setItem('lastPMUsername', sender);
                 
-                console.log('✅ Proceso completo - Mensaje PM del admin enviado:', newMessage.content);
+                console.log('✅ Proceso completo - Mensaje PM del admin enviado con botón de aceptar:', newMessage.content);
+                console.log('🎯 El jugador debe hacer clic en "Aceptar" para recibir los PM');
             } catch (error) {
                 console.error('❌ Error al enviar mensaje temporal de PM:', error);
                 alert('Error al enviar el mensaje');
