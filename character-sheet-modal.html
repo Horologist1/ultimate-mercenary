@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Sheet Modal - Ultimate Mercenary 1.0</title>
+    <title>Character Sheet Modal - Ultimate Mercenary 1.61</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -750,6 +750,89 @@
             font-size: 11px !important;
             text-align: right !important;
         }
+
+        /* XIII Image Styles */
+        .xiii-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 170, 0.1));
+            border: 2px solid #00ccff;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            margin: 15px auto;
+            width: 100px;
+            height: 100px;
+        }
+
+        .xiii-image-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            border-color: #ff4757;
+        }
+
+        .xiii-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        /* XIII Modal Styles */
+        .xiii-image-modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .xiii-modal-content {
+            position: relative;
+            background: linear-gradient(135deg, rgba(10, 10, 18, 0.95), rgba(18, 18, 36, 0.95));
+            border: 3px solid #00ccff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            max-width: 70vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .xiii-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #00ccff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .xiii-close:hover {
+            color: #ff4757;
+            text-shadow: 0 0 10px #ff4757;
+        }
+
+        .xiii-full-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
     </style>
     
     <script>
@@ -762,6 +845,11 @@
         <div class="sheet-header">
             <h1>FICHA DE PERSONAJE</h1>
             <h2>Concursante #13</h2>
+            
+            <!-- Imagen XIII -->
+            <div class="xiii-image-container" onclick="openXIIIModal()">
+                <img src="images/XIIIbox.png" alt="XIII" class="xiii-thumbnail">
+            </div>
         </div>
 
         <div class="button-container">
@@ -4154,6 +4242,33 @@ Introduce el número (1-4):`);
         console.log('🚀 [v0.99] Sistema de atributos NUEVO cargado');
         console.log('🔧 [v0.99] Función disponible: testNewAttributeSystem()');
         console.log('🎯 [v0.99] PLANTILLA + PUNTOS ADICIONALES - Guardado separado GARANTIZADO');
+    </script>
+
+    <!-- XIII Image Modal -->
+    <div id="xiii-modal" class="xiii-image-modal" style="display: none;">
+        <div class="xiii-modal-content">
+            <span class="xiii-close" onclick="closeXIIIModal()">&times;</span>
+            <img src="images/XIII.png" alt="XIII Completa" class="xiii-full-image">
+        </div>
+    </div>
+
+    <script>
+        // Funciones para el modal de imagen XIII
+        function openXIIIModal() {
+            document.getElementById('xiii-modal').style.display = 'flex';
+        }
+        
+        function closeXIIIModal() {
+            document.getElementById('xiii-modal').style.display = 'none';
+        }
+        
+        // Cerrar modal al hacer clic fuera de la imagen
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('xiii-modal');
+            if (event.target === modal) {
+                closeXIIIModal();
+            }
+        });
     </script>
 </body>
 </html> 

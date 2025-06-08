@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.6</title>
+    <title>Ultimate Mercenary 1.61</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1354,7 +1354,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                                     <div class="title-container">
-                    <h1>ULTIMATE MERCENARY 1.6</h1>
+                    <h1>ULTIMATE MERCENARY 1.61</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1384,13 +1384,6 @@
                 
                 <!-- Panel lateral -->
                 <div class="sidebar">
-                    <!-- Imagen XIII -->
-                    <div class="sidebar-section xiii-image-section">
-                        <div class="xiii-image-container" onclick="openXIIIModal()">
-                            <img src="images/XIIIbox.png" alt="XIII" class="xiii-thumbnail">
-                        </div>
-                    </div>
-                    
                     <!-- Estadísticas -->
                     <div class="sidebar-section">
                         <h3>ESTADÍSTICAS</h3>
@@ -1468,14 +1461,6 @@
         </div>
         <!-- END OF NEW Objective Modal -->
 
-        <!-- XIII Image Modal -->
-        <div id="xiii-modal" class="xiii-image-modal" style="display: none;">
-            <div class="xiii-modal-content">
-                <span class="xiii-close" onclick="closeXIIIModal()">&times;</span>
-                <img src="images/XIII.png" alt="XIII Completa" class="xiii-full-image">
-            </div>
-        </div>
-
         <div class="overlay" style="z-index:50;"></div>
     </div>
 
@@ -1538,26 +1523,6 @@
         };
     }
     window.openStats = openStats;
-    
-    // Funciones para el modal de imagen XIII
-    function openXIIIModal() {
-        document.getElementById('xiii-modal').style.display = 'block';
-    }
-    
-    function closeXIIIModal() {
-        document.getElementById('xiii-modal').style.display = 'none';
-    }
-    
-    window.openXIIIModal = openXIIIModal;
-    window.closeXIIIModal = closeXIIIModal;
-    
-    // Cerrar modal al hacer clic fuera de la imagen
-    document.addEventListener('click', function(event) {
-        const modal = document.getElementById('xiii-modal');
-        if (event.target === modal) {
-            closeXIIIModal();
-        }
-    });
     </script>
     <script>
     // --- MODALES Y FUNCIONES GLOBALES (openShop, openMessages, openObjective) ---
