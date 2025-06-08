@@ -1824,33 +1824,33 @@
                     isPlayerMessage: true // Marca para identificar mensajes del jugador
                 };
                 
-                // Mantener mensajes automáticos y reemplazar solo el último del jugador
+                // Mantener orden cronológico y reemplazar solo el último mensaje del jugador
                 try {
                     const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                     
-                    // Filtrar mensajes: mantener automáticos + último admin, eliminar jugador anteriores
-                    const finalMessages = existingMessages.filter(msg => {
-                        // Mantener mensajes automáticos (no son del admin ni del jugador)
-                        if (!msg.isAdminMessage && !msg.isPlayerMessage) {
-                            return true;
+                    // Encontrar el índice del último mensaje del jugador
+                    let lastPlayerIndex = -1;
+                    for (let i = existingMessages.length - 1; i >= 0; i--) {
+                        if (existingMessages[i].isPlayerMessage) {
+                            lastPlayerIndex = i;
+                            break;
                         }
-                        // Mantener último mensaje del admin
-                        if (msg.isAdminMessage) {
-                            return true;
-                        }
-                        // Eliminar mensajes anteriores del jugador
-                        return false;
-                    });
+                    }
                     
-                    // Añadir el nuevo mensaje del jugador
-                    finalMessages.push(playerMsg);
+                    // Si existe un mensaje anterior del jugador, reemplazarlo en su posición
+                    if (lastPlayerIndex !== -1) {
+                        existingMessages[lastPlayerIndex] = playerMsg;
+                    } else {
+                        // Si no existe, añadir al final manteniendo orden cronológico
+                        existingMessages.push(playerMsg);
+                    }
                     
-                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
+                    localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                     
                     // Sincronizar con Firebase
                     if (window.saveChat) {
-                        window.saveChat(finalMessages);
-                        console.log('📤 Último mensaje del jugador enviado a Firebase (manteniendo automáticos):', text.substring(0, 30));
+                        window.saveChat(existingMessages);
+                        console.log('📤 Último mensaje del jugador enviado a Firebase (manteniendo orden):', text.substring(0, 30));
                     }
                 } catch (error) {
                     console.error('❌ Error guardando mensaje del jugador:', error);
@@ -1905,7 +1905,10 @@
                 const chatContainer = document.getElementById('chat-messages');
                 if (!chatContainer) return;
                 
-                // Solo actualizar/reemplazar mensajes del admin y jugador, mantener automáticos
+                // Limpiar todo el chat y volver a renderizar en orden correcto
+                chatContainer.innerHTML = '';
+                
+                // Renderizar todos los mensajes en el orden cronológico correcto
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
                     
@@ -1915,27 +1918,12 @@
                         color = '#00ccff'; // Color azul para mensajes del jugador
                     }
                     
-                    const msgId = `msg-${msg.isPlayerMessage ? 'player' : 'admin'}-${msg.timestamp}`;
+                    // Generar ID único basado en el tipo y timestamp
+                    const msgId = msg.isPlayerMessage ? `msg-player-${msg.timestamp}` : 
+                                 msg.isAdminMessage ? `msg-admin-${msg.timestamp}` : 
+                                 `msg-auto-${index}-${msg.timestamp || Date.now()}`;
                     
-                    // Eliminar mensaje anterior del mismo tipo (admin o jugador) si existe
-                    if (msg.isPlayerMessage) {
-                        // Eliminar mensajes anteriores del jugador
-                        const previousPlayerMsgs = chatContainer.querySelectorAll('[id^="msg-player-"], [id*="-xiii-"], .chat-message');
-                        previousPlayerMsgs.forEach(prevMsg => {
-                            const username = prevMsg.querySelector('.username');
-                            if (username && username.textContent.trim().toLowerCase().startsWith('xiii')) {
-                                prevMsg.remove();
-                            }
-                        });
-                    } else if (msg.isAdminMessage) {
-                        // Eliminar mensajes anteriores del admin
-                        const previousAdminMsgs = chatContainer.querySelectorAll('[id^="msg-admin-"]');
-                        previousAdminMsgs.forEach(prevMsg => {
-                            prevMsg.remove();
-                        });
-                    }
-                    
-                    // Añadir el nuevo mensaje
+                    // Añadir el mensaje en orden cronológico
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
                         mensaje: msg.content,
@@ -1944,7 +1932,7 @@
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
                     
-                    console.log('📨 Mensaje sincronizado desde Firebase (manteniendo automáticos):', msg.sender, '-', msg.content.substring(0, 30));
+                    console.log('📨 Mensaje renderizado en orden cronológico:', msg.sender, '-', msg.content.substring(0, 30));
                 });
             };
             // Limpieza total al hacer logout

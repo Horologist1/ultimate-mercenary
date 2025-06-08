@@ -864,30 +864,30 @@
                     isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Mantener mensajes automáticos y reemplazar solo el último del admin
+                // Mantener orden cronológico y reemplazar solo el último mensaje del admin
                 const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 
-                // Filtrar mensajes: mantener automáticos + último jugadora, eliminar admin anteriores
-                const finalMessages = existingMessages.filter(msg => {
-                    // Mantener mensajes automáticos (no son del admin ni del jugador)
-                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
-                        return true;
+                // Encontrar el índice del último mensaje del admin
+                let lastAdminIndex = -1;
+                for (let i = existingMessages.length - 1; i >= 0; i--) {
+                    if (existingMessages[i].isAdminMessage) {
+                        lastAdminIndex = i;
+                        break;
                     }
-                    // Mantener último mensaje del jugador
-                    if (msg.isPlayerMessage) {
-                        return true;
-                    }
-                    // Eliminar mensajes anteriores del admin
-                    return false;
-                });
+                }
                 
-                // Añadir el nuevo mensaje del admin
-                finalMessages.push(newMessage);
+                // Si existe un mensaje anterior del admin, reemplazarlo en su posición
+                if (lastAdminIndex !== -1) {
+                    existingMessages[lastAdminIndex] = newMessage;
+                } else {
+                    // Si no existe, añadir al final manteniendo orden cronológico
+                    existingMessages.push(newMessage);
+                }
                 
-                // Guardar mensajes (automáticos + último jugadora + último admin)
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
+                // Guardar mensajes manteniendo orden cronológico original
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                 if (window.saveChat) {
-                    window.saveChat(finalMessages);
+                    window.saveChat(existingMessages);
                 }
                 
                 // Actualizar el chat del control panel
@@ -954,30 +954,30 @@
                     isAdminMessage: true // Marcar como mensaje del admin para identificarlo
                 };
                 
-                // Mantener mensajes automáticos y reemplazar solo el último del admin
+                // Mantener orden cronológico y reemplazar solo el último mensaje del admin
                 const existingMessages = JSON.parse(localStorage.getItem('mensajes-publico-expanded') || '[]');
                 
-                // Filtrar mensajes: mantener automáticos + último jugadora, eliminar admin anteriores
-                const finalMessages = existingMessages.filter(msg => {
-                    // Mantener mensajes automáticos (no son del admin ni del jugador)
-                    if (!msg.isAdminMessage && !msg.isPlayerMessage) {
-                        return true;
+                // Encontrar el índice del último mensaje del admin
+                let lastAdminIndex = -1;
+                for (let i = existingMessages.length - 1; i >= 0; i--) {
+                    if (existingMessages[i].isAdminMessage) {
+                        lastAdminIndex = i;
+                        break;
                     }
-                    // Mantener último mensaje del jugador
-                    if (msg.isPlayerMessage) {
-                        return true;
-                    }
-                    // Eliminar mensajes anteriores del admin
-                    return false;
-                });
+                }
                 
-                // Añadir el nuevo mensaje del admin
-                finalMessages.push(newMessage);
+                // Si existe un mensaje anterior del admin, reemplazarlo en su posición
+                if (lastAdminIndex !== -1) {
+                    existingMessages[lastAdminIndex] = newMessage;
+                } else {
+                    // Si no existe, añadir al final manteniendo orden cronológico
+                    existingMessages.push(newMessage);
+                }
                 
-                // Guardar mensajes (automáticos + último jugadora + último admin)
-                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(finalMessages));
+                // Guardar mensajes manteniendo orden cronológico original
+                localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                 if (window.saveChat) {
-                    window.saveChat(finalMessages);
+                    window.saveChat(existingMessages);
                 }
                 
                 // Actualizar PM
