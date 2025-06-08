@@ -344,6 +344,14 @@
                         <input type="number" class="control-input" id="rating-input" placeholder="Rating (0.0 - 10.0)" step="0.1" min="0" max="10">
                         <button class="control-button" onclick="updateRating()">ACTUALIZAR</button>
                     </div>
+                    
+                    <div class="control-group">
+                        <h4>CONTEXTO TEMPORAL</h4>
+                        <select id="timeOfDay-input" class="control-input" onchange="updateTimeOfDay(this.value)">
+                            <option value="dia">DÍA</option>
+                            <option value="noche">NOCHE</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Sección de Control de Mensajes -->
@@ -411,6 +419,21 @@
             const rating = document.getElementById('rating-input').value;
             localStorage.setItem('rating', rating);
             document.getElementById('rating-input').value = '';
+            console.log('📊 Rating actualizado:', rating);
+        }
+
+        // Función para actualizar contexto temporal
+        function updateTimeOfDay(timeValue) {
+            localStorage.setItem('timeOfDay', timeValue);
+            console.log('🕐 Contexto temporal actualizado:', timeValue);
+            
+            // Mostrar confirmación visual
+            const selector = document.getElementById('timeOfDay-input');
+            const originalBg = selector.style.backgroundColor;
+            selector.style.backgroundColor = '#00ccff';
+            setTimeout(() => {
+                selector.style.backgroundColor = originalBg;
+            }, 300);
         }
 
         // Función para enviar mensaje
@@ -483,8 +506,18 @@
         // Cargar la prueba actual al iniciar
         document.addEventListener('DOMContentLoaded', function() {
             const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            const timeOfDay = localStorage.getItem('timeOfDay') || 'dia';
+            const rating = localStorage.getItem('rating') || '7.0';
+            
             document.getElementById('current-test').value = currentTest;
+            document.getElementById('timeOfDay-input').value = timeOfDay;
             document.getElementById('objective-text').textContent = testObjectives[currentTest];
+            
+            console.log('🔧 Panel de admin cargado:', {
+                prueba: currentTest,
+                tiempo: timeOfDay,
+                rating: rating
+            });
         });
     </script>
 </body>

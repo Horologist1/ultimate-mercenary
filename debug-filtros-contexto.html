@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Filtros y Contexto</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            color: #00ffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #ff0080;
+            text-shadow: 0 0 10px #ff0080;
+        }
+        .debug-section {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .debug-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff0080;
+            margin-bottom: 10px;
+        }
+        .debug-info {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            margin: 10px 0;
+        }
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        select, button {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        button {
+            background: linear-gradient(45deg, #ff0080, #00ffff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .message-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .message-item {
+            padding: 5px;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+        }
+        .error {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        .success {
+            color: #44ff44;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffaa44;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DEBUG FILTROS Y CONTEXTO</h1>
+        
+        <div class="debug-section">
+            <div class="debug-title">🎮 Configuración Actual</div>
+            <div class="test-controls">
+                <div class="control-group">
+                    <label>Prueba:</label>
+                    <select id="testSelect">
+                        <option value="prueba0">Prueba 0</option>
+                        <option value="prueba1">Prueba 1</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Momento:</label>
+                    <select id="timeSelect">
+                        <option value="dia">Día</option>
+                        <option value="noche">Noche</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Rating:</label>
+                    <select id="ratingSelect">
+                        <option value="3">3 (Bajo)</option>
+                        <option value="5">5 (Bajo)</option>
+                        <option value="7">7 (Alto)</option>
+                        <option value="9">9 (Alto)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Acción:</label>
+                    <button onclick="updateAndTest()">Actualizar y Probar</button>
+                    <button onclick="debugCurrentState()">Debug Estado Actual</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">📊 Estado del Sistema</div>
+            <div class="debug-info" id="systemState">
+                Cargando estado del sistema...
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">🎯 Contexto Seleccionado</div>
+            <div class="debug-info" id="contextInfo">
+                Información del contexto aparecerá aquí...
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">📝 Mensajes Obtenidos</div>
+            <div class="debug-info" id="messageStats">
+                Estadísticas de mensajes...
+            </div>
+            <div class="message-list" id="messageList">
+                Los mensajes aparecerán aquí...
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">🔍 Análisis de Problemas</div>
+            <div class="debug-info" id="problemAnalysis">
+                Análisis aparecerá aquí...
+            </div>
+        </div>
+    </div>
+
+    <script src="contextual-messages.js"></script>
+    <script>
+        // Función para obtener estado actual del localStorage
+        function getCurrentState() {
+            return {
+                currentTest: localStorage.getItem('currentTest') || 'prueba0',
+                timeOfDay: localStorage.getItem('timeOfDay') || 'dia',
+                rating: parseFloat(localStorage.getItem('rating') || '0'),
+                categoryFilters: {
+                    fan: localStorage.getItem('filter_fan') !== 'false',
+                    picante: localStorage.getItem('filter_picante') !== 'false',
+                    humillante: localStorage.getItem('filter_humillante') !== 'false',
+                    relleno: localStorage.getItem('filter_relleno') !== 'false',
+                    queja: localStorage.getItem('filter_queja') !== 'false',
+                    divertido: localStorage.getItem('filter_divertido') !== 'false',
+                    insulto: localStorage.getItem('filter_insulto') !== 'false'
+                }
+            };
+        }
+
+        // Función para detectar palabras clave nocturnas en mensajes
+        function detectNightReferences(messages) {
+            const nightKeywords = [
+                'nocturno', 'noche', 'hangar', 'intimidad', 'oscuridad', 
+                'penumbra', 'vulnerable', 'descanso', 'reflexión',
+                'íntimo', 'vulnerabilidad', 'nocturnos'
+            ];
+            
+            const problematicMessages = [];
+            
+            messages.forEach((msg, index) => {
+                const lowerMsg = msg.toLowerCase();
+                const foundKeywords = nightKeywords.filter(keyword => 
+                    lowerMsg.includes(keyword)
+                );
+                
+                if (foundKeywords.length > 0) {
+                    problematicMessages.push({
+                        index: index,
+                        message: msg,
+                        keywords: foundKeywords
+                    });
+                }
+            });
+            
+            return problematicMessages;
+        }
+
+        // Función para analizar qué contexto debería estar activo
+        function analyzeExpectedContext(state) {
+            const ratingLevel = state.rating > 6 ? 'alto' : 'bajo';
+            const expectedContext = `${state.timeOfDay}_${ratingLevel}`;
+            
+            return {
+                expectedContext: expectedContext,
+                shouldContainNightContent: state.timeOfDay === 'noche',
+                contextExists: CONTEXTUAL_MESSAGES[state.currentTest] && 
+                              CONTEXTUAL_MESSAGES[state.currentTest][expectedContext]
+            };
+        }
+
+        // Función principal de debug
+        function debugCurrentState() {
+            const state = getCurrentState();
+            const analysis = analyzeExpectedContext(state);
+            
+            // Mostrar estado del sistema
+            document.getElementById('systemState').innerHTML = `
+                <strong>LocalStorage:</strong><br>
+                • currentTest: "${state.currentTest}"<br>
+                • timeOfDay: "${state.timeOfDay}"<br>
+                • rating: ${state.rating}<br>
+                • Filtros activos: ${Object.entries(state.categoryFilters)
+                    .filter(([key, value]) => value)
+                    .map(([key]) => key.toUpperCase())
+                    .join(', ')}<br>
+                <br>
+                <strong>Análisis:</strong><br>
+                • Contexto esperado: "${analysis.expectedContext}"<br>
+                • ¿Debería tener contenido nocturno?: ${analysis.shouldContainNightContent ? 'SÍ' : 'NO'}<br>
+                • ¿Existe el contexto?: ${analysis.contextExists ? 'SÍ' : 'NO'}
+            `;
+
+            // Obtener mensajes actuales
+            const messages = getContextualMessages();
+            
+            // Detectar referencias nocturnas problemáticas
+            const nightReferences = detectNightReferences(messages);
+            
+            // Mostrar información del contexto
+            const contextKey = analysis.expectedContext;
+            const rawMessages = CONTEXTUAL_MESSAGES[state.currentTest] && 
+                              CONTEXTUAL_MESSAGES[state.currentTest][contextKey] ? 
+                              CONTEXTUAL_MESSAGES[state.currentTest][contextKey] : [];
+            
+            document.getElementById('contextInfo').innerHTML = `
+                <strong>Contexto Activo:</strong> "${contextKey}"<br>
+                <strong>Mensajes en contexto:</strong> ${rawMessages.length}<br>
+                <strong>Mensajes después de filtros:</strong> ${messages.length}<br>
+                <strong>Referencias nocturnas detectadas:</strong> ${nightReferences.length}
+            `;
+
+            // Mostrar estadísticas de mensajes
+            document.getElementById('messageStats').innerHTML = `
+                <strong>Total mensajes obtenidos:</strong> ${messages.length}<br>
+                <strong>Referencias nocturnas problemáticas:</strong> ${nightReferences.length}<br>
+                <strong>¿Hay problema?:</strong> ${
+                    (!analysis.shouldContainNightContent && nightReferences.length > 0) ? 
+                    '<span class="error">SÍ - Hay contenido nocturno en contexto diurno</span>' : 
+                    '<span class="success">NO - El contenido es correcto</span>'
+                }
+            `;
+
+            // Mostrar lista de mensajes
+            const messageListDiv = document.getElementById('messageList');
+            messageListDiv.innerHTML = '';
+            
+            messages.slice(0, 20).forEach((msg, index) => {
+                const div = document.createElement('div');
+                div.className = 'message-item';
+                
+                // Marcar mensajes problemáticos
+                const isProblem = nightReferences.some(ref => ref.index === index);
+                if (isProblem && !analysis.shouldContainNightContent) {
+                    div.style.backgroundColor = 'rgba(255, 68, 68, 0.2)';
+                    div.style.border = '1px solid #ff4444';
+                }
+                
+                div.innerHTML = `${index + 1}. ${msg}`;
+                messageListDiv.appendChild(div);
+            });
+
+            // Análisis de problemas
+            let problemText = '';
+            if (!analysis.shouldContainNightContent && nightReferences.length > 0) {
+                problemText = `
+                    <span class="error">❌ PROBLEMA DETECTADO:</span><br>
+                    El contexto es DIURNO pero hay ${nightReferences.length} mensajes con referencias nocturnas.<br>
+                    <br>
+                    <strong>Mensajes problemáticos:</strong><br>
+                    ${nightReferences.slice(0, 5).map(ref => 
+                        `• "${ref.message}" (palabras: ${ref.keywords.join(', ')})`
+                    ).join('<br>')}
+                    <br><br>
+                    <strong>Posibles causas:</strong><br>
+                    1. Error en la selección de contexto<br>
+                    2. Mensajes mal categorizados en ${contextKey}<br>
+                    3. Problema en la función getContextualMessages()
+                `;
+            } else if (analysis.shouldContainNightContent && nightReferences.length === 0) {
+                problemText = `
+                    <span class="warning">⚠️ ADVERTENCIA:</span><br>
+                    El contexto es NOCTURNO pero no hay referencias nocturnas detectadas.<br>
+                    Esto podría ser normal si los filtros eliminaron todo el contenido nocturno.
+                `;
+            } else {
+                problemText = `
+                    <span class="success">✅ TODO CORRECTO:</span><br>
+                    El contexto ${analysis.shouldContainNightContent ? 'nocturno' : 'diurno'} 
+                    contiene el tipo de contenido apropiado.
+                `;
+            }
+            
+            document.getElementById('problemAnalysis').innerHTML = problemText;
+        }
+
+        // Función para actualizar configuración y probar
+        function updateAndTest() {
+            const testValue = document.getElementById('testSelect').value;
+            const timeValue = document.getElementById('timeSelect').value;
+            const ratingValue = document.getElementById('ratingSelect').value;
+            
+            localStorage.setItem('currentTest', testValue);
+            localStorage.setItem('timeOfDay', timeValue);
+            localStorage.setItem('rating', ratingValue);
+            
+            console.log(`🔄 Configuración actualizada: ${testValue} | ${timeValue} | ${ratingValue}`);
+            
+            setTimeout(() => {
+                debugCurrentState();
+            }, 100);
+        }
+
+        // Inicializar al cargar
+        window.addEventListener('load', () => {
+            // Configurar valores actuales en los selectores
+            const state = getCurrentState();
+            document.getElementById('testSelect').value = state.currentTest;
+            document.getElementById('timeSelect').value = state.timeOfDay;
+            document.getElementById('ratingSelect').value = state.rating.toString();
+            
+            // Ejecutar debug inicial
+            debugCurrentState();
+        });
+    </script>
+</body>
+</html> 

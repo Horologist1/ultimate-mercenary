@@ -1558,14 +1558,14 @@ function getContextualMessages() {
         rawMessages = CONTEXTUAL_MESSAGES[currentTest][contextKey];
         // Mantener estructura de objeto para poder acceder a la categoría
     } else {
-        // Fallback a mensajes básicos si no hay contextuales
+    // Fallback a mensajes básicos si no hay contextuales
         rawMessages = [
-            "¡Vamos XIII, no decepciones a tus fans!",
-            "¡Estoy apostando todo por ti, no me falles!",
-            "Mira esos reflejos, ¡eres una máquina!",
-            "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
-            "Acabo de apostar 5000 créditos a que sobrevives esta prueba"
-        ];
+        "¡Vamos XIII, no decepciones a tus fans!",
+        "¡Estoy apostando todo por ti, no me falles!",
+        "Mira esos reflejos, ¡eres una máquina!",
+        "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+        "Acabo de apostar 5000 créditos a que sobrevives esta prueba"
+    ];
     }
     
     // Aplicar filtros de categorías (mantiene objetos)
