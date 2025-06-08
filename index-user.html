@@ -1136,20 +1136,13 @@
             console.log(`🔥 [FIREBASE LISTENER] Recibidos ${messagesArray.length} mensajes de Firebase`);
             console.log('🔥 [FIREBASE LISTENER] Últimos 3 mensajes:', messagesArray.slice(-3));
             
-            // En dispositivos nuevos, mostrar solo los últimos 5 mensajes para sincronización
-            const isNewDevice = localStorage.getItem('lastProcessedTimestamp') === null;
-            if (isNewDevice && messagesArray.length > 0) {
-                console.log('🔥 [FIREBASE LISTENER] Dispositivo nuevo detectado - mostrando últimos mensajes');
-                
-                // Tomar solo los últimos 5 mensajes para no inundar el chat
-                const recentMessages = messagesArray.slice(-5);
-                const oldestRecentTimestamp = Math.min(...recentMessages.map(msg => msg.timestamp || 0));
-                
-                // Establecer el timestamp justo antes del más antiguo de los recientes
-                window.lastProcessedTimestamp = oldestRecentTimestamp - 1;
-                localStorage.setItem('lastProcessedTimestamp', window.lastProcessedTimestamp.toString());
-                
-                console.log('🔥 [FIREBASE LISTENER] Timestamp establecido para mostrar últimos', recentMessages.length, 'mensajes');
+            // En la primera carga, establecer el timestamp al mensaje más reciente para evitar renderizar históricos
+            if (window.lastProcessedTimestamp === 0 && messagesArray.length > 0) {
+                const latestTimestamp = Math.max(...messagesArray.map(msg => msg.timestamp || 0));
+                window.lastProcessedTimestamp = latestTimestamp;
+                console.log('🔥 [FIREBASE LISTENER] Primera carga - timestamp inicial establecido a:', latestTimestamp);
+                console.log('🔥 [FIREBASE LISTENER] Saltando renderizado inicial para evitar duplicar históricos');
+                return; // No renderizar en la primera carga
             }
             
             if (window.renderGlobalChatMessages) {
@@ -1910,8 +1903,8 @@
                     }
                 };
             }
-            // Variable global para rastrear el último timestamp procesado (persistente entre dispositivos)
-            window.lastProcessedTimestamp = parseInt(localStorage.getItem('lastProcessedTimestamp') || '0');
+            // Variable global para rastrear el último timestamp procesado
+            window.lastProcessedTimestamp = 0;
             
             window.renderGlobalChatMessages = function(messagesArray) {
                 const chatContainer = document.getElementById('chat-messages');
@@ -1961,8 +1954,6 @@
                     // Actualizar el último timestamp procesado
                     if (timestamp > window.lastProcessedTimestamp) {
                         window.lastProcessedTimestamp = timestamp;
-                        // Guardar en localStorage para persistir entre sesiones
-                        localStorage.setItem('lastProcessedTimestamp', window.lastProcessedTimestamp.toString());
                     }
                 });
                 
@@ -2453,7 +2444,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '1.55';
+        const SYSTEM_VERSION = '1.54';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -2995,7 +2986,7 @@
             }
         };
 
-                    console.log('🎮 Ultimate Mercenary v1.55 - SINCRONIZACIÓN ENTRE DISPOSITIVOS MEJORADA');
+                    console.log('🎮 Ultimate Mercenary v1.54 - SOLO MENSAJES NUEVOS, SIN HISTÓRICOS');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
         console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');
