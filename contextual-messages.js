@@ -11,26 +11,35 @@
 
 // Función para aplicar filtros basándose en categorías ya asignadas
 function applyMessageFilters(messages) {
+    console.log('🔍 [FILTROS] applyMessageFilters llamado con', messages.length, 'mensajes');
+    
     // Verificar si existe el sistema de filtros
     if (!window.MESSAGE_FILTERS) {
+        console.warn('⚠️ [FILTROS] window.MESSAGE_FILTERS no disponible - devolviendo todos los mensajes');
         return messages; // Sin filtros, devolver todos los mensajes
     }
     
-    return messages.filter(message => {
+    console.log('🎛️ [FILTROS] Filtros activos:', window.MESSAGE_FILTERS.enabledCategories);
+    
+    const filteredMessages = messages.filter(message => {
         // Si es un objeto mensaje con categoría, usar la categoría asignada
         if (typeof message === 'object' && message.category) {
-            const isEnabled = window.MESSAGE_FILTERS.enabledCategories[message.category] !== false;
+            const isEnabled = window.MESSAGE_FILTERS.enabledCategories[message.category] === true;
             
             if (!isEnabled) {
-                console.log(`🚫 Mensaje filtrado (${message.category}): ${message.text.substring(0, 50)}...`);
+                console.log(`🚫 [FILTROS] Mensaje filtrado (${message.category}): ${message.text ? message.text.substring(0, 30) : 'sin texto'}...`);
             }
             
             return isEnabled;
         }
         
         // Para retrocompatibilidad con mensajes string (no debería pasar)
+        console.log('🔄 [FILTROS] Mensaje sin categoría (string):', typeof message === 'string' ? message.substring(0, 30) : 'tipo desconocido');
         return true;
     });
+    
+    console.log(`✅ [FILTROS] Filtrado completado: ${messages.length} → ${filteredMessages.length} mensajes`);
+    return filteredMessages;
 }
 
 // Función para crear mensaje con categoría
@@ -42,37 +51,8 @@ function createMessage(text, category, subCategory = null) {
     };
 }
 
-// Sistema de filtros globales
-window.MESSAGE_FILTERS = {
-    enabledCategories: {
-        'fan': true,
-        'picante': true,
-        'humillante': true,
-        'relleno': true,
-        'queja': true,
-        'divertido': true,
-        'insulto': true
-    },
-    
-    applyFilters: function(messages) {
-        return messages.filter(msg => {
-            if (typeof msg === 'string') {
-                // Retrocompatibilidad para mensajes sin categorizar
-                return true;
-            }
-            return this.enabledCategories[msg.category] === true;
-        });
-    },
-    
-    getEnabledCategories: function() {
-        return this.enabledCategories;
-    },
-    
-    setFilter: function(category, enabled) {
-        this.enabledCategories[category] = enabled;
-        console.log(`🎛️ Filtro ${category}: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
-    }
-};
+// El sistema MESSAGE_FILTERS se inicializa en index-user.html
+// No redefinir aquí para evitar conflictos
 
 // === MENSAJES CONTEXTUALES POR PRUEBA ===
 const CONTEXTUAL_MESSAGES = {

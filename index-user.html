@@ -3123,6 +3123,93 @@
     <script src="contextual-messages-p3.js"></script>
     <script src="contextual-system-integration.js"></script>
     
+    <!-- SISTEMA DE FILTROS DE MENSAJES v1.59 -->
+    <script>
+        // Inicializar sistema de filtros en index-user.html
+        if (!window.MESSAGE_FILTERS) {
+            window.MESSAGE_FILTERS = {
+                enabledCategories: {
+                    'fan': true,
+                    'picante': true,
+                    'humillante': true,
+                    'relleno': true,
+                    'queja': true,
+                    'divertido': true,
+                    'insulto': true
+                },
+                
+                setFilter: function(category, enabled) {
+                    this.enabledCategories[category] = enabled;
+                    localStorage.setItem('messageFilters', JSON.stringify(this.enabledCategories));
+                    console.log(`🎛️ [FILTROS] ${category}: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
+                    
+                    // Actualizar mensajes contextuales cuando cambien los filtros
+                    if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
+                        window.contextualSystem.refreshMessages();
+                    }
+                },
+                
+                getEnabledCategories: function() {
+                    return this.enabledCategories;
+                },
+                
+                loadFromStorage: function() {
+                    const saved = localStorage.getItem('messageFilters');
+                    if (saved) {
+                        try {
+                            this.enabledCategories = JSON.parse(saved);
+                            console.log('🎛️ [FILTROS] Cargados desde localStorage:', this.enabledCategories);
+                        } catch (e) {
+                            console.error('❌ [FILTROS] Error loading message filters:', e);
+                        }
+                    }
+                },
+                
+                // Función para aplicar filtros a mensajes
+                applyFilters: function(messages) {
+                    return messages.filter(msg => {
+                        if (typeof msg === 'string') {
+                            // Retrocompatibilidad para mensajes sin categorizar
+                            return true;
+                        }
+                        const isEnabled = this.enabledCategories[msg.category] === true;
+                        if (!isEnabled) {
+                            console.log(`🚫 [FILTROS] Mensaje filtrado (${msg.category}): ${msg.text ? msg.text.substring(0, 30) : 'sin texto'}...`);
+                        }
+                        return isEnabled;
+                    });
+                }
+            };
+            
+            // Cargar filtros desde localStorage al inicializar
+            window.MESSAGE_FILTERS.loadFromStorage();
+            console.log('✅ [FILTROS] Sistema de filtros inicializado en index-user.html');
+            
+            // Función de test para probar filtros desde la consola
+            window.testFilters = function() {
+                console.log('🧪 [FILTROS] Probando sistema de filtros...');
+                console.log('🎛️ [FILTROS] Estado actual:', window.MESSAGE_FILTERS.enabledCategories);
+                
+                // Desactivar picante para probar
+                console.log('🚫 [FILTROS] Desactivando filtro "picante"...');
+                window.MESSAGE_FILTERS.setFilter('picante', false);
+                
+                // Obtener mensajes y ver si se filtran
+                const messages = window.getCurrentContextualMessages();
+                console.log(`📨 [FILTROS] Mensajes después del filtro: ${messages.length}`);
+                
+                // Reactivar picante
+                setTimeout(() => {
+                    console.log('✅ [FILTROS] Reactivando filtro "picante"...');
+                    window.MESSAGE_FILTERS.setFilter('picante', true);
+                    
+                    const messagesAfter = window.getCurrentContextualMessages();
+                    console.log(`📨 [FILTROS] Mensajes después de reactivar: ${messagesAfter.length}`);
+                }, 2000);
+            };
+        }
+    </script>
+    
     <!-- INICIALIZACIÓN INMEDIATA v0.97 -->
     <script>
         // FORZAR inicialización inmediata del sistema contextual
