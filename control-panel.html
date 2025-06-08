@@ -932,29 +932,61 @@
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
         }
 
-        // Función simplificada v1.57: EXACTAMENTE igual que updateCurrentTest
+        // Función FORZADA v1.57: Sobrescribir Firebase directamente
         function applyTimeOfDay() {
             const selector = document.getElementById('time-of-day');
             const selectedValue = selector.value;
             
-            console.log('🎯 APLICANDO TIMEOFDAY v1.57 - PATRÓN SIMPLIFICADO');
-            console.log('📍 Valor seleccionado:', selectedValue);
+            console.log('🚨 FORZANDO ESCRITURA DIRECTA A FIREBASE v1.57');
+            console.log('📍 Valor del dropdown:', selectedValue);
+            console.log('📍 localStorage ANTES:', localStorage.getItem('timeOfDay'));
             
-            // Patrón EXACTO de updateCurrentTest - SIN complejidad extra
-            localStorage.setItem('timeOfDay', selectedValue);
-            if (window.saveTimeOfDay) window.saveTimeOfDay(selectedValue);
+            // MÉTODO 1: Escritura directa agresiva a Firebase
+            if (window.saveTimeOfDay) {
+                console.log('🔥 ESCRIBIENDO DIRECTAMENTE A FIREBASE:', selectedValue);
+                window.saveTimeOfDay(selectedValue);
+            } else {
+                console.error('❌ window.saveTimeOfDay no disponible');
+            }
             
-            console.log('✅ Aplicado:', selectedValue);
+            // MÉTODO 2: Sobrescribir localStorage también
+            localStorage.removeItem('timeOfDay'); // Limpiar primero
+            localStorage.setItem('timeOfDay', selectedValue); // Establecer nuevo
             
-            // Solo confirmación visual básica
+            console.log('📍 localStorage DESPUÉS:', localStorage.getItem('timeOfDay'));
+            console.log('📊 Valor FORZADO:', {
+                dropdown: selectedValue,
+                localStorage: localStorage.getItem('timeOfDay'),
+                timestamp: Date.now()
+            });
+            
+            // Confirmación visual
             const originalBg = selector.style.backgroundColor;
-            selector.style.backgroundColor = '#00ff88';
+            selector.style.backgroundColor = '#ff4757'; // Rojo para mostrar acción forzada
             setTimeout(() => {
                 selector.style.backgroundColor = originalBg;
-            }, 500);
+            }, 1000);
             
-            alert(`✅ Contexto: ${selectedValue.toUpperCase()}\n\n🔄 Recarga la página de usuario.`);
+            alert(`🚨 FORZADO: ${selectedValue.toUpperCase()}\n\n⚠️ Si no funciona, hay problema en Firebase.`);
         }
+        
+        // Función de DEBUGGING: Ver qué tiene Firebase almacenado
+        function debugFirebaseTimeOfDay() {
+            console.log('🔍 DEBUGGING FIREBASE TIMEOFDAY:');
+            console.log('📍 localStorage actual:', localStorage.getItem('timeOfDay'));
+            console.log('📍 Dropdown actual:', document.getElementById('time-of-day').value);
+            
+            // Intentar leer directamente de Firebase si es posible
+            if (window.database && typeof window.database === 'object') {
+                console.log('🔥 Firebase database disponible');
+                // Aquí podríamos hacer una lectura directa si necesario
+            } else {
+                console.log('❌ Firebase database no accesible desde aquí');
+            }
+        }
+        
+        // Hacer la función disponible globalmente para testing
+        window.debugFirebaseTimeOfDay = debugFirebaseTimeOfDay;
 
         // Función para cargar y mostrar los últimos mensajes del chat (solo para el panel de control)
         function loadChatMessages() {
@@ -1430,9 +1462,18 @@
 
         onValue(timeOfDayRef, (snapshot) => {
             const data = snapshot.val();
+            console.log('🔥 FIREBASE LISTENER ACTIVADO - timeOfDay:', data);
+            console.log('📍 localStorage antes del listener:', localStorage.getItem('timeOfDay'));
+            console.log('📍 Dropdown antes del listener:', document.getElementById('time-of-day').value);
+            
             if (data) {
                 localStorage.setItem('timeOfDay', data);
                 document.getElementById('time-of-day').value = data;
+                console.log('✅ FIREBASE SOBRESCRIBIÓ CON:', data);
+                console.log('📍 localStorage después:', localStorage.getItem('timeOfDay'));
+                console.log('📍 Dropdown después:', document.getElementById('time-of-day').value);
+            } else {
+                console.log('⚠️ Firebase timeOfDay es null/undefined');
             }
         });
 
