@@ -1455,6 +1455,7 @@
         const mensajesRef = ref(database, 'mensajes-directos');
         const currentTestRef = ref(database, 'currentTest');
         const timeOfDayRef = ref(database, 'timeOfDay');
+        const messageFiltersRef = ref(database, 'messageFilters');
         const nombresRef = ref(database, 'nombresConcursantes');
         const audienceRef = ref(database, 'audience');
         const ratingRef = ref(database, 'rating');
@@ -1475,6 +1476,7 @@
         window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
         window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
         window.saveTimeOfDay = function(valor) { set(timeOfDayRef, valor); };
+        window.saveMessageFilters = function(filters) { set(messageFiltersRef, filters); };
 
         // Listeners para sincronización en tiempo real
         onValue(conocidosRef, (snapshot) => {
@@ -1523,6 +1525,29 @@
                 console.log('📍 Dropdown después:', document.getElementById('time-of-day').value);
             } else {
                 console.log('⚠️ Firebase timeOfDay es null/undefined');
+            }
+        });
+
+        onValue(messageFiltersRef, (snapshot) => {
+            const data = snapshot.val();
+            console.log('🔥 FIREBASE LISTENER ACTIVADO - messageFilters:', data);
+            
+            if (data) {
+                // Actualizar sistema local
+                MESSAGE_FILTERS.enabledCategories = data;
+                localStorage.setItem('messageFilters', JSON.stringify(data));
+                
+                // Actualizar checkboxes visuales
+                Object.keys(data).forEach(category => {
+                    const checkbox = document.getElementById(`filter-${category}`);
+                    if (checkbox) {
+                        checkbox.checked = data[category];
+                    }
+                });
+                
+                console.log('✅ FIREBASE SOBRESCRIBIÓ FILTROS CON:', data);
+            } else {
+                console.log('⚠️ Firebase messageFilters es null/undefined');
             }
         });
 
@@ -1689,6 +1714,11 @@
         // Funciones para el manejo de filtros
         function toggleMessageFilter(category, enabled) {
             MESSAGE_FILTERS.setFilter(category, enabled);
+            
+            // *** SINCRONIZAR CON FIREBASE (igual que timeOfDay) ***
+            if (window.saveMessageFilters) {
+                window.saveMessageFilters(MESSAGE_FILTERS.enabledCategories);
+            }
         }
 
         function enableAllFilters() {
@@ -1697,6 +1727,10 @@
                 const checkbox = document.getElementById(`filter-${category}`);
                 if (checkbox) checkbox.checked = true;
             });
+            // *** SINCRONIZAR CON FIREBASE ***
+            if (window.saveMessageFilters) {
+                window.saveMessageFilters(MESSAGE_FILTERS.enabledCategories);
+            }
         }
 
         function disableAllFilters() {
@@ -1705,6 +1739,10 @@
                 const checkbox = document.getElementById(`filter-${category}`);
                 if (checkbox) checkbox.checked = false;
             });
+            // *** SINCRONIZAR CON FIREBASE ***
+            if (window.saveMessageFilters) {
+                window.saveMessageFilters(MESSAGE_FILTERS.enabledCategories);
+            }
         }
 
         function resetFiltersToDefault() {
@@ -1713,6 +1751,10 @@
                 const checkbox = document.getElementById(`filter-${category}`);
                 if (checkbox) checkbox.checked = true;
             });
+            // *** SINCRONIZAR CON FIREBASE ***
+            if (window.saveMessageFilters) {
+                window.saveMessageFilters(MESSAGE_FILTERS.enabledCategories);
+            }
         }
 
         // Inicializar filtros al cargar la página

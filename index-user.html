@@ -1046,6 +1046,7 @@
         const audienceRef = window.database.ref('audience');
         const ratingRef = window.database.ref('rating');
         const timeOfDayRef = window.database.ref('timeOfDay');
+        const messageFiltersRef = window.database.ref('messageFilters');
         const pmRef = window.database.ref('playerPM');
         const pmTransactionsRef = window.database.ref('pmTransactions');
         const chatRef = window.database.ref('mensajes-publico-expanded');
@@ -1152,6 +1153,78 @@
         });
         
         console.log('✅ [FIREBASE] Listener timeOfDay configurado completamente');
+        
+        // NUEVO: Listener para messageFilters desde Firebase
+        console.log('🚀 [FIREBASE] Configurando listener para messageFilters...');
+        messageFiltersRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            const currentLocal = localStorage.getItem('messageFilters');
+            
+            console.log('🔥 [FIREBASE LISTENER] messageFilters Firebase Listener ACTIVADO!');
+            console.log('🔥 [FIREBASE LISTENER] Datos de Firebase:', data);
+            console.log('🔥 [FIREBASE LISTENER] localStorage actual:', currentLocal);
+            
+            if (data && typeof data === 'object') {
+                localStorage.setItem('messageFilters', JSON.stringify(data));
+                
+                // Actualizar sistema MESSAGE_FILTERS
+                if (window.MESSAGE_FILTERS && window.MESSAGE_FILTERS.enabledCategories) {
+                    window.MESSAGE_FILTERS.enabledCategories = data;
+                    console.log(`✅ [FIREBASE SYNC] messageFilters SINCRONIZADOS:`, data);
+                    
+                    // *** REINICIAR MENSAJES AUTOMÁTICOS CON NUEVOS FILTROS ***
+                    if (window.updateAutoMessages) {
+                        console.log('🔄 [FIREBASE SYNC] Reiniciando mensajes automáticos con nuevos filtros...');
+                        window.updateAutoMessages();
+                    }
+                    
+                    // Refrescar mensajes contextuales si el sistema está disponible
+                    if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
+                        console.log('🔄 [FIREBASE SYNC] Refrescando mensajes contextuales...');
+                        window.contextualSystem.refreshMessages();
+                    }
+                } else {
+                    console.warn('⚠️ [FIREBASE SYNC] MESSAGE_FILTERS no disponible aún');
+                }
+                
+                console.log('🎯 [FIREBASE SYNC] SYNC FILTROS COMPLETADO');
+            } else {
+                console.warn('⚠️ [FIREBASE SYNC] messageFilters inválido o null:', data);
+            }
+        });
+        
+        // FORZAR LECTURA INICIAL DE FILTROS FIREBASE
+        messageFiltersRef.once('value').then((snapshot) => {
+            const firebaseValue = snapshot.val();
+            const localValue = localStorage.getItem('messageFilters');
+            
+            console.log('🔍 [FIREBASE INIT] Lectura inicial filtros:');
+            console.log('🔍 [FIREBASE INIT] Firebase tiene:', firebaseValue);
+            console.log('🔍 [FIREBASE INIT] localStorage tiene:', localValue);
+            
+            if (firebaseValue && JSON.stringify(firebaseValue) !== localValue) {
+                console.log('🚨 [FIREBASE INIT] FILTROS DESINCRONIZADOS - Forzando sync...');
+                localStorage.setItem('messageFilters', JSON.stringify(firebaseValue));
+                
+                if (window.MESSAGE_FILTERS && window.MESSAGE_FILTERS.enabledCategories) {
+                    window.MESSAGE_FILTERS.enabledCategories = firebaseValue;
+                    
+                    // Reiniciar mensajes automáticos inmediatamente
+                    if (window.updateAutoMessages) {
+                        console.log('🔄 [FIREBASE INIT] Reiniciando mensajes automáticos inmediatamente...');
+                        window.updateAutoMessages();
+                    }
+                }
+                
+                console.log('✅ [FIREBASE INIT] Sincronización filtros completada');
+            } else {
+                console.log('✅ [FIREBASE INIT] Filtros ya sincronizados');
+            }
+        }).catch(error => {
+            console.error('❌ [FIREBASE INIT] Error leyendo filtros iniciales:', error);
+        });
+        
+        console.log('✅ [FIREBASE] Listener messageFilters configurado completamente');
         
         // FORZAR LECTURA INICIAL DE FIREBASE para sincronizar inmediatamente
         timeOfDayRef.once('value').then((snapshot) => {
