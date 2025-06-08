@@ -304,6 +304,41 @@ function testContextualSystem() {
     console.log('✅ Test completado');
 }
 
+// =================== SISTEMA CONTEXTUAL PRINCIPAL ===================
+
+// Objeto contextualSystem para manejar actualizaciones desde Firebase
+window.contextualSystem = {
+    refreshMessages: function() {
+        console.log('🔄 [CONTEXTUAL SYSTEM] refreshMessages() llamado desde Firebase');
+        
+        try {
+            // Actualizar el sistema contextual completo
+            updateContextualSystem();
+            
+            // Forzar actualización de mensajes automáticos si existe
+            if (window.updateAutoMessages) {
+                console.log('🔄 [CONTEXTUAL SYSTEM] Actualizando mensajes automáticos...');
+                window.updateAutoMessages();
+            }
+            
+            // Actualizar UI del chat si existe
+            if (window.contextualMessageSystem && window.contextualMessageSystem.loadMessages) {
+                console.log('🔄 [CONTEXTUAL SYSTEM] Actualizando sistema de mensajes del chat...');
+                window.contextualMessageSystem.loadMessages();
+            }
+            
+            console.log('✅ [CONTEXTUAL SYSTEM] refreshMessages completado exitosamente');
+        } catch (error) {
+            console.error('❌ [CONTEXTUAL SYSTEM] Error en refreshMessages:', error);
+        }
+    },
+    
+    getCurrentMessages: getCurrentContextualMessages,
+    getCurrentUsernames: getContextualUsernames,
+    logStatus: logCurrentContext,
+    test: testContextualSystem
+};
+
 // Exportar funciones principales INMEDIATAMENTE
 window.initContextualSystem = initContextualSystem;
 window.updateContextualSystem = updateContextualSystem;

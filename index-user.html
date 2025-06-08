@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.57</title>
+    <title>Ultimate Mercenary 1.58</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1045,6 +1045,7 @@
         const nombresRef = window.database.ref('nombresConcursantes');
         const audienceRef = window.database.ref('audience');
         const ratingRef = window.database.ref('rating');
+        const timeOfDayRef = window.database.ref('timeOfDay');
         const pmRef = window.database.ref('playerPM');
         const pmTransactionsRef = window.database.ref('pmTransactions');
         const chatRef = window.database.ref('mensajes-publico-expanded');
@@ -1101,6 +1102,34 @@
                 localStorage.setItem('rating', data);
                 if (window.updateStatusPanel) window.updateStatusPanel();
                 if (window.updateUserList) window.updateUserList();
+            }
+        });
+        
+        // NUEVO: Listener para timeOfDay desde Firebase
+        timeOfDayRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log('🔥 [FIREBASE LISTENER] timeOfDay cambió en Firebase:', data);
+            
+            if (data && (data === 'dia' || data === 'noche')) {
+                const oldValue = localStorage.getItem('timeOfDay');
+                localStorage.setItem('timeOfDay', data);
+                console.log(`✅ [FIREBASE SYNC] timeOfDay actualizado: ${oldValue} → ${data}`);
+                
+                // Refrescar mensajes contextuales si el sistema está disponible
+                if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
+                    console.log('🔄 [FIREBASE SYNC] Refrescando mensajes contextuales...');
+                    window.contextualSystem.refreshMessages();
+                }
+                
+                // Actualizar UI si hay funciones disponibles
+                if (window.updateStatusPanel) window.updateStatusPanel();
+            } else {
+                console.warn('⚠️ [FIREBASE SYNC] timeOfDay inválido o null:', data);
+                // Establecer valor por defecto si no existe
+                if (!localStorage.getItem('timeOfDay')) {
+                    localStorage.setItem('timeOfDay', 'dia');
+                    console.log('📍 [FIREBASE SYNC] Establecido timeOfDay por defecto: dia');
+                }
             }
         });
         pmRef.on('value', (snapshot) => {
@@ -1167,7 +1196,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                                     <div class="title-container">
-                    <h1>ULTIMATE MERCENARY 1.57</h1>
+                    <h1>ULTIMATE MERCENARY 1.58</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -2986,7 +3015,7 @@
             }
         };
 
-                                console.log('🎮 Ultimate Mercenary v1.57 - DEBUGGING DE CONTEXTO MEJORADO');
+                                console.log('🎮 Ultimate Mercenary v1.58 - FIREBASE FORZADO POST-CARGA');
             console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
             console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
             
@@ -3191,9 +3220,9 @@
     
     <!-- Verificación y debug del sistema contextual -->
     <script>
-        // FORZAR inicialización del sistema contextual v1.57 - FORZAR DESPUÉS DE FIREBASE
+        // FORZAR inicialización del sistema contextual v1.58 - FORZAR DESPUÉS DE FIREBASE
         setTimeout(() => {
-            console.log('🔍 INICIALIZANDO sistema contextual v1.57 - FORZAR MENSAJES CONFIGURADOS...');
+            console.log('🔍 INICIALIZANDO sistema contextual v1.58 - FORZAR MENSAJES CONFIGURADOS...');
             
             // SOBRESCRIBIR valores DESPUÉS de que Firebase termine de cargar
             console.log('🚨 FORZANDO valores por defecto DESPUÉS de Firebase...');
