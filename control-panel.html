@@ -456,6 +456,91 @@
             color: #fff;
             word-wrap: break-word;
         }
+
+        /* Estilos para los filtros de mensajes */
+        .filter-checkbox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .filter-checkbox:hover {
+            background-color: rgba(0, 204, 255, 0.1);
+            border-color: #00ccff;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            height: 16px;
+            width: 16px;
+            background-color: #333;
+            border: 2px solid #666;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-checkbox input:checked ~ .checkmark {
+            background-color: #00ccff;
+            border-color: #00ccff;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .filter-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .filter-checkbox .checkmark:after {
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .filter-label {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 11px;
+            color: #00ccff;
+            margin-top: 20px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .filter-desc {
+            font-size: 9px;
+            color: #888;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .filter-checkbox input:checked ~ .filter-label {
+            color: #00ff88;
+        }
+
+        .filter-checkbox input:checked ~ .filter-desc {
+            color: #00ff88;
+        }
     </style>
 </head>
 <body>
@@ -546,6 +631,62 @@
                 <!-- Sección de Control de Mensajes -->
                 <div class="control-section">
                     <h3>CONTROL DE MENSAJES</h3>
+                    
+                    <!-- Filtros de Categorías de Mensajes -->
+                    <div class="control-group" style="background-color: rgba(0, 20, 40, 0.8); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #00ccff; margin-bottom: 15px; font-family: 'Orbitron', sans-serif;">
+                            <i class="fas fa-filter"></i> FILTROS DE MENSAJES CONTEXTUALES
+                        </h4>
+                        <div class="filter-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-fan" checked onchange="toggleMessageFilter('fan', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">FAN</span>
+                                <span class="filter-desc">Admiración y apoyo</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-picante" checked onchange="toggleMessageFilter('picante', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">PICANTE</span>
+                                <span class="filter-desc">Contenido sensual</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-humillante" checked onchange="toggleMessageFilter('humillante', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">HUMILLANTE</span>
+                                <span class="filter-desc">Retos degradantes</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-relleno" checked onchange="toggleMessageFilter('relleno', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">RELLENO</span>
+                                <span class="filter-desc">Comentarios generales</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-queja" checked onchange="toggleMessageFilter('queja', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">QUEJA</span>
+                                <span class="filter-desc">Críticas y descontento</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-divertido" checked onchange="toggleMessageFilter('divertido', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">DIVERTIDO</span>
+                                <span class="filter-desc">Humor y entretenimiento</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-insulto" checked onchange="toggleMessageFilter('insulto', this.checked)">
+                                <span class="checkmark"></span>
+                                <span class="filter-label">INSULTO</span>
+                                <span class="filter-desc">Ofensas directas</span>
+                            </label>
+                        </div>
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button class="control-button" onclick="enableAllFilters()">ACTIVAR TODOS</button>
+                            <button class="control-button" onclick="disableAllFilters()">DESACTIVAR TODOS</button>
+                            <button class="control-button" onclick="resetFiltersToDefault()">RESTABLECER</button>
+                        </div>
+                    </div>
                     
                     <!-- Añadir el widget de chat -->
                     <div class="chat-container" style="margin-bottom: 20px;">
@@ -1376,6 +1517,100 @@
         if (typeof subtractPM === 'function') window.subtractPM = subtractPM;
         if (typeof updateSpectators === 'function') window.updateSpectators = updateSpectators;
         if (typeof updateRating === 'function') window.updateRating = updateRating;
+
+        // === SISTEMA DE FILTROS DE MENSAJES ===
+        
+        // Inicializar sistema de filtros
+        window.MESSAGE_FILTERS = {
+            enabledCategories: {
+                'fan': true,
+                'picante': true,
+                'humillante': true,
+                'relleno': true,
+                'queja': true,
+                'divertido': true,
+                'insulto': true
+            },
+            
+            setFilter: function(category, enabled) {
+                this.enabledCategories[category] = enabled;
+                localStorage.setItem('messageFilters', JSON.stringify(this.enabledCategories));
+                console.log(`🎛️ Filtro ${category}: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
+                
+                // Notificar a otros sistemas si existen
+                if (window.contextualSystem && typeof window.contextualSystem.refreshMessages === 'function') {
+                    window.contextualSystem.refreshMessages();
+                }
+            },
+            
+            getEnabledCategories: function() {
+                return this.enabledCategories;
+            },
+            
+            loadFromStorage: function() {
+                const saved = localStorage.getItem('messageFilters');
+                if (saved) {
+                    try {
+                        this.enabledCategories = JSON.parse(saved);
+                        this.updateCheckboxes();
+                    } catch (e) {
+                        console.error('Error loading message filters:', e);
+                    }
+                }
+            },
+            
+            updateCheckboxes: function() {
+                Object.keys(this.enabledCategories).forEach(category => {
+                    const checkbox = document.getElementById(`filter-${category}`);
+                    if (checkbox) {
+                        checkbox.checked = this.enabledCategories[category];
+                    }
+                });
+            }
+        };
+
+        // Funciones para el manejo de filtros
+        function toggleMessageFilter(category, enabled) {
+            MESSAGE_FILTERS.setFilter(category, enabled);
+        }
+
+        function enableAllFilters() {
+            Object.keys(MESSAGE_FILTERS.enabledCategories).forEach(category => {
+                MESSAGE_FILTERS.setFilter(category, true);
+                const checkbox = document.getElementById(`filter-${category}`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        function disableAllFilters() {
+            Object.keys(MESSAGE_FILTERS.enabledCategories).forEach(category => {
+                MESSAGE_FILTERS.setFilter(category, false);
+                const checkbox = document.getElementById(`filter-${category}`);
+                if (checkbox) checkbox.checked = false;
+            });
+        }
+
+        function resetFiltersToDefault() {
+            Object.keys(MESSAGE_FILTERS.enabledCategories).forEach(category => {
+                MESSAGE_FILTERS.setFilter(category, true);
+                const checkbox = document.getElementById(`filter-${category}`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        // Inicializar filtros al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            MESSAGE_FILTERS.loadFromStorage();
+            
+            // Mostrar estado inicial en consola
+            console.log('🎛️ Sistema de filtros inicializado:', MESSAGE_FILTERS.getEnabledCategories());
+        });
+
+        // Exponer funciones globalmente para compatibilidad
+        window.toggleMessageFilter = toggleMessageFilter;
+        window.enableAllFilters = enableAllFilters;
+        window.disableAllFilters = disableAllFilters;
+        window.resetFiltersToDefault = resetFiltersToDefault;
     </script>
 </body>
 </html> 
