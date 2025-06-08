@@ -788,7 +788,7 @@
             if (window.saveTimeOfDay) window.saveTimeOfDay(timeOfDay);
         }
 
-        // Función para cargar y mostrar los últimos mensajes del chat
+        // Función para cargar y mostrar los últimos mensajes del chat (solo para el panel de control)
         function loadChatMessages() {
             let mensajes = [];
             try {
@@ -801,7 +801,7 @@
             const chat = document.getElementById('chat-messages');
             if (!chat) return;
             
-            // Limpiar completamente el chat antes de recargar
+            // Limpiar completamente el chat del PANEL DE CONTROL antes de recargar
             chat.innerHTML = '';
             
             if (!mensajes || mensajes.length === 0) {
@@ -809,7 +809,7 @@
                 return;
             }
             
-            // Renderizar solo los últimos mensajes (admin + jugador)
+            // Renderizar solo los últimos mensajes (admin + jugador) EN EL PANEL DE CONTROL
             const messagesHTML = mensajes.map(msg => {
                 // Determinar el color y estilo según el tipo de mensaje
                 let usernameColor = '#cccccc';
@@ -839,7 +839,7 @@
             chat.innerHTML = messagesHTML;
             chat.scrollTop = chat.scrollHeight;
             
-            console.log(`📧 Chat cargado con ${mensajes.length} últimos mensajes`);
+            console.log(`📧 Panel de control actualizado con ${mensajes.length} últimos mensajes`);
         }
         window.loadChatMessages = loadChatMessages;
 
@@ -890,7 +890,12 @@
                     window.saveChat(existingMessages);
                 }
                 
-                // Actualizar el chat del control panel
+                // Notificar al chat del usuario SIN reiniciar
+                if (window.renderGlobalChatMessages) {
+                    window.renderGlobalChatMessages(existingMessages);
+                }
+                
+                // Actualizar solo el panel de control
                 loadChatMessages();
                 
                 // Limpiar formulario
@@ -983,7 +988,12 @@
                 // Actualizar PM
                 statsManager.updatePM(pmAmount);
                 
-                // Actualizar el chat del control panel
+                // Notificar al chat del usuario SIN reiniciar
+                if (window.renderGlobalChatMessages) {
+                    window.renderGlobalChatMessages(existingMessages);
+                }
+                
+                // Actualizar solo el panel de control
                 loadChatMessages();
                 
                 // Limpiar formulario
