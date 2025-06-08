@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Mercenary 1.52</title>
+    <title>Ultimate Mercenary 1.53</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chat-publico.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1132,14 +1132,16 @@
             // Chat normal: simplemente guardar todos los mensajes sin filtrar
             localStorage.setItem('mensajes-publico-expanded', JSON.stringify(messagesArray));
             
-            // NO llamar renderGlobalChatMessages desde Firebase - evita reinicios
-            console.log(`[Firebase Chat Listener] ${messagesArray.length} mensajes sincronizados en localStorage`);
+            // Log detallado para debug
+            console.log(`🔥 [FIREBASE LISTENER] Recibidos ${messagesArray.length} mensajes de Firebase`);
+            console.log('🔥 [FIREBASE LISTENER] Últimos 3 mensajes:', messagesArray.slice(-3));
             
-            // Solo renderizar si la función está disponible Y no hay mensajes locales ya renderizados
-            const chatContainer = document.getElementById('chat-messages');
-            if (window.renderGlobalChatMessages && chatContainer && chatContainer.children.length === 0) {
-                console.log(`[Firebase Chat Listener] Renderizando chat inicial`);
+            if (window.renderGlobalChatMessages) {
+                console.log('🔥 [FIREBASE LISTENER] Llamando renderGlobalChatMessages...');
                 window.renderGlobalChatMessages(messagesArray);
+                console.log('🔥 [FIREBASE LISTENER] ✅ renderGlobalChatMessages completado');
+            } else {
+                console.error('🔥 [FIREBASE LISTENER] ❌ renderGlobalChatMessages no disponible');
             }
         });
     </script>
@@ -1156,7 +1158,7 @@
                 <div class="logo-container">
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
-                        <h1>ULTIMATE MERCENARY 1.52</h1>
+                        <h1>ULTIMATE MERCENARY 1.53</h1>
                         <h2>Concursante #13</h2>
                     </div>
                 </div>
@@ -1847,10 +1849,15 @@
                     
                     localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
                     
+                    console.log('🎮 JUGADOR ENVIANDO A FIREBASE - Total mensajes:', existingMessages.length);
+                    console.log('🎮 Mensaje del jugador:', playerMsg);
+                    
                     // Sincronizar con Firebase
                     if (window.saveChat) {
                         window.saveChat(existingMessages);
-                        console.log('📤 Último mensaje del jugador enviado a Firebase (manteniendo orden):', text.substring(0, 30));
+                        console.log('✅ Mensaje del jugador enviado a Firebase correctamente');
+                    } else {
+                        console.error('❌ window.saveChat no disponible para jugador');
                     }
                 } catch (error) {
                     console.error('❌ Error guardando mensaje del jugador:', error);
@@ -1905,13 +1912,21 @@
                 const chatContainer = document.getElementById('chat-messages');
                 if (!chatContainer) return;
                 
-                // Chat normal: renderizar todos los mensajes sin filtros complejos
+                // Obtener IDs de mensajes ya renderizados para evitar duplicados
+                const existingIds = new Set();
+                const existingMessages = chatContainer.querySelectorAll('[data-msg-timestamp]');
+                existingMessages.forEach(elem => {
+                    const timestamp = elem.getAttribute('data-msg-timestamp');
+                    if (timestamp) existingIds.add(timestamp);
+                });
+                
+                // Chat normal: renderizar solo mensajes nuevos
                 messagesArray.forEach((msg, index) => {
                     const sender = (msg.sender || '').trim().toLowerCase();
+                    const timestamp = msg.timestamp || (Date.now() + index);
                     
-                    // Verificar si el mensaje ya existe en el DOM para evitar duplicados
-                    const msgId = `msg-${msg.timestamp || index}`;
-                    if (document.getElementById(msgId)) {
+                    // Verificar si el mensaje ya existe
+                    if (existingIds.has(timestamp.toString())) {
                         return; // Ya existe, no duplicar
                     }
                     
@@ -1921,6 +1936,9 @@
                         color = '#00ccff'; // Color azul para mensajes del jugador
                     }
                     
+                    // Generar ID único para evitar duplicados
+                    const msgId = `msg-${timestamp}`;
+                    
                     // Añadir el mensaje al chat
                     agregarMensajeAlChatDisplay({
                         usuario: msg.sender,
@@ -1929,6 +1947,14 @@
                         color: color,
                         esReto: !!((msg.content||'').match(/([+][0-9]+)\s*PM/))
                     }, msgId);
+                    
+                    // Marcar el mensaje con timestamp para evitar duplicados futuros
+                    setTimeout(() => {
+                        const addedMsg = document.getElementById(msgId);
+                        if (addedMsg) {
+                            addedMsg.setAttribute('data-msg-timestamp', timestamp.toString());
+                        }
+                    }, 100);
                     
                     console.log('📨 Mensaje añadido al chat:', msg.sender, '-', msg.content.substring(0, 30));
                 });
@@ -2418,7 +2444,7 @@
 
     <!-- Versión del sistema -->
     <script>
-        const SYSTEM_VERSION = '1.52';
+        const SYSTEM_VERSION = '1.53';
     </script>
 
     <!-- Sistema de Mensajes Directos -->
@@ -2960,7 +2986,7 @@
             }
         };
 
-                    console.log('🎮 Ultimate Mercenary v1.52 - CHAT NORMAL SIN REINICIOS');
+                    console.log('🎮 Ultimate Mercenary v1.53 - CHAT SINCRONIZADO ENTRE DISPOSITIVOS');
         console.log('📧 Usa testMessagingSystem() para probar el sistema de mensajes');
         console.log('📧 Usa fixOldMessages() para migrar mensajes viejos a Bandeja de entrada');
         console.log('💬 Usa testChatSync() para probar la sincronización del chat entre dispositivos');

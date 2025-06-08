@@ -870,8 +870,16 @@
                 
                 // Guardar todos los mensajes
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
+                
+                console.log('📤 ENVIANDO A FIREBASE - Total mensajes:', existingMessages.length);
+                console.log('📤 Último mensaje:', newMessage);
+                console.log('📤 Array completo a Firebase:', existingMessages);
+                
                 if (window.saveChat) {
                     window.saveChat(existingMessages);
+                    console.log('✅ Función saveChat ejecutada');
+                } else {
+                    console.error('❌ window.saveChat no disponible');
                 }
                 
                 // Actualizar solo el panel de control (Firebase se encarga del resto)
@@ -881,7 +889,7 @@
                 document.getElementById('message-input').value = '';
                 localStorage.setItem('lastPublicUsername', sender);
                 
-                console.log('✅ Mensaje del admin enviado permanentemente:', newMessage);
+                console.log('✅ Proceso completo - Mensaje del admin enviado:', newMessage.content);
             } catch (error) {
                 console.error('❌ Error al enviar mensaje temporal:', error);
                 alert('Error al enviar el mensaje');
@@ -944,8 +952,15 @@
                 
                 // Guardar todos los mensajes
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(existingMessages));
+                
+                console.log('📤 ENVIANDO PM A FIREBASE - Total mensajes:', existingMessages.length);
+                console.log('📤 Mensaje PM:', newMessage);
+                
                 if (window.saveChat) {
                     window.saveChat(existingMessages);
+                    console.log('✅ Función saveChat ejecutada para PM');
+                } else {
+                    console.error('❌ window.saveChat no disponible para PM');
                 }
                 
                 // Actualizar PM
@@ -959,7 +974,7 @@
                 document.getElementById('pm-message-input').value = '';
                 localStorage.setItem('lastPMUsername', sender);
                 
-                console.log('✅ Mensaje de PM del admin enviado permanentemente:', newMessage);
+                console.log('✅ Proceso completo - Mensaje PM del admin enviado:', newMessage.content);
             } catch (error) {
                 console.error('❌ Error al enviar mensaje temporal de PM:', error);
                 alert('Error al enviar el mensaje');
