@@ -1129,8 +1129,26 @@
             // If 'data' is an object of messages, convert to array.
             const messagesArray = Array.isArray(data) ? data : (data ? Object.values(data) : []);
 
-            // No filtramos mensajes - mostramos últimos mensajes de admin y jugador
-            const mensajesFiltrados = messagesArray;
+            // Filtrar solo mensajes del admin y jugador para mantener solo los últimos
+            const mensajesFiltrados = [];
+            let lastAdminMessage = null;
+            let lastPlayerMessage = null;
+            
+            // Mantener mensajes automáticos y encontrar últimos admin/jugador
+            for (const msg of messagesArray) {
+                if (msg.isAdminMessage) {
+                    lastAdminMessage = msg;
+                } else if (msg.isPlayerMessage) {
+                    lastPlayerMessage = msg;
+                } else if (!msg.isAdminMessage && !msg.isPlayerMessage) {
+                    // Mantener mensajes automáticos
+                    mensajesFiltrados.push(msg);
+                }
+            }
+            
+            // Añadir solo los últimos mensajes del admin y jugador
+            if (lastPlayerMessage) mensajesFiltrados.push(lastPlayerMessage);
+            if (lastAdminMessage) mensajesFiltrados.push(lastAdminMessage);
 
             localStorage.setItem('mensajes-publico-expanded', JSON.stringify(mensajesFiltrados));
             if (window.renderGlobalChatMessages) {
