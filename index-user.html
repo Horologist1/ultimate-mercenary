@@ -1014,6 +1014,98 @@
         .pm-accept-btn {
             transition: background 0.2s, color 0.2s;
         }
+
+        /* Ranking Modal Styles */
+        .ranking-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .ranking-modal-content {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #444;
+            color: white;
+        }
+
+        .ranking-modal h2 {
+            color: #00ccff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ranking-table table {
+            width: 100%;
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        .ranking-table th {
+            background-color: rgba(0, 204, 255, 0.2);
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .ranking-table tr:nth-child(even) {
+            background-color: rgba(30, 30, 30, 0.8);
+        }
+
+        .ranking-table tr:hover {
+            background-color: rgba(255, 71, 87, 0.2);
+        }
+
+        .close-ranking {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-ranking:hover {
+            color: #ff4757;
+        }
+
+        .ranking-button {
+            background-color: #00ccff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-button:hover {
+            background-color: #00a3cc;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -1355,7 +1447,7 @@
                     <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
                     <div class="title-container">
                     <h1>ULTIMATE MERCENARY 1.61</h1>
-                        <h2>Concursante #13</h2>
+                        <h2>Concursante #13 <button class="ranking-button" onclick="showRanking()">Ranking</button></h2>
                     </div>
                 </div>
                 <button class="logout-button" onclick="logout()">
@@ -3599,5 +3691,28 @@
         }, 3000); // Esperar MÁS para que Firebase termine completamente
     </script>
 
+    <!-- Add the ranking modal -->
+    <div id="rankingModal" class="ranking-modal">
+        <div class="ranking-modal-content" id="rankingModalContent">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+        <span class="close-ranking" onclick="document.getElementById('rankingModal').style.display='none'">&times;</span>
+    </div>
+
+    <!-- Add the ranking button next to Concursante #13 -->
+    <div class="title-container">
+        <h1>Ultimate Mercenary</h1>
+        <h2>Concursante #13 <button class="ranking-button" onclick="showRanking()">Ranking</button></h2>
+    </div>
+
+    <!-- Add the ranking system script -->
+    <script src="ranking-system.js"></script>
+    <script>
+        function showRanking() {
+            const modal = document.getElementById('rankingModal');
+            modal.style.display = 'block';
+            rankingSystem.renderRanking();
+        }
+    </script>
 </body>
 </html> 

@@ -541,6 +541,58 @@
         .filter-checkbox input:checked ~ .filter-desc {
             color: #00ff88;
         }
+
+        /* Add styles for the ranking table */
+        .ranking-table-admin {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .ranking-table-admin table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ranking-table-admin th,
+        .ranking-table-admin td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #444;
+            color: white;
+        }
+
+        .ranking-table-admin th {
+            background-color: rgba(0, 204, 255, 0.2);
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .ranking-table-admin tr:nth-child(even) {
+            background-color: rgba(30, 30, 30, 0.8);
+        }
+
+        .ranking-table-admin input {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+            color: white;
+            padding: 5px;
+            width: 100px;
+            text-align: center;
+        }
+
+        .ranking-table-admin button {
+            background-color: #00ccff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .ranking-table-admin button:hover {
+            background-color: #00a3cc;
+        }
     </style>
 </head>
 <body>
@@ -729,6 +781,29 @@
                     <div id="conocidos-list" class="control-group"></div>
                     <h3>CONOCIMIENTOS</h3>
                     <div id="conocimientos-list" class="control-group"></div>
+                </div>
+
+                <!-- Add new ranking section -->
+                <div class="control-section ranking">
+                    <h3>Gestión del Ranking</h3>
+                    <div class="control-group">
+                        <h4>Top 10 Participantes</h4>
+                        <div class="ranking-table-admin">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Posición</th>
+                                        <th>Número</th>
+                                        <th>PM</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rankingTableBody">
+                                    <!-- Content will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1778,6 +1853,55 @@
         window.enableAllFilters = enableAllFilters;
         window.disableAllFilters = disableAllFilters;
         window.resetFiltersToDefault = resetFiltersToDefault;
+    </script>
+
+    <!-- Add the ranking system script -->
+    <script src="ranking-system.js"></script>
+    <script>
+        // Function to render the editable ranking table
+        function renderAdminRanking() {
+            const tableBody = document.getElementById('rankingTableBody');
+            if (!tableBody) return;
+
+            const ranking = rankingSystem.getRanking();
+            tableBody.innerHTML = '';
+
+            ranking.forEach((participant, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>#${participant.number}</td>
+                    <td>
+                        <input type="number" value="${participant.pm}" 
+                               onchange="updateParticipantPM(${participant.number}, this.value)">
+                    </td>
+                    <td>
+                        <button onclick="saveParticipantPM(${participant.number})">Guardar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update participant's PM
+        function updateParticipantPM(number, newPM) {
+            rankingSystem.updateParticipantPM(number, parseInt(newPM));
+            renderAdminRanking();
+        }
+
+        // Function to save participant's PM
+        function saveParticipantPM(number) {
+            const input = document.querySelector(`input[onchange="updateParticipantPM(${number}, this.value)"]`);
+            if (input) {
+                rankingSystem.updateParticipantPM(number, parseInt(input.value));
+                rankingSystem.saveRanking();
+            }
+        }
+
+        // Initialize the admin ranking table
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAdminRanking();
+        });
     </script>
 </body>
 </html> 
