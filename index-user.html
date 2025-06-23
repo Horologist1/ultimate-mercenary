@@ -1435,6 +1435,14 @@
     </script>
     <div class="main-container">
         <!-- Video de fondo -->
+                <!-- Ranking Modal -->
+        <div id="rankingModal" class="ranking-modal">
+            <div class="ranking-modal-content" id="rankingModalContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <span class="close-ranking" onclick="document.getElementById('rankingModal').style.display='none'">&times;</span>
+        </div>
+
         <video id="background-video" class="background-video" autoplay loop muted playsinline>
             <source src="https://www.dropbox.com/scl/fi/1josbstrlr7detymj71j9/Prueba0.mp4?rlkey=zphfprdpum4q58xz297r8h3k9&st=sbkz57tk&dl=1" type="video/mp4">
         </video>
@@ -3325,6 +3333,9 @@
     <script src="contextual-messages-p3.js"></script>
     <script src="contextual-system-integration.js"></script>
     
+    <!-- Sistema de Ranking -->
+    <script src="ranking-system.js"></script>
+
     <!-- SISTEMA DE FILTROS DE MENSAJES v1.61 -->
     <script>
         // Inicializar sistema de filtros en index-user.html
@@ -3699,12 +3710,7 @@
         <span class="close-ranking" onclick="document.getElementById('rankingModal').style.display='none'">&times;</span>
     </div>
 
-    <!-- Add the ranking button next to Concursante #13 -->
-    <div class="title-container">
-        <h1>Ultimate Mercenary</h1>
-        <h2>Concursante #13 <button class="ranking-button" onclick="showRanking()">Ranking</button></h2>
-    </div>
-
+    
     <!-- Add the ranking system script -->
     <script src="ranking-system.js"></script>
     <script>

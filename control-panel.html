@@ -1872,8 +1872,10 @@
                     <td>${index + 1}</td>
                     <td>#${participant.number}</td>
                     <td>
-                        <input type="number" value="${participant.pm}" 
-                               onchange="updateParticipantPM(${participant.number}, this.value)">
+                        <input type="number" 
+                               id="pm-input-${participant.number}"
+                               value="${participant.pm}" 
+                               min="0">
                     </td>
                     <td>
                         <button onclick="saveParticipantPM(${participant.number})">Guardar</button>
@@ -1885,16 +1887,19 @@
 
         // Function to update participant's PM
         function updateParticipantPM(number, newPM) {
+            if (newPM < 0) return; // No permitir valores negativos
             rankingSystem.updateParticipantPM(number, parseInt(newPM));
-            renderAdminRanking();
         }
 
         // Function to save participant's PM
         function saveParticipantPM(number) {
-            const input = document.querySelector(`input[onchange="updateParticipantPM(${number}, this.value)"]`);
+            const input = document.getElementById(`pm-input-${number}`);
             if (input) {
-                rankingSystem.updateParticipantPM(number, parseInt(input.value));
-                rankingSystem.saveRanking();
+                const newPM = parseInt(input.value);
+                if (!isNaN(newPM) && newPM >= 0) {
+                    updateParticipantPM(number, newPM);
+                    rankingSystem.saveRanking(); // Esto enviará los datos a Firebase
+                }
             }
         }
 
