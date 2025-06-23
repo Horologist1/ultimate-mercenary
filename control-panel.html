@@ -950,37 +950,48 @@
 
         // Datos de personajes y facciones
         const personajes = [
+            // Personajes principales
             { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
             { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
             { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
             { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
             { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
             { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
-            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
-            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
-            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
-            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
-            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
-            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
-            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
-            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
-            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
-            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' },
-            // Nuevos personajes de la sección de inicio
-            { nombre: 'Kaiser "El Emperador" Von Stroheim', img: 'images/kaiser_new.png', desc: 'Anfitrión y Productor Ejecutivo de Ultimate Mercenary.' },
-            { nombre: 'Mr. Kenji Tanaka', img: 'images/guard_ocemk2.png', desc: 'Jefe de Adquisiciones de Talento, OCE.' },
-            { nombre: 'Dra. Naomi "Nano" McClaray', img: 'images/doctora_nano.png', desc: 'Médica Jefe de OCE, experta en nanomedicina.' },
-            { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Agente del Gobierno Sombra, oficial de alto rango.' },
-            { nombre: 'Dra. Ada "Quantum" Mercurio', img: 'images/nexus9_ada_quantum.png', desc: 'Científica Visionaria y Fundadora del Colectivo Nexus-9.' },
-            { nombre: 'Xiong "Mesh" Lee', img: 'images/nexus9_mesh_lee.png', desc: 'Especialista en Infiltración y Recuperación del Colectivo Nexus-9.' },
-            { nombre: 'Madame Jade "Emperatriz de Cromo"', img: 'images/chrome_dynasty_emperatriz.png', desc: 'Líder Suprema de la Chrome Dynasty.' },
-            { nombre: 'Jin "Silverhand" Wong', img: 'images/chrome_dynasty_silverhand.png', desc: 'Enforcer Principal y Cirujano de Combate de Chrome Dynasty.' },
-            { nombre: 'Hideo Nakamura', img: 'images/nakamura_daichi_ceo.png', desc: 'CEO y Patriarca de Nakamura-Daichi Corp.' },
-            { nombre: 'Dra. Yuki Nakamura', img: 'images/nakamura_daichi_yuki.png', desc: 'Directora de I+D de Nakamura-Daichi Corp.' },
-            { nombre: 'Zero "Void" Tanaka', img: 'images/huerfanos_zero_void.png', desc: 'Líder y Rostro del Movimiento Huérfanos Digitales.' },
-            { nombre: 'Iris "Glitch" Sato', img: 'images/huerfanos_iris_glitch.png', desc: 'Especialista en Recuperación de Conciencias de los Huérfanos Digitales.' }
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La Negociadora Elegante, experta en tratos.' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Hacker Caótica, impredecible y brillante.' },
+            { nombre: 'Maven', img: 'images/maven_corporate.png', desc: 'La Corporativa Reformada, estratega maestra.' },
+            { nombre: 'Thunder Fist', img: 'images/thunder_fist.png', desc: 'El Luchador Callejero, honor y puños.' },
+            { nombre: 'Viper Blade', img: 'images/viper_blade.png', desc: 'La Mercenaria Letal, precisa y mortal.' },
+            { nombre: 'Faith "Oracle" Chen', img: 'images/faith_oracle.png', desc: 'La Médica Visionaria, sanadora y guía.' },
+            { nombre: 'Phantom', img: 'images/hacker_phantom.png', desc: 'El Hacker Fantasma, invisible en la red.' },
+            
+            // Personal de OCE
+            { nombre: 'Kaiser "El Emperador" Von Stroheim', img: 'images/kaiser_new.png', desc: 'CEO de OCE, visionario y manipulador.' },
+            { nombre: 'Mr. Kenji Tanaka', img: 'images/nakamura_daichi_ceo.png', desc: 'Director de Seguridad de OCE, disciplinado y honorable.' },
+            { nombre: 'Dra. Naomi "Nano" McClaray', img: 'images/doctora_nano.png', desc: 'Jefa de Investigación de OCE, brillante y ambiciosa.' },
+            { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Director de Operaciones de OCE, eficiente y despiadado.' },
+            
+            // Nexus-9
+            { nombre: 'Dra. Ada "Quantum" Mercurio', img: 'images/nexus9_ada_quantum.png', desc: 'Líder de Nexus-9, genio de la IA.' },
+            { nombre: 'Xiong "Mesh" Lee', img: 'images/nexus9_mesh_lee.png', desc: 'Especialista en redes neuronales de Nexus-9.' },
+            
+            // Chrome Dynasty
+            { nombre: 'Madame Jade "Emperatriz de Cromo"', img: 'images/chrome_dynasty_emperatriz.png', desc: 'Líder de Chrome Dynasty, elegante y mortal.' },
+            { nombre: 'Jin "Silverhand" Wong', img: 'images/chrome_dynasty_silverhand.png', desc: 'Lugarteniente de Chrome Dynasty, cyborg legendario.' },
+            
+            // Nakamura-Daichi
+            { nombre: 'Hideo Nakamura', img: 'images/nakamura_daichi_ceo.png', desc: 'CEO de Nakamura-Daichi Corp, tradicionalista y poderoso.' },
+            { nombre: 'Dra. Yuki Nakamura', img: 'images/nakamura_daichi_yuki.png', desc: 'Directora de I+D de Nakamura-Daichi, innovadora.' },
+            
+            // Huérfanos Digitales
+            { nombre: 'Zero "Void" Tanaka', img: 'images/huerfanos_zero_void.png', desc: 'Líder de los Huérfanos Digitales, enigmático hacker.' },
+            { nombre: 'Iris "Glitch" Sato', img: 'images/huerfanos_iris_glitch.png', desc: 'Segunda al mando de los Huérfanos, experta en virus.' },
+            
+            // NPCs y Enemigos
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'Experimento fallido de OCE, peligrosamente inestable.' },
+            { nombre: 'Terror del Maíz', img: 'images/terror_maiz_new.png', desc: 'Mutante del distrito agrícola, territorial y agresivo.' },
+            { nombre: 'Cosechador Reptante', img: 'images/cosechador_reptante_new.png', desc: 'Drone agrícola reprogramado, letal y eficiente.' },
+            { nombre: 'Pacifier Soldier', img: 'images/pacifier_soldier_new.png', desc: 'Soldado de élite de OCE, sin voluntad propia.' }
         ];
         const facciones = [
             { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },

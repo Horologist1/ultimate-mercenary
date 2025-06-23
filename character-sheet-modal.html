@@ -1575,24 +1575,342 @@
 
         // Datos de personajes y facciones
         const personajes = [
-            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
-            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
-            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
-            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
-            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
-            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.' },
-            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.' },
-            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.' },
-            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.' },
-            { nombre: 'Los Gemelos (Jin & Jun)', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.' },
-            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.' },
-            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.' },
-            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.' },
-            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.' },
-            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
-            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' }
+            // Personajes principales
+            {
+                nombre: 'Auri',
+                numero: 13,
+                apodo: 'Protagonista Principal',
+                descripcion: 'Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto.',
+                dialogo: '',
+                img: 'images/kira_initial.png',
+                nombreReal: 'Auri'
+            },
+            {
+                nombre: 'Boris "Goliath" Volkov',
+                numero: 42,
+                apodo: 'El Tanque Ruso',
+                descripcion: 'Ex-Spetsnaz, enorme, implantes de fuerza de primera gen, cicatrices. Directo, brutal.',
+                dialogo: '"¿Tú? ¿Competir? ¡Ja! Durarás menos que un helado en el infierno."',
+                img: 'images/goliath.png',
+                nombreReal: 'Boris Volkov'
+            },
+            {
+                nombre: 'Silas "Glitch" Vance',
+                numero: 17,
+                apodo: 'El Netrunner Nervioso',
+                descripcion: 'Ex-ingeniero de seguridad corporativa que vendió secretos. Evita el conflicto directo.',
+                dialogo: '"Los protocolos de seguridad son... anticuados. Si me cubres, podría darte una \'ventaja\'."',
+                img: 'images/silas_glitch.png',
+                nombreReal: 'Silas Vance'
+            },
+            {
+                nombre: 'Raven',
+                numero: 89,
+                apodo: 'La Asesina Silenciosa',
+                descripcion: 'Maestra del sigilo y el combate cuerpo a cuerpo. Habla poco, observa mucho.',
+                dialogo: 'Un asentimiento casi imperceptible.',
+                img: 'images/raven.png',
+                nombreReal: 'Mizuki Tanaka'
+            },
+            {
+                nombre: 'Chispa',
+                numero: 31,
+                apodo: 'La Mecánica Optimista',
+                descripcion: 'Ex-ingeniera de mantenimiento orbital. Optimista, siempre trasteando con tecnología.',
+                dialogo: '"¡Ey! ¿Nueva? No te dejes comer por los tiburones."',
+                img: 'images/chispa_new.png',
+                nombreReal: 'Anya Sharma'
+            },
+            {
+                nombre: 'Marcus "Old Man" Thorne',
+                numero: 76,
+                apodo: 'El Veterano Cínico',
+                descripcion: 'Ex-corporativo de seguridad, lo perdió todo. Pragmático y calculador.',
+                dialogo: '"He visto programas como este ir y venir. Todos terminan igual."',
+                img: 'images/old_man.png',
+                nombreReal: 'Marcus Thorne'
+            },
+            {
+                nombre: 'Lin Mayfair',
+                numero: 58,
+                apodo: 'La Negociadora Elegante',
+                descripcion: 'Experta en tratos y negociaciones. Hay más en ella de lo que aparenta.',
+                dialogo: '"Los negocios son como un baile, y yo nunca pierdo el ritmo."',
+                img: 'images/lin_mayfair_new.png',
+                nombreReal: 'Lin Mayfair'
+            },
+            {
+                nombre: 'Jinx',
+                numero: 23,
+                apodo: 'La Hacker Caótica',
+                descripcion: 'Impredecible y brillante, experta en sistemas de seguridad.',
+                dialogo: '"¡La vida es más divertida cuando todo explota!"',
+                img: 'images/jinx_alt.png',
+                nombreReal: 'Jinx'
+            },
+            {
+                nombre: 'Maven',
+                numero: 29,
+                apodo: 'La Corporativa Reformada',
+                descripcion: 'Ex-ejecutiva de alto nivel, ahora usa sus conocimientos contra el sistema.',
+                dialogo: '"Conozco el sistema desde dentro, y sé cómo derribarlo."',
+                img: 'images/maven_corporate.png',
+                nombreReal: 'Aria Chen'
+            },
+            {
+                nombre: 'Thunder Fist',
+                numero: 68,
+                apodo: 'El Luchador Callejero',
+                descripcion: 'Campeón de peleas clandestinas, honor y puños por igual.',
+                dialogo: '"Mis puños hablan más fuerte que mis palabras."',
+                img: 'images/thunder_fist.png',
+                nombreReal: 'Darius Jackson'
+            },
+            {
+                nombre: 'Viper Blade',
+                numero: 45,
+                apodo: 'La Mercenaria Letal',
+                descripcion: 'Ex-guardaespaldas de élite, precisa y mortal en combate.',
+                dialogo: '"Un corte limpio, una muerte rápida."',
+                img: 'images/viper_blade.png',
+                nombreReal: 'Sofía Nakamura'
+            },
+            {
+                nombre: 'Faith "Oracle" Chen',
+                numero: 53,
+                apodo: 'La Médica Visionaria',
+                descripcion: 'Sanadora y guía espiritual, conectada con la tecnología de formas místicas.',
+                dialogo: '"La tecnología es el puente entre cuerpo y espíritu."',
+                img: 'images/faith_oracle.png',
+                nombreReal: 'Faith Chen'
+            },
+            {
+                nombre: 'Phantom',
+                numero: 91,
+                apodo: 'El Hacker Fantasma',
+                descripcion: 'Legendario hacker, invisible en la red y en la vida real.',
+                dialogo: '"En la red, todos somos fantasmas."',
+                img: 'images/hacker_phantom.png',
+                nombreReal: 'Alex Mercer'
+            },
+            {
+                nombre: 'Dr. Felix "Compound" Reyes',
+                numero: 64,
+                apodo: 'El Químico Clandestino',
+                descripcion: 'Genio científico que trabajaba para Pharmaceutech desarrollando drogas de combate para soldados corporativos. Sus ojos brillantes son resultado de sus propios experimentos con neurorreguladores que amplificaron su capacidad intelectual pero desestabilizaron su psique.',
+                dialogo: '"¿Ves estas manos? Pueden crear sustancias que harían que tus pesadillas parezcan cuentos infantiles. Una gota, y tu cerebro se derretiría dentro de tu cráneo. Una gota diferente, y pelearías como un dios. Así que... ¿quieres ser mi amigo o mi experimento?"',
+                img: 'images/cyber_chemist.png',
+                nombreReal: 'Dr. Felix "Compound" Reyes'
+            },
+            {
+                nombre: 'Los Gemelos (Jin & Jun)',
+                numero: 82,
+                apodo: 'Los Sincronizados',
+                descripcion: 'Gemelos idénticos que cuentan como un solo concursante gracias a una regla especial de Kaiser. Sus mentes están enlazadas por implantes neurales experimentales que les permiten compartir percepciones sensoriales y actuar con una coordinación perfecta.',
+                dialogo: '"Nunca estamos solos." (Jin) "Nunca luchamos solos." (Jun) "Siempre somos dos." (Jin) "Y eso nos hace invencibles." (Jun) "Cuando nos enfrentas..." (Jin) "...enfrentas a dos enemigos que actúan como uno." (Ambos al unísono)',
+                img: 'images/cyber_twins.png',
+                nombreReal: 'Los Gemelos (Jin & Jun)'
+            },
+            {
+                nombre: 'Marcus "Titan" Graves',
+                numero: 71,
+                apodo: 'El Soldado Aumentado',
+                descripcion: 'Veterano de las Guerras Corporativas, Graves participó en el programa experimental de super-soldados del ejército. Su cuerpo está reforzado con un exoesqueleto militar integrado y sistemas de armas. Tras ser dado por "obsoleto" y programado para desmantelamiento, escapó.',
+                dialogo: '"Me construyeron para la guerra. Me entrenaron para la victoria. ¿Y cuando terminó todo? Me tiraron como chatarra. Pero lo que no entienden es que me hicieron demasiado bien. No soy una herramienta que se pueda desechar. Soy un arma que ahora apunta hacia ellos."',
+                img: 'images/titan_warrior.png',
+                nombreReal: 'Marcus "Titan" Graves'
+            },
+            {
+                nombre: 'Faith "Oracle" Lee',
+                numero: 53,
+                apodo: 'La Tecno-Sacerdotisa',
+                descripcion: 'Ex-profeta de la Iglesia de la Singularidad Divina, una religión que venera la fusión de humanidad y tecnología. Tiene implantes neurales que le permiten procesar información a velocidades sobrehumanas y conectarse directamente con sistemas informáticos.',
+                dialogo: '"La carne es solo el vehículo temporal de la conciencia. En la confluencia de sangre y silicio hallaremos la trascendencia. Tus temores, tus dudas... He visto cómo terminan. Te guiaré si estás dispuesto a escuchar."',
+                img: 'images/faith_oracle.png',
+                nombreReal: 'Faith "Oracle" Lee'
+            },
+            {
+                nombre: 'Yuki Nakamura',
+                numero: null,
+                apodo: 'Hija de Hideo, heredera de Nakamura-Daichi',
+                descripcion: 'Joven prodigio en biotecnología, Yuki es la heredera de la corporación. Su ambición solo es igualada por su talento.',
+                dialogo: '"El futuro pertenece a quienes se atreven a reescribir el código de la vida."',
+                img: 'images/yuki_nakamura.png',
+                nombreReal: 'Yuki Nakamura'
+            },
+            {
+                nombre: 'Zero Void',
+                numero: null,
+                apodo: 'Asesino Cibernético',
+                descripcion: 'Casi un mito urbano, Zero Void es un asesino a sueldo con implantes experimentales que le permiten volverse invisible a los sensores y cámaras.',
+                dialogo: '"No puedes matar lo que no puedes ver."',
+                img: 'images/zero_void.png',
+                nombreReal: 'Zero Void'
+            },
+            {
+                nombre: 'Iris',
+                numero: null,
+                apodo: 'Operadora de la Resistencia',
+                descripcion: 'Experta en comunicaciones y sabotaje, Iris coordina las células de resistencia desde las sombras. Su identidad real es desconocida.',
+                dialogo: '"La esperanza es la señal más difícil de bloquear."',
+                img: 'images/iris.png',
+                nombreReal: 'Iris'
+            },
+            // Personal de OCE
+            {
+                nombre: 'Kaiser "El Emperador" Von Stroheim',
+                numero: 0,
+                apodo: 'CEO de OCE',
+                descripcion: 'Visionario y manipulador, creador de Ultimate Mercenary.',
+                dialogo: '"El espectáculo debe continuar, y yo soy el maestro de ceremonias."',
+                img: 'images/kaiser_new.png',
+                nombreReal: 'Kaiser Von Stroheim'
+            },
+            {
+                nombre: 'Mr. Kenji Tanaka',
+                numero: 0,
+                apodo: 'Director de Seguridad',
+                descripcion: 'Disciplinado y honorable, mantiene el orden en OCE.',
+                dialogo: '"El orden es la base de todo progreso."',
+                img: 'images/nakamura_daichi_ceo.png',
+                nombreReal: 'Kenji Tanaka'
+            },
+            {
+                nombre: 'Dra. Naomi "Nano" McClaray',
+                numero: 0,
+                apodo: 'Jefa de Investigación',
+                descripcion: 'Brillante y ambiciosa, lidera los avances tecnológicos de OCE.',
+                dialogo: '"La ciencia no tiene límites, solo horizontes por explorar."',
+                img: 'images/doctora_nano.png',
+                nombreReal: 'Naomi McClaray'
+            },
+            {
+                nombre: 'Director Ikari',
+                numero: 0,
+                apodo: 'Director de Operaciones',
+                descripcion: 'Eficiente y despiadado, supervisa las operaciones de OCE.',
+                dialogo: '"La eficiencia es todo lo que importa."',
+                img: 'images/director_ikari.png',
+                nombreReal: 'Director Ikari'
+            },
+
+            // Nexus-9
+            {
+                nombre: 'Dra. Ada "Quantum" Mercurio',
+                numero: 0,
+                apodo: 'Líder de Nexus-9',
+                descripcion: 'Genio de la IA y visionaria tecnológica.',
+                dialogo: '"La singularidad no es el fin, es solo el principio."',
+                img: 'images/nexus9_ada_quantum.png',
+                nombreReal: 'Ada Mercurio'
+            },
+            {
+                nombre: 'Xiong "Mesh" Lee',
+                numero: 0,
+                apodo: 'Especialista en Redes',
+                descripcion: 'Experto en redes neuronales y sistemas complejos.',
+                dialogo: '"La red es un organismo vivo, y yo soy su médico."',
+                img: 'images/nexus9_mesh_lee.png',
+                nombreReal: 'Xiong Lee'
+            },
+
+            // Chrome Dynasty
+            {
+                nombre: 'Madame Jade',
+                numero: 0,
+                apodo: 'Emperatriz de Cromo',
+                descripcion: 'Líder de Chrome Dynasty, elegante y mortal.',
+                dialogo: '"El cromo es poder, y el poder lo es todo."',
+                img: 'images/chrome_dynasty_emperatriz.png',
+                nombreReal: 'Madame Jade'
+            },
+            {
+                nombre: 'Jin "Silverhand" Wong',
+                numero: 0,
+                apodo: 'Lugarteniente de Chrome Dynasty',
+                descripcion: 'Cyborg legendario y brazo derecho de Madame Jade.',
+                dialogo: '"Mi lealtad está grabada en cromo."',
+                img: 'images/chrome_dynasty_silverhand.png',
+                nombreReal: 'Jin Wong'
+            },
+
+            // Nakamura-Daichi
+            {
+                nombre: 'Hideo Nakamura',
+                numero: 0,
+                apodo: 'CEO de Nakamura-Daichi',
+                descripcion: 'Tradicionalista y poderoso líder corporativo.',
+                dialogo: '"La tradición es la base del futuro."',
+                img: 'images/nakamura_daichi_ceo.png',
+                nombreReal: 'Hideo Nakamura'
+            },
+            {
+                nombre: 'Dra. Yuki Nakamura',
+                numero: 0,
+                apodo: 'Directora de I+D',
+                descripcion: 'Innovadora y brillante investigadora.',
+                dialogo: '"La innovación es el camino hacia el progreso."',
+                img: 'images/nakamura_daichi_yuki.png',
+                nombreReal: 'Yuki Nakamura'
+            },
+
+            // Huérfanos Digitales
+            {
+                nombre: 'Zero "Void" Tanaka',
+                numero: 0,
+                apodo: 'Líder de los Huérfanos',
+                descripcion: 'Enigmático hacker y líder revolucionario.',
+                dialogo: '"En el vacío digital, encontramos nuestra libertad."',
+                img: 'images/huerfanos_zero_void.png',
+                nombreReal: 'Zero Tanaka'
+            },
+            {
+                nombre: 'Iris "Glitch" Sato',
+                numero: 0,
+                apodo: 'Segunda al Mando',
+                descripcion: 'Experta en virus y sistemas de hackeo.',
+                dialogo: '"Cada sistema tiene una falla, solo hay que encontrarla."',
+                img: 'images/huerfanos_iris_glitch.png',
+                nombreReal: 'Iris Sato'
+            },
+
+            // NPCs y Enemigos
+            {
+                nombre: 'Subject Omega',
+                numero: 0,
+                apodo: 'El Experimento',
+                descripcion: 'Experimento fallido de OCE, peligrosamente inestable.',
+                dialogo: '"Protocolo... debe... completarse..."',
+                img: 'images/subject_omega.png',
+                nombreReal: 'Desconocido'
+            },
+            {
+                nombre: 'Terror del Maíz',
+                numero: 0,
+                apodo: 'El Mutante Agrícola',
+                descripcion: 'Mutante del distrito agrícola, territorial y agresivo.',
+                dialogo: '*Gruñidos amenazantes*',
+                img: 'images/terror_maiz_new.png',
+                nombreReal: 'Desconocido'
+            },
+            {
+                nombre: 'Cosechador Reptante',
+                numero: 0,
+                apodo: 'El Drone Reprogramado',
+                descripcion: 'Drone agrícola reprogramado, letal y eficiente.',
+                dialogo: '*Zumbido mecánico*',
+                img: 'images/cosechador_reptante_new.png',
+                nombreReal: 'N/A'
+            },
+            {
+                nombre: 'Pacifier Soldier',
+                numero: 0,
+                apodo: 'El Soldado sin Voluntad',
+                descripcion: 'Soldado de élite de OCE, sin voluntad propia.',
+                dialogo: '"Objetivo identificado. Iniciando protocolo de pacificación."',
+                img: 'images/pacifier_soldier_new.png',
+                nombreReal: 'Desconocido'
+            }
         ];
         const facciones = [
             { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
@@ -1720,15 +2038,6 @@
                 dialogo: '"La carne es solo el vehículo temporal de la conciencia. En la confluencia de sangre y silicio hallaremos la trascendencia. Tus temores, tus dudas... He visto cómo terminan. Te guiaré si estás dispuesto a escuchar."',
                 img: 'images/faith_oracle.png',
                 nombreReal: 'Faith "Oracle" Lee'
-            },
-            {
-                nombre: 'Darius "Thunder Fist" Jackson',
-                numero: 68,
-                apodo: 'El Campeón de las Peleas Clandestinas',
-                descripcion: 'Ex-campeón del circuito de luchas ilegales de Neo-Kyoto, Darius fue modificado ilegalmente con brazos cibernéticos de combate que contienen capacitores de impacto. Fue arrestado tras matar accidentalmente a un oponente y ahora busca en Ultimate Mercenary una vía para recuperar su libertad.',
-                dialogo: '"No busco fama, no busco gloria. Tengo tres hijos esperándome en casa. Haré lo que sea necesario para volver con ellos, y si eso significa destrozar algunos cráneos en el proceso, que así sea. No tengo nada personal contra ti, pero no te metas en mi camino."',
-                img: 'images/thunder_fist.png',
-                nombreReal: 'Darius "Thunder Fist" Jackson'
             },
             {
                 nombre: 'Lin Mayfair',
