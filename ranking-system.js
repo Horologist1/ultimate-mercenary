@@ -15,11 +15,14 @@ const rankingSystem = {
 
     // Initialize Firebase reference
     init() {
+        console.log('Inicializando sistema de ranking...');
         if (window.database) {
+            console.log('Firebase database encontrada, configurando referencias...');
             this.rankingRef = window.database.ref('ranking');
             
             // Primero, configurar el listener para cambios
             this.rankingRef.on('value', (snapshot) => {
+                console.log('Cambio detectado en Firebase:', snapshot.val());
                 const data = snapshot.val();
                 if (data) {
                     this.ranking = data;
@@ -29,19 +32,27 @@ const rankingSystem = {
                         renderAdminRanking();
                     }
                 }
+            }, (error) => {
+                console.error('Error en el listener de Firebase:', error);
             });
 
             // Luego, verificar si necesitamos inicializar con datos por defecto
-            this.rankingRef.once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    console.log('Inicializando ranking con datos por defecto...');
-                    this.saveRanking();
-                } else {
-                    console.log('Datos de ranking cargados desde Firebase');
-                }
-            });
+            this.rankingRef.once('value')
+                .then((snapshot) => {
+                    if (!snapshot.exists()) {
+                        console.log('No hay datos en Firebase, inicializando con datos por defecto...');
+                        return this.saveRanking();
+                    } else {
+                        console.log('Datos existentes encontrados en Firebase:', snapshot.val());
+                        this.ranking = snapshot.val();
+                        this.renderRanking();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al verificar datos iniciales:', error);
+                });
         } else {
-            console.error('Firebase database not available');
+            console.error('Firebase database no está disponible. Asegúrate de que Firebase está inicializado correctamente.');
         }
     },
 
@@ -52,13 +63,15 @@ const rankingSystem = {
 
     // Update a participant's PM
     updateParticipantPM(number, newPM) {
+        console.log(`Intentando actualizar PM para participante #${number} a ${newPM}`);
         const participant = this.ranking.find(p => p.number === number);
         if (participant) {
             participant.pm = parseInt(newPM);
             this.sortRanking();
-            this.saveRanking();
+            console.log('Participante actualizado, ranking ordenado:', this.ranking);
             return true;
         }
+        console.error(`No se encontró el participante #${number}`);
         return false;
     },
 
@@ -68,27 +81,37 @@ const rankingSystem = {
     },
 
     // Save ranking to Firebase
-    saveRanking() {
-        if (this.rankingRef) {
-            return this.rankingRef.set(this.ranking)
-                .then(() => {
-                    console.log('Ranking guardado exitosamente en Firebase');
-                    return true;
-                })
-                .catch(error => {
-                    console.error('Error al guardar ranking en Firebase:', error);
-                    return false;
-                });
-        } else {
-            console.error('Firebase reference not available');
-            return Promise.reject('Firebase reference not available');
+    async saveRanking() {
+        console.log('Intentando guardar ranking en Firebase...');
+        console.log('Estado actual del ranking:', this.ranking);
+        
+        if (!window.database) {
+            console.error('Firebase database no está disponible');
+            throw new Error('Firebase database no está disponible');
+        }
+
+        if (!this.rankingRef) {
+            console.error('Firebase reference no está disponible');
+            throw new Error('Firebase reference no está disponible');
+        }
+
+        try {
+            await this.rankingRef.set(this.ranking);
+            console.log('Ranking guardado exitosamente en Firebase');
+            return true;
+        } catch (error) {
+            console.error('Error detallado al guardar en Firebase:', error);
+            throw error;
         }
     },
 
     // Render ranking in modal
     renderRanking() {
         const modalContent = document.getElementById('rankingModalContent');
-        if (!modalContent) return;
+        if (!modalContent) {
+            console.log('Modal content no encontrado, posiblemente estamos en el panel de admin');
+            return;
+        }
 
         let html = `
             <h2>Top 10 Participantes</h2>
@@ -126,5 +149,6 @@ const rankingSystem = {
 
 // Initialize the ranking system
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM cargado, inicializando sistema de ranking...');
     rankingSystem.init();
 }); 

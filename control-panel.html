@@ -1861,9 +1861,13 @@
         // Function to render the editable ranking table
         function renderAdminRanking() {
             const tableBody = document.getElementById('rankingTableBody');
-            if (!tableBody) return;
+            if (!tableBody) {
+                console.error('No se encontró el elemento rankingTableBody');
+                return;
+            }
 
             const ranking = rankingSystem.getRanking();
+            console.log('Renderizando tabla con ranking:', ranking);
             tableBody.innerHTML = '';
 
             ranking.forEach((participant, index) => {
@@ -1887,14 +1891,22 @@
 
         // Function to update participant's PM
         function updateParticipantPM(number, newPM) {
-            if (newPM < 0) return false; // No permitir valores negativos
+            console.log(`Intentando actualizar PM para #${number} a ${newPM}`);
+            if (newPM < 0) {
+                console.error('Valor negativo no permitido');
+                return false;
+            }
             return rankingSystem.updateParticipantPM(number, parseInt(newPM));
         }
 
         // Function to save participant's PM
         async function saveParticipantPM(number, button) {
+            console.log(`Iniciando guardado para participante #${number}`);
             const input = document.getElementById(`pm-input-${number}`);
-            if (!input) return;
+            if (!input) {
+                console.error(`No se encontró el input para el participante #${number}`);
+                return;
+            }
 
             const newPM = parseInt(input.value);
             if (isNaN(newPM) || newPM < 0) {
@@ -1909,11 +1921,14 @@
             button.style.backgroundColor = '#666';
 
             try {
+                console.log(`Intentando actualizar PM para #${number} a ${newPM}`);
                 // Actualizar el PM
                 if (updateParticipantPM(number, newPM)) {
+                    console.log('Actualización local exitosa, guardando en Firebase...');
                     // Esperar a que se complete la operación en Firebase
                     await rankingSystem.saveRanking();
                     
+                    console.log('Guardado en Firebase exitoso');
                     // Feedback visual de éxito
                     button.textContent = '¡Guardado!';
                     button.style.backgroundColor = '#2ed573';
@@ -1924,10 +1939,11 @@
                         button.style.backgroundColor = '';
                     }, 1500);
                 } else {
-                    throw new Error('No se pudo actualizar el participante');
+                    throw new Error(`No se pudo actualizar el participante #${number}`);
                 }
             } catch (error) {
-                console.error('Error al guardar:', error);
+                console.error('Error detallado al guardar:', error);
+                alert(`Error al guardar: ${error.message}`);
                 button.textContent = 'Error';
                 button.style.backgroundColor = '#ff4757';
                 
@@ -1941,6 +1957,7 @@
 
         // Initialize the admin ranking table
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Inicializando panel de control...');
             if (rankingSystem) {
                 rankingSystem.init(); // Inicializar el sistema de ranking
                 renderAdminRanking(); // Renderizar la tabla inicial
