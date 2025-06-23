@@ -1899,13 +1899,28 @@
                 if (!isNaN(newPM) && newPM >= 0) {
                     updateParticipantPM(number, newPM);
                     rankingSystem.saveRanking(); // Esto enviará los datos a Firebase
+                    
+                    // Feedback visual
+                    const button = input.parentElement.nextElementSibling.querySelector('button');
+                    const originalText = button.textContent;
+                    button.textContent = '¡Guardado!';
+                    button.style.backgroundColor = '#2ed573';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.backgroundColor = '';
+                    }, 1500);
                 }
             }
         }
 
         // Initialize the admin ranking table
         document.addEventListener('DOMContentLoaded', () => {
-            renderAdminRanking();
+            if (rankingSystem) {
+                rankingSystem.init(); // Inicializar el sistema de ranking
+                renderAdminRanking(); // Renderizar la tabla inicial
+            } else {
+                console.error('Sistema de ranking no disponible');
+            }
         });
     </script>
 </body>
