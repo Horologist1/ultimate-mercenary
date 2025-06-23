@@ -1878,7 +1878,7 @@
                                min="0">
                     </td>
                     <td>
-                        <button onclick="saveParticipantPM(${participant.number})">Guardar</button>
+                        <button onclick="saveParticipantPM(${participant.number}, this)">Guardar</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -1887,29 +1887,55 @@
 
         // Function to update participant's PM
         function updateParticipantPM(number, newPM) {
-            if (newPM < 0) return; // No permitir valores negativos
-            rankingSystem.updateParticipantPM(number, parseInt(newPM));
+            if (newPM < 0) return false; // No permitir valores negativos
+            return rankingSystem.updateParticipantPM(number, parseInt(newPM));
         }
 
         // Function to save participant's PM
-        function saveParticipantPM(number) {
+        async function saveParticipantPM(number, button) {
             const input = document.getElementById(`pm-input-${number}`);
-            if (input) {
-                const newPM = parseInt(input.value);
-                if (!isNaN(newPM) && newPM >= 0) {
-                    updateParticipantPM(number, newPM);
-                    rankingSystem.saveRanking(); // Esto enviará los datos a Firebase
+            if (!input) return;
+
+            const newPM = parseInt(input.value);
+            if (isNaN(newPM) || newPM < 0) {
+                alert('Por favor, introduce un número válido mayor o igual a 0');
+                return;
+            }
+
+            // Deshabilitar el botón mientras se guarda
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Guardando...';
+            button.style.backgroundColor = '#666';
+
+            try {
+                // Actualizar el PM
+                if (updateParticipantPM(number, newPM)) {
+                    // Esperar a que se complete la operación en Firebase
+                    await rankingSystem.saveRanking();
                     
-                    // Feedback visual
-                    const button = input.parentElement.nextElementSibling.querySelector('button');
-                    const originalText = button.textContent;
+                    // Feedback visual de éxito
                     button.textContent = '¡Guardado!';
                     button.style.backgroundColor = '#2ed573';
+                    
                     setTimeout(() => {
+                        button.disabled = false;
                         button.textContent = originalText;
                         button.style.backgroundColor = '';
                     }, 1500);
+                } else {
+                    throw new Error('No se pudo actualizar el participante');
                 }
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                button.textContent = 'Error';
+                button.style.backgroundColor = '#ff4757';
+                
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 1500);
             }
         }
 

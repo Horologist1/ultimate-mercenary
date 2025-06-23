@@ -17,16 +17,8 @@ const rankingSystem = {
     init() {
         if (window.database) {
             this.rankingRef = window.database.ref('ranking');
-            // Load initial data from Firebase
-            this.rankingRef.once('value', (snapshot) => {
-                const data = snapshot.val();
-                if (!data) {
-                    // If no data exists, initialize with default ranking
-                    this.rankingRef.set(this.ranking);
-                }
-            });
-
-            // Listen for real-time updates
+            
+            // Primero, configurar el listener para cambios
             this.rankingRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -36,6 +28,16 @@ const rankingSystem = {
                     if (typeof renderAdminRanking === 'function') {
                         renderAdminRanking();
                     }
+                }
+            });
+
+            // Luego, verificar si necesitamos inicializar con datos por defecto
+            this.rankingRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    console.log('Inicializando ranking con datos por defecto...');
+                    this.saveRanking();
+                } else {
+                    console.log('Datos de ranking cargados desde Firebase');
                 }
             });
         } else {
@@ -52,10 +54,12 @@ const rankingSystem = {
     updateParticipantPM(number, newPM) {
         const participant = this.ranking.find(p => p.number === number);
         if (participant) {
-            participant.pm = newPM;
+            participant.pm = parseInt(newPM);
             this.sortRanking();
             this.saveRanking();
+            return true;
         }
+        return false;
     },
 
     // Sort ranking by PM (descending)
@@ -66,9 +70,18 @@ const rankingSystem = {
     // Save ranking to Firebase
     saveRanking() {
         if (this.rankingRef) {
-            this.rankingRef.set(this.ranking);
+            return this.rankingRef.set(this.ranking)
+                .then(() => {
+                    console.log('Ranking guardado exitosamente en Firebase');
+                    return true;
+                })
+                .catch(error => {
+                    console.error('Error al guardar ranking en Firebase:', error);
+                    return false;
+                });
         } else {
             console.error('Firebase reference not available');
+            return Promise.reject('Firebase reference not available');
         }
     },
 
