@@ -4,6 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Mercenary 1.6 - Panel de Control</title>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811",
+            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Get database reference
+        window.database = firebase.database();
+
+        // Referencias
+        window.conocidosRef = window.database.ref('conocidosSeleccionados');
+        window.conocimientosRef = window.database.ref('conocimientosSeleccionados');
+        window.mensajesRef = window.database.ref('mensajes-directos');
+        window.currentTestRef = window.database.ref('currentTest');
+        window.timeOfDayRef = window.database.ref('timeOfDay');
+        window.messageFiltersRef = window.database.ref('messageFilters');
+        window.nombresRef = window.database.ref('nombresConcursantes');
+        window.audienceRef = window.database.ref('audience');
+        window.ratingRef = window.database.ref('rating');
+        window.pmRef = window.database.ref('playerPM');
+        window.chatRef = window.database.ref('mensajes-publico-expanded');
+    </script>
+
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
@@ -1509,52 +1550,23 @@
         // Los mensajes ahora vienen exclusivamente del sistema contextual del juego principal
     </script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
-            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
-            projectId: "ultimatemercenary-1e212",
-            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
-            messagingSenderId: "683730871364",
-            appId: "1:683730871364:web:350aaf7a296ad34db28811",
-            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
-        };
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // Referencias
-        const conocidosRef = ref(database, 'conocidosSeleccionados');
-        const conocimientosRef = ref(database, 'conocimientosSeleccionados');
-        const mensajesRef = ref(database, 'mensajes-directos');
-        const currentTestRef = ref(database, 'currentTest');
-        const timeOfDayRef = ref(database, 'timeOfDay');
-        const messageFiltersRef = ref(database, 'messageFilters');
-        const nombresRef = ref(database, 'nombresConcursantes');
-        const audienceRef = ref(database, 'audience');
-        const ratingRef = ref(database, 'rating');
-        const pmRef = ref(database, 'playerPM');
-        const chatRef = ref(database, 'mensajes-publico-expanded');
-
         // Funciones para guardar en Firebase
         window.saveConcursanteName = function(numero, nombre) {
-            const nombreRef = ref(database, `nombresConcursantes/${numero}`);
-            set(nombreRef, nombre);
+            window.database.ref(`nombresConcursantes/${numero}`).set(nombre);
         };
-        window.saveAudience = function(valor) { set(audienceRef, valor); };
-        window.saveRating = function(valor) { set(ratingRef, valor); };
-        window.savePM = function(valor) { set(pmRef, valor); };
-        window.saveChat = function(arr) { set(chatRef, arr); };
-        window.saveConocidosSeleccionados = function(arr) { set(conocidosRef, arr); };
-        window.saveConocimientosSeleccionados = function(arr) { set(conocimientosRef, arr); };
-        window.saveMensajesDirectos = function(arr) { set(mensajesRef, arr); };
-        window.saveCurrentTest = function(valor) { set(currentTestRef, valor); };
-        window.saveTimeOfDay = function(valor) { set(timeOfDayRef, valor); };
-        window.saveMessageFilters = function(filters) { set(messageFiltersRef, filters); };
+        window.saveAudience = function(valor) { window.audienceRef.set(valor); };
+        window.saveRating = function(valor) { window.ratingRef.set(valor); };
+        window.savePM = function(valor) { window.pmRef.set(valor); };
+        window.saveChat = function(arr) { window.chatRef.set(arr); };
+        window.saveConocidosSeleccionados = function(arr) { window.conocidosRef.set(arr); };
+        window.saveConocimientosSeleccionados = function(arr) { window.conocimientosRef.set(arr); };
+        window.saveMensajesDirectos = function(arr) { window.mensajesRef.set(arr); };
+        window.saveCurrentTest = function(valor) { window.currentTestRef.set(valor); };
+        window.saveTimeOfDay = function(valor) { window.timeOfDayRef.set(valor); };
+        window.saveMessageFilters = function(filters) { window.messageFiltersRef.set(filters); };
 
         // Listeners para sincronización en tiempo real
-        onValue(conocidosRef, (snapshot) => {
+        window.conocidosRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
@@ -1562,7 +1574,7 @@
             }
         });
 
-        onValue(conocimientosRef, (snapshot) => {
+        window.conocimientosRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
@@ -1570,14 +1582,14 @@
             }
         });
 
-        onValue(mensajesRef, (snapshot) => {
+        window.mensajesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('mensajes-directos', JSON.stringify(data));
             }
         });
 
-        onValue(currentTestRef, (snapshot) => {
+        window.currentTestRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('currentTest', data);
@@ -1586,7 +1598,7 @@
             }
         });
 
-        onValue(timeOfDayRef, (snapshot) => {
+        window.timeOfDayRef.on('value', (snapshot) => {
             const data = snapshot.val();
             console.log('🔥 FIREBASE LISTENER ACTIVADO - timeOfDay:', data);
             console.log('📍 localStorage antes del listener:', localStorage.getItem('timeOfDay'));
@@ -1603,7 +1615,7 @@
             }
         });
 
-        onValue(messageFiltersRef, (snapshot) => {
+        window.messageFiltersRef.on('value', (snapshot) => {
             const data = snapshot.val();
             console.log('🔥 FIREBASE LISTENER ACTIVADO - messageFilters:', data);
             
@@ -1626,7 +1638,7 @@
                 
                 // Si Firebase está vacío, inicializar con valores por defecto
                 const defaultFilters = MESSAGE_FILTERS.enabledCategories;
-                messageFiltersRef.set(defaultFilters).then(() => {
+                window.messageFiltersRef.set(defaultFilters).then(() => {
                     console.log('✅ CONTROL PANEL inicializó filtros en Firebase:', defaultFilters);
                 }).catch(error => {
                     console.error('❌ Error inicializando filtros en Firebase:', error);
@@ -1634,7 +1646,7 @@
             }
         });
 
-        onValue(nombresRef, (snapshot) => {
+        window.nombresRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 Object.entries(data).forEach(([numero, nombre]) => {
@@ -1643,7 +1655,7 @@
             }
         });
 
-        onValue(audienceRef, (snapshot) => {
+        window.audienceRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 localStorage.setItem('spectators', data);
@@ -1653,7 +1665,7 @@
             }
         });
 
-        onValue(ratingRef, (snapshot) => {
+        window.ratingRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 localStorage.setItem('rating', data);
@@ -1663,7 +1675,7 @@
             }
         });
 
-        onValue(pmRef, (snapshot) => {
+        window.pmRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data !== null) {
                 localStorage.setItem('playerPM', data);
@@ -1672,7 +1684,7 @@
             }
         });
 
-        onValue(chatRef, (snapshot) => {
+        window.chatRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('mensajes-publico-expanded', JSON.stringify(data));
