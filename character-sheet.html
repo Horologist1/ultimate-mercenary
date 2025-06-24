@@ -905,7 +905,7 @@
     ];
     function renderTarjetasSeleccionadas() {
         // Conocidos
-        const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '["Kaiser \\"El Emperador\\" Von Stroheim"]');
+        const conocidosSel = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
         const conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
         const conocidosCont = document.getElementById('conocidos-tarjetas');
         if (conocidos.length === 0) {
