@@ -1661,8 +1661,8 @@
                 nombre: 'Thunder Fist',
                 numero: 68,
                 apodo: 'El Luchador Callejero',
-                descripcion: 'Campeón de peleas clandestinas, honor y puños por igual.',
-                dialogo: '"Mis puños hablan más fuerte que mis palabras."',
+                descripcion: 'Campeón indiscutible del circuito clandestino de peleas de Neo-Tokyo. Sus puños aumentados con implantes de titanio y sus reflejos mejorados lo convierten en una fuerza imparable en el combate cuerpo a cuerpo. A pesar de su éxito en las peleas ilegales, mantiene un estricto código de honor y se niega a matar a sus oponentes.',
+                dialogo: '"Mis puños hablan más fuerte que mis palabras, y tienen mucho que decir. En las calles aprendí que la fuerza sin honor es solo violencia sin sentido. Te venceré, pero vivirás para aprender de ello."',
                 img: 'images/thunder_fist.png',
                 nombreReal: 'Darius Jackson'
             },
@@ -1761,8 +1761,8 @@
                 nombre: 'Kaiser Von Stroheim',
                 numero: 999,
                 apodo: 'CEO de OCE',
-                descripcion: 'Visionario y manipulador, creador de Ultimate Mercenary.',
-                dialogo: '"El espectáculo debe continuar, y yo soy el maestro de ceremonias."',
+                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta. Motivación: Ratings, poder, sadismo, y lo que él denomina "crear al guerrero definitivo".',
+                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"',
                 img: 'images/kaiser_new.png',
                 nombreReal: 'Kaiser Von Stroheim'
             },
@@ -1779,10 +1779,10 @@
                 nombre: 'Dra. Naomi "Nano" McClaray',
                 numero: 999,
                 apodo: 'Médica Jefe de OCE',
-                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes.',
+                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.',
                 dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
                 img: 'images/doctora_nano.png',
-                nombreReal: 'Naomi McClaray'
+                nombreReal: 'Dra. Naomi "Nano" McClaray'
             },
             {
                 nombre: 'Mr. Kenji Tanaka',
@@ -2261,8 +2261,8 @@
                 conocidos.sort((a, b) => {
                     const aExtendido = personajesExtendidos.find(pe => pe.nombre === a.nombre);
                     const bExtendido = personajesExtendidos.find(pe => pe.nombre === b.nombre);
-                    const aNum = aExtendido?.numero || 999;
-                    const bNum = bExtendido?.numero || 999;
+                    const aNum = aExtendido?.numero === null ? 999 : (aExtendido?.numero || 999);
+                    const bNum = bExtendido?.numero === null ? 999 : (bExtendido?.numero || 999);
                     return aNum - bNum;
                 });
             } else {
