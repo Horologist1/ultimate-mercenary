@@ -1564,6 +1564,14 @@
             const currentTimeOfDay = localStorage.getItem('timeOfDay') || 'dia';
             document.getElementById('time-of-day').value = currentTimeOfDay;
 
+            // Asegurarse de que Kaiser esté en la lista de conocidos
+            let conocidos = getConocidosSeleccionados();
+            if (!conocidos.includes('Kaiser "El Emperador" Von Stroheim')) {
+                conocidos.push('Kaiser "El Emperador" Von Stroheim');
+                setConocidosSeleccionados(conocidos);
+                if (window.saveConocidosSeleccionados) window.saveConocidosSeleccionados(conocidos);
+            }
+
             // Renderizar las listas de conocidos y conocimientos
             renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
             renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');

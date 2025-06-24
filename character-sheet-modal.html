@@ -2227,7 +2227,7 @@
         // Utilidades para localStorage
         function getConocidosSeleccionados() {
             const val = localStorage.getItem('conocidosSeleccionados');
-            return val ? JSON.parse(val) : [];
+            return val ? JSON.parse(val) : ['Kaiser "El Emperador" Von Stroheim'];
         }
         function getConocimientosSeleccionados() {
             const val = localStorage.getItem('conocimientosSeleccionados');
@@ -2293,10 +2293,10 @@
                     'Vainilla': 12
                 };
                 const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
-                const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '';
+                const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '#999';
                 // Si no hay número, usar el nombre real como "numero" visual
-                const displayLabel = numero || personajeExtendido.nombreReal || p.nombre;
-                const nombreReal = personajeExtendido.nombreReal ? ` (${personajeExtendido.nombreReal})` : '';
+                const displayLabel = numero;
+                const nombreReal = personajeExtendido.numero === null ? ` (${personajeExtendido.nombreReal || p.nombre})` : '';
                 const clave = `nombreConcursante_${displayLabel}`;
                 // Pre-rellenar con el nombre real si no hay valor guardado
                 const valorGuardado = localStorage.getItem(clave) || '';

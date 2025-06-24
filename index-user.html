@@ -1149,6 +1149,12 @@
             if (data) {
                 localStorage.setItem('conocidosSeleccionados', JSON.stringify(data));
                 if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
+            } else {
+                // Si no hay datos, inicializar con Kaiser
+                const conocidosIniciales = ['Kaiser "El Emperador" Von Stroheim'];
+                localStorage.setItem('conocidosSeleccionados', JSON.stringify(conocidosIniciales));
+                if (window.saveConocidosSeleccionados) window.saveConocidosSeleccionados(conocidosIniciales);
+                if (window.renderTarjetasSeleccionadas) window.renderTarjetasSeleccionadas();
             }
         });
         conocimientosRef.on('value', (snapshot) => {
