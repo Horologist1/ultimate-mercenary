@@ -821,6 +821,7 @@
                     <h3>CONOCIDOS</h3>
                     <div id="conocidos-list" class="control-group"></div>
                     <h3>CONOCIMIENTOS</h3>
+                    <p style="color: #aaa; font-size: 12px; margin-bottom: 10px;">Selecciona los personajes específicos que conoce el jugador:</p>
                     <div id="conocimientos-list" class="control-group"></div>
                 </div>
 
@@ -980,6 +981,31 @@
             { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
         ];
 
+        // Personajes individuales de las facciones para selección granular
+        const personajesFacciones = [
+            // OmniCorp Entertainment (OCE)
+            { nombre: 'Kaiser "El Emperador" Von Stroheim', faccion: 'OmniCorp Entertainment (OCE)', rol: 'Anfitrión y Productor Ejecutivo', img: 'images/kaiser_new.png', desc: 'Imponente figura que viste trajes de seda negra con reflejos carmesí.' },
+            { nombre: 'Mr. Kenji Tanaka', faccion: 'OmniCorp Entertainment (OCE)', rol: 'Jefe de Adquisiciones de Talento', img: 'images/guard_ocemk2.png', desc: 'Trajeado impecablemente, la cara "amable" de OCE.' },
+            { nombre: 'Dra. Naomi "Nano" McClaray', faccion: 'OmniCorp Entertainment (OCE)', rol: 'Médica Jefe de OCE', img: 'images/doctora_nano_thumb.png', desc: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina.' },
+            { nombre: 'Director Ikari', faccion: 'OmniCorp Entertainment (OCE)', rol: 'Agente del Gobierno Sombra', img: 'images/director_ikari.png', desc: 'Oficial de alto rango en el Ministerio de Seguridad Interna.' },
+            
+            // Colectivo Nexus-9
+            { nombre: 'Dra. Ada "Quantum" Mercurio', faccion: 'Colectivo Nexus-9', rol: 'Científica Visionaria y Fundadora', img: 'images/nexus9_ada_quantum.png', desc: 'Antigua jefa de investigación en neurotecnología avanzada para NeuroCorp.' },
+            { nombre: 'Xiong "Mesh" Lee', faccion: 'Colectivo Nexus-9', rol: 'Especialista en Infiltración y Recuperación', img: 'images/nexus9_mesh_lee.png', desc: 'Ex-agente de seguridad corporativa con amplia experiencia militar.' },
+            
+            // Chrome Dynasty
+            { nombre: 'Madame Jade "Emperatriz de Cromo"', faccion: 'Chrome Dynasty', rol: 'Líder Suprema de la Chrome Dynasty', img: 'images/chrome_dynasty_emperatriz.png', desc: 'Una figura casi mítica, rara vez se muestra públicamente sin velo digital.' },
+            { nombre: 'Jin "Silverhand" Wong', faccion: 'Chrome Dynasty', rol: 'Enforcer Principal y Cirujano de Combate', img: 'images/chrome_dynasty_silverhand.png', desc: 'Antiguo cirujano militar deshonradamente despedido por experimentación no autorizada.' },
+            
+            // Nakamura-Daichi Corp
+            { nombre: 'Hideo Nakamura', faccion: 'Zaibatsu Nakamura-Daichi Corp', rol: 'CEO y Patriarca de Nakamura-Daichi Corp', img: 'images/nakamura_daichi_ceo.png', desc: 'A sus 78 años, representa la vieja guardia corporativa con adaptaciones modernas.' },
+            { nombre: 'Dra. Yuki Nakamura', faccion: 'Zaibatsu Nakamura-Daichi Corp', rol: 'Directora de Investigación y Desarrollo', img: 'images/nakamura_daichi_yuki.png', desc: 'Genio científico con doctorados en bioingeniería y cibernética neural.' },
+            
+            // Huérfanos Digitales
+            { nombre: 'Zero "Void" Tanaka', faccion: 'Huérfanos Digitales', rol: 'Líder y Rostro del Movimiento', img: 'images/huerfanos_zero_void.png', desc: 'Perdió a ambos padres en el "Gran Fallo de Arasaka" cuando tenía 15 años.' },
+            { nombre: 'Iris "Glitch" Sato', faccion: 'Huérfanos Digitales', rol: 'Especialista en Recuperación de Conciencias', img: 'images/huerfanos_iris_glitch.png', desc: 'Ex-ingeniera de calibración de resleeving para Arasaka.' }
+        ];
+
         // Utilidades para localStorage
         function getConocidosSeleccionados() {
             const val = localStorage.getItem('conocidosSeleccionados');
@@ -1000,16 +1026,62 @@
         function renderCheckboxList(list, containerId, cookieKey) {
             const container = document.getElementById(containerId);
             const selected = cookieKey === 'conocidosSeleccionados' ? getConocidosSeleccionados() : getConocimientosSeleccionados();
-            container.innerHTML = list.map((item, idx) => {
-                const isSelected = selected.includes(item.nombre);
-                return '<label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">' +
-                    '<input type="checkbox" value="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" ' + (isSelected ? 'checked' : '') +
-                    ' data-nombre="' + encodeURIComponent(item.nombre) + '" data-cookiekey="' + cookieKey + '">' +
-                    '<img src="' + item.img + '" alt="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">' +
-                    '<span style="font-weight:bold;color:#00ccff;">' + item.nombre + '</span>' +
-                    '<span style="font-size:12px;color:#aaa;margin-left:8px;">' + item.desc + '</span>' +
-                    '</label>';
-            }).join('');
+            
+            if (cookieKey === 'conocimientosSeleccionados') {
+                // Para conocimientos, mostrar personajes agrupados por facción
+                const personajesPorFaccion = {};
+                personajesFacciones.forEach(personaje => {
+                    if (!personajesPorFaccion[personaje.faccion]) {
+                        personajesPorFaccion[personaje.faccion] = [];
+                    }
+                    personajesPorFaccion[personaje.faccion].push(personaje);
+                });
+                
+                container.innerHTML = Object.entries(personajesPorFaccion).map(([faccion, personajes]) => {
+                    const faccionInfo = facciones.find(f => f.nombre === faccion);
+                    return `
+                        <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                <img src="${faccionInfo.img}" alt="${faccion}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid #444;">
+                                <div>
+                                    <h4 style="color: #ff4757; margin: 0; font-family: 'Orbitron', sans-serif;">${faccion}</h4>
+                                    <p style="color: #aaa; margin: 5px 0 0 0; font-size: 12px;">${faccionInfo.desc}</p>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px;">
+                                ${personajes.map(personaje => {
+                                    const isSelected = selected.includes(personaje.nombre);
+                                    return `
+                                        <label style="display:flex;align-items:center;padding:8px;background:rgba(0,0,0,0.5);border:1px solid #555;border-radius:6px;cursor:pointer;gap:10px;transition:all 0.3s ease;">
+                                            <input type="checkbox" value="${personaje.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" ${isSelected ? 'checked' : ''}
+                                                data-nombre="${encodeURIComponent(personaje.nombre)}" data-cookiekey="${cookieKey}">
+                                            <img src="${personaje.img}" alt="${personaje.nombre}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #444;">
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-weight:bold;color:#00ccff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${personaje.nombre}</div>
+                                                <div style="color:#ff4757;font-size:10px;margin:2px 0;">${personaje.rol}</div>
+                                                <div style="color:#aaa;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${personaje.desc}</div>
+                                            </div>
+                                        </label>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Para conocidos, mantener el comportamiento original
+                container.innerHTML = list.map((item, idx) => {
+                    const isSelected = selected.includes(item.nombre);
+                    return '<label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer;gap:10px;">' +
+                        '<input type="checkbox" value="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" ' + (isSelected ? 'checked' : '') +
+                        ' data-nombre="' + encodeURIComponent(item.nombre) + '" data-cookiekey="' + cookieKey + '">' +
+                        '<img src="' + item.img + '" alt="' + item.nombre.replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #444;">' +
+                        '<span style="font-weight:bold;color:#00ccff;">' + item.nombre + '</span>' +
+                        '<span style="font-size:12px;color:#aaa;margin-left:8px;">' + item.desc + '</span>' +
+                        '</label>';
+                }).join('');
+            }
+            
             // Agregar listeners después de renderizar
             const checkboxes = container.querySelectorAll('input[type="checkbox"][data-nombre][data-cookiekey]');
             checkboxes.forEach(cb => {
@@ -1035,7 +1107,7 @@
             }
             // Volver a renderizar para reflejar el cambio
             if(cookieKey === 'conocidosSeleccionados') renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
-            else renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
+            else renderCheckboxList(personajesFacciones, 'conocimientos-list', 'conocimientosSeleccionados');
         }
 
         function updateCurrentTest(testId) {
@@ -1544,7 +1616,7 @@
 
             // Renderizar las listas de conocidos y conocimientos
             renderCheckboxList(personajes, 'conocidos-list', 'conocidosSeleccionados');
-            renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
+            renderCheckboxList(personajesFacciones, 'conocimientos-list', 'conocimientosSeleccionados');
         });
 
         // PANEL DE CONTROL v0.95 - ELIMINADOS MENSAJES HARDCODEADOS
@@ -1579,7 +1651,7 @@
             const data = snapshot.val();
             if (data) {
                 localStorage.setItem('conocimientosSeleccionados', JSON.stringify(data));
-                renderCheckboxList(facciones, 'conocimientos-list', 'conocimientosSeleccionados');
+                renderCheckboxList(personajesFacciones, 'conocimientos-list', 'conocimientosSeleccionados');
             }
         });
 

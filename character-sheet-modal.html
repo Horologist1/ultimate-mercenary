@@ -356,6 +356,82 @@
             font-size: 0.95em;
         }
 
+        /* Estilos para miembros de facciones */
+        .faction-members {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .faction-members h4 {
+            color: #ff4757;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .member-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .member-card:hover {
+            border-color: #00ccff;
+            box-shadow: 0 0 8px rgba(0,204,255,0.3);
+        }
+
+        .member-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #222;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .member-image:hover {
+            border-color: #00ccff;
+            box-shadow: 0 0 5px rgba(0,204,255,0.5);
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-info h5 {
+            color: #00ccff;
+            margin: 0 0 2px 0;
+            font-size: 12px;
+            font-family: 'Orbitron', sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-info p {
+            color: #aaa;
+            margin: 0;
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         /* Modal de imagen con neón */
         .image-modal {
             display: none;
@@ -2014,15 +2090,66 @@
             
             // Conocimientos
             const conocimientosSel = getConocimientosSeleccionados();
-            const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
-            document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => {
-                const faccionExtendida = faccionesExtendidas.find(fe => fe.nombre === f.nombre) || f;
+            
+            // Mapeo de facciones con sus miembros (basado en index.html)
+            const miembrosFacciones = {
+                'OmniCorp Entertainment (OCE)': [
+                    { nombre: 'Kaiser "El Emperador" Von Stroheim', rol: 'Anfitrión y Productor Ejecutivo', img: 'images/kaiser_new.png' },
+                    { nombre: 'Mr. Kenji Tanaka', rol: 'Jefe de Adquisiciones de Talento', img: 'images/guard_ocemk2.png' },
+                    { nombre: 'Dra. Naomi "Nano" McClaray', rol: 'Médica Jefe de OCE', img: 'images/doctora_nano_thumb.png' },
+                    { nombre: 'Director Ikari', rol: 'Agente del Gobierno Sombra', img: 'images/director_ikari.png' }
+                ],
+                'Colectivo Nexus-9': [
+                    { nombre: 'Dra. Ada "Quantum" Mercurio', rol: 'Científica Visionaria y Fundadora', img: 'images/nexus9_ada_quantum.png' },
+                    { nombre: 'Xiong "Mesh" Lee', rol: 'Especialista en Infiltración y Recuperación', img: 'images/nexus9_mesh_lee.png' }
+                ],
+                'Chrome Dynasty': [
+                    { nombre: 'Madame Jade "Emperatriz de Cromo"', rol: 'Líder Suprema de la Chrome Dynasty', img: 'images/chrome_dynasty_emperatriz.png' },
+                    { nombre: 'Jin "Silverhand" Wong', rol: 'Enforcer Principal y Cirujano de Combate', img: 'images/chrome_dynasty_silverhand.png' }
+                ],
+                'Zaibatsu Nakamura-Daichi Corp': [
+                    { nombre: 'Hideo Nakamura', rol: 'CEO y Patriarca de Nakamura-Daichi Corp', img: 'images/nakamura_daichi_ceo.png' },
+                    { nombre: 'Dra. Yuki Nakamura', rol: 'Directora de Investigación y Desarrollo', img: 'images/nakamura_daichi_yuki.png' }
+                ],
+                'Huérfanos Digitales': [
+                    { nombre: 'Zero "Void" Tanaka', rol: 'Líder y Rostro del Movimiento', img: 'images/huerfanos_zero_void.png' },
+                    { nombre: 'Iris "Glitch" Sato', rol: 'Especialista en Recuperación de Conciencias', img: 'images/huerfanos_iris_glitch.png' }
+                ]
+            };
+            
+            // Agrupar personajes seleccionados por facción
+            const personajesPorFaccion = {};
+            Object.entries(miembrosFacciones).forEach(([faccion, miembros]) => {
+                const miembrosSeleccionados = miembros.filter(miembro => conocimientosSel.includes(miembro.nombre));
+                if (miembrosSeleccionados.length > 0) {
+                    personajesPorFaccion[faccion] = miembrosSeleccionados;
+                }
+            });
+            
+            document.getElementById('conocimientos-tarjetas').innerHTML = Object.entries(personajesPorFaccion).map(([faccion, miembros]) => {
+                const faccionInfo = facciones.find(f => f.nombre === faccion);
+                const faccionExtendida = faccionesExtendidas.find(fe => fe.nombre === faccion) || faccionInfo;
+                
                 return `
                     <div class="faction-card">
-                        <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
+                        <img src="${faccionInfo.img}" alt="${faccion}" class="faction-logo">
                         <div class="faction-info">
-                            <h3>${f.nombre}</h3>
-                            <p>${faccionExtendida.descripcion || f.desc}</p>
+                            <h3>${faccion}</h3>
+                            <p>${faccionExtendida.descripcion || faccionInfo.desc}</p>
+                            <div class="faction-members">
+                                <h4>Miembros Conocidos:</h4>
+                                <div class="members-grid">
+                                    ${miembros.map(miembro => `
+                                        <div class="member-card">
+                                            <img src="${miembro.img}" alt="${miembro.nombre}" class="member-image" onclick="openImageModal('${miembro.img}')">
+                                            <div class="member-info">
+                                                <h5>${miembro.nombre}</h5>
+                                                <p>${miembro.rol}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
