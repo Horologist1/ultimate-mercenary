@@ -1593,7 +1593,7 @@
             // Personal de OCE
             { nombre: 'Kaiser "El Emperador" Von Stroheim', img: 'images/kaiser_new.png', desc: 'CEO de OCE, visionario y manipulador.', numero: 999, nombreReal: 'Kaiser Von Stroheim' },
             { nombre: 'Mr. Kenji Tanaka', img: 'images/nakamura_daichi_ceo.png', desc: 'Director de Seguridad de OCE, disciplinado y honorable.', numero: 999, nombreReal: 'Kenji Tanaka' },
-            { nombre: 'Dra. Naomi "Nano" McClaray', img: 'images/doctora_nano.png', desc: 'Jefa de Investigación de OCE, brillante y ambiciosa.', numero: 999, nombreReal: 'Dra. Naomi "Nano" McClaray' },
+            // ... existing code ...
             { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Director de Operaciones de OCE, eficiente y despiadado.', numero: 999, nombreReal: 'Director Ikari' },
             // ... existing code ...
 
@@ -1927,15 +1927,7 @@
                 img: 'images/director_ikari.png',
                 nombreReal: 'Director Ikari'
             },
-            {
-                nombre: 'Dr. Naomi',
-                numero: null,
-                apodo: 'Jefa de Bioingeniería, OCE',
-                descripcion: 'Científica brillante y fría, responsable de los implantes y modificaciones de los concursantes. Su ética es tan flexible como su presupuesto.',
-                dialogo: '"La perfección biotecnológica no es un derecho, es un privilegio... y yo decido quién lo merece."',
-                img: 'images/dr_naomi.png',
-                nombreReal: 'Dr. Naomi'
-            },
+
             {
                 nombre: 'dRa Ada',
                 numero: null,
@@ -2008,15 +2000,6 @@
                 dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"',
                 img: 'images/kaiser_new.png',
                 nombreReal: 'Kaiser Von Stroheim'
-            },
-            {
-                nombre: 'Dra. Naomi "Nano" McClaray',
-                numero: 999,
-                apodo: 'Médica Jefe de OCE',
-                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.',
-                dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
-                img: 'images/doctora_nano.png',
-                nombreReal: 'Dra. Naomi "Nano" McClaray'
             },
             // ... existing code ...
 
@@ -2232,8 +2215,8 @@
             document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
                 const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
                 const numero = personajeExtendido.numero === null ? '#999' : personajeExtendido.numero ? `#${personajeExtendido.numero}` : '';
-                // Solo mostrar el nombre real para personajes con numero: null
-                const nombreReal = personajeExtendido.numero === null && personajeExtendido.nombreReal ? ` (${personajeExtendido.nombreReal})` : '';
+                // Mostrar el nombre real para personajes con numero: null o numero: 999
+                const nombreReal = (personajeExtendido.numero === null || personajeExtendido.numero === 999) && personajeExtendido.nombreReal ? ` (${personajeExtendido.nombreReal})` : '';
                 const clave = `nombreConcursante_${numero}`;
                 // Pre-rellenar con el nombre real si no hay valor guardado
                 const valorGuardado = localStorage.getItem(clave) || '';
