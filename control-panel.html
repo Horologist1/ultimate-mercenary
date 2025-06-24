@@ -950,49 +950,34 @@
 
         // Datos de personajes y facciones
         const personajes = [
-            // Personajes principales
+            // Protagonista
             { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
-            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
-            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
-            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
-            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
-            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La Negociadora Elegante, experta en tratos.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Hacker Caótica, impredecible y brillante.' },
-            { nombre: 'Maven', img: 'images/maven_corporate.png', desc: 'La Corporativa Reformada, estratega maestra.' },
-            { nombre: 'Thunder Fist', img: 'images/thunder_fist.png', desc: 'El Luchador Callejero, honor y puños.', numero: 68, nombreReal: 'Darius Jackson' },
-            { nombre: 'Viper Blade', img: 'images/viper_blade.png', desc: 'La Mercenaria Letal, precisa y mortal.' },
-            { nombre: 'Faith "Oracle" Chen', img: 'images/faith_oracle.png', desc: 'La Médica Visionaria, sanadora y guía.' },
-            { nombre: 'Phantom', img: 'images/hacker_phantom.png', desc: 'El Hacker Fantasma, invisible en la red.' },
+            
+            // Concursantes
+            { nombre: 'Vainilla', img: 'images/vainilla.png', desc: 'Ex-estrella del pop que conquistó los escenarios de Neo-Tokio.', numero: 12, nombreReal: 'Vainilla' },
+            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'Ex-Spetsnaz, enorme, implantes de fuerza de primera gen.', numero: 42, nombreReal: 'Boris Volkov' },
+            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.', numero: 17, nombreReal: 'Silas Vance' },
+            { nombre: 'Raven', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.', numero: 89, nombreReal: 'Mizuki Tanaka' },
+            { nombre: 'Chispa', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.', numero: 31, nombreReal: 'Anya Sharma' },
+            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.', numero: 76, nombreReal: 'Marcus Thorne' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.', numero: 23, nombreReal: 'Desconocido' },
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.', numero: 58, nombreReal: 'Lin Mayfair' },
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.', numero: 91, nombreReal: 'Subject Omega' },
+            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.', numero: 37, nombreReal: 'Ekaterina Petrov' },
+            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.', numero: 64, nombreReal: 'Felix Reyes' },
+            { nombre: 'Los Gemelos', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.', numero: 82, nombreReal: 'Jin & Jun' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.', numero: 45, nombreReal: 'Sofía Nakamura' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.', numero: 29, nombreReal: 'Alex Mercer' },
+            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.', numero: 71, nombreReal: 'Marcus Graves' },
+            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.', numero: 53, nombreReal: 'Faith Lee' },
+            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.', numero: 68, nombreReal: 'Darius Jackson' },
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.', numero: 19, nombreReal: 'Aria Chen' },
             
             // Personal de OCE
             { nombre: 'Kaiser "El Emperador" Von Stroheim', img: 'images/kaiser_new.png', desc: 'CEO de OCE, visionario y manipulador.', numero: 999, nombreReal: 'Kaiser Von Stroheim' },
-            { nombre: 'Mr. Kenji Tanaka', img: 'images/nakamura_daichi_ceo.png', desc: 'Director de Seguridad de OCE, disciplinado y honorable.' },
+            { nombre: 'Mr. Kenji Tanaka', img: 'images/nakamura_daichi_ceo.png', desc: 'Director de Seguridad de OCE, disciplinado y honorable.', numero: 999, nombreReal: 'Kenji Tanaka' },
             { nombre: 'Dra. Naomi "Nano" McClaray', img: 'images/doctora_nano.png', desc: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.', numero: 999, nombreReal: 'Dra. Naomi "Nano" McClaray' },
-            { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Director de Operaciones de OCE, eficiente y despiadado.' },
-            
-            // Nexus-9
-            { nombre: 'Dra. Ada "Quantum" Mercurio', img: 'images/nexus9_ada_quantum.png', desc: 'Líder de Nexus-9, genio de la IA.' },
-            { nombre: 'Xiong "Mesh" Lee', img: 'images/nexus9_mesh_lee.png', desc: 'Especialista en redes neuronales de Nexus-9.' },
-            
-            // Chrome Dynasty
-            { nombre: 'Madame Jade "Emperatriz de Cromo"', img: 'images/chrome_dynasty_emperatriz.png', desc: 'Líder de Chrome Dynasty, elegante y mortal.' },
-            { nombre: 'Jin "Silverhand" Wong', img: 'images/chrome_dynasty_silverhand.png', desc: 'Lugarteniente de Chrome Dynasty, cyborg legendario.' },
-            
-            // Nakamura-Daichi
-            { nombre: 'Hideo Nakamura', img: 'images/nakamura_daichi_ceo.png', desc: 'CEO de Nakamura-Daichi Corp, tradicionalista y poderoso.' },
-            { nombre: 'Dra. Yuki Nakamura', img: 'images/nakamura_daichi_yuki.png', desc: 'Directora de I+D de Nakamura-Daichi, innovadora.' },
-            
-            // Huérfanos Digitales
-            { nombre: 'Zero "Void" Tanaka', img: 'images/huerfanos_zero_void.png', desc: 'Líder de los Huérfanos Digitales, enigmático hacker.' },
-            { nombre: 'Iris "Glitch" Sato', img: 'images/huerfanos_iris_glitch.png', desc: 'Segunda al mando de los Huérfanos, experta en virus.' },
-            
-            // NPCs y Enemigos
-            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'Experimento fallido de OCE, peligrosamente inestable.' },
-            { nombre: 'Terror del Maíz', img: 'images/terror_maiz_new.png', desc: 'Mutante del distrito agrícola, territorial y agresivo.' },
-            { nombre: 'Cosechador Reptante', img: 'images/cosechador_reptante_new.png', desc: 'Drone agrícola reprogramado, letal y eficiente.' },
-            { nombre: 'Pacifier Soldier', img: 'images/pacifier_soldier_new.png', desc: 'Soldado de élite de OCE, sin voluntad propia.' },
-            { nombre: 'Vainilla', img: 'images/vainilla.png', desc: 'Ex-idol de Neo-Tokio, competidora #12.' }
+            { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Director de Operaciones de OCE, eficiente y despiadado.', numero: 999, nombreReal: 'Director Ikari' }
         ];
         const facciones = [
             { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
