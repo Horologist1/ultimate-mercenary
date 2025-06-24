@@ -887,6 +887,216 @@
             margin: 5px 0 0 0;
             font-size: 0.9em;
         }
+
+        .character-card, .faction-card, .staff-member-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .character-card:hover, .faction-card:hover, .staff-member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .character-card {
+            border-color: #00ccff;
+        }
+
+        .faction-card, .staff-member-card {
+            border-color: #ff4757;
+        }
+
+        .character-header, .faction-header, .staff-member-header {
+            margin-bottom: 10px;
+        }
+
+        .character-header h3, .faction-header h3, .staff-member-header h3 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+        }
+
+        .character-number {
+            color: #ff4757;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+        }
+
+        .character-content, .faction-content {
+            display: flex;
+            gap: 15px;
+        }
+
+        .character-image, .faction-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .character-info, .faction-info {
+            flex: 1;
+        }
+
+        .character-nickname {
+            color: #ff4757;
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .character-description, .faction-description, .staff-member-description {
+            color: #fff;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .character-quote {
+            color: #aaa;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .staff-member-role {
+            color: #ff4757;
+            font-size: 0.9em;
+            font-style: italic;
+            display: block;
+            margin-top: 5px;
+        }
+
+        #conocidos, #conocimientos {
+            padding: 20px;
+        }
+
+        #contenedor-conocidos, #contenedor-conocimientos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Estilos para las pestañas de conocidos y conocimientos */
+        #conocidos, #conocimientos {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        #contenedor-conocidos, #contenedor-conocimientos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Estilos para las tarjetas */
+        .character-card, .faction-card, .staff-member-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .character-card:hover, .faction-card:hover, .staff-member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .character-card {
+            border-color: #00ccff;
+        }
+
+        .faction-card, .staff-member-card {
+            border-color: #ff4757;
+        }
+
+        .character-header, .faction-header, .staff-member-header {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .character-header h3, .faction-header h3, .staff-member-header h3 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .character-number {
+            color: #ff4757;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .character-content, .faction-content {
+            display: flex;
+            gap: 15px;
+        }
+
+        .character-image, .faction-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .character-info, .faction-info {
+            flex: 1;
+        }
+
+        .character-nickname {
+            color: #ff4757;
+            font-style: italic;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .character-description, .faction-description, .staff-member-description {
+            color: #fff;
+            font-size: 0.9em;
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .character-quote {
+            color: #aaa;
+            font-style: italic;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #ff4757;
+        }
+
+        .staff-member-role {
+            color: #ff4757;
+            font-size: 0.9em;
+            font-style: italic;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Estilos para los títulos de sección */
+        #conocidos h2, #conocimientos h2 {
+            color: #00ccff;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
     </style>
     
     <script>
@@ -1456,20 +1666,24 @@
         </div>
 
         <div id="conocidos" class="tab-content">
-            <div class="sheet-section">
-                <h3>Conocidos</h3>
-                <div class="conocidos-controls" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="conocidos-search" placeholder="Buscar conocidos..." style="flex: 1; padding: 8px; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius: 4px; color: white; font-family: 'Orbitron', sans-serif;">
-                    <button id="sort-by-number" style="padding: 8px 12px; background: #00ccff; color: black; border: none; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 12px;">Ordenar por #</button>
-                    <button id="sort-by-name" style="padding: 8px 12px; background: #ff4757; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 12px;">Ordenar por Nombre</button>
+            <div class="section">
+                <h2>CONOCIDOS</h2>
+                <div class="conocidos-controls">
+                    <input type="text" id="conocidos-search" placeholder="Buscar conocidos..." class="search-input">
+                    <button id="sort-by-number" class="sort-button">Ordenar por #</button>
+                    <button id="sort-by-name" class="sort-button">Ordenar por Nombre</button>
                 </div>
-                <div id="conocidos-tarjetas" class="personajes-container"></div>
+                <div id="contenedor-conocidos"></div>
             </div>
         </div>
+
         <div id="conocimientos" class="tab-content">
-            <div class="sheet-section">
-                <h3>Conocimientos</h3>
-                <div id="conocimientos-tarjetas" class="facciones-container"></div>
+            <div class="section">
+                <h2>CONOCIMIENTOS</h2>
+                <div class="conocimientos-controls">
+                    <input type="text" id="conocimientos-search" placeholder="Buscar facciones..." class="search-input">
+                </div>
+                <div id="contenedor-conocimientos"></div>
             </div>
         </div>
     </div>
@@ -1949,38 +2163,6 @@
                 ]
             },
             {
-                nombre: 'Staff de OCE',
-                descripcion: 'El equipo ejecutivo y operativo detrás de Ultimate Mercenary. Liderados por Kaiser "El Emperador" Von Stroheim, este grupo de élite incluye a la brillante pero amoral Dra. Naomi, el manipulador Mr. Kenji Tanaka, el enigmático Director Ikari, y la IA supervisora dRa Ada. Cada uno de ellos es un experto en su campo, y juntos forman el núcleo que mantiene funcionando el espectáculo más peligroso de Neo-Kyoto.',
-                img: 'images/oce_logo.png',
-                miembros: [
-                    {
-                        nombre: 'Kaiser "El Emperador" Von Stroheim',
-                        rol: 'CEO y Productor Ejecutivo',
-                        desc: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente.'
-                    },
-                    {
-                        nombre: 'Dr. Naomi',
-                        rol: 'Jefa de Bioingeniería',
-                        desc: 'Científica brillante y fría, responsable de los implantes y modificaciones de los concursantes. Su ética es tan flexible como su presupuesto.'
-                    },
-                    {
-                        nombre: 'Mr. Kenji Tanaka',
-                        rol: 'Jefe de Adquisiciones de Talento',
-                        desc: 'La cara "amable" de OCE, quien cierra los tratos sucios que llevan a los concursantes hasta el programa.'
-                    },
-                    {
-                        nombre: 'Director Ikari',
-                        rol: 'Director de Seguridad',
-                        desc: 'Veterano de mil operaciones encubiertas, responsable de la seguridad y la integridad del show.'
-                    },
-                    {
-                        nombre: 'dRa Ada',
-                        rol: 'IA Supervisora',
-                        desc: 'Inteligencia artificial avanzada que gestiona la logística y monitorización del show.'
-                    }
-                ]
-            },
-            {
                 nombre: 'Colectivo Nexus-9',
                 descripcion: 'Comunidad tecno-anarquista que opera en los márgenes de Neo-Kyoto. Formada originalmente por investigadores de IA expulsados de corporaciones, hackers idealistas y transhumanistas radicales, el colectivo se dedica a "democratizar" la tecnología de modificación corporal y transferencia de conciencia. Organizados en células semi-autónomas, creen que la inmortalidad digital debe estar disponible para todos, no solo para las élites corporativas. Han infiltrado personal en OCE para tener acceso a las pilas corticales de los concursantes fallecidos, que son reutilizadas en sus propios experimentos.',
                 img: 'images/nexus9_logo.png'
@@ -2005,15 +2187,29 @@
         // Utilidades para localStorage
         function getConocidosSeleccionados() {
             const val = localStorage.getItem('conocidosSeleccionados');
-            return val ? JSON.parse(val) : [];
+            return val ? JSON.parse(val) : [
+                'Auri',
+                'Boris "Goliath" Volkov',
+                'Silas "Glitch" Vance',
+                'Raven (Mizuki Tanaka)',
+                'Chispa (Anya Sharma)',
+                'Marcus "Old Man" Thorne'
+            ];
         }
+        
         function getConocimientosSeleccionados() {
             const val = localStorage.getItem('conocimientosSeleccionados');
-            return val ? JSON.parse(val) : ['Staff de OCE'];
+            return val ? JSON.parse(val) : [
+                'OmniCorp Entertainment (OCE)',
+                'Staff de OCE',
+                'Colectivo Nexus-9'
+            ];
         }
+        
         function setConocidosSeleccionados(arr) {
             localStorage.setItem('conocidosSeleccionados', JSON.stringify(arr));
         }
+        
         function setConocimientosSeleccionados(arr) {
             localStorage.setItem('conocimientosSeleccionados', JSON.stringify(arr));
         }
@@ -2022,8 +2218,8 @@
         let searchTerm = '';
         
         function renderTarjetasSeleccionadas() {
-            const conocidosSeleccionados = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
-            const conocimientosSeleccionados = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
+            const conocidosSeleccionados = getConocidosSeleccionados();
+            const conocimientosSeleccionados = getConocimientosSeleccionados();
             
             // Contenedor para personajes conocidos
             const contenedorConocidos = document.getElementById('contenedor-conocidos');
@@ -2034,9 +2230,8 @@
             contenedorConocimientos.innerHTML = '';
 
             // Renderizar personajes conocidos
-            conocidosSeleccionados.forEach(personaje => {
-                // Solo renderizar personajes que no son staff (numero !== null)
-                const personajeData = personajesExtendidos.find(p => p.nombre === personaje);
+            conocidosSeleccionados.forEach(nombrePersonaje => {
+                const personajeData = personajesExtendidos.find(p => p.nombre === nombrePersonaje);
                 if (personajeData && personajeData.numero !== null) {
                     const tarjeta = crearTarjetaPersonaje(personajeData);
                     contenedorConocidos.appendChild(tarjeta);
@@ -4303,103 +4498,191 @@ Introduce el número (1-4):`);
         console.log('🎯 [v0.99] PLANTILLA + PUNTOS ADICIONALES - Guardado separado GARANTIZADO');
 
         function crearTarjetaPersonaje(personaje) {
-            // Si es un miembro del staff, no crear tarjeta
-            if (personaje.numero === null) {
-                return null;
-            }
-
             const div = document.createElement('div');
             div.className = 'character-card';
-            
-            const displayLabel = `#${personaje.numero}`;
-            const nombreReal = personaje.nombreReal ? ` (${personaje.nombreReal})` : '';
-            
             div.innerHTML = `
-                <img src="${personaje.img}" alt="${personaje.nombre}" class="character-image">
-                <div class="character-info">
-                    <h4 class="character-name">
-                        ${displayLabel}${nombreReal}
-                        <input type="text" 
-                               class="nombre-concursante-input" 
-                               data-numero="${displayLabel}" 
-                               placeholder="Nota" 
-                               value="${localStorage.getItem(`nombreConcursante_${displayLabel}`) || ''}"
-                               style="font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; 
-                                      background:#111; color:#00ccff; font-family:Orbitron,sans-serif; 
-                                      width:140px; margin-left:8px;">
-                    </h4>
-                    <div class="character-role" style="color: #ff4757; font-size: 0.9em; margin-bottom: 8px;">
-                        ${personaje.apodo || ''}
+                <div class="character-header">
+                    <h3>${personaje.nombre}</h3>
+                    ${personaje.numero ? `<span class="character-number">#${personaje.numero}</span>` : ''}
+                </div>
+                <div class="character-content">
+                    <img src="${personaje.img}" alt="${personaje.nombre}" class="character-image">
+                    <div class="character-info">
+                        ${personaje.apodo ? `<p class="character-nickname">${personaje.apodo}</p>` : ''}
+                        <p class="character-description">${personaje.descripcion}</p>
+                        ${personaje.dialogo ? `<p class="character-quote">"${personaje.dialogo}"</p>` : ''}
                     </div>
-                    <p class="character-description">${personaje.descripcion}</p>
-                    ${personaje.dialogo ? 
-                        `<div class="dialogue" style="background: rgba(255, 71, 87, 0.1); 
-                                           border-left: 3px solid #ff4757; 
-                                           padding: 8px; margin-top: 8px; 
-                                           font-style: italic;">
-                        ${personaje.dialogo}
-                    </div>` : 
-                        ''}
                 </div>
             `;
-
-            // Añadir listener para guardar notas
-            const input = div.querySelector('.nombre-concursante-input');
-            input.addEventListener('input', function() {
-                localStorage.setItem(`nombreConcursante_${displayLabel}`, this.value);
-            });
-
             return div;
         }
 
         function crearTarjetaFaccion(faccion) {
             const div = document.createElement('div');
             div.className = 'faction-card';
-            
-            let miembrosHTML = '';
-            if (faccion.miembros) {
-                miembrosHTML = `
-                    <div class="faction-members">
-                        ${faccion.miembros.map(m => `
-                            <div class="faction-member">
-                                <h4>${m.nombre}</h4>
-                                <div class="member-role">${m.rol}</div>
-                                <p>${m.desc}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
             div.innerHTML = `
-                <img src="${faccion.img}" alt="${faccion.nombre}" class="faction-logo">
-                <div class="faction-info">
+                <div class="faction-header">
                     <h3>${faccion.nombre}</h3>
-                    <p>${faccion.descripcion}</p>
-                    ${miembrosHTML}
+                </div>
+                <div class="faction-content">
+                    <img src="${faccion.img}" alt="${faccion.nombre}" class="faction-image">
+                    <div class="faction-info">
+                        <p class="faction-description">${faccion.descripcion}</p>
+                    </div>
                 </div>
             `;
-            
             return div;
         }
 
         function crearTarjetaMiembroStaff(miembro) {
             const div = document.createElement('div');
-            div.className = 'staff-member';
-            
+            div.className = 'staff-member-card';
             div.innerHTML = `
-                <div class="personaje-header">
+                <div class="staff-member-header">
                     <h3>${miembro.nombre}</h3>
-                    <span class="numero-staff">#999</span>
+                    <span class="staff-member-role">${miembro.rol}</span>
                 </div>
-                <div class="personaje-info">
-                    <p><strong>${miembro.rol}</strong></p>
-                    <p>${miembro.desc}</p>
+                <div class="staff-member-content">
+                    <p class="staff-member-description">${miembro.desc}</p>
                 </div>
             `;
-            
             return div;
         }
+
+        // Estilos para las tarjetas
+        const styles = document.createElement('style');
+        styles.textContent = `
+            .character-card, .faction-card, .staff-member-card {
+                background: rgba(0, 0, 0, 0.7);
+                border: 1px solid #444;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                padding: 15px;
+                transition: all 0.3s ease;
+            }
+
+            .character-card:hover, .faction-card:hover, .staff-member-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+            }
+
+            .character-card {
+                border-color: #00ccff;
+            }
+
+            .faction-card, .staff-member-card {
+                border-color: #ff4757;
+            }
+
+            .character-header, .faction-header, .staff-member-header {
+                margin-bottom: 10px;
+            }
+
+            .character-header h3, .faction-header h3, .staff-member-header h3 {
+                color: #00ccff;
+                font-family: 'Orbitron', sans-serif;
+                margin: 0;
+            }
+
+            .character-number {
+                color: #ff4757;
+                font-family: 'Orbitron', sans-serif;
+                font-size: 0.9em;
+            }
+
+            .character-content, .faction-content {
+                display: flex;
+                gap: 15px;
+            }
+
+            .character-image, .faction-image {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+
+            .character-info, .faction-info {
+                flex: 1;
+            }
+
+            .character-nickname {
+                color: #ff4757;
+                font-style: italic;
+                margin: 5px 0;
+            }
+
+            .character-description, .faction-description, .staff-member-description {
+                color: #fff;
+                font-size: 0.9em;
+                margin: 5px 0;
+            }
+
+            .character-quote {
+                color: #aaa;
+                font-style: italic;
+                margin-top: 10px;
+            }
+
+            .staff-member-role {
+                color: #ff4757;
+                font-size: 0.9em;
+                font-style: italic;
+                display: block;
+                margin-top: 5px;
+            }
+
+            #conocidos, #conocimientos {
+                padding: 20px;
+            }
+
+            #contenedor-conocidos, #contenedor-conocimientos {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+        `;
+        document.head.appendChild(styles);
+
+        // Asegurarnos de que los contenedores existen
+        document.addEventListener('DOMContentLoaded', function() {
+            // Crear contenedores si no existen
+            const conocidosTab = document.getElementById('conocidos');
+            if (!conocidosTab) {
+                const newConocidosTab = document.createElement('div');
+                newConocidosTab.id = 'conocidos';
+                newConocidosTab.className = 'tab-content';
+                document.querySelector('.character-sheet').appendChild(newConocidosTab);
+            }
+
+            const conocimientosTab = document.getElementById('conocimientos');
+            if (!conocimientosTab) {
+                const newConocimientosTab = document.createElement('div');
+                newConocimientosTab.id = 'conocimientos';
+                newConocimientosTab.className = 'tab-content';
+                document.querySelector('.character-sheet').appendChild(newConocimientosTab);
+            }
+
+            // Crear contenedores internos si no existen
+            const contenedorConocidos = document.getElementById('contenedor-conocidos');
+            if (!contenedorConocidos) {
+                const newContenedorConocidos = document.createElement('div');
+                newContenedorConocidos.id = 'contenedor-conocidos';
+                document.getElementById('conocidos').appendChild(newContenedorConocidos);
+            }
+
+            const contenedorConocimientos = document.getElementById('contenedor-conocimientos');
+            if (!contenedorConocimientos) {
+                const newContenedorConocimientos = document.createElement('div');
+                newContenedorConocimientos.id = 'contenedor-conocimientos';
+                document.getElementById('conocimientos').appendChild(newContenedorConocimientos);
+            }
+
+            // Inicializar renderizado
+            renderTarjetasSeleccionadas();
+            setupConocidosControls();
+        });
     </script>
 
     <!-- XIII Image Modal -->
