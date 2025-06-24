@@ -255,39 +255,23 @@
             
             <p>Con 100 concursantes compitiendo en Ultimate Mercenary, estos son los más destacados que la audiencia sigue de cerca. Cada uno tiene su propia historia y motivación para participar en este letal reality show.</p>
             
-                <!-- Auri (Protagonista) -->
-                <div class="character-card featured-character">
-                    <img src="images/kira_initial.png" alt="Auri" class="featured-image">
+                <!-- Auri - Protagonista Principal (Personalizable) -->
+                <div class="featured-character">
+                    <div class="featured-image-container">
+                        <img src="images/kira_initial.png" alt="Auri" class="featured-image" id="protagonist-image">
+                    </div>
                     <div class="featured-info">
-                        <h3 class="featured-name">
-                            <span class="character-number">#13</span>
-                            Auri
-                        </h3>
-                        <div class="featured-role">Protagonista Principal (Personalizable)</div>
-                        <p class="character-description">Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.</p>
-                        <div class="dialogue">
-                            <p>*El diálogo dependerá de las elecciones del jugador*</p>
+                        <div class="protagonist-header">
+                            <div>
+                                <h3 class="featured-name" id="protagonist-name">Auri <span class="character-number">#13</span></h3>
+                                <div class="featured-role">Protagonista Principal (Personalizable)</div>
+                            </div>
+                            <a href="character-customizer.html" class="customize-button" id="customize-protagonist"><i class="fas fa-edit"></i> Personalizar</a>
                         </div>
+                        <p class="character-description" id="protagonist-description">Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.</p>
                     </div>
                 </div>
-
-                <!-- Vainilla -->
-                <div class="character-card">
-                    <img src="images/vainilla.png" alt="Vainilla" class="character-image">
-                    <div class="character-info">
-                    <h3 class="character-name">
-                        <span class="character-number">#12</span>
-                        <span class="character-real-name">Vainilla</span>
-                    </h3>
-                        <div class="character-role">La Idol Ambiciosa</div>
-                        <p class="character-description">Ex-estrella del pop que conquistó los escenarios de Neo-Tokio con su voz angelical y presencia magnética. Tras años dominando reality shows de entretenimiento, Vainilla busca demostrar que detrás de su imagen dulce se esconde una competidora feroz. Su experiencia mediática y capacidad de manipular audiencias la convierten en una rival peligrosa.</p>
-                        <div class="dialogue">
-                            <p>"¿Creen que por ser una idol soy débil? Cariños, he sobrevivido a la industria del entretenimiento. Esto es solo otro escenario donde brillar. Y cuando brillo... todos los demás se desvanecen en las sombras."</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Boris "Goliath" Volkov -->
+                
                 <div class="personajes-container">
                     <!-- Boris "Goliath" Volkov -->
                     <div class="character-card">
@@ -557,6 +541,22 @@
                             <p class="character-description">Ex-vicepresidenta de operaciones en Nakamura-Daichi Corp, una rival de OCE. Fue culpada por el fracaso de un proyecto de billones y ahora debe "rehabilitarse" en Ultimate Mercenary para recuperar su posición. Sus implantes de negocios incluyen analizadores de microexpresiones y potenciadores cognitivos para estrategia.</p>
                             <div class="dialogue">
                                 <p>"En las corporaciones o en este juego, las reglas son las mismas: planifica a largo plazo, identifica activos valiosos, elimina obstáculos con precisión, y nunca muestres tus verdaderas intenciones. La diferencia es que aquí puedo ensuciarme las manos personalmente."</p>
+                        </div>
+                    </div>
+
+                    <!-- Vainilla -->
+                    <div class="character-card">
+                        <img src="images/vainilla.png" alt="Vainilla" class="character-image">
+                        <div class="character-info">
+                        <h3 class="character-name">
+                            <span class="character-number">#12</span>
+                            <span class="character-real-name">"Vainilla"</span>
+                        </h3>
+                            <div class="character-role">La Idol Ambiciosa</div>
+                            <p class="character-description">Ex-estrella del pop que conquistó los escenarios de Neo-Tokio con su voz angelical y presencia magnética. Tras años dominando reality shows de entretenimiento, Vainilla busca demostrar que detrás de su imagen dulce se esconde una competidora feroz. Su experiencia mediática y capacidad de manipular audiencias la convierten en una rival peligrosa.</p>
+                            <div class="dialogue">
+                                <p>"¿Creen que por ser una idol soy débil? Cariños, he sobrevivido a la industria del entretenimiento. Esto es solo otro escenario donde brillar. Y cuando brillo... todos los demás se desvanecen en las sombras."</p>
+                            </div>
                         </div>
                     </div>
                 </div>
