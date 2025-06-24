@@ -1575,6 +1575,25 @@
 
         // Datos de personajes y facciones
         const personajes = [
+            // Staff de OCE
+            {
+                nombre: 'Kaiser Von Stroheim',
+                numero: 999,
+                apodo: 'CEO de OCE',
+                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta.',
+                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera!"',
+                img: 'images/kaiser_new.png',
+                nombreReal: 'Kaiser Von Stroheim'
+            },
+            {
+                nombre: 'Dra. Naomi "Nano" McClaray',
+                numero: 999,
+                apodo: 'Médica Jefe de OCE',
+                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary.',
+                dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
+                img: 'images/doctora_nano.png',
+                nombreReal: 'Dra. Naomi "Nano" McClaray'
+            },
             // Personajes principales
             {
                 nombre: 'Auri',
@@ -1660,9 +1679,9 @@
             {
                 nombre: 'Thunder Fist',
                 numero: 68,
-                apodo: 'El Luchador Callejero',
-                descripcion: 'Campeón indiscutible del circuito clandestino de peleas de Neo-Tokyo. Sus puños aumentados con implantes de titanio y sus reflejos mejorados lo convierten en una fuerza imparable en el combate cuerpo a cuerpo. A pesar de su éxito en las peleas ilegales, mantiene un estricto código de honor y se niega a matar a sus oponentes.',
-                dialogo: '"Mis puños hablan más fuerte que mis palabras, y tienen mucho que decir. En las calles aprendí que la fuerza sin honor es solo violencia sin sentido. Te venceré, pero vivirás para aprender de ello."',
+                apodo: 'El Campeón de las Peleas Clandestinas',
+                descripcion: 'Ex-campeón del circuito de luchas ilegales de Neo-Kyoto, Darius fue modificado ilegalmente con brazos cibernéticos de combate que contienen capacitores de impacto. Fue arrestado tras matar accidentalmente a un oponente y ahora busca en Ultimate Mercenary una vía para recuperar su libertad.',
+                dialogo: '"No busco fama, no busco gloria. Tengo tres hijos esperándome en casa. Haré lo que sea necesario para volver con ellos, y si eso significa destrozar algunos cráneos en el proceso, que así sea. No tengo nada personal contra ti, pero no te metas en mi camino."',
                 img: 'images/thunder_fist.png',
                 nombreReal: 'Darius Jackson'
             },
@@ -2259,10 +2278,10 @@
             // Aplicar ordenamiento
             if (currentSort === 'number') {
                 conocidos.sort((a, b) => {
-                    const aExtendido = personajesExtendidos.find(pe => pe.nombre === a.nombre);
-                    const bExtendido = personajesExtendidos.find(pe => pe.nombre === b.nombre);
-                    const aNum = aExtendido?.numero === null ? 999 : (aExtendido?.numero || 999);
-                    const bNum = bExtendido?.numero === null ? 999 : (bExtendido?.numero || 999);
+                    const aExtendido = personajesExtendidos.find(pe => pe.nombre === a.nombre) || a;
+                    const bExtendido = personajesExtendidos.find(pe => pe.nombre === b.nombre) || b;
+                    const aNum = !aExtendido.numero || aExtendido.numero === 999 ? 999 : parseInt(aExtendido.numero);
+                    const bNum = !bExtendido.numero || bExtendido.numero === 999 ? 999 : parseInt(bExtendido.numero);
                     return aNum - bNum;
                 });
             } else {
@@ -2288,7 +2307,8 @@
                     'Marcus "Titan" Graves': 71,
                     'Faith "Oracle" Lee': 53,
                     'Darius "Thunder Fist" Jackson': 68,
-                    'Aria "Maven" Chen': 19
+                    'Aria "Maven" Chen': 19,
+                    'Vainilla': 12
                 };
                 const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
                 const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '';
