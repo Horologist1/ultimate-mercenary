@@ -959,3 +959,167 @@ footer {
     );
     pointer-events: none;
 }
+
+.staff-member {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff4757;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.2);
+}
+
+.staff-member .personaje-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.staff-member h3 {
+    color: #ff4757;
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2em;
+}
+
+.staff-member .numero-staff {
+    background: #ff4757;
+    color: #000;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+}
+
+.staff-member .personaje-info {
+    margin-top: 10px;
+}
+
+.staff-member .personaje-info p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.staff-member .personaje-info strong {
+    color: #00ccff;
+}
+
+.character-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ccff;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    gap: 15px;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.2);
+}
+
+.character-card .character-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #00ccff;
+}
+
+.character-card .character-info {
+    flex: 1;
+}
+
+.character-card .character-name {
+    color: #00ccff;
+    margin: 0 0 5px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+}
+
+.character-card .character-role {
+    color: #ff4757;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.character-card .character-description {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.character-card .dialogue {
+    background: rgba(255, 71, 87, 0.1);
+    border-left: 3px solid #ff4757;
+    padding: 8px;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.faction-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff4757;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    gap: 15px;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.2);
+}
+
+.faction-card .faction-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 4px;
+    border: 1px solid #ff4757;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+}
+
+.faction-card .faction-info {
+    flex: 1;
+}
+
+.faction-card h3 {
+    color: #ff4757;
+    margin: 0 0 10px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2em;
+}
+
+.faction-card p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.faction-members {
+    margin-top: 15px;
+    border-top: 1px solid rgba(255, 71, 87, 0.3);
+    padding-top: 15px;
+}
+
+.faction-member {
+    margin-bottom: 15px;
+}
+
+.faction-member h4 {
+    color: #00ccff;
+    margin: 0 0 5px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1em;
+}
+
+.faction-member .member-role {
+    color: #ff4757;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.faction-member p {
+    margin: 0;
+    font-size: 0.9em;
+}

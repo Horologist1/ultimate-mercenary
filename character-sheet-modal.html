@@ -1924,6 +1924,38 @@
                     {
                         nombre: 'Kaiser "El Emperador" Von Stroheim',
                         rol: 'CEO y Productor Ejecutivo',
+                        desc: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta.'
+                    },
+                    {
+                        nombre: 'Dr. Naomi',
+                        rol: 'Jefa de Bioingeniería',
+                        desc: 'Científica brillante y fría, responsable de los implantes y modificaciones de los concursantes. Su ética es tan flexible como su presupuesto. Sus decisiones determinan quién recibe las mejoras más avanzadas y quién debe conformarse con tecnología de segunda mano.'
+                    },
+                    {
+                        nombre: 'Mr. Kenji Tanaka',
+                        rol: 'Jefe de Adquisiciones de Talento',
+                        desc: 'Trajeado impecablemente, Mr. Tanaka es la cara "amable" de OCE. Con una sonrisa falsa pero convincente y mirada fríamente calculadora, es él quien cierra los tratos sucios que llevan a los concursantes hasta el programa.'
+                    },
+                    {
+                        nombre: 'Director Ikari',
+                        rol: 'Director de Seguridad',
+                        desc: 'Veterano de mil operaciones encubiertas, Ikari es el responsable de la seguridad y la integridad del show. Su rostro inexpresivo y su voz grave imponen respeto. Nadie sabe realmente para quién trabaja en última instancia.'
+                    },
+                    {
+                        nombre: 'dRa Ada',
+                        rol: 'IA Supervisora',
+                        desc: 'Inteligencia artificial avanzada que gestiona la logística y monitorización del show. Su tono es cortés, pero sus decisiones son implacables. Tiene acceso directo a todos los sistemas de OCE y puede controlar cualquier aspecto del programa en tiempo real.'
+                    }
+                ]
+            },
+            {
+                nombre: 'Staff de OCE',
+                descripcion: 'El equipo ejecutivo y operativo detrás de Ultimate Mercenary. Liderados por Kaiser "El Emperador" Von Stroheim, este grupo de élite incluye a la brillante pero amoral Dra. Naomi, el manipulador Mr. Kenji Tanaka, el enigmático Director Ikari, y la IA supervisora dRa Ada. Cada uno de ellos es un experto en su campo, y juntos forman el núcleo que mantiene funcionando el espectáculo más peligroso de Neo-Kyoto.',
+                img: 'images/oce_logo.png',
+                miembros: [
+                    {
+                        nombre: 'Kaiser "El Emperador" Von Stroheim',
+                        rol: 'CEO y Productor Ejecutivo',
                         desc: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente.'
                     },
                     {
@@ -1990,118 +2022,46 @@
         let searchTerm = '';
         
         function renderTarjetasSeleccionadas() {
-            // Conocidos
-            const conocidosSel = getConocidosSeleccionados();
-            let conocidos = personajes.filter(p => conocidosSel.includes(p.nombre));
+            const conocidosSeleccionados = JSON.parse(localStorage.getItem('conocidosSeleccionados') || '[]');
+            const conocimientosSeleccionados = JSON.parse(localStorage.getItem('conocimientosSeleccionados') || '[]');
             
-            // Aplicar filtro de búsqueda
-            if (searchTerm) {
-                conocidos = conocidos.filter(p => {
-                    const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
-                    const searchText = `${p.nombre} ${personajeExtendido.apodo || ''} ${personajeExtendido.nombreReal || ''}`.toLowerCase();
-                    return searchText.includes(searchTerm.toLowerCase());
-                });
-            }
+            // Contenedor para personajes conocidos
+            const contenedorConocidos = document.getElementById('contenedor-conocidos');
+            contenedorConocidos.innerHTML = '';
             
-            // Aplicar ordenamiento
-            if (currentSort === 'number') {
-                conocidos.sort((a, b) => {
-                    const aExtendido = personajesExtendidos.find(pe => pe.nombre === a.nombre) || a;
-                    const bExtendido = personajesExtendidos.find(pe => pe.nombre === b.nombre) || b;
-                    const aNum = !aExtendido.numero || aExtendido.numero === 999 ? 999 : parseInt(aExtendido.numero);
-                    const bNum = !bExtendido.numero || bExtendido.numero === 999 ? 999 : parseInt(bExtendido.numero);
-                    return aNum - bNum;
-                });
-            } else {
-                conocidos.sort((a, b) => a.nombre.localeCompare(b.nombre));
-            }
-            document.getElementById('conocidos-tarjetas').innerHTML = conocidos.map(p => {
-                // Mapeo de número de concursante
-                const numeros = {
-                    'Auri': 13,
-                    'Boris "Goliath" Volkov': 42,
-                    'Silas "Glitch" Vance': 17,
-                    'Raven (Mizuki Tanaka)': 89,
-                    'Chispa (Anya Sharma)': 31,
-                    'Marcus "Old Man" Thorne': 76,
-                    'Jinx': 23,
-                    'Lin Mayfair': 58,
-                    'Subject Omega': 91,
-                    'Ekaterina "Echo" Petrov': 37,
-                    'Dr. Felix "Compound" Reyes': 64,
-                    'Los Gemelos (Jin & Jun)': 82,
-                    'Sofía "Viper" Nakamura': 45,
-                    'Alex "Phantom" Mercer': 29,
-                    'Marcus "Titan" Graves': 71,
-                    'Faith "Oracle" Lee': 53,
-                    'Darius "Thunder Fist" Jackson': 68,
-                    'Aria "Maven" Chen': 19,
-                    'Vainilla': 12
-                };
-                const personajeExtendido = personajesExtendidos.find(pe => pe.nombre === p.nombre) || p;
-                const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '#999';
-                const displayLabel = numero;
-                const nombreReal = personajeExtendido.numero === null ? ` (${personajeExtendido.nombre})` : '';
-                const clave = `nombreConcursante_${displayLabel}`;
-                // Pre-rellenar con el nombre real si no hay valor guardado
-                const valorGuardado = localStorage.getItem(clave) || '';
-                return `
-                    <div class="character-card">
-                        <img src="${p.img}" alt="${p.nombre}" class="character-image">
-                        <div class="character-info">
-                            <h4 class="character-name">${displayLabel}${nombreReal} <input type='text' class='nombre-concursante-input' data-numero='${displayLabel}' placeholder='Nota' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
-                            <div class="character-role" style="color: #ff4757; font-size: 0.9em; margin-bottom: 8px;">${personajeExtendido.apodo || ''}</div>
-                            <p class="character-description">${personajeExtendido.descripcion || p.desc}</p>
-                            ${personajeExtendido.dialogo ? `<div class="dialogue" style="background: rgba(255, 71, 87, 0.1); border-left: 3px solid #ff4757; padding: 8px; margin-top: 8px; font-style: italic;">${personajeExtendido.dialogo}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            // Listeners para guardar el nombre al escribir
-            document.querySelectorAll('.nombre-concursante-input').forEach(input => {
-                input.addEventListener('input', function() {
-                    const num = this.getAttribute('data-numero');
-                    localStorage.setItem(`nombreConcursante_${num}`, this.value);
-                });
-            });
-            
-            // Configurar controles de búsqueda y ordenamiento
-            setupConocidosControls();
-            
-            // Conocimientos
-            const conocimientosSel = getConocimientosSeleccionados();
-            const conocimientos = facciones.filter(f => conocimientosSel.includes(f.nombre));
-            document.getElementById('conocimientos-tarjetas').innerHTML = conocimientos.map(f => {
-                const faccionExtendida = faccionesExtendidas.find(fe => fe.nombre === f.nombre) || f;
-                let miembrosHTML = '';
-                if (faccionExtendida.miembros) {
-                    miembrosHTML = `
-                        <div class="faction-members">
-                            ${faccionExtendida.miembros.map(m => `
-                                <div class="faction-member">
-                                    <h4>${m.nombre}</h4>
-                                    <div class="member-role">${m.rol}</div>
-                                    <p>${m.desc}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-                return `
-                    <div class="faction-card">
-                        <img src="${f.img}" alt="${f.nombre}" class="faction-logo">
-                        <div class="faction-info">
-                            <h3>${f.nombre}</h3>
-                            <p>${faccionExtendida.descripcion || f.desc}</p>
-                            ${miembrosHTML}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            // Contenedor para conocimientos
+            const contenedorConocimientos = document.getElementById('contenedor-conocimientos');
+            contenedorConocimientos.innerHTML = '';
 
-            // Después de renderizar las tarjetas, añado el listener para abrir la imagen al hacer clic
-            addImageModalListeners();
+            // Renderizar personajes conocidos
+            conocidosSeleccionados.forEach(personaje => {
+                // Solo renderizar personajes que no son staff (numero !== null)
+                const personajeData = personajesExtendidos.find(p => p.nombre === personaje);
+                if (personajeData && personajeData.numero !== null) {
+                    const tarjeta = crearTarjetaPersonaje(personajeData);
+                    contenedorConocidos.appendChild(tarjeta);
+                }
+            });
+
+            // Renderizar conocimientos y staff
+            conocimientosSeleccionados.forEach(faccion => {
+                const faccionData = faccionesExtendidas.find(f => f.nombre === faccion);
+                if (faccionData) {
+                    const tarjeta = crearTarjetaFaccion(faccionData);
+                    contenedorConocimientos.appendChild(tarjeta);
+                    
+                    // Si es el Staff de OCE, renderizar sus miembros
+                    if (faccionData.nombre === 'Staff de OCE' && faccionData.miembros) {
+                        faccionData.miembros.forEach(miembro => {
+                            const tarjetaMiembro = crearTarjetaMiembroStaff(miembro);
+                            contenedorConocimientos.appendChild(tarjetaMiembro);
+                        });
+                    }
+                }
+            });
+
+            // Actualizar contadores
+            updatePointCounters();
         }
         
         function setupConocidosControls() {
@@ -4341,6 +4301,87 @@ Introduce el número (1-4):`);
         console.log('🚀 [v0.99] Sistema de atributos NUEVO cargado');
         console.log('🔧 [v0.99] Función disponible: testNewAttributeSystem()');
         console.log('🎯 [v0.99] PLANTILLA + PUNTOS ADICIONALES - Guardado separado GARANTIZADO');
+
+        function crearTarjetaPersonaje(personaje) {
+            // Si es un miembro del staff, no crear tarjeta
+            if (personaje.numero === null) {
+                return null;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'character-card';
+            
+            const displayLabel = `#${personaje.numero}`;
+            const nombreReal = personaje.nombreReal ? ` (${personaje.nombreReal})` : '';
+            
+            div.innerHTML = `
+                <img src="${personaje.img}" alt="${personaje.nombre}" class="character-image">
+                <div class="character-info">
+                    <h4 class="character-name">
+                        ${displayLabel}${nombreReal}
+                        <input type="text" 
+                               class="nombre-concursante-input" 
+                               data-numero="${displayLabel}" 
+                               placeholder="Nota" 
+                               value="${localStorage.getItem(`nombreConcursante_${displayLabel}`) || ''}"
+                               style="font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; 
+                                      background:#111; color:#00ccff; font-family:Orbitron,sans-serif; 
+                                      width:140px; margin-left:8px;">
+                    </h4>
+                    <div class="character-role" style="color: #ff4757; font-size: 0.9em; margin-bottom: 8px;">
+                        ${personaje.apodo || ''}
+                    </div>
+                    <p class="character-description">${personaje.descripcion}</p>
+                    ${personaje.dialogo ? 
+                        `<div class="dialogue" style="background: rgba(255, 71, 87, 0.1); 
+                                           border-left: 3px solid #ff4757; 
+                                           padding: 8px; margin-top: 8px; 
+                                           font-style: italic;">
+                        ${personaje.dialogo}
+                    </div>` : 
+                        ''}
+                </div>
+            `;
+
+            // Añadir listener para guardar notas
+            const input = div.querySelector('.nombre-concursante-input');
+            input.addEventListener('input', function() {
+                localStorage.setItem(`nombreConcursante_${displayLabel}`, this.value);
+            });
+
+            return div;
+        }
+
+        function crearTarjetaFaccion(faccion) {
+            const div = document.createElement('div');
+            div.className = 'faction-card';
+            
+            let miembrosHTML = '';
+            if (faccion.miembros) {
+                miembrosHTML = `
+                    <div class="faction-members">
+                        ${faccion.miembros.map(m => `
+                            <div class="faction-member">
+                                <h4>${m.nombre}</h4>
+                                <div class="member-role">${m.rol}</div>
+                                <p>${m.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            div.innerHTML = `
+                <img src="${faccion.img}" alt="${faccion.nombre}" class="faction-logo">
+                <div class="faction-info">
+                    <h3>${faccion.nombre}</h3>
+                    <p>${faccion.descripcion}</p>
+                    ${miembrosHTML}
+                </div>
+            `;
+            
+            return div;
+        }
     </script>
 
     <!-- XIII Image Modal -->
