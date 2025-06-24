@@ -1575,19 +1575,33 @@
 
         // Datos de personajes y facciones
         const personajes = [
-            // Personajes principales
-            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.' },
-            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.' },
-            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.' },
-            { nombre: 'Raven (Mizuki Tanaka)', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.' },
-            { nombre: 'Chispa (Anya Sharma)', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.' },
-            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.' },
-            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La Negociadora Elegante, experta en tratos.' },
-            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Hacker Caótica, impredecible y brillante.' },
-            { nombre: 'Maven', img: 'images/maven_corporate.png', desc: 'La Corporativa Reformada, estratega maestra.' },
-            { nombre: 'Thunder Fist', img: 'images/thunder_fist.png', desc: 'El Luchador Callejero, honor y puños.', numero: 68, nombreReal: 'Darius Jackson' },
-            { nombre: 'Viper Blade', img: 'images/viper_blade.png', desc: 'La Mercenaria Letal, precisa y mortal.' },
-            { nombre: 'Faith "Oracle" Chen', img: 'images/faith_oracle.png', desc: 'La Médica Visionaria, sanadora y guía.' },
+            // Protagonista
+            { nombre: 'Auri', img: 'images/kira_initial.png', desc: 'Protagonista principal, adaptable y endeudada con los Dragones de Jade.', numero: 13, nombreReal: 'Auri' },
+            
+            // Personal de OCE
+            { nombre: 'Kaiser "El Emperador" Von Stroheim', img: 'images/kaiser_new.png', desc: 'CEO de OCE, visionario y manipulador.', numero: 999, nombreReal: 'Kaiser Von Stroheim' },
+            { nombre: 'Dra. Naomi "Nano" McClaray', img: 'images/doctora_nano.png', desc: 'Médica Jefe de OCE, experta en nanomedicina.', numero: 999, nombreReal: 'Dra. Naomi "Nano" McClaray' },
+            { nombre: 'Mr. Kenji Tanaka', img: 'images/nakamura_daichi_ceo.png', desc: 'Director de Seguridad de OCE, disciplinado y honorable.', numero: 999, nombreReal: 'Kenji Tanaka' },
+            { nombre: 'Director Ikari', img: 'images/director_ikari.png', desc: 'Director de Operaciones de OCE, eficiente y despiadado.', numero: 999, nombreReal: 'Director Ikari' },
+            
+            // Concursantes
+            { nombre: 'Boris "Goliath" Volkov', img: 'images/goliath.png', desc: 'El Tanque Ruso, ex-Spetsnaz, brutal y directo.', numero: 42, nombreReal: 'Boris Volkov' },
+            { nombre: 'Silas "Glitch" Vance', img: 'images/silas_glitch.png', desc: 'Netrunner nervioso, ex-ingeniero de seguridad.', numero: 17, nombreReal: 'Silas Vance' },
+            { nombre: 'Raven', img: 'images/raven.png', desc: 'La Asesina Silenciosa, maestra del sigilo.', numero: 89, nombreReal: 'Mizuki Tanaka' },
+            { nombre: 'Chispa', img: 'images/chispa_new.png', desc: 'La Mecánica Optimista, experta en cromo.', numero: 31, nombreReal: 'Anya Sharma' },
+            { nombre: 'Marcus "Old Man" Thorne', img: 'images/old_man.png', desc: 'El Veterano Cínico, ex-corporativo.', numero: 76, nombreReal: 'Marcus Thorne' },
+            { nombre: 'Jinx', img: 'images/jinx_alt.png', desc: 'La Psicópata Impredecible, disfruta del caos.', numero: 23, nombreReal: 'Desconocido' },
+            { nombre: 'Lin Mayfair', img: 'images/lin_mayfair_new.png', desc: 'La "Inocente" Endeudada, historia trágica.', numero: 58, nombreReal: 'Lin Mayfair' },
+            { nombre: 'Subject Omega', img: 'images/subject_omega.png', desc: 'El Misterioso, posible experimento de OCE.', numero: 91, nombreReal: 'Subject Omega' },
+            { nombre: 'Ekaterina "Echo" Petrov', img: 'images/cyber_sniper.png', desc: 'La Francotiradora Fantasma, precisión sobrehumana.', numero: 37, nombreReal: 'Ekaterina Petrov' },
+            { nombre: 'Dr. Felix "Compound" Reyes', img: 'images/cyber_chemist.png', desc: 'El Químico Clandestino, genio de drogas de combate.', numero: 64, nombreReal: 'Felix Reyes' },
+            { nombre: 'Los Gemelos', img: 'images/cyber_twins.png', desc: 'Los Sincronizados, mentes enlazadas.', numero: 82, nombreReal: 'Jin & Jun' },
+            { nombre: 'Sofía "Viper" Nakamura', img: 'images/viper_blade.png', desc: 'La Samurái Callejera, busca venganza.', numero: 45, nombreReal: 'Sofía Nakamura' },
+            { nombre: 'Alex "Phantom" Mercer', img: 'images/hacker_phantom.png', desc: 'El Fantasma de la Red, hacker legendario.', numero: 29, nombreReal: 'Alex Mercer' },
+            { nombre: 'Marcus "Titan" Graves', img: 'images/titan_warrior.png', desc: 'El Soldado Aumentado, ex-super-soldado.', numero: 71, nombreReal: 'Marcus Graves' },
+            { nombre: 'Faith "Oracle" Lee', img: 'images/faith_oracle.png', desc: 'La Tecno-Sacerdotisa, ex-profeta de la Singularidad.', numero: 53, nombreReal: 'Faith Lee' },
+            { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.', numero: 68, nombreReal: 'Darius Jackson' },
+            { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta.', numero: 19, nombreReal: 'Aria Chen' },
             { nombre: 'Phantom', img: 'images/hacker_phantom.png', desc: 'El Hacker Fantasma, invisible en la red.' },
             
             // Personal de OCE
@@ -1755,6 +1769,44 @@
                 dialogo: '*El diálogo dependerá de las elecciones del jugador*',
                 img: 'images/kira_initial.png',
                 nombreReal: 'Auri'
+            },
+
+            // Personal de OCE
+            {
+                nombre: 'Kaiser "El Emperador" Von Stroheim',
+                numero: 999,
+                apodo: 'CEO de OCE',
+                descripcion: 'CEO de OCE, visionario y manipulador. Su presencia impone respeto y temor por igual.',
+                dialogo: '"Bienvenidos a Ultimate Mercenary, donde sus sueños de gloria... o sus pesadillas de fracaso, se harán realidad."',
+                img: 'images/kaiser_new.png',
+                nombreReal: 'Kaiser Von Stroheim'
+            },
+            {
+                nombre: 'Dra. Naomi "Nano" McClaray',
+                numero: 999,
+                apodo: 'Médica Jefe de OCE',
+                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.',
+                dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
+                img: 'images/doctora_nano.png',
+                nombreReal: 'Dra. Naomi "Nano" McClaray'
+            },
+            {
+                nombre: 'Mr. Kenji Tanaka',
+                numero: 999,
+                apodo: 'Director de Seguridad de OCE',
+                descripcion: 'Director de Seguridad de OCE, disciplinado y honorable. Ex-militar con un estricto código de conducta.',
+                dialogo: '"La seguridad no es negociable. Las reglas existen por una razón, y esa razón suele ser mantener a la gente con vida."',
+                img: 'images/nakamura_daichi_ceo.png',
+                nombreReal: 'Kenji Tanaka'
+            },
+            {
+                nombre: 'Director Ikari',
+                numero: 999,
+                apodo: 'Director de Operaciones de OCE',
+                descripcion: 'Director de Operaciones de OCE, eficiente y despiadado. Maneja la logística del programa con precisión militar.',
+                dialogo: '"Las estadísticas no mienten. Y las estadísticas dicen que la mayoría de ustedes no sobrevivirá hasta el final. No es personal, son solo números."',
+                img: 'images/director_ikari.png',
+                nombreReal: 'Director Ikari'
             },
 
             // Concursantes
