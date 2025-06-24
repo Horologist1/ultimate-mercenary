@@ -2005,11 +2005,11 @@
         // Utilidades para localStorage
         function getConocidosSeleccionados() {
             const val = localStorage.getItem('conocidosSeleccionados');
-            return val ? JSON.parse(val) : ['Kaiser "El Emperador" Von Stroheim'];
+            return val ? JSON.parse(val) : [];
         }
         function getConocimientosSeleccionados() {
             const val = localStorage.getItem('conocimientosSeleccionados');
-            return val ? JSON.parse(val) : [];
+            return val ? JSON.parse(val) : ['Staff de OCE'];
         }
         function setConocidosSeleccionados(arr) {
             localStorage.setItem('conocidosSeleccionados', JSON.stringify(arr));
@@ -4377,6 +4377,24 @@ Introduce el número (1-4):`);
                     <h3>${faccion.nombre}</h3>
                     <p>${faccion.descripcion}</p>
                     ${miembrosHTML}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function crearTarjetaMiembroStaff(miembro) {
+            const div = document.createElement('div');
+            div.className = 'staff-member';
+            
+            div.innerHTML = `
+                <div class="personaje-header">
+                    <h3>${miembro.nombre}</h3>
+                    <span class="numero-staff">#999</span>
+                </div>
+                <div class="personaje-info">
+                    <p><strong>${miembro.rol}</strong></p>
+                    <p>${miembro.desc}</p>
                 </div>
             `;
             
