@@ -1580,8 +1580,8 @@
                 nombre: 'Kaiser Von Stroheim',
                 numero: 999,
                 apodo: 'CEO de OCE',
-                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta.',
-                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera!"',
+                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta. Motivación: Ratings, poder, sadismo, y lo que él denomina "crear al guerrero definitivo".',
+                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"',
                 img: 'images/kaiser_new.png',
                 nombreReal: 'Kaiser Von Stroheim'
             },
@@ -1589,7 +1589,7 @@
                 nombre: 'Dra. Naomi "Nano" McClaray',
                 numero: 999,
                 apodo: 'Médica Jefe de OCE',
-                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary.',
+                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.',
                 dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
                 img: 'images/doctora_nano.png',
                 nombreReal: 'Dra. Naomi "Nano" McClaray'
@@ -1777,15 +1777,6 @@
             },
             // Personal de OCE
             {
-                nombre: 'Kaiser Von Stroheim',
-                numero: 999,
-                apodo: 'CEO de OCE',
-                descripcion: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta. Motivación: Ratings, poder, sadismo, y lo que él denomina "crear al guerrero definitivo".',
-                dialogo: '"¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!"',
-                img: 'images/kaiser_new.png',
-                nombreReal: 'Kaiser Von Stroheim'
-            },
-            {
                 nombre: 'Director Ikari',
                 numero: 999,
                 apodo: 'Director de Operaciones',
@@ -1793,15 +1784,6 @@
                 dialogo: '"La eficiencia es todo lo que importa. En este lugar, la seguridad es una ilusión. Yo solo administro el riesgo."',
                 img: 'images/director_ikari.png',
                 nombreReal: 'Director Ikari'
-            },
-            {
-                nombre: 'Dra. Naomi "Nano" McClaray',
-                numero: 999,
-                apodo: 'Médica Jefe de OCE',
-                descripcion: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes. Supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos.',
-                dialogo: '"Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?"',
-                img: 'images/doctora_nano.png',
-                nombreReal: 'Dra. Naomi "Nano" McClaray'
             },
             {
                 nombre: 'Mr. Kenji Tanaka',
@@ -2314,6 +2296,7 @@
                 const numero = personajeExtendido.numero ? `#${personajeExtendido.numero}` : '';
                 // Si no hay número, usar el nombre real como "numero" visual
                 const displayLabel = numero || personajeExtendido.nombreReal || p.nombre;
+                const nombreReal = personajeExtendido.nombreReal ? ` (${personajeExtendido.nombreReal})` : '';
                 const clave = `nombreConcursante_${displayLabel}`;
                 // Pre-rellenar con el nombre real si no hay valor guardado
                 const valorGuardado = localStorage.getItem(clave) || '';
@@ -2321,7 +2304,7 @@
                     <div class="character-card">
                         <img src="${p.img}" alt="${p.nombre}" class="character-image">
                         <div class="character-info">
-                            <h4 class="character-name">${displayLabel} <input type='text' class='nombre-concursante-input' data-numero='${displayLabel}' placeholder='Nota' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
+                            <h4 class="character-name">${displayLabel}${nombreReal} <input type='text' class='nombre-concursante-input' data-numero='${displayLabel}' placeholder='Nota' value='${valorGuardado}' style='font-size:1em; padding:3px 8px; border-radius:4px; border:1px solid #00ccff; background:#111; color:#00ccff; font-family:Orbitron,sans-serif; width:140px; margin-left:8px;'></h4>
                             <div class="character-role" style="color: #ff4757; font-size: 0.9em; margin-bottom: 8px;">${personajeExtendido.apodo || ''}</div>
                             <p class="character-description">${personajeExtendido.descripcion || p.desc}</p>
                             ${personajeExtendido.dialogo ? `<div class="dialogue" style="background: rgba(255, 71, 87, 0.1); border-left: 3px solid #ff4757; padding: 8px; margin-top: 8px; font-style: italic;">${personajeExtendido.dialogo}</div>` : ''}
