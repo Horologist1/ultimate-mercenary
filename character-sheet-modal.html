@@ -2129,25 +2129,31 @@
             document.getElementById('conocimientos-tarjetas').innerHTML = Object.entries(personajesPorFaccion).map(([faccion, miembros]) => {
                 const faccionInfo = facciones.find(f => f.nombre === faccion);
                 const faccionExtendida = faccionesExtendidas.find(fe => fe.nombre === faccion) || faccionInfo;
-                
                 return `
-                    <div class="faction-card">
+                    <div class="faction-card" style="margin-bottom: 40px;">
                         <img src="${faccionInfo.img}" alt="${faccion}" class="faction-logo">
                         <div class="faction-info">
                             <h3>${faccion}</h3>
                             <p>${faccionExtendida.descripcion || faccionInfo.desc}</p>
                             <div class="faction-members">
                                 <h4>Miembros Conocidos:</h4>
-                                <div class="members-grid">
-                                    ${miembros.map(miembro => `
-                                        <div class="member-card">
-                                            <img src="${miembro.img}" alt="${miembro.nombre}" class="member-image" onclick="openImageModal('${miembro.img}')">
-                                            <div class="member-info">
-                                                <h5>${miembro.nombre}</h5>
-                                                <p>${miembro.rol}</p>
+                                <div class="members-grid" style="display: flex; flex-direction: column; gap: 32px;">
+                                    ${miembros.map(miembro => {
+                                        // Datos extendidos para cada personaje
+                                        const datos = window.personajesFaccionesExtendidos ? (window.personajesFaccionesExtendidos.find(pe => pe.nombre === miembro.nombre) || miembro) : miembro;
+                                        return `
+                                            <div class="character-card" style="display: flex; align-items: flex-start; gap: 32px; background: rgba(0,0,0,0.85); border: 2px solid #00ccff; border-radius: 12px; box-shadow: 0 0 24px #00ccff33; padding: 24px; max-width: 900px; margin: 0 auto;">
+                                                <img src="${miembro.img}" alt="${miembro.nombre}" class="character-image" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px; border: 2px solid #00ccff; background: #111; box-shadow: 0 0 16px #00ccff55; cursor: pointer;" onclick="openImageModal('${miembro.img}')">
+                                                <div class="character-info" style="flex: 1;">
+                                                    <h4 class="character-name" style="color: #ff2d7a; font-size: 1.6em; font-family: 'Orbitron', sans-serif; margin: 0 0 8px 0;">${miembro.nombre}</h4>
+                                                    <div class="character-role" style="color: #00ccff; font-size: 1.1em; font-family: 'Orbitron', sans-serif; margin-bottom: 12px;">${miembro.rol}</div>
+                                                    <p class="character-description" style="color: #fff; font-size: 1.1em; margin-bottom: 12px;">${datos.descripcion || miembro.desc}</p>
+                                                    <div class="character-motivacion" style="color: #ffcc00; font-size: 1em; margin-bottom: 12px;"><b>Motivación:</b> ${datos.motivacion || miembro.motivacion || ''}</div>
+                                                    <div class="dialogue" style="background: #073a4e; border-left: 4px solid #00ccff; padding: 14px 18px; margin-top: 8px; font-style: italic; color: #b2f7ff; font-size: 1.05em; border-radius: 6px;">${datos.dialogo || miembro.dialogo || ''}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    `).join('')}
+                                        `;
+                                    }).join('')}
                                 </div>
                             </div>
                         </div>
