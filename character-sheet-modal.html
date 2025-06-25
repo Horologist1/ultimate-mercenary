@@ -2139,15 +2139,16 @@
                                 <h4>Miembros Conocidos:</h4>
                                 <div class="members-grid" style="display: flex; flex-direction: column; gap: 32px;">
                                     ${miembros.map(miembro => {
-                                        const datos = window.personajesFaccionesExtendidos ? (window.personajesFaccionesExtendidos.find(pe => pe.nombre === miembro.nombre) || miembro) : miembro;
+                                        // Buscar datos completos en personajesFacciones
+                                        let datos = (window.personajesFacciones || []).find(pf => pf.nombre === miembro.nombre) || miembro;
                                         return `
                                             <div class="character-card" style="display: flex; align-items: flex-start; gap: 32px; background: rgba(0,0,0,0.85); border: 2px solid #00ccff; border-radius: 12px; box-shadow: 0 0 24px #00ccff33; padding: 24px; max-width: 900px; margin: 0 auto;">
                                                 <img src="${miembro.img}" alt="${miembro.nombre}" class="character-image" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px; border: 2px solid #00ccff; background: #111; box-shadow: 0 0 16px #00ccff55; cursor: pointer;" onclick="openImageModal('${miembro.img}')">
                                                 <div class="character-info" style="flex: 1;">
                                                     <h4 class="character-name" style="color: #ff2d7a; font-size: 1.6em; font-family: 'Orbitron', sans-serif; margin: 0 0 8px 0;">${miembro.nombre}</h4>
                                                     <div class="character-role" style="color: #00ccff; font-size: 1.1em; font-family: 'Orbitron', sans-serif; margin-bottom: 12px;">${miembro.rol}</div>
-                                                    <p class="character-description" style="color: #fff; font-size: 1.1em; margin-bottom: 12px;">${datos.descripcion || datos.desc || miembro.desc || ''}</p>
-                                                    ${(datos.dialogo || miembro.dialogo) ? `<div class="dialogue" style="background: #181c22; border-left: 3px solid #ff4757; padding: 12px 18px; margin-top: 12px; font-style: italic; color: #fff; font-size: 1.08em; border-radius: 6px;">${datos.dialogo || miembro.dialogo}</div>` : ''}
+                                                    <p class="character-description" style="color: #fff; font-size: 1.1em; margin-bottom: 12px;">${datos.desc || ''}</p>
+                                                    ${datos.dialogo ? `<div class="dialogue" style="background: #181c22; border-left: 3px solid #ff4757; padding: 12px 18px; margin-top: 12px; font-style: italic; color: #fff; font-size: 1.08em; border-radius: 6px;">${datos.dialogo}</div>` : ''}
                                                 </div>
                                             </div>
                                         `;
