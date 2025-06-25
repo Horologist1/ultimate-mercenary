@@ -928,6 +928,111 @@
         // SISTEMA SIMPLIFICADO: Solo recibe datos del listener maestro de character-sheet.js
         // El modal NO maneja Firebase directamente, solo recibe datos via postMessage
     </script>
+    <script>
+window.personajesFacciones = [
+  // OmniCorp Entertainment (OCE)
+  {
+    nombre: 'Kaiser "El Emperador" Von Stroheim',
+    faccion: 'OmniCorp Entertainment (OCE)',
+    rol: 'Anfitrión y Productor Ejecutivo',
+    img: 'images/kaiser_new.png',
+    desc: 'Imponente figura que viste trajes de seda negra con reflejos carmesí. Su brazo biónico "Ares Predator VII" de cromo negro pulido con detalles dorados intimidaría incluso al más valiente. Sus ópticas "Zeiss Ikon X" revelan pupilas rojas que parecen analizar cada debilidad. Su cabello plateado peinado hacia atrás completa su imagen de autoridad absoluta.',
+    dialogo: '¡Bienvenidos, rebaño de desesperados, a la arena donde las ovejas se convierten en lobos o en pienso! ¡Cien almas buscando redención, o al menos, una muerte con más estilo que la que les esperaba fuera! Soy Kaiser, su pastor en este valle de sombras y neón. Sus deudas, sus crímenes, sus errores... olvídense de ellos. Aquí, solo importa una cosa: ¡SOBREVIVIR! ¡ENTRETENER! ¡ASCENDER! Ultimate Mercenary ha comenzado. ¡Que la purga... digo, la competencia, dé inicio!'
+  },
+  {
+    nombre: 'Mr. Kenji Tanaka',
+    faccion: 'OmniCorp Entertainment (OCE)',
+    rol: 'Jefe de Adquisiciones de Talento',
+    img: 'images/guard_ocemk2.png',
+    desc: 'Trajeado impecablemente, Mr. Tanaka es la cara "amable" de OCE. Con una sonrisa falsa pero convincente y mirada fríamente calculadora, es él quien cierra los tratos sucios que llevan a los concursantes hasta el programa. Función: Maneja la "contratación" de concursantes y otros activos de OCE, asegurándose de que todo tenga el aspecto de legalidad necesario para la transmisión pública.',
+    dialogo: 'Le aseguro que todas nuestras operaciones son... completamente legales. ¿Los participantes? Todos son voluntarios, por supuesto. Han firmado contratos extensivos. El que algunos lo hicieran con una pistola figurativa en la cabeza es, como comprenderá, irrelevante para nuestros abogados.'
+  },
+  {
+    nombre: 'Dra. Naomi "Nano" McClaray',
+    faccion: 'OmniCorp Entertainment (OCE)',
+    rol: 'Médica Jefe de OCE',
+    img: 'images/doctora_nano_thumb.png',
+    desc: 'Ex-investigadora principal en BioTech Corp, especializada en nanomedicina avanzada. Ahora supervisa todos los procedimientos médicos en Ultimate Mercenary, incluyendo implantes y "reparaciones" de concursantes valiosos. Sus brazos cibernéticos están especializados en procedimientos de precisión que han salvado —y transformado— a docenas de concursantes.',
+    dialogo: 'Mis dispositivos son lo único que mantiene vivos a la mitad de ustedes. Curiosamente, también son lo que podría matarlos con solo un comando remoto. ¿Fascinante balance, no crees?'
+  },
+  {
+    nombre: 'Director Ikari',
+    faccion: 'OmniCorp Entertainment (OCE)',
+    rol: 'Agente del Gobierno Sombra',
+    img: 'images/director_ikari.png',
+    desc: 'Oficial de alto rango en el Ministerio de Seguridad Interna de Neo-Kyoto. Su presencia en las gradas VIP de Ultimate Mercenary es discreta pero constante. El gobierno oficialmente condena el show mientras secretamente lo utiliza para probar implantes experimentales y reclutar especialistas en combate.',
+    dialogo: 'Puedo hacer que tu historial criminal desaparezca... o que tú desaparezcas. Ambas opciones son igualmente sencillas para mí. La diferencia está en lo útil que me resultes.'
+  },
+  // Colectivo Nexus-9
+  {
+    nombre: 'Dra. Ada "Quantum" Mercurio',
+    faccion: 'Colectivo Nexus-9',
+    rol: 'Científica Visionaria y Fundadora',
+    img: 'images/nexus9_ada_quantum.png',
+    desc: 'Antigua jefa de investigación en neurotecnología avanzada para NeuroCorp, Ada descubrió que la empresa planeaba hacer que la tecnología de transferencia de conciencia fuera deliberadamente adictiva. Robó prototipos y datos críticos antes de desaparecer. Con implantes neurales experimentales autoinstalados, puede procesar información a velocidades sobrehumanas y conectarse directamente con sistemas informáticos. Su rostro está parcialmente cubierto por una máscara respiratoria personalizada.',
+    dialogo: 'La muerte ya no es inevitable, solo es costosa. Cambiaremos eso, aunque tengamos que desmantelar todo el sistema corporativo para lograrlo.'
+  },
+  {
+    nombre: 'Xiong "Mesh" Lee',
+    faccion: 'Colectivo Nexus-9',
+    rol: 'Especialista en Infiltración y Recuperación',
+    img: 'images/nexus9_mesh_lee.png',
+    desc: 'Ex-agente de seguridad corporativa con amplia experiencia militar. Después de perder a su familia en un "accidente" corporativo, fue reconstruido por el Colectivo con tecnología experimental. Su cuerpo está poblado por nanomáquinas que pueden reconfigurar parcialmente su apariencia. Se especializa en operaciones de infiltración y recuperación, entrando en instalaciones corporativas para extraer tecnología o datos. Su lealtad al Colectivo es absoluta.',
+    dialogo: 'Mi cuerpo es un prototipo. Mi mente es un arma. Si me matas, aprenderán de mi cadáver y construirán algo mejor.'
+  },
+  // Chrome Dynasty
+  {
+    nombre: 'Madame Jade "Emperatriz de Cromo"',
+    faccion: 'Chrome Dynasty',
+    rol: 'Líder Suprema de la Chrome Dynasty',
+    img: 'images/chrome_dynasty_emperatriz.png',
+    desc: 'Una figura casi mítica, la Emperatriz rara vez se muestra públicamente sin un elaborado velo digital que oculta sus facciones. Su verdadera edad es desconocida, con rumores que sugieren que ha transferido su conciencia a múltiples cuerpos a lo largo de décadas. Su cuerpo actual es una obra maestra de ingeniería biomecánica, con implantes cromados que realzan su presencia intimidante. Como líder, controla un vasto imperio criminal con eficiencia implacable.',
+    dialogo: 'La carne es débil. La sangre es transitoria. Solo el cromo perdura. En este nuevo mundo, aquellos con la mejor tecnología no son simplemente ricos - son dioses.'
+  },
+  {
+    nombre: 'Jin "Silverhand" Wong',
+    faccion: 'Chrome Dynasty',
+    rol: 'Enforcer Principal y Cirujano de Combate',
+    img: 'images/chrome_dynasty_silverhand.png',
+    desc: 'Antiguo cirujano militar deshonradamente despedido por experimentación no autorizada, Jin encontró un hogar en la Chrome Dynasty. Sus brazos completamente cibernéticos contienen un arsenal de herramientas quirúrgicas que utiliza tanto para instalar implantes de élite como para "recuperarlos" de enemigos caídos. Su reputación es legendaria en los bajos fondos de Neo-Kyoto, donde se dice que puede remover todos los implantes de un objetivo mientras lo mantiene consciente, como forma de castigo ejemplar.',
+    dialogo: 'Puedo reconstruirte o desmantelarte con la misma precisión. La elección es tuya, pero te sugiero que elijas sabiamente.'
+  },
+  // Nakamura-Daichi Corp
+  {
+    nombre: 'Hideo Nakamura',
+    faccion: 'Zaibatsu Nakamura-Daichi Corp',
+    rol: 'CEO y Patriarca de Nakamura-Daichi Corp',
+    img: 'images/nakamura_daichi_ceo.png',
+    desc: 'A sus 78 años, Hideo representa la vieja guardia corporativa con adaptaciones modernas. Su cuerpo está sutilmente mejorado con los mejores productos de su compañía, haciéndolo parecer un saludable hombre de 50 años. A diferencia de muchos ejecutivos, Hideo mantiene sus mejoras discretas y casi invisibles. Conocido por su inteligencia estratégica y paciencia implacable, Hideo planifica a décadas vista, posicionando a Nakamura-Daichi para eventualmente dominar el mercado global de biotecnología.',
+    dialogo: 'Las corporaciones que exhiben su poder son las primeras en caer. El verdadero poder, como la mejor tecnología, funciona de manera invisible.'
+  },
+  {
+    nombre: 'Dra. Yuki Nakamura',
+    faccion: 'Zaibatsu Nakamura-Daichi Corp',
+    rol: 'Directora de Investigación y Desarrollo',
+    img: 'images/nakamura_daichi_yuki.png',
+    desc: 'Genio científico con doctorados en bioingeniería y cibernética neural, Yuki representa el futuro de la corporación. A diferencia de su padre, es más agresiva en sus tácticas y menos paciente con obstáculos. Ha dirigido personalmente varios proyectos revolucionarios, incluyendo el "Programa Fénix" - un intento de transferencia de conciencia. Aunque públicamente mantiene la imagen corporativa de elegancia y discreción, Yuki ha autorizado operaciones clandestinas para sabotear a competidores y adquirir tecnología por medios cuestionables.',
+    dialogo: 'Mi padre construyó esta empresa con paciencia. Yo la convertiré en un imperio con determinación. La diferencia entre nosotros es que él está dispuesto a esperar que el mundo cambie. Yo estoy decidida a cambiarlo yo misma.'
+  },
+  // Huérfanos Digitales
+  {
+    nombre: 'Zero "Void" Tanaka',
+    faccion: 'Huérfanos Digitales',
+    rol: 'Líder y Rostro del Movimiento',
+    img: 'images/huerfanos_zero_void.png',
+    desc: 'Zero perdió a ambos padres en el "Gran Fallo de Arasaka" cuando tenía 15 años. Sus padres habían transferido sus conciencias a la infraestructura corporativa días antes de que un ataque cibernético masivo corrompiera irreversiblemente miles de almacenamientos de conciencia. Ahora en sus veintitantos, Zero se ha convertido en el rostro de los Huérfanos Digitales. Su máscara, un panel LCD que alterna entre estática y fragmentos reconstruidos de los rostros de sus padres, se ha convertido en un símbolo del movimiento.',
+    dialogo: 'No están muertos. No están vivos. Están atrapados en el limbo corporativo mientras nosotros quedamos aquí, con cuentas que pagar y corazones rotos. No somos anti-tecnología - somos pro-humanidad.'
+  },
+  {
+    nombre: 'Iris "Glitch" Sato',
+    faccion: 'Huérfanos Digitales',
+    rol: 'Especialista en Recuperación de Conciencias',
+    img: 'images/huerfanos_iris_glitch.png',
+    desc: 'Ex-ingeniera de calibración de resleeving para Arasaka, Iris abandonó su lucrativa carrera después de descubrir que la empresa estaba ocultando deliberadamente la tasa de fallos en las transferencias de conciencia. Ahora se especializa en la delicada tarea de intentar recuperar fragmentos de conciencias dañadas.',
+    dialogo: 'A veces, lo único que puedes salvar de alguien es un eco digital. Pero a veces, un eco es suficiente para recordar que existieron.'
+  }
+];
+    </script>
 </head>
 <body>
     <div class="character-sheet">
