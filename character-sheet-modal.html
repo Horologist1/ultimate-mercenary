@@ -2146,8 +2146,8 @@
                                                 <div class="character-info" style="flex: 1;">
                                                     <h4 class="character-name" style="color: #ff2d7a; font-size: 1.6em; font-family: 'Orbitron', sans-serif; margin: 0 0 8px 0;">${miembro.nombre}</h4>
                                                     <div class="character-role" style="color: #00ccff; font-size: 1.1em; font-family: 'Orbitron', sans-serif; margin-bottom: 12px;">${miembro.rol}</div>
-                                                    <p class="character-description" style="color: #fff; font-size: 1.1em; margin-bottom: 12px;">${datos.descripcion || miembro.desc}</p>
-                                                    ${datos.dialogo || miembro.dialogo ? `<div class="dialogue" style="background: #181c22; border-left: 3px solid #ff4757; padding: 12px 18px; margin-top: 12px; font-style: italic; color: #fff; font-size: 1.08em; border-radius: 6px;">${datos.dialogo || miembro.dialogo}</div>` : ''}
+                                                    <p class="character-description" style="color: #fff; font-size: 1.1em; margin-bottom: 12px;">${datos.descripcion || datos.desc || miembro.desc || ''}</p>
+                                                    ${(datos.dialogo || miembro.dialogo) ? `<div class="dialogue" style="background: #181c22; border-left: 3px solid #ff4757; padding: 12px 18px; margin-top: 12px; font-style: italic; color: #fff; font-size: 1.08em; border-radius: 6px;">${datos.dialogo || miembro.dialogo}</div>` : ''}
                                                 </div>
                                             </div>
                                         `;
