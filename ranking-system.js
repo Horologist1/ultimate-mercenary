@@ -75,6 +75,27 @@ const rankingSystem = {
         return false;
     },
 
+    // Update a participant's number
+    updateParticipantNumber(oldNumber, newNumber) {
+        console.log(`Intentando actualizar número de participante de #${oldNumber} a #${newNumber}`);
+        
+        // Verificar que el nuevo número no esté en uso
+        const existingParticipant = this.ranking.find(p => p.number === newNumber);
+        if (existingParticipant && existingParticipant.number !== oldNumber) {
+            console.error(`El número #${newNumber} ya está en uso por otro participante`);
+            return false;
+        }
+        
+        const participant = this.ranking.find(p => p.number === oldNumber);
+        if (participant) {
+            participant.number = parseInt(newNumber);
+            console.log('Número de participante actualizado:', this.ranking);
+            return true;
+        }
+        console.error(`No se encontró el participante #${oldNumber}`);
+        return false;
+    },
+
     // Sort ranking by PM (descending)
     sortRanking() {
         this.ranking.sort((a, b) => b.pm - a.pm);

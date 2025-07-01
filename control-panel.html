@@ -2043,7 +2043,12 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>#${participant.number}</td>
+                    <td>
+                        <input type="number" 
+                               id="number-input-${participant.number}"
+                               value="${participant.number}" 
+                               min="1" max="999">
+                    </td>
                     <td>
                         <input type="number" 
                                id="pm-input-${participant.number}"
@@ -2051,7 +2056,7 @@
                                min="0">
                     </td>
                     <td>
-                        <button onclick="saveParticipantPM(${participant.number}, this)">Guardar</button>
+                        <button onclick="saveParticipantData(${participant.number}, this)">Guardar</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -2068,18 +2073,37 @@
             return rankingSystem.updateParticipantPM(number, parseInt(newPM));
         }
 
-        // Function to save participant's PM
-        async function saveParticipantPM(number, button) {
+        // Function to update participant's number
+        function updateParticipantNumber(oldNumber, newNumber) {
+            console.log(`Intentando actualizar número de participante de #${oldNumber} a #${newNumber}`);
+            if (newNumber < 1 || newNumber > 999) {
+                console.error('Número fuera del rango permitido (1-999)');
+                return false;
+            }
+            return rankingSystem.updateParticipantNumber(oldNumber, parseInt(newNumber));
+        }
+
+        // Function to save participant's data (number and PM)
+        async function saveParticipantData(number, button) {
             console.log(`Iniciando guardado para participante #${number}`);
-            const input = document.getElementById(`pm-input-${number}`);
-            if (!input) {
-                console.error(`No se encontró el input para el participante #${number}`);
+            const pmInput = document.getElementById(`pm-input-${number}`);
+            const numberInput = document.getElementById(`number-input-${number}`);
+            
+            if (!pmInput || !numberInput) {
+                console.error(`No se encontraron los inputs para el participante #${number}`);
                 return;
             }
 
-            const newPM = parseInt(input.value);
+            const newPM = parseInt(pmInput.value);
+            const newNumber = parseInt(numberInput.value);
+            
             if (isNaN(newPM) || newPM < 0) {
-                alert('Por favor, introduce un número válido mayor o igual a 0');
+                alert('Por favor, introduce un PM válido mayor o igual a 0');
+                return;
+            }
+            
+            if (isNaN(newNumber) || newNumber < 1 || newNumber > 999) {
+                alert('Por favor, introduce un número de participante válido entre 1 y 999');
                 return;
             }
 
@@ -2090,9 +2114,23 @@
             button.style.backgroundColor = '#666';
 
             try {
-                console.log(`Intentando actualizar PM para #${number} a ${newPM}`);
+                let updateSuccess = true;
+                
+                // Actualizar el número si ha cambiado
+                if (newNumber !== number) {
+                    console.log(`Intentando actualizar número de participante de #${number} a #${newNumber}`);
+                    if (!updateParticipantNumber(number, newNumber)) {
+                        throw new Error(`No se pudo actualizar el número del participante #${number}`);
+                    }
+                }
+                
                 // Actualizar el PM
-                if (updateParticipantPM(number, newPM)) {
+                console.log(`Intentando actualizar PM para #${newNumber} a ${newPM}`);
+                if (!updateParticipantPM(newNumber, newPM)) {
+                    throw new Error(`No se pudo actualizar el PM del participante #${newNumber}`);
+                }
+                
+                if (updateSuccess) {
                     console.log('Actualización local exitosa, guardando en Firebase...');
                     // Esperar a que se complete la operación en Firebase
                     await rankingSystem.saveRanking();
@@ -2102,13 +2140,18 @@
                     button.textContent = '¡Guardado!';
                     button.style.backgroundColor = '#2ed573';
                     
+                    // Si el número cambió, actualizar la tabla
+                    if (newNumber !== number) {
+                        setTimeout(() => {
+                            renderAdminRanking();
+                        }, 1000);
+                    }
+                    
                     setTimeout(() => {
                         button.disabled = false;
                         button.textContent = originalText;
                         button.style.backgroundColor = '';
                     }, 1500);
-                } else {
-                    throw new Error(`No se pudo actualizar el participante #${number}`);
                 }
             } catch (error) {
                 console.error('Error detallado al guardar:', error);
