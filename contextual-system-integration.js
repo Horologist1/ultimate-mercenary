@@ -70,13 +70,13 @@ function getCurrentContextualMessages() {
             }
             break;
         case 'prueba2':
-            if (window.PRUEBA2_MESSAGES && window.PRUEBA2_MESSAGES[contextKey]) {
-                rawMessages = window.PRUEBA2_MESSAGES[contextKey];
+            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba2 && window.CONTEXTUAL_MESSAGES.prueba2[contextKey]) {
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba2[contextKey];
             }
             break;
         case 'prueba3':
-            if (window.PRUEBA3_MESSAGES && window.PRUEBA3_MESSAGES[contextKey]) {
-                rawMessages = window.PRUEBA3_MESSAGES[contextKey];
+            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba3 && window.CONTEXTUAL_MESSAGES.prueba3[contextKey]) {
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba3[contextKey];
             }
             break;
         default:

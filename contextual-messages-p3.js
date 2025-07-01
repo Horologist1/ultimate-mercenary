@@ -378,5 +378,5 @@ const PRUEBA3_MESSAGES = {
     ]
 };
 
-// Exportar para uso global
-window.PRUEBA3_MESSAGES = PRUEBA3_MESSAGES; 
+// Integrar mensajes de prueba3 al sistema global
+window.CONTEXTUAL_MESSAGES.prueba3 = PRUEBA3_MESSAGES; 

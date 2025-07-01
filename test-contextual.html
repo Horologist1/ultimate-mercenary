@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema Contextual</title>
+</head>
+<body>
+    <h1>Test Sistema de Mensajes Contextuales</h1>
+    
+    <div>
+        <label>Prueba:</label>
+        <select id="testSelect">
+            <option value="prueba0">Prueba 0</option>
+            <option value="prueba1">Prueba 1</option>
+            <option value="prueba2">Prueba 2</option>
+            <option value="prueba3">Prueba 3</option>
+        </select>
+    </div>
+    
+    <div>
+        <label>Momento:</label>
+        <select id="timeSelect">
+            <option value="dia">Día</option>
+            <option value="noche">Noche</option>
+        </select>
+    </div>
+    
+    <div>
+        <label>Rating:</label>
+        <input type="number" id="ratingInput" value="7.5" step="0.1" min="0" max="10">
+    </div>
+    
+    <button onclick="testMessages()">Probar Mensajes</button>
+    
+    <div id="results"></div>
+
+    <!-- Cargar scripts en orden correcto -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-messages-p2.js"></script>
+    <script src="contextual-messages-p3.js"></script>
+    <script src="contextual-system-integration.js"></script>
+    
+    <script>
+        function testMessages() {
+            const test = document.getElementById('testSelect').value;
+            const time = document.getElementById('timeSelect').value;
+            const rating = parseFloat(document.getElementById('ratingInput').value);
+            
+            // Establecer valores en localStorage
+            localStorage.setItem('currentTest', test);
+            localStorage.setItem('timeOfDay', time);
+            localStorage.setItem('rating', rating.toString());
+            
+            // Obtener mensajes
+            const messages = window.getContextualMessages();
+            
+            // Mostrar resultados
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h3>Resultados:</h3>
+                <p><strong>Contexto:</strong> ${test} - ${time} - ${rating} (${rating > 6 ? 'alto' : 'bajo'})</p>
+                <p><strong>Mensajes encontrados:</strong> ${messages.length}</p>
+                <h4>Primeros 5 mensajes:</h4>
+                <ul>
+                    ${messages.slice(0, 5).map(msg => `<li>${msg}</li>`).join('')}
+                </ul>
+            `;
+            
+            console.log('Test completado:', {
+                test: test,
+                time: time,
+                rating: rating,
+                messagesCount: messages.length,
+                messages: messages.slice(0, 3)
+            });
+        }
+        
+        // Test inicial
+        setTimeout(testMessages, 1000);
+    </script>
+</body>
+</html> 

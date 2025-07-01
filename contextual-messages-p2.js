@@ -369,3 +369,6 @@ const PRUEBA2_MESSAGES = {
     ]
 };
 
+// Integrar mensajes de prueba2 al sistema global
+window.CONTEXTUAL_MESSAGES.prueba2 = PRUEBA2_MESSAGES;
+
