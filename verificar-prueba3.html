@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación Prueba 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        .result {
+            background-color: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Verificación Prueba 3 - Mensajes Contextuales</h1>
+    
+    <div class="result">
+        <h2>Estado de la Verificación</h2>
+        <div id="verification-results">Ejecutando verificación...</div>
+    </div>
+
+    <!-- Cargar los scripts en el orden correcto -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-messages-p2.js"></script>
+    <script src="contextual-messages-p3.js"></script>
+    <script src="contextual-system-integration.js"></script>
+    <script src="verificar-prueba3.js"></script>
+
+    <script>
+        // Capturar logs de la consola y mostrarlos en la página
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        const resultsDiv = document.getElementById('verification-results');
+        let logOutput = '';
+        
+        function addToOutput(message, type = 'info') {
+            logOutput += `<p class="${type}">${message}</p>`;
+            resultsDiv.innerHTML = logOutput;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToOutput(args.join(' '), 'info');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToOutput('⚠️ ' + args.join(' '), 'warning');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToOutput('❌ ' + args.join(' '), 'error');
+        };
+        
+        // Ejecutar verificación después de que se carguen todos los scripts
+        setTimeout(() => {
+            addToOutput('🚀 Iniciando verificación automática...', 'info');
+            
+            // Ejecutar el script de verificación
+            if (typeof window.getCurrentContextualMessages === 'function') {
+                try {
+                    const messages = window.getCurrentContextualMessages();
+                    addToOutput(`✅ Verificación exitosa: ${messages.length} mensajes obtenidos`, 'success');
+                    
+                    if (messages.length > 0) {
+                        addToOutput('📨 Primeros mensajes:', 'info');
+                        messages.slice(0, 3).forEach((msg, index) => {
+                            addToOutput(`   ${index + 1}. ${msg}`, 'info');
+                        });
+                    }
+                } catch (error) {
+                    addToOutput(`❌ Error en verificación: ${error.message}`, 'error');
+                }
+            } else {
+                addToOutput('❌ Función getCurrentContextualMessages no disponible', 'error');
+            }
+        }, 1000);
+    </script>
+</body>
+</html> 

@@ -3,81 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Sistema Contextual</title>
+    <title>Test Contextual Messages - Prueba 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background-color: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .message-item {
+            padding: 5px;
+            border-bottom: 1px solid #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Test Sistema de Mensajes Contextuales</h1>
+    <h1>🧪 Test Contextual Messages - Prueba 3</h1>
     
-    <div>
-        <label>Prueba:</label>
-        <select id="testSelect">
-            <option value="prueba0">Prueba 0</option>
-            <option value="prueba1">Prueba 1</option>
-            <option value="prueba2">Prueba 2</option>
-            <option value="prueba3">Prueba 3</option>
-        </select>
+    <div class="test-section">
+        <h2>Configuración del Test</h2>
+        <button onclick="setTestConfig('prueba3', 'dia', 8.0)">Configurar: Prueba 3 - Día - Rating Alto</button>
+        <button onclick="setTestConfig('prueba3', 'noche', 8.0)">Configurar: Prueba 3 - Noche - Rating Alto</button>
+        <button onclick="setTestConfig('prueba2', 'dia', 8.0)">Configurar: Prueba 2 - Día - Rating Alto (Referencia)</button>
+        <div id="current-config"></div>
     </div>
-    
-    <div>
-        <label>Momento:</label>
-        <select id="timeSelect">
-            <option value="dia">Día</option>
-            <option value="noche">Noche</option>
-        </select>
-    </div>
-    
-    <div>
-        <label>Rating:</label>
-        <input type="number" id="ratingInput" value="7.5" step="0.1" min="0" max="10">
-    </div>
-    
-    <button onclick="testMessages()">Probar Mensajes</button>
-    
-    <div id="results"></div>
 
-    <!-- Cargar scripts en orden correcto -->
+    <div class="test-section">
+        <h2>Verificación del Sistema</h2>
+        <button onclick="testSystemLoad()">Verificar Carga del Sistema</button>
+        <button onclick="testMessages()">Obtener Mensajes</button>
+        <button onclick="testFilters()">Probar Filtros</button>
+        <div id="system-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mensajes Obtenidos</h2>
+        <div id="messages-display"></div>
+    </div>
+
+    <!-- Cargar los scripts en el orden correcto -->
     <script src="contextual-messages.js"></script>
     <script src="contextual-messages-p2.js"></script>
     <script src="contextual-messages-p3.js"></script>
     <script src="contextual-system-integration.js"></script>
-    
+
     <script>
-        function testMessages() {
-            const test = document.getElementById('testSelect').value;
-            const time = document.getElementById('timeSelect').value;
-            const rating = parseFloat(document.getElementById('ratingInput').value);
-            
-            // Establecer valores en localStorage
+        // Configurar el contexto de prueba
+        function setTestConfig(test, timeOfDay, rating) {
             localStorage.setItem('currentTest', test);
-            localStorage.setItem('timeOfDay', time);
+            localStorage.setItem('timeOfDay', timeOfDay);
             localStorage.setItem('rating', rating.toString());
             
-            // Obtener mensajes
-            const messages = window.getContextualMessages();
-            
-            // Mostrar resultados
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <h3>Resultados:</h3>
-                <p><strong>Contexto:</strong> ${test} - ${time} - ${rating} (${rating > 6 ? 'alto' : 'bajo'})</p>
-                <p><strong>Mensajes encontrados:</strong> ${messages.length}</p>
-                <h4>Primeros 5 mensajes:</h4>
-                <ul>
-                    ${messages.slice(0, 5).map(msg => `<li>${msg}</li>`).join('')}
-                </ul>
-            `;
-            
-            console.log('Test completado:', {
-                test: test,
-                time: time,
-                rating: rating,
-                messagesCount: messages.length,
-                messages: messages.slice(0, 3)
-            });
+            updateConfigDisplay();
+            console.log(`✅ Configurado: ${test} - ${timeOfDay} - Rating ${rating}`);
         }
-        
-        // Test inicial
-        setTimeout(testMessages, 1000);
+
+        function updateConfigDisplay() {
+            const config = {
+                test: localStorage.getItem('currentTest'),
+                timeOfDay: localStorage.getItem('timeOfDay'),
+                rating: localStorage.getItem('rating')
+            };
+            
+            document.getElementById('current-config').innerHTML = `
+                <p><strong>Configuración actual:</strong></p>
+                <p>Prueba: ${config.test}</p>
+                <p>Momento: ${config.timeOfDay}</p>
+                <p>Rating: ${config.rating}</p>
+            `;
+        }
+
+        function testSystemLoad() {
+            const status = document.getElementById('system-status');
+            let results = '<h3>Estado del Sistema:</h3>';
+            
+            // Verificar archivos cargados
+            results += '<p><strong>Archivos cargados:</strong></p>';
+            results += `<p class="success">✅ contextual-messages.js: ${typeof window.CONTEXTUAL_MESSAGES !== 'undefined' ? 'Cargado' : 'Error'}</p>`;
+            results += `<p class="success">✅ contextual-messages-p2.js: ${typeof window.PRUEBA2_MESSAGES !== 'undefined' ? 'Cargado' : 'Error'}</p>`;
+            results += `<p class="success">✅ contextual-messages-p3.js: ${typeof window.PRUEBA3_MESSAGES !== 'undefined' ? 'Cargado' : 'Error'}</p>`;
+            
+            // Verificar integración
+            results += '<p><strong>Integración:</strong></p>';
+            if (window.CONTEXTUAL_MESSAGES) {
+                results += `<p class="success">✅ CONTEXTUAL_MESSAGES disponible</p>`;
+                results += `<p class="info">📦 Pruebas disponibles: ${Object.keys(window.CONTEXTUAL_MESSAGES).join(', ')}</p>`;
+                
+                if (window.CONTEXTUAL_MESSAGES.prueba3) {
+                    results += `<p class="success">✅ Prueba 3 integrada correctamente</p>`;
+                    const contexts = Object.keys(window.CONTEXTUAL_MESSAGES.prueba3);
+                    results += `<p class="info">📦 Contextos de Prueba 3: ${contexts.join(', ')}</p>`;
+                } else {
+                    results += `<p class="error">❌ Prueba 3 NO está integrada</p>`;
+                }
+            } else {
+                results += `<p class="error">❌ CONTEXTUAL_MESSAGES no disponible</p>`;
+            }
+            
+            // Verificar funciones
+            results += '<p><strong>Funciones:</strong></p>';
+            results += `<p class="success">✅ getContextualMessages: ${typeof window.getContextualMessages === 'function' ? 'Disponible' : 'Error'}</p>`;
+            results += `<p class="success">✅ getCurrentContextualMessages: ${typeof window.getCurrentContextualMessages === 'function' ? 'Disponible' : 'Error'}</p>`;
+            
+            status.innerHTML = results;
+        }
+
+        function testMessages() {
+            const display = document.getElementById('messages-display');
+            const currentTest = localStorage.getItem('currentTest');
+            const timeOfDay = localStorage.getItem('timeOfDay');
+            const rating = localStorage.getItem('rating');
+            
+            display.innerHTML = '<h3>Obteniendo mensajes...</h3>';
+            
+            try {
+                // Obtener mensajes usando la función principal
+                const messages = window.getCurrentContextualMessages();
+                
+                let results = `<h3>Mensajes para ${currentTest} - ${timeOfDay} - Rating ${rating}</h3>`;
+                results += `<p class="success">✅ Total de mensajes: ${messages.length}</p>`;
+                
+                if (messages.length > 0) {
+                    results += '<div class="message-list">';
+                    messages.slice(0, 10).forEach((msg, index) => {
+                        results += `<div class="message-item">${index + 1}. ${msg}</div>`;
+                    });
+                    if (messages.length > 10) {
+                        results += `<div class="message-item">... y ${messages.length - 10} mensajes más</div>`;
+                    }
+                    results += '</div>';
+                } else {
+                    results += '<p class="warning">⚠️ No se encontraron mensajes</p>';
+                }
+                
+                // Verificar contexto específico
+                const contextKey = `${timeOfDay}_${parseFloat(rating) > 6 ? 'alto' : 'bajo'}`;
+                results += `<p class="info">🔍 Clave de contexto buscada: ${currentTest}.${contextKey}</p>`;
+                
+                if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES[currentTest]) {
+                    const contextMessages = window.CONTEXTUAL_MESSAGES[currentTest][contextKey];
+                    if (contextMessages) {
+                        results += `<p class="success">✅ Contexto encontrado con ${contextMessages.length} mensajes raw</p>`;
+                    } else {
+                        results += `<p class="error">❌ Contexto ${contextKey} no encontrado en ${currentTest}</p>`;
+                    }
+                }
+                
+                display.innerHTML = results;
+                
+            } catch (error) {
+                display.innerHTML = `<p class="error">❌ Error obteniendo mensajes: ${error.message}</p>`;
+            }
+        }
+
+        function testFilters() {
+            const display = document.getElementById('messages-display');
+            
+            if (!window.MESSAGE_FILTERS) {
+                display.innerHTML = '<p class="error">❌ Sistema de filtros no disponible</p>';
+                return;
+            }
+            
+            let results = '<h3>Probando Filtros:</h3>';
+            results += `<p class="info">🎛️ Filtros activos: ${JSON.stringify(window.MESSAGE_FILTERS.enabledCategories)}</p>`;
+            
+            // Desactivar filtro picante
+            window.MESSAGE_FILTERS.setFilter('picante', false);
+            const messagesWithoutPicante = window.getCurrentContextualMessages();
+            results += `<p class="info">📊 Mensajes sin picante: ${messagesWithoutPicante.length}</p>`;
+            
+            // Reactivar filtro picante
+            window.MESSAGE_FILTERS.setFilter('picante', true);
+            const messagesWithPicante = window.getCurrentContextualMessages();
+            results += `<p class="info">📊 Mensajes con picante: ${messagesWithPicante.length}</p>`;
+            
+            display.innerHTML = results;
+        }
+
+        // Inicializar al cargar la página
+        window.onload = function() {
+            updateConfigDisplay();
+            testSystemLoad();
+        };
     </script>
 </body>
 </html> 

@@ -2087,20 +2087,36 @@ function getContextualMessages() {
     
     let rawMessages = [];
     
+    // Buscar mensajes en CONTEXTUAL_MESSAGES principal
     if (CONTEXTUAL_MESSAGES[currentTest] && CONTEXTUAL_MESSAGES[currentTest][contextKey]) {
         rawMessages = CONTEXTUAL_MESSAGES[currentTest][contextKey];
-        console.log(`✅ Contexto encontrado: ${contextKey} con ${rawMessages.length} mensajes`);
-        // Mantener estructura de objeto para poder acceder a la categoría
-    } else {
+        console.log(`✅ Contexto encontrado en principal: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
+    // Buscar mensajes en archivos externos integrados (Prueba 2 y 3)
+    else if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES[currentTest] && window.CONTEXTUAL_MESSAGES[currentTest][contextKey]) {
+        rawMessages = window.CONTEXTUAL_MESSAGES[currentTest][contextKey];
+        console.log(`✅ Contexto encontrado en externo: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
+    // Fallback específico para Prueba 3
+    else if (currentTest === 'prueba3' && window.PRUEBA3_MESSAGES && window.PRUEBA3_MESSAGES[contextKey]) {
+        rawMessages = window.PRUEBA3_MESSAGES[contextKey];
+        console.log(`✅ Contexto encontrado en PRUEBA3_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
+    // Fallback específico para Prueba 2
+    else if (currentTest === 'prueba2' && window.PRUEBA2_MESSAGES && window.PRUEBA2_MESSAGES[contextKey]) {
+        rawMessages = window.PRUEBA2_MESSAGES[contextKey];
+        console.log(`✅ Contexto encontrado en PRUEBA2_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
+    else {
         console.warn(`⚠️ Contexto no encontrado: ${currentTest}.${contextKey}`);
         // Fallback a mensajes básicos si no hay contextuales
         rawMessages = [
-        "¡Vamos XIII, no decepciones a tus fans!",
-        "¡Estoy apostando todo por ti, no me falles!",
-        "Mira esos reflejos, ¡eres una máquina!",
-        "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
-        "Acabo de apostar 5000 créditos a que sobrevives esta prueba"
-    ];
+            "¡Vamos XIII, no decepciones a tus fans!",
+            "¡Estoy apostando todo por ti, no me falles!",
+            "Mira esos reflejos, ¡eres una máquina!",
+            "Mi IA predictiva dice que no llegarás a la siguiente ronda, XIII...",
+            "Acabo de apostar 5000 créditos a que sobrevives esta prueba"
+        ];
     }
     
     // Aplicar filtros de categorías (mantiene objetos)
