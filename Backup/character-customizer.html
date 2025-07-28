@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personaliza tu Protagonista - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .character-editor {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff4757;
+        }
+        
+        .character-preview {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .image-preview {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            height: 400px;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+        
+        .image-upload {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-upload input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .upload-btn {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+        
+        .upload-btn:hover {
+            background-color: #ff6b81;
+        }
+        
+        .preview-info {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid #ff4757;
+        }
+        
+        .preview-name {
+            color: #ff4757;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .preview-role {
+            color: #00ccff;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .preview-bio {
+            color: #ddd;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .preview-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .preview-stat {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #00ccff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #00ccff;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .stat-groups {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .save-btn {
+            background-color: #ff4757;
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background-color: #ff6b81;
+        }
+        
+        .random-btn {
+            background-color: #333;
+            color: #ddd;
+        }
+        
+        .random-btn:hover {
+            background-color: #555;
+        }
+        
+        .reset-btn {
+            background-color: #444;
+            color: #ddd;
+        }
+        
+        .reset-btn:hover {
+            background-color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .character-preview {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-groups {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+        
+        .back-button {
+            display: inline-block;
+            background-color: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #ff6b81;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>La Forja del Acero Callejero</h2>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <h2 class="section-header"><i class="fas fa-user-edit"></i> Personaliza Tu Protagonista</h2>
+            
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+            
+            <p>Crea tu propio protagonista para la historia de Ultimate Mercenary. Define su apariencia, historia, habilidades y motivaciones. ¿Qué te llevó a este brutal reality show? ¿Tienes lo necesario para sobrevivir?</p>
+            
+            <div class="character-editor">
+                <div class="character-preview">
+                    <div class="image-preview">
+                        <img src="images/kira_initial.png" alt="Tu Personaje" class="preview-image" id="preview-image">
+                        <div class="image-upload">
+                            <div class="file-upload">
+                                <button class="upload-btn"><i class="fas fa-camera"></i> Subir Imagen</button>
+                                <input type="file" id="image-upload" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-info">
+                        <div class="preview-name" id="preview-name">Auri</div>
+                        <div class="preview-role" id="preview-role">Protagonista</div>
+                        <div class="preview-bio" id="preview-bio">Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.</div>
+                    </div>
+                </div>
+                
+                <form id="character-form">
+                    <div class="form-group">
+                        <label for="character-name">Nombre del Personaje:</label>
+                        <input type="text" id="character-name" value="Auri" placeholder="Nombre del protagonista">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="character-bio">Historia y Motivaciones:</label>
+                        <textarea id="character-bio" placeholder="Describe la historia de tu personaje, motivaciones y cómo llegó a Ultimate Mercenary...">Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="image-url">URL de Imagen (opcional):</label>
+                        <input type="text" id="image-url" placeholder="https://...">
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="button" class="action-btn reset-btn" id="reset-btn">Reiniciar</button>
+                        <button type="button" class="action-btn random-btn" id="random-btn">Generar Aleatorio</button>
+                        <button type="submit" class="action-btn save-btn">Guardar Personaje</button>
+                    </div>
+                </form>
+            </div>
+            
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+        </main>
+
+        <footer>
+            <p>Ultimate Mercenary: La Forja del Acero Callejero &copy; 2025</p>
+            <p>Basado en Eclipse Phase Segunda Edición</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del formulario
+            const form = document.getElementById('character-form');
+            const nameInput = document.getElementById('character-name');
+            const bioInput = document.getElementById('character-bio');
+            const imageUrlInput = document.getElementById('image-url');
+            const imageUploadInput = document.getElementById('image-upload');
+            const randomBtn = document.getElementById('random-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            // Elementos de vista previa
+            const previewName = document.getElementById('preview-name');
+            const previewBio = document.getElementById('preview-bio');
+            const previewImage = document.getElementById('preview-image');
+            
+            // Datos originales para el reinicio
+            const originalData = {
+                name: 'Auri',
+                bio: 'Trasfondo de "odd jobs", endeudada con los Dragones de Jade. Adaptable y con potencial oculto. Auri ha sobrevivido en las calles de Neo-Kyoto tomando trabajos de todo tipo, algunos legales, otros no tanto. Una serie de malas decisiones la llevaron a endeudarse con la Yakuza, y ahora se encuentra obligada a participar en Ultimate Mercenary como forma de saldar su deuda... o morir en el intento.',
+                imageSrc: 'images/kira_initial.png'
+            };
+            
+            // Función para actualizar la vista previa
+            function updatePreview() {
+                previewName.textContent = nameInput.value;
+                previewBio.textContent = bioInput.value;
+                
+                if (imageUrlInput.value) {
+                    previewImage.src = imageUrlInput.value;
+                }
+            }
+            
+            // Eventos para actualizar la vista previa
+            nameInput.addEventListener('input', updatePreview);
+            bioInput.addEventListener('input', updatePreview);
+            imageUrlInput.addEventListener('input', updatePreview);
+            
+            // Manejo de carga de imagen
+            imageUploadInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Generación aleatoria
+            randomBtn.addEventListener('click', function() {
+                const randomNames = [
+                    'Nova', 'Zephyr', 'Echo', 'Vex', 'Raven', 'Nyx', 'Jericho', 
+                    'Phoenix', 'Dante', 'Luna', 'Cinder', 'Nemesis', 'Ghost', 'Cipher', 
+                    'Lux', 'Rix', 'Shade', 'Mako', 'Dex', 'Thorn', 'Jade', 'Zero', 'Ash'
+                ];
+                
+                const randomBackgrounds = [
+                    'Ex-militar deshonrado/a buscando redención en el único campo que conoce: el combate.',
+                    'Hacker perseguido/a por corporaciones tras exponer sus secretos. Ahora es participar o ser eliminado/a.',
+                    'Médico/a callejero/a que acumuló deudas tratando a los necesitados. La única salida: Ultimate Mercenary.',
+                    'Guardaespaldas que falló en proteger a un cliente importante y ahora busca recuperar su honor.',
+                    'Experimento corporativo fugado/a, con habilidades mejoradas pero poca comprensión del mundo exterior.',
+                    'Ex-policía que descubrió corrupción en las altas esferas y fue silenciado/a. Ahora busca visibilidad y venganza.',
+                    'Pandillero/a barrial que debe generar ingresos para su familia tras la muerte del sostén principal.',
+                    'Adicto/a a las drogas de combate con deudas enormes. Ahora debe usarlas para sobrevivir y quizás liberarse.',
+                    'Huérfano/a de las guerras corporativas con habilidades de supervivencia aprendidas en las calles más duras.'
+                ];
+                
+                nameInput.value = randomNames[Math.floor(Math.random() * randomNames.length)];
+                bioInput.value = randomBackgrounds[Math.floor(Math.random() * randomBackgrounds.length)];
+                
+                updatePreview();
+            });
+            
+            // Reinicio a valores originales
+            resetBtn.addEventListener('click', function() {
+                nameInput.value = originalData.name;
+                bioInput.value = originalData.bio;
+                imageUrlInput.value = '';
+                previewImage.src = originalData.imageSrc;
+                
+                updatePreview();
+            });
+            
+            // Guardar personaje
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Aquí guardaríamos los datos en localStorage o en algún sistema de persistencia
+                localStorage.setItem('character-name', nameInput.value);
+                localStorage.setItem('character-bio', bioInput.value);
+                
+                if (previewImage.src !== originalData.imageSrc) {
+                    localStorage.setItem('character-image', previewImage.src);
+                }
+                
+                alert('¡Personaje guardado con éxito! Tu protagonista ha sido registrado en el sistema de Ultimate Mercenary.');
+            });
+            
+            // Cargar datos guardados si existen
+            if (localStorage.getItem('character-name')) {
+                nameInput.value = localStorage.getItem('character-name');
+                bioInput.value = localStorage.getItem('character-bio');
+                
+                if (localStorage.getItem('character-image')) {
+                    previewImage.src = localStorage.getItem('character-image');
+                }
+                
+                updatePreview();
+            }
+        });
+    </script>
+</body>
+</html>

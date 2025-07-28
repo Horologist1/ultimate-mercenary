@@ -4,20 +4,18 @@
 // =======================================================================
 
 // Importar todos los archivos de mensajes contextuales
-let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES, PRUEBA4_MESSAGES;
+let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES;
 
 // Cargar los archivos de mensajes dinámicamente
 function loadContextualMessages() {
     return Promise.all([
         loadScript('contextual-messages.js'),
         loadScript('contextual-messages-p2.js'),
-        loadScript('contextual-messages-p3.js'),
-        loadScript('contextual-messages-p4.js')
+        loadScript('contextual-messages-p3.js')
     ]).then(() => {
         // Los mensajes están ahora disponibles globalmente
         PRUEBA2_MESSAGES = window.PRUEBA2_MESSAGES;
         PRUEBA3_MESSAGES = window.PRUEBA3_MESSAGES;
-        PRUEBA4_MESSAGES = window.PRUEBA4_MESSAGES;
         console.log('✅ Sistema contextual cargado completamente');
     });
 }
@@ -79,11 +77,6 @@ function getCurrentContextualMessages() {
         case 'prueba3':
             if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba3 && window.CONTEXTUAL_MESSAGES.prueba3[contextKey]) {
                 rawMessages = window.CONTEXTUAL_MESSAGES.prueba3[contextKey];
-            }
-            break;
-        case 'prueba4':
-            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba4 && window.CONTEXTUAL_MESSAGES.prueba4[contextKey]) {
-                rawMessages = window.CONTEXTUAL_MESSAGES.prueba4[contextKey];
             }
             break;
         default:
@@ -291,7 +284,7 @@ function logCurrentContext() {
 function testContextualSystem() {
     console.log('🧪 Probando sistema contextual...');
     
-    const tests = ['prueba0', 'prueba1', 'prueba2', 'prueba3', 'prueba4'];
+    const tests = ['prueba0', 'prueba1', 'prueba2', 'prueba3'];
     const times = ['dia', 'noche'];
     const ratings = [5.0, 8.0];
     

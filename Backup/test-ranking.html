@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema de Ranking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .ranking-table th,
+        .ranking-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+        .ranking-table th {
+            background-color: #333;
+            color: #00ccff;
+        }
+        .ranking-table input {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            padding: 5px;
+            width: 80px;
+            text-align: center;
+        }
+        .ranking-table button {
+            background-color: #00ccff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .ranking-table button:hover {
+            background-color: #00a3cc;
+        }
+        .test-buttons {
+            margin: 20px 0;
+        }
+        .test-buttons button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Sistema de Ranking</h1>
+        
+        <div class="test-buttons">
+            <button onclick="testUpdateNumber()">Test Cambiar Número</button>
+            <button onclick="testUpdatePM()">Test Cambiar PM</button>
+            <button onclick="testUpdateBoth()">Test Cambiar Ambos</button>
+            <button onclick="showCurrentRanking()">Mostrar Ranking Actual</button>
+        </div>
+        
+        <div id="rankingDisplay">
+            <h3>Ranking Actual:</h3>
+            <div id="rankingContent"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVc1a4E4_y-YJZV5ZqFQzTr1T8Txe8TmQ",
+            authDomain: "ultimatemercenary-1e212.firebaseapp.com",
+            projectId: "ultimatemercenary-1e212",
+            storageBucket: "ultimatemercenary-1e212.firebasestorage.app",
+            messagingSenderId: "683730871364",
+            appId: "1:683730871364:web:350aaf7a296ad34db28811",
+            databaseURL: "https://ultimatemercenary-1e212-default-rtdb.firebaseio.com/"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.database = firebase.database();
+    </script>
+    
+    <script src="ranking-system.js"></script>
+    
+    <script>
+        function showCurrentRanking() {
+            const ranking = rankingSystem.getRanking();
+            const content = document.getElementById('rankingContent');
+            
+            let html = '<table class="ranking-table">';
+            html += '<thead><tr><th>Posición</th><th>Número</th><th>PM</th></tr></thead><tbody>';
+            
+            ranking.forEach((participant, index) => {
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td>#${participant.number}</td>
+                    <td>${participant.pm}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            content.innerHTML = html;
+        }
+        
+        async function testUpdateNumber() {
+            console.log('Test: Cambiando número del participante #12 a #99');
+            const success = rankingSystem.updateParticipantNumber(12, 99);
+            if (success) {
+                await rankingSystem.saveRanking();
+                console.log('Test exitoso: Número actualizado');
+                showCurrentRanking();
+            } else {
+                console.error('Test falló: No se pudo actualizar el número');
+            }
+        }
+        
+        async function testUpdatePM() {
+            console.log('Test: Cambiando PM del participante #71 a 25000');
+            const success = rankingSystem.updateParticipantPM(71, 25000);
+            if (success) {
+                await rankingSystem.saveRanking();
+                console.log('Test exitoso: PM actualizado');
+                showCurrentRanking();
+            } else {
+                console.error('Test falló: No se pudo actualizar el PM');
+            }
+        }
+        
+        async function testUpdateBoth() {
+            console.log('Test: Cambiando número y PM del participante #13');
+            const numberSuccess = rankingSystem.updateParticipantNumber(13, 88);
+            const pmSuccess = rankingSystem.updateParticipantPM(88, 30000);
+            
+            if (numberSuccess && pmSuccess) {
+                await rankingSystem.saveRanking();
+                console.log('Test exitoso: Ambos valores actualizados');
+                showCurrentRanking();
+            } else {
+                console.error('Test falló: No se pudieron actualizar los valores');
+            }
+        }
+        
+        // Inicializar y mostrar ranking al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                showCurrentRanking();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 
