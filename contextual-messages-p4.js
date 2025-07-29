@@ -502,8 +502,8 @@ const contextualMessages = {
 function getMessagesByCategory(category, rating = 'normal') {
     const messages = contextualMessages[category] || [];
     
-    // Para la prueba 4, todos los mensajes son apropiados para rating normal
-    // En futuras versiones se podrían filtrar por rating
+    // Para la prueba 4, todos los mensajes son apropiados para rating alto
+    // Los mensajes están diseñados para ser apropiados en cualquier contexto
     return messages;
 }
 
@@ -516,12 +516,78 @@ function getRandomMessage(category, rating = 'normal') {
     return messages[randomIndex];
 }
 
+// Función para obtener mensajes por momento del día
+function getMessagesByTimeOfDay(timeOfDay = 'dia') {
+    if (timeOfDay === 'noche') {
+        // PLACEHOLDER: Sección para mensajes nocturnos de la Prueba 4
+        // TODO: Implementar mensajes específicos para el momento noche
+        return {
+            fan: [
+                "¡Las actuaciones nocturnas tienen un aura mágica especial! 🌙",
+                "La noche intensifica todas las emociones en el escenario",
+                "¡Qué manera de expresar la pasión bajo las estrellas!",
+                "Los efectos nocturnos hacen todo más intenso",
+                "¡Esta noche está siendo verdaderamente mágica!",
+                "La oscuridad revela la verdadera esencia de cada actuación",
+                "¡Las cortes de las hadas son aún más misteriosas de noche!",
+                "La luna está presenciando algo extraordinario",
+                "¡Esta noche está siendo una experiencia única!",
+                "La magia nocturna está en el aire"
+            ],
+            picante: [
+                "La noche intensifica la pasión en el escenario 🔥",
+                "¡Qué manera de expresar el deseo bajo la luna!",
+                "La oscuridad hace todo más íntimo y sensual",
+                "¡Esta noche está siendo verdaderamente ardiente!",
+                "La luna está presenciando pasión pura",
+                "¡La noche revela el lado más salvaje de todos!",
+                "La magia nocturna está desatando pasiones",
+                "¡Qué manera de canalizar la energía de la noche!",
+                "La oscuridad intensifica cada mirada y gesto",
+                "¡Esta noche está siendo una experiencia sensual única!"
+            ],
+            confesionario: [
+                "La noche hace que las confesiones sean más profundas",
+                "¡Qué manera de abrir el corazón bajo las estrellas!",
+                "La oscuridad permite ser más vulnerable",
+                "¡Esta noche está revelando verdades ocultas!",
+                "La luna está presenciando confesiones íntimas",
+                "La noche intensifica la honestidad emocional",
+                "¡Qué manera de mostrar el alma en la oscuridad!",
+                "La magia nocturna está liberando secretos",
+                "¡Esta noche está siendo catártica para todos!",
+                "La oscuridad permite ser completamente auténtico"
+            ],
+            relleno: [
+                "¡Los efectos nocturnos están increíbles!",
+                "La iluminación de noche es espectacular",
+                "¡Qué manera de crear ambiente mágico!",
+                "Los hologramas nocturnos son alucinantes",
+                "¡La producción nocturna es de otro nivel!",
+                "La música de noche tiene un toque especial",
+                "¡Los efectos de luz nocturna son hermosos!",
+                "La atmósfera nocturna es completamente inmersiva",
+                "¡Qué manera de transformar el escenario de noche!",
+                "Los detalles nocturnos son impresionantes"
+            ]
+        };
+    } else {
+        // Mensajes para el día (los que ya están definidos)
+        return contextualMessages;
+    }
+}
+
 // Exportar para uso en otros archivos
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         contextualMessages,
         getMessagesByCategory,
-        getRandomMessage
+        getRandomMessage,
+        getMessagesByTimeOfDay
     };
 }
+
+// Hacer disponible globalmente para el sistema de mensajes contextuales
+window.contextualMessages = contextualMessages;
+window.getMessagesByTimeOfDay = getMessagesByTimeOfDay;
 

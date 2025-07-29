@@ -2107,6 +2107,29 @@ function getContextualMessages() {
         rawMessages = window.PRUEBA2_MESSAGES[contextKey];
         console.log(`✅ Contexto encontrado en PRUEBA2_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
     }
+    // Fallback específico para Prueba 4
+    else if (currentTest === 'prueba4' && window.getMessagesByTimeOfDay) {
+        // Para la prueba 4, usar mensajes según el momento del día
+        const timeMessages = window.getMessagesByTimeOfDay(timeOfDay);
+        const allMessages = [];
+        
+        // Agregar mensajes de todas las categorías disponibles
+        if (timeMessages.fan) {
+            allMessages.push(...timeMessages.fan);
+        }
+        if (timeMessages.picante) {
+            allMessages.push(...timeMessages.picante);
+        }
+        if (timeMessages.confesionario) {
+            allMessages.push(...timeMessages.confesionario);
+        }
+        if (timeMessages.relleno) {
+            allMessages.push(...timeMessages.relleno);
+        }
+        
+        rawMessages = allMessages;
+        console.log(`✅ Contexto encontrado en contextualMessages (Prueba 4 - ${timeOfDay}): ${allMessages.length} mensajes totales`);
+    }
     else {
         console.warn(`⚠️ Contexto no encontrado: ${currentTest}.${contextKey}`);
         // Fallback a mensajes básicos si no hay contextuales
