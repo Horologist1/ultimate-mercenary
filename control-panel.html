@@ -977,17 +977,18 @@
             { nombre: 'Darius "Thunder Fist" Jackson', img: 'images/thunder_fist.png', desc: 'El Campeón de las Peleas Clandestinas.' },
             { nombre: 'Aria "Maven" Chen', img: 'images/maven_corporate.png', desc: 'La Ejecutiva Despiadada, ex-vicepresidenta de Nakamura-Daichi.' },
             // Patrocinadores de las Cortes de las Hadas
-            { nombre: 'Lord Aurelius Goldweaver', img: 'images/lord_aurelius.png', desc: 'Patrón de la Corte de Verano. Magnate de entretenimiento que busca alegría pura y celebración auténtica.' },
-            { nombre: 'Lady Morgana Frostbane', img: 'images/lady_morgana.png', desc: 'Señora de la Corte de Invierno. Ejecutiva de seguridad corporativa fascinada por la muerte y el final de las cosas.' },
-            { nombre: 'Smoke', img: 'images/smoke_autumn.png', desc: 'Enigma de la Corte de Otoño. Broker de información que aprecia la nostalgia, la melancolía y los finales agridulces.' },
-            { nombre: 'Madame Scarlett Passion', img: 'images/madame_scarlett.png', desc: 'Reina de la Corte de Primavera. Empresaria de entretenimiento adulto que valora la pasión desenfrenada y el deseo puro.' }
+            { nombre: 'Lord Aurelius Solaris', img: 'images/lord_aurelius_solaris.png', desc: 'Patrón de la Corte de Verano. Magnate de entretenimiento que busca alegría pura y celebración auténtica.' },
+            { nombre: 'Lady Morgana Frost', img: 'images/lady_morgana_frost.png', desc: 'Señora de la Corte de Invierno. Ejecutiva de seguridad corporativa fascinada por la muerte y el final de las cosas.' },
+            { nombre: 'Smoke, el Susurrador de Memorias', img: 'images/smoke_memory_whisperer.png', desc: 'Enigma de la Corte de Otoño. Broker de información que aprecia la nostalgia, la melancolía y los finales agridulces.' },
+            { nombre: 'Madame Scarlett Bloom', img: 'images/madame_scarlett_bloom.png', desc: 'Reina de la Corte de Primavera. Empresaria de entretenimiento adulto que valora la pasión desenfrenada y el deseo puro.' }
         ];
         const facciones = [
             { nombre: 'OmniCorp Entertainment (OCE)', img: 'images/oce_logo.png', desc: 'Conglomerado mediático global, operaciones negras y tecnología militar.' },
             { nombre: 'Colectivo Nexus-9', img: 'images/nexus9_logo.png', desc: 'Tecno-anarquistas, democratizan la tecnología de modificación corporal.' },
             { nombre: 'Chrome Dynasty', img: 'images/chrome_dynasty_logo.png', desc: 'Organización criminal de élite, obsesionados con el cromo.' },
             { nombre: 'Zaibatsu Nakamura-Daichi Corp', img: 'images/nakamura_daichi_logo.png', desc: 'Conglomerado de biotecnología, integración tecno-orgánica.' },
-            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' }
+            { nombre: 'Huérfanos Digitales', img: 'images/huerfanos_digitales_emblema.png', desc: 'Tribu urbana, víctimas de la "muerte digital".' },
+            { nombre: 'Cortes de las Hadas', img: 'images/fairy_courts_logo.png', desc: 'Patrocinadores excéntricos que evalúan actuaciones temáticas según las estaciones del año.' }
         ];
 
         // Personajes individuales de las facciones para selección granular
@@ -1096,6 +1097,40 @@
                 img: 'images/huerfanos_iris_glitch.png',
                 desc: 'Ex-ingeniera de calibración de resleeving para Arasaka, Iris abandonó su lucrativa carrera después de descubrir que la empresa estaba ocultando deliberadamente la tasa de fallos en las transferencias de conciencia. Ahora se especializa en la delicada tarea de intentar recuperar fragmentos de conciencias dañadas.',
                 dialogo: 'A veces, lo único que puedes salvar de alguien es un eco digital. Pero a veces, un eco es suficiente para recordar que existieron.'
+            },
+
+            // Cortes de las Hadas
+            {
+                nombre: 'Lord Aurelius Solaris',
+                faccion: 'Cortes de las Hadas',
+                rol: 'Patrón de la Corte de Verano',
+                img: 'images/lord_aurelius_solaris.png',
+                desc: 'Magnate de entretenimiento que busca alegría pura y celebración auténtica. Lord Aurelius representa la vitalidad y exuberancia del verano, patrocinando eventos que celebran la vida y la diversión sin restricciones.',
+                dialogo: 'La alegría es el combustible del alma. En mi corte, cada risa es una victoria contra la oscuridad que nos rodea. ¡Celebremos la vida mientras podamos!'
+            },
+            {
+                nombre: 'Lady Morgana Frost',
+                faccion: 'Cortes de las Hadas',
+                rol: 'Señora de la Corte de Invierno',
+                img: 'images/lady_morgana_frost.png',
+                desc: 'Ejecutiva de seguridad corporativa fascinada por la muerte y el final de las cosas. Morgana personifica la belleza fría y calculadora del invierno, apreciando la elegancia de los finales y las ceremonias de transferencia de conciencia.',
+                dialogo: 'La muerte no es el final, es una transición elegante. En mi corte, aprendemos a apreciar la belleza de los finales y los nuevos comienzos que traen.'
+            },
+            {
+                nombre: 'Smoke, el Susurrador de Memorias',
+                faccion: 'Cortes de las Hadas',
+                rol: 'Enigma de la Corte de Otoño',
+                img: 'images/smoke_memory_whisperer.png',
+                desc: 'Broker de información que aprecia la nostalgia, la melancolía y los finales agridulces. Smoke comercia con memorias extraídas, experiencias sintéticas y nostalgia artificial, operando tras máscaras holográficas cambiantes.',
+                dialogo: 'Las memorias son la moneda más valiosa. Vendo nostalgia, compro melancolía, y en el proceso, preservo fragmentos de humanidad que de otro modo se perderían.'
+            },
+            {
+                nombre: 'Madame Scarlett Bloom',
+                faccion: 'Cortes de las Hadas',
+                rol: 'Reina de la Corte de Primavera',
+                img: 'images/madame_scarlett_bloom.png',
+                desc: 'Empresaria de entretenimiento adulto que valora la pasión desenfrenada y el deseo puro. Madame Scarlett representa el renacimiento y la fertilidad de la primavera, celebrando el amor y la pasión en todas sus formas.',
+                dialogo: 'El deseo es la fuerza más poderosa del universo. En mi corte, celebramos la pasión sin vergüenza, el amor sin restricciones, y la belleza del renacimiento constante.'
             }
         ];
 
