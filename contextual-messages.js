@@ -2130,6 +2130,11 @@ function getContextualMessages() {
         rawMessages = allMessages;
         console.log(`✅ Contexto encontrado en contextualMessages (Prueba 4 - ${timeOfDay}): ${allMessages.length} mensajes totales`);
     }
+    // Fallback específico para Prueba 5
+    else if (currentTest === 'prueba5' && window.PRUEBA5_MESSAGES && window.PRUEBA5_MESSAGES[contextKey]) {
+        rawMessages = window.PRUEBA5_MESSAGES[contextKey];
+        console.log(`✅ Contexto encontrado en PRUEBA5_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
     else {
         console.warn(`⚠️ Contexto no encontrado: ${currentTest}.${contextKey}`);
         // Fallback a mensajes básicos si no hay contextuales

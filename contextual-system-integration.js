@@ -4,7 +4,7 @@
 // =======================================================================
 
 // Importar todos los archivos de mensajes contextuales
-let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES, PRUEBA4_MESSAGES;
+let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES, PRUEBA4_MESSAGES, PRUEBA5_MESSAGES;
 
 // Cargar los archivos de mensajes dinámicamente
 function loadContextualMessages() {
@@ -12,12 +12,14 @@ function loadContextualMessages() {
         loadScript('contextual-messages.js'),
         loadScript('contextual-messages-p2.js'),
         loadScript('contextual-messages-p3.js'),
-        loadScript('contextual-messages-p4.js')
+        loadScript('contextual-messages-p4.js'),
+        loadScript('contextual-messages-p5.js')
     ]).then(() => {
         // Los mensajes están ahora disponibles globalmente
         PRUEBA2_MESSAGES = window.PRUEBA2_MESSAGES;
         PRUEBA3_MESSAGES = window.PRUEBA3_MESSAGES;
         PRUEBA4_MESSAGES = window.PRUEBA4_MESSAGES;
+        PRUEBA5_MESSAGES = window.PRUEBA5_MESSAGES;
         console.log('✅ Sistema contextual cargado completamente');
     });
 }
