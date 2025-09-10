@@ -8,32 +8,32 @@
 Liderado por XIII, representan la esperanza y la humanidad en un mundo corrupto.
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ XIII        │ Una chica normal con un cuerpo artificial de leyenda          │
-│ Vainilla    │ Idol corporativa implantada, belleza letal en movimiento     │
-│ 89          │ Hija de millonario convertida en cyber ninja por capricho    │
-│ 71          │ Soldado experimental con implantes y poderes psíquicos       │
-│ 76          │ Veterano de guerra, fuente secreta del genoma supersoldado   │
-│ 68          │ Boxeador con brazos de hierro, cumpliendo condena letal      │
-│ Chispa      │ Campeona de 3 ediciones, hacker especialista en drones       │
-│ 53          │ Tecnosacerdotisa que parece poder prever el futuro            │
-│ 37          │ Soldado de Nuevo Israel, francotiradora rubia y letal        │
-│ 29          │ Hacker vengativo contra OCE, torpe pero genial               │
+│ XIII        │ Una chica normal con un cuerpo artificial de leyenda         4 │b 35000
+│ Vainilla    │ Idol corporativa implantada, belleza letal en movimiento     2│d -20000
+│ 89          │ Hija de millonario convertida en cyber ninja por capricho    4 │d 20000
+│ 71          │ Soldado experimental con implantes y poderes psíquicos     4.5 │c -10000
+│ 76          │ Veterano de guerra, fuente secreta del genoma supersoldado   5 │c 20000
+│ 68          │ Boxeador con brazos de hierro, cumpliendo condena letal      2│e -20000
+│ Chispa      │ Campeona de 3 ediciones, hacker especialista en drones       5│e 20000
+│ 53          │ Tecnosacerdotisa que parece poder prever el futuro          5 │a 20002
+│ 37          │ Soldado de Nuevo Israel, francotiradora rubia y letal       2 │b -20000
+│ 29          │ Hacker vengativo contra OCE, torpe pero genial              3 │a Fuera
 └─────────────────────────────────────────────────────────────────────────────┘
 
 💀 EQUIPO ROJO - "LOS DESPIADADOS" 💀
 Liderado por la ejecutiva 19, encarnan la corrupción y el poder sin alma.
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ 19          │ Ejecutiva despiadada que ha escalado con sangre y traición   │
-│ Jinx        │ Experta en explosivos y caos, combate desnuda por placer     │
-│ 45          │ Samurai callejera implantada, honor vendido a la Yakuza      │
-│ 91          │ Experimento científico andrógino, perfección tecnológica     │
-│ 42          │ Tanque ruso gigante, máquina de guerra humana                │
-│ 82          │ Gemelos Yakuza resucitados, la muerte no los detuvo          │
-│ 07          │ Asesino corporativo de élite, sombra letal del sistema       │
-│ 66          │ Hacker psicópata que tortura sistemas por diversión          │
-│ 33          │ Francotiradora sádica que colecciona trofeos humanos         │
-│ 88          │ Berserker implantado, se fortalece con cada herida           │
+│ 19          │ Ejecutiva despiadada que ha escalado con sangre y traición    │
+│ Jinx        │ Experta en explosivos y caos, combate desnuda por placer   4.5   │ 15000
+│ 45          │ Samurai callejera implantada, honor vendido a la Yakuza    5   │ 40001
+│ 91          │ Experimento científico andrógino, perfección tecnológica    3.5  │
+│ 42          │ Tanque ruso gigante, máquina de guerra humana               3  │
+│ 82          │ Gemelos Yakuza resucitados, la muerte no los detuvo         3.5  │ 10000
+│ 07          │ Asesino corporativo de élite, sombra letal del sistema      4  │ 20001
+│ 66          │ Hacker psicópata que tortura sistemas por diversión          2 │
+│ 33          │ Francotiradora sádica que colecciona trofeos humanos         4 │
+│ 88          │ Berserker implantado, se fortalece con cada herida           4 │ 10000
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -54,4 +54,3 @@ el Equipo Azul cuenta con algo que no se puede comprar: verdadera unidad.
                             RATING ESPERADO: 9.9/10
                           RIESGO DE MORTALIDAD: EXTREMO
 ═══════════════════════════════════════════════════════════════════════════════
-
