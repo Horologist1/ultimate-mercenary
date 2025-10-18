@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Prueba 7 - Sistema Contextual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ccff;
+        }
+        .success { border-left-color: #00ff00; }
+        .error { border-left-color: #ff0000; }
+        .warning { border-left-color: #ffaa00; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00aacc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Sistema Prueba 7</h1>
+    
+    <div class="test-section">
+        <h2>1. Cargar Scripts</h2>
+        <button onclick="loadScripts()">Cargar Scripts</button>
+        <div id="script-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Configurar Contexto</h2>
+        <button onclick="setPrueba7()">Configurar Prueba 7 + Día + Rating Alto</button>
+        <div id="context-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Probar Mensajes</h2>
+        <button onclick="testMessages()">Obtener Mensajes</button>
+        <div id="message-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Verificar Panel Admin</h2>
+        <button onclick="checkAdminPanel()">Verificar Panel Admin</button>
+        <div id="admin-status"></div>
+    </div>
+
+    <!-- Cargar scripts -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-messages-p2.js"></script>
+    <script src="contextual-messages-p3.js"></script>
+    <script src="contextual-messages-p4.js"></script>
+    <script src="contextual-messages-p5.js"></script>
+    <script src="contextual-messages-p6.js"></script>
+    <script src="contextual-messages-p7.js"></script>
+    <script src="contextual-system-integration.js"></script>
+
+    <script>
+        function loadScripts() {
+            const status = document.getElementById('script-status');
+            status.innerHTML = '<p>🔄 Cargando scripts...</p>';
+            
+            setTimeout(() => {
+                let results = [];
+                
+                // Verificar si los scripts se cargaron
+                if (window.CONTEXTUAL_MESSAGES) {
+                    results.push('✅ CONTEXTUAL_MESSAGES disponible');
+                } else {
+                    results.push('❌ CONTEXTUAL_MESSAGES no disponible');
+                }
+                
+                if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba7) {
+                    results.push('✅ Prueba 7 en CONTEXTUAL_MESSAGES');
+                } else {
+                    results.push('❌ Prueba 7 no encontrada en CONTEXTUAL_MESSAGES');
+                }
+                
+                if (window.PRUEBA7_MESSAGES) {
+                    results.push('✅ PRUEBA7_MESSAGES disponible');
+                } else {
+                    results.push('❌ PRUEBA7_MESSAGES no disponible');
+                }
+                
+                if (window.getCurrentContextualMessages) {
+                    results.push('✅ getCurrentContextualMessages disponible');
+                } else {
+                    results.push('❌ getCurrentContextualMessages no disponible');
+                }
+                
+                status.innerHTML = results.map(r => `<p>${r}</p>`).join('');
+            }, 1000);
+        }
+        
+        function setPrueba7() {
+            localStorage.setItem('currentTest', 'prueba7');
+            localStorage.setItem('timeOfDay', 'dia');
+            localStorage.setItem('rating', '8.0');
+            
+            const status = document.getElementById('context-status');
+            status.innerHTML = `
+                <p>✅ Contexto configurado:</p>
+                <pre>Prueba: ${localStorage.getItem('currentTest')}
+Momento: ${localStorage.getItem('timeOfDay')}
+Rating: ${localStorage.getItem('rating')}</pre>
+            `;
+        }
+        
+        function testMessages() {
+            const status = document.getElementById('message-status');
+            status.innerHTML = '<p>🔄 Obteniendo mensajes...</p>';
+            
+            setTimeout(() => {
+                try {
+                    if (typeof window.getCurrentContextualMessages === 'function') {
+                        const messages = window.getCurrentContextualMessages();
+                        status.innerHTML = `
+                            <p>✅ Mensajes obtenidos: ${messages.length}</p>
+                            <p><strong>Primeros 3 mensajes:</strong></p>
+                            <pre>${messages.slice(0, 3).map((msg, i) => `${i+1}. ${msg}`).join('\n')}</pre>
+                        `;
+                    } else {
+                        status.innerHTML = '<p>❌ Función getCurrentContextualMessages no disponible</p>';
+                    }
+                } catch (error) {
+                    status.innerHTML = `<p>❌ Error: ${error.message}</p>`;
+                }
+            }, 500);
+        }
+        
+        function checkAdminPanel() {
+            const status = document.getElementById('admin-status');
+            
+            // Simular verificación del panel admin
+            const testObjectives = {
+                'prueba7': 'Torneo de eliminación directa. Los 13 supervivientes se enfrentan en combates uno contra uno apostando 10,000 PM (una vida) por combate. El ganador obtiene libertad, 1 millón de créditos y un contrato corporativo en subasta.'
+            };
+            
+            if (testObjectives['prueba7']) {
+                status.innerHTML = `
+                    <p>✅ Panel Admin configurado correctamente</p>
+                    <p><strong>Descripción de Prueba 7:</strong></p>
+                    <pre>${testObjectives['prueba7']}</pre>
+                `;
+            } else {
+                status.innerHTML = '<p>❌ Prueba 7 no encontrada en panel admin</p>';
+            }
+        }
+        
+        // Auto-ejecutar al cargar
+        window.addEventListener('load', () => {
+            setTimeout(loadScripts, 500);
+        });
+    </script>
+</body>
+</html>

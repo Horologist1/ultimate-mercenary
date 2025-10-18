@@ -2135,6 +2135,16 @@ function getContextualMessages() {
         rawMessages = window.PRUEBA5_MESSAGES[contextKey];
         console.log(`✅ Contexto encontrado en PRUEBA5_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
     }
+    // Fallback específico para Prueba 6
+    else if (currentTest === 'prueba6' && window.PRUEBA6_MESSAGES && window.PRUEBA6_MESSAGES[contextKey]) {
+        rawMessages = window.PRUEBA6_MESSAGES[contextKey];
+        console.log(`✅ Contexto encontrado en PRUEBA6_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
+    // Fallback específico para Prueba 7
+    else if (currentTest === 'prueba7' && window.PRUEBA7_MESSAGES && window.PRUEBA7_MESSAGES[contextKey]) {
+        rawMessages = window.PRUEBA7_MESSAGES[contextKey];
+        console.log(`✅ Contexto encontrado en PRUEBA7_MESSAGES: ${contextKey} con ${rawMessages.length} mensajes`);
+    }
     else {
         console.warn(`⚠️ Contexto no encontrado: ${currentTest}.${contextKey}`);
         // Fallback a mensajes básicos si no hay contextuales

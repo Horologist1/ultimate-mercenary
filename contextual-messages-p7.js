@@ -541,6 +541,7 @@ function createMessage(text, category, subCategory = null) {
 // Integrar mensajes de prueba7 al sistema global
 window.CONTEXTUAL_MESSAGES = window.CONTEXTUAL_MESSAGES || {};
 window.CONTEXTUAL_MESSAGES.prueba7 = PRUEBA7_MESSAGES;
+window.PRUEBA7_MESSAGES = PRUEBA7_MESSAGES; // Exportar también con el nombre esperado
 
 console.log('✅ Mensajes contextuales de Prueba 7 (El Torneo) cargados');
 console.log(`📊 Mensajes dia_alto: ${PRUEBA7_MESSAGES.dia_alto.length}`);
