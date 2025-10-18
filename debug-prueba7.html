@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Prueba 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .debug-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ccff;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00aacc;
+        }
+        .error { border-left-color: #ff0000; }
+        .success { border-left-color: #00ff00; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Prueba 7 - Diagnóstico Completo</h1>
+    
+    <div class="debug-section">
+        <h2>1. Verificar Scripts Cargados</h2>
+        <button onclick="checkScripts()">Verificar Scripts</button>
+        <div id="script-debug"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Verificar Variables Globales</h2>
+        <button onclick="checkGlobals()">Verificar Variables</button>
+        <div id="global-debug"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Verificar localStorage</h2>
+        <button onclick="checkLocalStorage()">Verificar localStorage</button>
+        <div id="localStorage-debug"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Probar Función Directamente</h2>
+        <button onclick="testFunction()">Probar Función</button>
+        <div id="function-debug"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>5. Cargar Scripts Manualmente</h2>
+        <button onclick="loadScriptsManually()">Cargar Scripts</button>
+        <div id="manual-debug"></div>
+    </div>
+
+    <script>
+        function checkScripts() {
+            const debug = document.getElementById('script-debug');
+            debug.innerHTML = '<p>🔄 Verificando scripts...</p>';
+            
+            setTimeout(() => {
+                let results = [];
+                
+                // Verificar si los scripts están en el DOM
+                const scripts = document.querySelectorAll('script[src]');
+                const scriptSources = Array.from(scripts).map(s => s.src.split('/').pop());
+                
+                results.push(`<p>📜 Scripts en DOM: ${scriptSources.join(', ')}</p>`);
+                
+                // Verificar si las funciones están disponibles
+                const functions = [
+                    'getContextualMessages',
+                    'getContextualUsers', 
+                    'applyMessageFilters',
+                    'getCurrentContextualMessages',
+                    'contextualIntegration_getCurrentContextualMessages'
+                ];
+                
+                functions.forEach(func => {
+                    if (typeof window[func] === 'function') {
+                        results.push(`<p>✅ ${func}: Disponible</p>`);
+                    } else {
+                        results.push(`<p>❌ ${func}: No disponible</p>`);
+                    }
+                });
+                
+                debug.innerHTML = results.join('');
+            }, 500);
+        }
+        
+        function checkGlobals() {
+            const debug = document.getElementById('global-debug');
+            debug.innerHTML = '<p>🔄 Verificando variables globales...</p>';
+            
+            setTimeout(() => {
+                let results = [];
+                
+                const globals = [
+                    'CONTEXTUAL_MESSAGES',
+                    'PRUEBA7_MESSAGES',
+                    'PRUEBA6_MESSAGES',
+                    'PRUEBA5_MESSAGES',
+                    'PRUEBA4_MESSAGES',
+                    'PRUEBA3_MESSAGES',
+                    'PRUEBA2_MESSAGES'
+                ];
+                
+                globals.forEach(global => {
+                    if (window[global]) {
+                        if (global === 'CONTEXTUAL_MESSAGES') {
+                            const keys = Object.keys(window[global]);
+                            results.push(`<p>✅ ${global}: Disponible (${keys.length} pruebas: ${keys.join(', ')})</p>`);
+                        } else {
+                            results.push(`<p>✅ ${global}: Disponible</p>`);
+                        }
+                    } else {
+                        results.push(`<p>❌ ${global}: No disponible</p>`);
+                    }
+                });
+                
+                debug.innerHTML = results.join('');
+            }, 500);
+        }
+        
+        function checkLocalStorage() {
+            const debug = document.getElementById('localStorage-debug');
+            
+            const currentTest = localStorage.getItem('currentTest');
+            const timeOfDay = localStorage.getItem('timeOfDay');
+            const rating = localStorage.getItem('rating');
+            
+            debug.innerHTML = `
+                <p>📊 Valores de localStorage:</p>
+                <pre>currentTest: "${currentTest || 'undefined'}"
+timeOfDay: "${timeOfDay || 'undefined'}"
+rating: "${rating || 'undefined'}"</pre>
+                <p>🎯 Contexto calculado: ${timeOfDay}_${rating > 6 ? 'alto' : 'bajo'}</p>
+            `;
+        }
+        
+        function testFunction() {
+            const debug = document.getElementById('function-debug');
+            debug.innerHTML = '<p>🔄 Probando función...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Configurar contexto para Prueba 7
+                    localStorage.setItem('currentTest', 'prueba7');
+                    localStorage.setItem('timeOfDay', 'dia');
+                    localStorage.setItem('rating', '8.0');
+                    
+                    let results = [];
+                    results.push('<p>✅ Contexto configurado para Prueba 7</p>');
+                    
+                    // Probar diferentes funciones
+                    if (typeof window.getContextualMessages === 'function') {
+                        try {
+                            const messages = window.getContextualMessages();
+                            results.push(`<p>✅ getContextualMessages(): ${messages.length} mensajes</p>`);
+                            results.push(`<p>📝 Primeros 3 mensajes:</p>`);
+                            results.push(`<pre>${messages.slice(0, 3).map((m, i) => `${i+1}. ${m}`).join('\n')}</pre>`);
+                        } catch (error) {
+                            results.push(`<p>❌ Error en getContextualMessages(): ${error.message}</p>`);
+                        }
+                    } else {
+                        results.push('<p>❌ getContextualMessages() no disponible</p>');
+                    }
+                    
+                    if (typeof window.getCurrentContextualMessages === 'function') {
+                        try {
+                            const messages = window.getCurrentContextualMessages();
+                            results.push(`<p>✅ getCurrentContextualMessages(): ${messages.length} mensajes</p>`);
+                        } catch (error) {
+                            results.push(`<p>❌ Error en getCurrentContextualMessages(): ${error.message}</p>`);
+                        }
+                    } else {
+                        results.push('<p>❌ getCurrentContextualMessages() no disponible</p>');
+                    }
+                    
+                    debug.innerHTML = results.join('');
+                } catch (error) {
+                    debug.innerHTML = `<p>❌ Error general: ${error.message}</p>`;
+                }
+            }, 500);
+        }
+        
+        function loadScriptsManually() {
+            const debug = document.getElementById('manual-debug');
+            debug.innerHTML = '<p>🔄 Cargando scripts manualmente...</p>';
+            
+            const scripts = [
+                'contextual-messages.js',
+                'contextual-messages-p2.js',
+                'contextual-messages-p3.js',
+                'contextual-messages-p4.js',
+                'contextual-messages-p5.js',
+                'contextual-messages-p6.js',
+                'contextual-messages-p7.js',
+                'contextual-system-integration.js'
+            ];
+            
+            let loaded = 0;
+            let errors = [];
+            
+            scripts.forEach((script, index) => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                scriptElement.onload = () => {
+                    loaded++;
+                    if (loaded === scripts.length) {
+                        debug.innerHTML = `
+                            <p>✅ Scripts cargados: ${loaded}/${scripts.length}</p>
+                            <p>🔄 Probando funciones después de carga...</p>
+                        `;
+                        setTimeout(() => {
+                            checkScripts();
+                            checkGlobals();
+                        }, 1000);
+                    }
+                };
+                scriptElement.onerror = () => {
+                    errors.push(script);
+                    loaded++;
+                    if (loaded === scripts.length) {
+                        debug.innerHTML = `
+                            <p>⚠️ Scripts cargados: ${loaded}/${scripts.length}</p>
+                            <p>❌ Errores: ${errors.join(', ')}</p>
+                        `;
+                    }
+                };
+                document.head.appendChild(scriptElement);
+            });
+        }
+        
+        // Auto-ejecutar al cargar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkScripts();
+                checkGlobals();
+                checkLocalStorage();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

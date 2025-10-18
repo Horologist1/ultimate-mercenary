@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Solo Prueba 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-box {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ccff;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Solo Prueba 7</h1>
+    
+    <div class="test-box">
+        <h2>Test de Prueba 7 Aislado</h2>
+        <button onclick="testPrueba7()">Probar Prueba 7</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Simular solo los mensajes de Prueba 7
+        const PRUEBA7_MESSAGES = {
+            dia_alto: [
+                "¡XIII va a arrasar en este torneo!",
+                "¡Mira ese ranking! #1 en PM, vas a demostrar por qué!",
+                "¡Vas a vencer a ese rival! ¡Tu entrenamiento lo demuestra!",
+                "¡Cada combate es tuyo si confías en ti misma!",
+                "¡109,209 PM! ¡Eres la favorita absoluta!",
+                "¡Vas a demostrar que la protagonista gana por algo!",
+                "¡El torneo está hecho para que brilles!",
+                "¡Vas a vencer porque has aprendido de todos!",
+                "¡Tu evolución ha sido increíble! ¡Ahora cosecharás!",
+                "¡Vas a vencer a ese oponente con todo lo que has aprendido!"
+            ],
+            noche_alto: [
+                "¡El torneo nocturno es aún más épico!",
+                "¡Las luces del Coliseo brillan para ti XIII!",
+                "¡Vas a vencer bajo la luna de Neo-Kyoto!",
+                "¡La noche es testigo de tu gloria!",
+                "¡Cada combate nocturno es más intenso!"
+            ]
+        };
+
+        // Función simple para obtener mensajes
+        function getContextualMessages() {
+            const currentTest = localStorage.getItem('currentTest') || 'prueba0';
+            const timeOfDay = localStorage.getItem('timeOfDay') || 'dia';
+            const rating = parseFloat(localStorage.getItem('rating') || '0');
+            
+            const ratingLevel = rating > 6 ? 'alto' : 'bajo';
+            const contextKey = `${timeOfDay}_${ratingLevel}`;
+            
+            console.log(`🎯 Contexto: ${currentTest} | ${timeOfDay} | ${rating} (${ratingLevel}) | key: ${contextKey}`);
+            
+            if (currentTest === 'prueba7' && PRUEBA7_MESSAGES[contextKey]) {
+                return PRUEBA7_MESSAGES[contextKey];
+            }
+            
+            return ["Mensaje de fallback"];
+        }
+
+        // Exportar funciones
+        window.getContextualMessages = getContextualMessages;
+        window.CONTEXTUAL_MESSAGES = { prueba7: PRUEBA7_MESSAGES };
+        window.PRUEBA7_MESSAGES = PRUEBA7_MESSAGES;
+
+        function testPrueba7() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>🔄 Probando Prueba 7...</p>';
+            
+            setTimeout(() => {
+                let output = [];
+                
+                // Configurar contexto
+                localStorage.setItem('currentTest', 'prueba7');
+                localStorage.setItem('timeOfDay', 'dia');
+                localStorage.setItem('rating', '8.0');
+                
+                output.push('<p>✅ Contexto configurado: prueba7 + dia + rating 8.0</p>');
+                
+                // Probar función
+                try {
+                    const messages = getContextualMessages();
+                    output.push(`<p>✅ Mensajes obtenidos: ${messages.length}</p>`);
+                    
+                    if (messages.length > 0) {
+                        output.push('<p>📝 Todos los mensajes:</p>');
+                        output.push(`<pre>${messages.map((m, i) => `${i+1}. ${m}`).join('\n')}</pre>`);
+                    }
+                } catch (error) {
+                    output.push(`<p>❌ Error: ${error.message}</p>`);
+                }
+                
+                results.innerHTML = output.join('');
+            }, 500);
+        }
+        
+        // Auto-ejecutar
+        window.addEventListener('load', () => {
+            setTimeout(testPrueba7, 1000);
+        });
+    </script>
+</body>
+</html>

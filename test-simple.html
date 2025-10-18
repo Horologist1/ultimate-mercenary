@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Prueba 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-box {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ccff;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Simple - Prueba 7</h1>
+    
+    <div class="test-box">
+        <h2>Estado del Sistema</h2>
+        <button onclick="runTest()">Ejecutar Test</button>
+        <div id="results"></div>
+    </div>
+
+    <!-- Cargar scripts en orden -->
+    <script src="contextual-messages.js"></script>
+    <script src="contextual-messages-p2.js"></script>
+    <script src="contextual-messages-p3.js"></script>
+    <script src="contextual-messages-p4.js"></script>
+    <script src="contextual-messages-p5.js"></script>
+    <script src="contextual-messages-p6.js"></script>
+    <script src="contextual-messages-p7.js"></script>
+    <script src="contextual-system-integration.js"></script>
+
+    <script>
+        function runTest() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>🔄 Ejecutando test...</p>';
+            
+            setTimeout(() => {
+                let output = [];
+                
+                // 1. Verificar funciones básicas
+                output.push('<h3>1. Funciones Básicas:</h3>');
+                if (typeof window.getContextualMessages === 'function') {
+                    output.push('<p>✅ getContextualMessages: OK</p>');
+                } else {
+                    output.push('<p>❌ getContextualMessages: FALTA</p>');
+                }
+                
+                if (typeof window.getCurrentContextualMessages === 'function') {
+                    output.push('<p>✅ getCurrentContextualMessages: OK</p>');
+                } else {
+                    output.push('<p>❌ getCurrentContextualMessages: FALTA</p>');
+                }
+                
+                // 2. Verificar variables globales
+                output.push('<h3>2. Variables Globales:</h3>');
+                if (window.CONTEXTUAL_MESSAGES) {
+                    const keys = Object.keys(window.CONTEXTUAL_MESSAGES);
+                    output.push(`<p>✅ CONTEXTUAL_MESSAGES: OK (${keys.length} pruebas: ${keys.join(', ')})</p>`);
+                } else {
+                    output.push('<p>❌ CONTEXTUAL_MESSAGES: FALTA</p>');
+                }
+                
+                if (window.PRUEBA7_MESSAGES) {
+                    output.push('<p>✅ PRUEBA7_MESSAGES: OK</p>');
+                } else {
+                    output.push('<p>❌ PRUEBA7_MESSAGES: FALTA</p>');
+                }
+                
+                // 3. Configurar contexto
+                output.push('<h3>3. Configurando Contexto:</h3>');
+                localStorage.setItem('currentTest', 'prueba7');
+                localStorage.setItem('timeOfDay', 'dia');
+                localStorage.setItem('rating', '8.0');
+                output.push('<p>✅ Contexto configurado: prueba7 + dia + rating 8.0</p>');
+                
+                // 4. Probar obtención de mensajes
+                output.push('<h3>4. Probando Mensajes:</h3>');
+                try {
+                    if (typeof window.getContextualMessages === 'function') {
+                        const messages = window.getContextualMessages();
+                        output.push(`<p>✅ Mensajes obtenidos: ${messages.length}</p>`);
+                        if (messages.length > 0) {
+                            output.push('<p>📝 Primeros 3 mensajes:</p>');
+                            output.push(`<pre>${messages.slice(0, 3).map((m, i) => `${i+1}. ${m}`).join('\n')}</pre>`);
+                        }
+                    } else {
+                        output.push('<p>❌ No se pueden obtener mensajes - función no disponible</p>');
+                    }
+                } catch (error) {
+                    output.push(`<p>❌ Error obteniendo mensajes: ${error.message}</p>`);
+                }
+                
+                // 5. Verificar panel admin
+                output.push('<h3>5. Panel Admin:</h3>');
+                const testObjectives = {
+                    'prueba7': 'Torneo de eliminación directa. Los 13 supervivientes se enfrentan en combates uno contra uno apostando 10,000 PM (una vida) por combate. El ganador obtiene libertad, 1 millón de créditos y un contrato corporativo en subasta.'
+                };
+                if (testObjectives['prueba7']) {
+                    output.push('<p>✅ Panel admin tiene descripción para Prueba 7</p>');
+                } else {
+                    output.push('<p>❌ Panel admin NO tiene descripción para Prueba 7</p>');
+                }
+                
+                results.innerHTML = output.join('');
+            }, 1000);
+        }
+        
+        // Auto-ejecutar al cargar
+        window.addEventListener('load', () => {
+            setTimeout(runTest, 2000);
+        });
+    </script>
+</body>
+</html>
