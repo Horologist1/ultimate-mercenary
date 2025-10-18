@@ -4,7 +4,7 @@
 // =======================================================================
 
 // Importar todos los archivos de mensajes contextuales
-let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES, PRUEBA4_MESSAGES, PRUEBA5_MESSAGES;
+let PRUEBA2_MESSAGES, PRUEBA3_MESSAGES, PRUEBA4_MESSAGES, PRUEBA5_MESSAGES, PRUEBA6_MESSAGES, PRUEBA7_MESSAGES;
 
 // Cargar los archivos de mensajes dinámicamente
 function loadContextualMessages() {
@@ -13,13 +13,17 @@ function loadContextualMessages() {
         loadScript('contextual-messages-p2.js'),
         loadScript('contextual-messages-p3.js'),
         loadScript('contextual-messages-p4.js'),
-        loadScript('contextual-messages-p5.js')
+        loadScript('contextual-messages-p5.js'),
+        loadScript('contextual-messages-p6.js'),
+        loadScript('contextual-messages-p7.js')
     ]).then(() => {
         // Los mensajes están ahora disponibles globalmente
         PRUEBA2_MESSAGES = window.PRUEBA2_MESSAGES;
         PRUEBA3_MESSAGES = window.PRUEBA3_MESSAGES;
         PRUEBA4_MESSAGES = window.PRUEBA4_MESSAGES;
         PRUEBA5_MESSAGES = window.PRUEBA5_MESSAGES;
+        PRUEBA6_MESSAGES = window.PRUEBA6_MESSAGES;
+        PRUEBA7_MESSAGES = window.PRUEBA7_MESSAGES;
         console.log('✅ Sistema contextual cargado completamente');
     });
 }
@@ -86,6 +90,21 @@ function getCurrentContextualMessages() {
         case 'prueba4':
             if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba4 && window.CONTEXTUAL_MESSAGES.prueba4[contextKey]) {
                 rawMessages = window.CONTEXTUAL_MESSAGES.prueba4[contextKey];
+            }
+            break;
+        case 'prueba5':
+            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba5 && window.CONTEXTUAL_MESSAGES.prueba5[contextKey]) {
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba5[contextKey];
+            }
+            break;
+        case 'prueba6':
+            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba6 && window.CONTEXTUAL_MESSAGES.prueba6[contextKey]) {
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba6[contextKey];
+            }
+            break;
+        case 'prueba7':
+            if (window.CONTEXTUAL_MESSAGES && window.CONTEXTUAL_MESSAGES.prueba7 && window.CONTEXTUAL_MESSAGES.prueba7[contextKey]) {
+                rawMessages = window.CONTEXTUAL_MESSAGES.prueba7[contextKey];
             }
             break;
         default:
@@ -293,7 +312,7 @@ function logCurrentContext() {
 function testContextualSystem() {
     console.log('🧪 Probando sistema contextual...');
     
-    const tests = ['prueba0', 'prueba1', 'prueba2', 'prueba3', 'prueba4'];
+    const tests = ['prueba0', 'prueba1', 'prueba2', 'prueba3', 'prueba4', 'prueba5', 'prueba6', 'prueba7'];
     const times = ['dia', 'noche'];
     const ratings = [5.0, 8.0];
     

@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba 7: El Torneo Final - Ultimate Mercenary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_additional.css">
+    <link rel="stylesheet" href="styles_additional_extra.css">
+    <link rel="stylesheet" href="styles_links.css">
+    <link rel="stylesheet" href="styles_tests.css">
+    <style>
+        .bracket-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+        }
+        
+        .bracket-round {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 3px solid #ff4757;
+        }
+        
+        .bracket-round h4 {
+            color: #00ffff;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        
+        .matchup {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid #333;
+            border-radius: 5px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .matchup:hover {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: #ff4757;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+        
+        .fighter {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 5px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+        }
+        
+        .fighter:hover {
+            border-color: #00ffff;
+            background: rgba(0, 204, 255, 0.1);
+        }
+        
+        .fighter-number {
+            display: inline-block;
+            background: #ff4757;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .fighter-name {
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .fighter-title {
+            color: #00ccff;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .fighter-pm {
+            color: #ffa502;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .vs-divider {
+            font-size: 2em;
+            color: #ff4757;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff4757;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .bye-match {
+            background: rgba(0, 204, 255, 0.05);
+            border-color: #00ccff;
+        }
+        
+        .bye-text {
+            color: #00ccff;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .rule-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #ff4757;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .rule-card:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.3);
+        }
+        
+        .rule-card h4 {
+            color: #ff4757;
+            margin-top: 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .stakes-box {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.2), rgba(0, 0, 0, 0.8));
+            border: 2px solid #ff4757;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .stakes-box h3 {
+            color: #ff4757;
+            font-size: 1.8em;
+            margin-top: 0;
+            text-shadow: 0 0 15px #ff4757;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .prize-amount {
+            font-size: 2.5em;
+            color: #ffa502;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ffa502;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .finalist-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .finalist-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .finalist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 204, 255, 0.4);
+            border-color: #ff4757;
+        }
+        
+        .finalist-card .fighter-number {
+            font-size: 1.3em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .winner-button {
+            padding: 8px 15px;
+            margin: 5px;
+            background: rgba(0, 204, 255, 0.2);
+            border: 1px solid #00ccff;
+            border-radius: 5px;
+            color: #00ccff;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+        
+        .winner-button:hover {
+            background: rgba(0, 204, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .winner-button.selected {
+            background: rgba(255, 71, 87, 0.4);
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+        
+        .fighter.winner {
+            border: 2px solid #ffa502;
+            background: rgba(255, 165, 2, 0.2);
+            box-shadow: 0 0 20px rgba(255, 165, 2, 0.4);
+        }
+        
+        .fighter.loser {
+            opacity: 0.4;
+            filter: grayscale(80%);
+        }
+        
+        .match-controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .reset-button {
+            padding: 6px 12px;
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid #ff4757;
+            border-radius: 5px;
+            color: #ff4757;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75em;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-button:hover {
+            background: rgba(255, 71, 87, 0.4);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="images/oce_logo.png" alt="OmniCorp Entertainment Logo" class="logo">
+                <div class="title-container">
+                    <h1>ULTIMATE MERCENARY</h1>
+                    <h2>La Forja del Acero Callejero</h2>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="index.html#facciones"><i class="fas fa-users"></i> Facciones</a></li>
+                    <li><a href="index.html#programa"><i class="fas fa-tv"></i> El Programa</a></li>
+                    <li><a href="concursantes_numerados.html"><i class="fas fa-user-secret"></i> Concursantes</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle"><i class="fas fa-gamepad"></i> Pruebas <i class="fas fa-caret-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="prueba0.html"><i class="fas fa-arrow-right"></i> Prueba 0: La Caída</a></li>
+                            <li><a href="prueba1.html"><i class="fas fa-arrow-right"></i> Prueba 1: Obstáculos</a></li>
+                            <li><a href="prueba2.html"><i class="fas fa-arrow-right"></i> Prueba 2: Cosecha</a></li>
+                            <li><a href="prueba3.html"><i class="fas fa-arrow-right"></i> Prueba 3: Entrega</a></li>
+                            <li><a href="prueba4.html"><i class="fas fa-arrow-right"></i> Prueba 4: El Baile</a></li>
+                            <li><a href="prueba5.html"><i class="fas fa-arrow-right"></i> Prueba 5: Deathmatch</a></li>
+                            <li><a href="prueba6.html"><i class="fas fa-arrow-right"></i> Prueba 6: Master Chief</a></li>
+                            <li><a href="prueba7.html"><i class="fas fa-arrow-right"></i> Prueba 7: El Torneo</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="index.html#tienda"><i class="fas fa-store"></i> Tienda de Méritos</a></li>
+                    <li><a href="character-sheet.html"><i class="fas fa-id-card"></i> Fichas</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Prueba 7: "El Torneo de la Muerte" - La Competición Final</h2>
+                </div>
+                
+                <div class="section-content">
+                    <div class="data-terminal">
+[INICIALIZANDO PROTOCOLO DE PRUEBA FINAL]
+[TEMA: COMBATE SINGULAR LETAL]
+[CONFIGURACIÓN: TORNEO DE ELIMINACIÓN DIRECTA]
+[ESTADO: BRACKETS GENERADOS]
+[ADVERTENCIA: CADA COMBATE CUESTA UNA VIDA]
+[APOSTADO: 10,000 PM POR PARTICIPANTE]
+                    </div>
+
+                    <!-- Narrativa Inmersiva -->
+                    <div class="narrative-section">
+                        <h3 class="narrative-title"><i class="fas fa-book-open"></i> El Último Escalón</h3>
+                        <div class="narrative-content">
+                            <p>El Gran Coliseo de Neo-Kyoto nunca había visto tal multitud. Trece guerreros permanecen de los cien que comenzaron. Cada uno ha derramado sangre, sudor y lágrimas para llegar hasta aquí. Ahora, bajo las luces cegadoras del escenario más grande del mundo, se enfrentarán uno contra uno en combates a muerte.</p>
+                            
+                            <div class="narrative-image">
+                                <img src="images/city_ruins.png" alt="Coliseo Final" class="test-image">
+                                <div class="image-caption">El Gran Coliseo de Neo-Kyoto, donde se forjan las leyendas</div>
+                            </div>
+                            
+                            <p>Kaiser aparece en el centro de la arena, su figura magnificada por hologramas que lo proyectan a proporciones titánicas. Su voz retumba como el trueno:</p>
+                            
+                            <blockquote class="cyberpunk-quote">
+                                "¡TRECE GUERREROS! ¡TRECE LEYENDAS! ¡TRECE ALMAS QUE HAN DESAFIADO LAS PROBABILIDADES! De cien entraron, trece permanecen. Pero solo UNO puede ascender al trono. Solo UNO puede reclamar el título de ULTIMATE MERCENARY. Solo UNO puede liberarse de las cadenas que los ataron aquí.
+                                
+                                Las reglas son simples: LUCHA. VENCE. SOBREVIVE. Cada combate es hasta la muerte, o hasta que uno se rinda... pero rendirse es morir de todas formas, solo que más lentamente. Cada participante apuesta 10,000 Puntos de Mérito, una vida completa. El ganador lo toma todo.
+                                
+                                ¡QUE COMIENCE... EL TORNEO FINAL!"
+                            </blockquote>
+                            
+                            <p>Las pantallas holográficas muestran el bracket del torneo. Los nombres brillan en neón carmesí, cada uno con su número y reputación. La audiencia, miles de millones en todo el sistema solar, contiene la respiración. Las apuestas alcanzan cifras astronómicas. El destino de estos trece se decidirá en los próximos días, combate tras combate, sangre tras sangre.</p>
+                        </div>
+                    </div>
+
+                    <div class="stakes-box">
+                        <h3><i class="fas fa-skull-crossbones"></i> LAS APUESTAS</h3>
+                        <p>Cada participante apuesta:</p>
+                        <div class="prize-amount">10,000 PM</div>
+                        <p style="color: #ff4757; font-size: 1.2em; margin-top: 10px;">UNA VIDA COMPLETA</p>
+                        <p style="color: #ccc; margin-top: 15px;">El perdedor de cada combate pierde todo. El ganador absorbe los puntos y avanza al siguiente round. Solo uno caminará libre del Coliseo.</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4><i class="fas fa-exclamation-triangle"></i> ADVERTENCIA CORPORATIVA</h4>
+                        <p>Esta es la prueba definitiva. No hay rescates médicos hasta que un combatiente quede incapacitado o muerto. Las reglas del combate son simples: no hay reglas. Armas, implantes, venenos, trampas... todo está permitido. La única ley es la victoria.</p>
+                    </div>
+
+                    <h3>// LOS TRECE FINALISTAS</h3>
+                    <div class="finalist-showcase">
+                        <div class="finalist-card">
+                            <span class="fighter-number">#13</span>
+                            <div class="fighter-name">XIII</div>
+                            <div class="fighter-title">La Protagonista</div>
+                            <div class="fighter-pm">109,209 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#89</span>
+                            <div class="fighter-name">Raven</div>
+                            <div class="fighter-title">Asesina Silenciosa</div>
+                            <div class="fighter-pm">91,522 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#76</span>
+                            <div class="fighter-name">Old Man</div>
+                            <div class="fighter-title">Veterano Cínico</div>
+                            <div class="fighter-pm">88,765 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#31</span>
+                            <div class="fighter-name">Chispa</div>
+                            <div class="fighter-title">Mecánica Optimista</div>
+                            <div class="fighter-pm">79,221 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#53</span>
+                            <div class="fighter-name">Oracle</div>
+                            <div class="fighter-title">Tecno-Sacerdotisa</div>
+                            <div class="fighter-pm">70,614 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#71</span>
+                            <div class="fighter-name">Titan</div>
+                            <div class="fighter-title">Soldado Aumentado</div>
+                            <div class="fighter-pm">52,100 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#37</span>
+                            <div class="fighter-name">Echo</div>
+                            <div class="fighter-title">Francotiradora Fantasma</div>
+                            <div class="fighter-pm">50,222 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#68</span>
+                            <div class="fighter-name">Thunder Fist</div>
+                            <div class="fighter-title">Campeón Clandestino</div>
+                            <div class="fighter-pm">40,513 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#45</span>
+                            <div class="fighter-name">Viper</div>
+                            <div class="fighter-title">Samurái Callejera</div>
+                            <div class="fighter-pm">40,000 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#23</span>
+                            <div class="fighter-name">Jinx</div>
+                            <div class="fighter-title">Psicópata Impredecible</div>
+                            <div class="fighter-pm">40,001 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#37</span>
+                            <div class="fighter-name">Concursante #37</div>
+                            <div class="fighter-title">Misterioso</div>
+                            <div class="fighter-pm">28,102 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#07</span>
+                            <div class="fighter-name">El Asesino</div>
+                            <div class="fighter-title">Sombra Corporativa</div>
+                            <div class="fighter-pm">20,001 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#82</span>
+                            <div class="fighter-name">Los Gemelos</div>
+                            <div class="fighter-title">Jin & Jun</div>
+                            <div class="fighter-pm">10,000 PM</div>
+                        </div>
+                        <div class="finalist-card">
+                            <span class="fighter-number">#88</span>
+                            <div class="fighter-name">Berserker</div>
+                            <div class="fighter-title">Furia Implantada</div>
+                            <div class="fighter-pm">10,000 PM</div>
+                        </div>
+                    </div>
+
+                    <h3>// REGLAS DEL TORNEO</h3>
+                    <div class="rules-grid">
+                        <div class="rule-card">
+                            <h4><i class="fas fa-sword"></i> Combate Letal</h4>
+                            <p>Cada enfrentamiento es a muerte o hasta rendición. No hay combates amistosos. La rendición equivale a la muerte diferida.</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4><i class="fas fa-coins"></i> Apuesta Obligatoria</h4>
+                            <p>Cada participante apuesta 10,000 PM por combate. El perdedor pierde todo. El ganador absorbe los puntos del derrotado.</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4><i class="fas fa-shield-alt"></i> Sin Restricciones</h4>
+                            <p>Armas, implantes, venenos, trampas, alianzas previas... todo está permitido. La única regla es sobrevivir.</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4><i class="fas fa-clock"></i> Sin Límite de Tiempo</h4>
+                            <p>Los combates continúan hasta que haya un ganador claro. No hay empates. No hay aplazamientos.</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4><i class="fas fa-heartbeat"></i> Intervención Médica</h4>
+                            <p>Los equipos médicos solo intervienen después de declarar un ganador, o para confirmar una muerte.</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4><i class="fas fa-trophy"></i> El Premio Final</h4>
+                            <p>El ganador absoluto obtiene libertad completa, todos sus PM acumulados, y un contrato corporativo de élite.</p>
+                        </div>
+                    </div>
+
+                    <h3>// ESTRUCTURA DEL BRACKET</h3>
+                    <p style="color: #00ccff; font-style: italic; text-align: center; margin: 20px 0;">
+                        Con 13 participantes, algunos avanzan directamente a rondas posteriores según su ranking de PM.
+                    </p>
+
+                    <div class="bracket-container">
+                        <!-- PRIMERA RONDA -->
+                        <div class="bracket-round">
+                            <h4><i class="fas fa-fire"></i> Primera Ronda - 8 Combates</h4>
+                            
+                            <div class="matchup" data-match="r1-1">
+                                <div class="fighter" data-fighter="88">
+                                    <div><span class="fighter-number">#88</span><span class="fighter-name">Berserker</span></div>
+                                    <div class="fighter-title">Furia Implantada</div>
+                                    <div class="fighter-pm">10,000 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-1', '88', 'Berserker')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" data-fighter="82">
+                                    <div><span class="fighter-number">#82</span><span class="fighter-name">Los Gemelos</span></div>
+                                    <div class="fighter-title">Jin & Jun - Sincronizados</div>
+                                    <div class="fighter-pm">10,000 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-1', '82', 'Los Gemelos')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="match-controls">
+                                <button class="reset-button" onclick="resetMatch('r1-1')">
+                                    <i class="fas fa-undo"></i> Resetear Combate
+                                </button>
+                            </div>
+
+                            <div class="matchup" data-match="r1-2">
+                                <div class="fighter" data-fighter="07">
+                                    <div><span class="fighter-number">#07</span><span class="fighter-name">El Asesino</span></div>
+                                    <div class="fighter-title">Sombra Corporativa</div>
+                                    <div class="fighter-pm">20,001 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-2', '07', 'El Asesino')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" data-fighter="23">
+                                    <div><span class="fighter-number">#23</span><span class="fighter-name">Jinx</span></div>
+                                    <div class="fighter-title">Psicópata Impredecible</div>
+                                    <div class="fighter-pm">15,000 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-2', '23', 'Jinx')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="match-controls">
+                                <button class="reset-button" onclick="resetMatch('r1-2')">
+                                    <i class="fas fa-undo"></i> Resetear Combate
+                                </button>
+                            </div>
+
+                            <div class="matchup" data-match="r1-3">
+                                <div class="fighter" data-fighter="45">
+                                    <div><span class="fighter-number">#45</span><span class="fighter-name">Viper</span></div>
+                                    <div class="fighter-title">Samurái Callejera</div>
+                                    <div class="fighter-pm">40,000 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-3', '45', 'Viper')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" data-fighter="68">
+                                    <div><span class="fighter-number">#68</span><span class="fighter-name">Thunder Fist</span></div>
+                                    <div class="fighter-title">Campeón Clandestino</div>
+                                    <div class="fighter-pm">40,513 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-3', '68', 'Thunder Fist')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="match-controls">
+                                <button class="reset-button" onclick="resetMatch('r1-3')">
+                                    <i class="fas fa-undo"></i> Resetear Combate
+                                </button>
+                            </div>
+
+                            <div class="matchup" data-match="r1-4">
+                                <div class="fighter" data-fighter="37">
+                                    <div><span class="fighter-number">#37</span><span class="fighter-name">Echo</span></div>
+                                    <div class="fighter-title">Francotiradora Fantasma</div>
+                                    <div class="fighter-pm">50,222 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-4', '37', 'Echo')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" data-fighter="71">
+                                    <div><span class="fighter-number">#71</span><span class="fighter-name">Titan</span></div>
+                                    <div class="fighter-title">Soldado Aumentado</div>
+                                    <div class="fighter-pm">52,100 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-4', '71', 'Titan')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="match-controls">
+                                <button class="reset-button" onclick="resetMatch('r1-4')">
+                                    <i class="fas fa-undo"></i> Resetear Combate
+                                </button>
+                            </div>
+
+                            <div class="matchup" data-match="r1-5">
+                                <div class="fighter" data-fighter="53">
+                                    <div><span class="fighter-number">#53</span><span class="fighter-name">Oracle</span></div>
+                                    <div class="fighter-title">Tecno-Sacerdotisa</div>
+                                    <div class="fighter-pm">70,614 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-5', '53', 'Oracle')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" data-fighter="31">
+                                    <div><span class="fighter-number">#31</span><span class="fighter-name">Chispa</span></div>
+                                    <div class="fighter-title">Mecánica Optimista</div>
+                                    <div class="fighter-pm">79,221 PM</div>
+                                    <button class="winner-button" onclick="selectWinner('r1-5', '31', 'Chispa')">
+                                        <i class="fas fa-check-circle"></i> Ganador
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="match-controls">
+                                <button class="reset-button" onclick="resetMatch('r1-5')">
+                                    <i class="fas fa-undo"></i> Resetear Combate
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- SEGUNDA RONDA -->
+                        <div class="bracket-round">
+                            <h4><i class="fas fa-bolt"></i> Segunda Ronda - Cuartos de Final</h4>
+                            
+                            <div class="matchup">
+                                <div class="fighter">
+                                    <div><span class="fighter-number">#76</span><span class="fighter-name">Old Man</span></div>
+                                    <div class="fighter-title">Veterano Cínico</div>
+                                    <div class="fighter-pm">88,765 PM</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" id="qf-1-winner">
+                                    <div class="fighter-name">Ganador #88 vs #82</div>
+                                    <div class="fighter-title">Primera Ronda - Combate 1</div>
+                                </div>
+                            </div>
+
+                            <div class="matchup">
+                                <div class="fighter">
+                                    <div><span class="fighter-number">#89</span><span class="fighter-name">Raven</span></div>
+                                    <div class="fighter-title">Asesina Silenciosa</div>
+                                    <div class="fighter-pm">91,522 PM</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" id="qf-2-winner">
+                                    <div class="fighter-name">Ganador #07 vs #23</div>
+                                    <div class="fighter-title">Primera Ronda - Combate 2</div>
+                                </div>
+                            </div>
+
+                            <div class="matchup">
+                                <div class="fighter">
+                                    <div><span class="fighter-number">#13</span><span class="fighter-name">XIII</span></div>
+                                    <div class="fighter-title">La Protagonista</div>
+                                    <div class="fighter-pm">109,209 PM</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" id="qf-3-winner">
+                                    <div class="fighter-name">Ganador #45 vs #68</div>
+                                    <div class="fighter-title">Primera Ronda - Combate 3</div>
+                                </div>
+                            </div>
+
+                            <div class="matchup">
+                                <div class="fighter" id="qf-4-left">
+                                    <div class="fighter-name">Ganador #37 vs #71</div>
+                                    <div class="fighter-title">Primera Ronda - Combate 4</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter" id="qf-4-right">
+                                    <div class="fighter-name">Ganador #53 vs #31</div>
+                                    <div class="fighter-title">Primera Ronda - Combate 5</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEMIFINALES -->
+                        <div class="bracket-round">
+                            <h4><i class="fas fa-crown"></i> Semifinales</h4>
+                            
+                            <div class="matchup">
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador QF1</div>
+                                    <div class="fighter-title">Cuartos de Final - Combate 1</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador QF2</div>
+                                    <div class="fighter-title">Cuartos de Final - Combate 2</div>
+                                </div>
+                            </div>
+
+                            <div class="matchup">
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador QF3</div>
+                                    <div class="fighter-title">Cuartos de Final - Combate 3</div>
+                                </div>
+                                <div class="vs-divider">VS</div>
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador QF4</div>
+                                    <div class="fighter-title">Cuartos de Final - Combate 4</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FINAL -->
+                        <div class="bracket-round" style="border-left-color: #ffa502;">
+                            <h4 style="color: #ffa502; font-size: 1.5em;"><i class="fas fa-trophy"></i> GRAN FINAL</h4>
+                            
+                            <div class="matchup" style="background: rgba(255, 165, 2, 0.1); border-color: #ffa502;">
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador Semifinal 1</div>
+                                    <div class="fighter-title">El Último Obstáculo</div>
+                                </div>
+                                <div class="vs-divider" style="color: #ffa502; text-shadow: 0 0 10px #ffa502;">VS</div>
+                                <div class="fighter">
+                                    <div class="fighter-name">Ganador Semifinal 2</div>
+                                    <div class="fighter-title">La Última Esperanza</div>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(255, 165, 2, 0.1); border-radius: 10px;">
+                                <h4 style="color: #ffa502; font-size: 1.8em; margin: 0;">ULTIMATE MERCENARY</h4>
+                                <p style="color: #fff; font-size: 1.2em; margin: 10px 0;">El Único Superviviente</p>
+                                <p style="color: #00ccff; font-style: italic;">Libertad • Gloria • Inmortalidad</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>// MECÁNICAS DE COMBATE</h3>
+                    <div class="data-terminal">
+[CONFIGURACIÓN DE ARENA: ADAPTATIVA]
+[CADA COMBATE TIENE UN ESCENARIO ÚNICO]
+[TERRENOS DISPONIBLES: URBANO / INDUSTRIAL / NATURAL / ESPACIAL]
+[MODIFICADORES AMBIENTALES: ACTIVOS]
+[TRAMPAS DINÁMICAS: HABILITADAS]
+[ARSENAL COMPLETO: DISPONIBLE EN ARENA]
+                    </div>
+
+                    <ul class="cyberpunk-list">
+                        <li><strong>Escenarios Adaptativos:</strong> Cada combate ocurre en un entorno único generado por los algoritmos de OCE</li>
+                        <li><strong>Arsenal Disponible:</strong> Armas cuerpo a cuerpo, armas de fuego, explosivos y equipamiento táctico esparcidos por la arena</li>
+                        <li><strong>Modificadores Ambientales:</strong> Gravedad alterada, tormentas eléctricas, radiación, temperaturas extremas</li>
+                        <li><strong>Trampas Activables:</strong> Ambos combatientes pueden activar trampas letales contra su oponente</li>
+                        <li><strong>Sin Asistencia Externa:</strong> Ningún aliado, ningún coach, solo tú y tu enemigo</li>
+                        <li><strong>Streaming en Vivo:</strong> Cada combate transmitido a billones de espectadores en tiempo real</li>
+                    </ul>
+
+                    <h3>// EL PREMIO FINAL</h3>
+                    <div class="stakes-box">
+                        <h3><i class="fas fa-star"></i> EL GANADOR RECIBE</h3>
+                        <ul style="text-align: left; max-width: 600px; margin: 20px auto; color: #fff; font-size: 1.1em;">
+                            <li><i class="fas fa-unlock"></i> <strong>Libertad Total:</strong> Cancelación de todas las deudas y obligaciones</li>
+                            <li><i class="fas fa-coins"></i> <strong>1 Millón de Créditos:</strong> Pago garantizado en efectivo</li>
+                            <li><i class="fas fa-wallet"></i> <strong>Todos los PM Acumulados:</strong> Convertibles a créditos adicionales</li>
+                            <li><i class="fas fa-briefcase"></i> <strong>Contrato de Élite en Subasta:</strong> Los patrocinadores corporativos pujan por tus servicios</li>
+                            <li><i class="fas fa-shield-alt"></i> <strong>Protección Corporativa:</strong> Inmunidad legal completa del patrocinador ganador</li>
+                            <li><i class="fas fa-crown"></i> <strong>Fama Eterna:</strong> Tu nombre en la historia del entretenimiento</li>
+                            <li><i class="fas fa-heartbeat"></i> <strong>Restauración Completa:</strong> Tratamiento médico de última generación para todas las heridas</li>
+                        </ul>
+                    </div>
+
+                    <div class="data-terminal">
+[INICIALIZANDO PROTOCOLO DE TORNEO]
+[SISTEMAS MÉDICOS DE EMERGENCIA: ACTIVOS]
+[AUDIENCIA PROYECTADA: 6.8 BILLONES DE ESPECTADORES]
+[APUESTAS TOTALES: 847 BILLONES DE CRÉDITOS]
+[PROTOCOLOS DE EXTRACCIÓN: STANDBY]
+[PREPARACIÓN DE ESCENARIOS: EN PROGRESO]
+
+INICIANDO TRANSMISIÓN: "EL TORNEO DE LA MUERTE"
+RATING PROYECTADO: 10/10
+RIESGO DE MORTALIDAD: ABSOLUTO
+VALOR HISTÓRICO: INCALCULABLE
+
+QUE COMIENCE... EL ÚLTIMO COMBATE
+                    </div>
+
+                    <div class="warning-box" style="margin-top: 30px;">
+                        <h4><i class="fas fa-heart-broken"></i> NOTA FINAL DE KAISER</h4>
+                        <blockquote class="cyberpunk-quote" style="border-left-color: #ffa502;">
+                            "De cien entraron. Trece permanecen. Solo uno saldrá. Esta es la naturaleza del Ultimate Mercenary. No buscamos al más fuerte, ni al más rápido, ni al más inteligente. Buscamos al más COMPLETO. Al que puede adaptarse, sobrevivir, y triunfar contra todo pronóstico.
+                            
+                            A los trece que quedan: han llegado más lejos de lo que nadie esperaba. Han demostrado valor más allá de toda medida. Pero ahora... ahora deben demostrar que están dispuestos a pagar el precio final por la libertad.
+                            
+                            Que los dioses del acero y el neón los favorezcan. ¡QUE COMIENCE EL TORNEO!"
+                        </blockquote>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>&copy; 2127 OmniCorp Entertainment. Todos los derechos reservados.</p>
+                <p>Ultimate Mercenary es una marca registrada de OmniCorp Entertainment.</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-shield-alt"></i> Términos de Servicio</a>
+                    <a href="#"><i class="fas fa-user-secret"></i> Política de Privacidad</a>
+                    <a href="#"><i class="fas fa-exclamation-triangle"></i> Descargo de Responsabilidad</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Volver arriba" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+    <script src="widgets.js"></script>
+    <script>
+        // Sistema de gestión de torneo
+        const tournamentState = {
+            winners: {}
+        };
+
+        function selectWinner(matchId, fighterId, fighterName) {
+            const match = document.querySelector(`[data-match="${matchId}"]`);
+            if (!match) return;
+
+            // Obtener todos los fighters en este match
+            const fighters = match.querySelectorAll('.fighter');
+            const buttons = match.querySelectorAll('.winner-button');
+
+            // Limpiar estados previos
+            fighters.forEach(f => {
+                f.classList.remove('winner', 'loser');
+            });
+            buttons.forEach(b => {
+                b.classList.remove('selected');
+            });
+
+            // Marcar ganador y perdedor
+            fighters.forEach(fighter => {
+                if (fighter.dataset.fighter === fighterId) {
+                    fighter.classList.add('winner');
+                    fighter.querySelector('.winner-button').classList.add('selected');
+                } else {
+                    fighter.classList.add('loser');
+                }
+            });
+
+            // Guardar el ganador en el estado
+            tournamentState.winners[matchId] = {
+                id: fighterId,
+                name: fighterName
+            };
+
+            // Actualizar siguiente ronda si aplica
+            updateNextRound(matchId, fighterId, fighterName);
+
+            // Guardar en localStorage
+            localStorage.setItem('tournamentState', JSON.stringify(tournamentState));
+
+            console.log(`Ganador del match ${matchId}: #${fighterId} ${fighterName}`);
+        }
+
+        function resetMatch(matchId) {
+            const match = document.querySelector(`[data-match="${matchId}"]`);
+            if (!match) return;
+
+            // Limpiar todos los fighters
+            const fighters = match.querySelectorAll('.fighter');
+            const buttons = match.querySelectorAll('.winner-button');
+
+            fighters.forEach(f => {
+                f.classList.remove('winner', 'loser');
+            });
+            buttons.forEach(b => {
+                b.classList.remove('selected');
+            });
+
+            // Eliminar del estado
+            delete tournamentState.winners[matchId];
+
+            // Limpiar siguiente ronda
+            clearNextRound(matchId);
+
+            // Guardar en localStorage
+            localStorage.setItem('tournamentState', JSON.stringify(tournamentState));
+
+            console.log(`Match ${matchId} reseteado`);
+        }
+
+        function updateNextRound(matchId, fighterId, fighterName) {
+            // Mapeo de matches a sus siguientes rounds
+            const nextRoundMap = {
+                'r1-1': 'qf-1-winner',
+                'r1-2': 'qf-2-winner',
+                'r1-3': 'qf-3-winner',
+                'r1-4': 'qf-4-left',
+                'r1-5': 'qf-4-right'
+            };
+
+            const nextMatchId = nextRoundMap[matchId];
+            if (!nextMatchId) return;
+
+            const nextFighter = document.getElementById(nextMatchId);
+            if (nextFighter) {
+                nextFighter.innerHTML = `
+                    <div><span class="fighter-number">#${fighterId}</span> <span class="fighter-name">${fighterName}</span></div>
+                    <div class="fighter-title">Ganador ${matchId.toUpperCase()}</div>
+                `;
+                
+                // Añadir efecto visual de actualización
+                nextFighter.style.border = '2px solid #00ccff';
+                nextFighter.style.background = 'rgba(0, 204, 255, 0.1)';
+                setTimeout(() => {
+                    nextFighter.style.border = '';
+                    nextFighter.style.background = '';
+                }, 2000);
+            }
+        }
+
+        function clearNextRound(matchId) {
+            const nextRoundMap = {
+                'r1-1': 'qf-1-winner',
+                'r1-2': 'qf-2-winner',
+                'r1-3': 'qf-3-winner',
+                'r1-4': 'qf-4-left',
+                'r1-5': 'qf-4-right'
+            };
+            
+            const matchLabels = {
+                'r1-1': '#88 vs #82',
+                'r1-2': '#07 vs #23',
+                'r1-3': '#45 vs #68',
+                'r1-4': '#37 vs #71',
+                'r1-5': '#53 vs #31'
+            };
+
+            const nextMatchId = nextRoundMap[matchId];
+            if (!nextMatchId) return;
+
+            const nextFighter = document.getElementById(nextMatchId);
+            if (nextFighter) {
+                const label = matchLabels[matchId] || matchId.toUpperCase();
+                nextFighter.innerHTML = `
+                    <div class="fighter-name">Ganador ${label}</div>
+                    <div class="fighter-title">Primera Ronda - Combate ${matchId.split('-')[1]}</div>
+                `;
+            }
+        }
+
+        function resetAllMatches() {
+            if (confirm('¿Estás seguro de que quieres resetear todo el torneo?')) {
+                // Resetear todos los matches
+                Object.keys(tournamentState.winners).forEach(matchId => {
+                    resetMatch(matchId);
+                });
+
+                // Limpiar localStorage
+                localStorage.removeItem('tournamentState');
+
+                alert('Torneo reseteado completamente');
+            }
+        }
+
+        // Cargar estado guardado al cargar la página
+        window.addEventListener('load', function() {
+            const savedState = localStorage.getItem('tournamentState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                Object.assign(tournamentState, state);
+
+                // Restaurar estado visual
+                Object.entries(tournamentState.winners).forEach(([matchId, winner]) => {
+                    selectWinner(matchId, winner.id, winner.name);
+                });
+
+                console.log('Estado del torneo restaurado desde localStorage');
+            }
+        });
+    </script>
+</body>
+</html>
+
