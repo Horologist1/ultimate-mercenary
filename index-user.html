@@ -1672,6 +1672,14 @@
             console.error('Objective modal not found!');
             return;
         }
+        
+        // Si es Prueba 7, mostrar el esquema del torneo
+        if (currentTestKey === 'prueba7') {
+            showTournamentBracket();
+            modal.style.display = 'block';
+            return;
+        }
+        
         fetch(`prueba${currentTestKey.replace('prueba','')}.html`)
             .then(res => res.text())
             .then(html => {
@@ -1696,6 +1704,195 @@
         modal.style.display = 'block';
     }
     window.showObjectiveModal = showObjectiveModal;
+
+    // Función para mostrar el esquema del torneo en el modal
+    function showTournamentBracket() {
+        const tournamentHTML = `
+            <div class="tournament-bracket-modal" style="
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                font-family: 'Orbitron', monospace;
+                max-height: 80vh;
+                overflow-y: auto;
+            ">
+                <h2 style="color: #00ccff; text-align: center; margin-bottom: 20px; text-shadow: 0 0 10px #00ccff;">
+                    🏆 TORNEO DE ELIMINACIÓN DIRECTA 🏆
+                </h2>
+                
+                <div style="text-align: center; margin-bottom: 20px; color: #ff6b6b;">
+                    <strong>13 SUPERVIVIENTES • 10,000 PM POR COMBATE • ELIMINACIÓN DIRECTA</strong>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                    <!-- PRIMERA RONDA -->
+                    <div class="round" style="flex: 1; min-width: 300px;">
+                        <h3 style="color: #ffd700; text-align: center; margin-bottom: 15px;">PRIMERA RONDA</h3>
+                        <div class="matches" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="match" style="background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #00ccff; font-weight: bold;">#88 Berserker</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div style="color: #00ccff; font-weight: bold;">#82 Los Gemelos</div>
+                                    </div>
+                                    <button onclick="selectWinner('r1-1', '88', 'Berserker')" style="
+                                        background: #00ccff; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #00ccff; font-weight: bold;">#07 El Asesino</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div style="color: #00ccff; font-weight: bold;">#23 Jinx</div>
+                                    </div>
+                                    <button onclick="selectWinner('r1-2', '07', 'El Asesino')" style="
+                                        background: #00ccff; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #00ccff; font-weight: bold;">#45 Viper</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div style="color: #00ccff; font-weight: bold;">#68 Thunder Fist</div>
+                                    </div>
+                                    <button onclick="selectWinner('r1-3', '45', 'Viper')" style="
+                                        background: #00ccff; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #00ccff; font-weight: bold;">#37 Echo</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div style="color: #00ccff; font-weight: bold;">#71 Titan</div>
+                                    </div>
+                                    <button onclick="selectWinner('r1-4', '37', 'Echo')" style="
+                                        background: #00ccff; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(0, 204, 255, 0.1); border: 1px solid #00ccff; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #00ccff; font-weight: bold;">#53 Oracle</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div style="color: #00ccff; font-weight: bold;">#31 Chispa</div>
+                                    </div>
+                                    <button onclick="selectWinner('r1-5', '53', 'Oracle')" style="
+                                        background: #00ccff; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CUARTOS DE FINAL -->
+                    <div class="round" style="flex: 1; min-width: 300px;">
+                        <h3 style="color: #ffd700; text-align: center; margin-bottom: 15px;">CUARTOS DE FINAL</h3>
+                        <div class="matches" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="match" style="background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #ffd700; font-weight: bold;">#76 Old Man</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div id="qf-1-winner" style="color: #ffd700; font-weight: bold;">Ganador R1-1</div>
+                                    </div>
+                                    <button onclick="selectWinner('qf-1', '76', 'Old Man')" style="
+                                        background: #ffd700; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #ffd700; font-weight: bold;">#89 Raven</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div id="qf-2-winner" style="color: #ffd700; font-weight: bold;">Ganador R1-2</div>
+                                    </div>
+                                    <button onclick="selectWinner('qf-2', '89', 'Raven')" style="
+                                        background: #ffd700; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="color: #ffd700; font-weight: bold;">#13 XIII</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div id="qf-3-winner" style="color: #ffd700; font-weight: bold;">Ganador R1-3</div>
+                                    </div>
+                                    <button onclick="selectWinner('qf-3', '13', 'XIII')" style="
+                                        background: #ffd700; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                            
+                            <div class="match" style="background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px; padding: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div id="qf-4-left" style="color: #ffd700; font-weight: bold;">Ganador R1-4</div>
+                                        <div style="color: #fff; font-size: 0.9em;">vs</div>
+                                        <div id="qf-4-right" style="color: #ffd700; font-weight: bold;">Ganador R1-5</div>
+                                    </div>
+                                    <button onclick="selectWinner('qf-4', 'winner', 'Ganador')" style="
+                                        background: #ffd700; color: #000; border: none; padding: 5px 10px; 
+                                        border-radius: 4px; cursor: pointer; font-weight: bold;
+                                    ">Ganador</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PREMIOS -->
+                <div style="margin-top: 20px; text-align: center; background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; border-radius: 8px; padding: 15px;">
+                    <h3 style="color: #ff0000; margin-bottom: 10px;">🏆 PREMIOS DEL GANADOR 🏆</h3>
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
+                        <div style="color: #00ff00; font-weight: bold;">💰 1 MILLÓN DE CRÉDITOS</div>
+                        <div style="color: #00ff00; font-weight: bold;">🔓 LIBERTAD TOTAL</div>
+                        <div style="color: #00ff00; font-weight: bold;">📜 CONTRATO CORPORATIVO</div>
+                        <div style="color: #00ff00; font-weight: bold;">⭐ TODOS LOS PM ACUMULADOS</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center; color: #ff6b6b; font-size: 0.9em;">
+                    <strong>⚠️ Cada combate apuesta 10,000 PM (una vida) ⚠️</strong>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('objective-modal-description').innerHTML = tournamentHTML;
+    }
+    
+    // Función para seleccionar ganadores (simplificada para el modal)
+    function selectWinner(matchId, fighterId, fighterName) {
+        console.log(`Ganador del match ${matchId}: #${fighterId} ${fighterName}`);
+        alert(`¡#${fighterId} ${fighterName} avanza al siguiente round!`);
+    }
+    
+    window.showTournamentBracket = showTournamentBracket;
+    window.selectWinner = selectWinner;
 
     // Exponer funciones de UI globalmente para los listeners de Firebase
     if (typeof updateStatusPanel === 'function') window.updateStatusPanel = updateStatusPanel;
